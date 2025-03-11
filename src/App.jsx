@@ -8,7 +8,7 @@ import About_Sarawak from './Pages/customer/About_Sarawak/about_sarawak';
 import Product from './Pages/customer/Product/product';
 import PropertyDetails from './Pages/customer/PropertyDetails/PropertyDetails';
 import Cart from './Pages/customer/Cart/cart';
-import About_Us from './Pages/customer/About_Us/About_Us';
+import About_Us from './Pages/customer/About_us/About_Us';
 import NoAccess from './Component/NoAccess/NoAccess';
 import Error from './Component/Error_404/Error';
 import Profile from './Pages/customer/Profile/Profile';
