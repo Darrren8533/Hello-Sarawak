@@ -1,0 +1,17 @@
+.role-badge {
+  padding: 2px 6px;
+  border-radius: 5px;
+  color: #333; 
+  font-weight: bold;
+  font-size: 12px; 
+}
+
+.administrator {
+  background-color: #C1F0C1; 
+  color: #333; 
+}
+
+.moderator {
+  background-color: #FFE9A3; 
+  color: #333; 
+}

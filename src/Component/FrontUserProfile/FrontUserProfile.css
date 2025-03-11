@@ -1,0 +1,163 @@
+.front-profile-container {
+    display: flex;
+    padding: 40px;
+    justify-content: center;
+}
+
+.front-profile-layout {
+    display: flex;
+    width: 100%;
+    max-width: 1000px;
+}
+
+.front-sidebar-card {
+    width: 300px;
+    background-color: #f8f9fa;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-right: 30px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: sticky;
+    top: 40px;
+    height: fit-content;
+}
+
+.front-tab {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    cursor: pointer;
+    border: none;
+    text-align: left;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.front-tab:hover {
+    background-color: #e9ecef;
+}
+
+.front-tab-icon {
+    margin-right: 10px;
+}
+
+.front-tab.active {
+    background: #CC8C18;
+    color: white;
+}
+
+.front-content-card {
+    flex: 1;
+    padding: 10px;
+    overflow: auto;
+}
+
+.front-content-card h2 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.front-profile-field {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    border-bottom: 1px solid #ccc;
+    padding: 30px 30px;
+}
+
+.front-field-label {
+    font-weight: bold;
+    color: #333;
+    flex: 1;
+    margin:10px;
+}
+
+.front-field-value {
+    color: #555;
+    flex: 2;
+    text-align: left;
+}
+
+.front-edit-link {
+    color: #CC8C18;
+    text-decoration: underline;
+    cursor: pointer;
+    flex: 1;
+    text-align: right;
+}
+
+.front-edit-section {
+    margin-top: 30px;
+    text-align: right;
+    position: relative;
+    border-bottom: 1px solid #ccc;
+    z-index: 1;
+}
+
+.front-edit-section input {
+    width: calc(100% - 20px);
+    padding: 12px;
+    margin-bottom: 25px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.front-edit-section button {
+    padding: 9px 20px;
+    margin-right: 12px;
+    margin-bottom: 20px;
+    background: #CC8C18;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+}
+
+.front-edit-section button:hover {
+    background-color: #653600;
+    color: white;
+}
+
+.front-edit-section .country-dropdown {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: white;
+    font-size: 14px;
+    color: #333;
+}
+
+.front-edit-section .country-dropdown:focus {
+    border-color: #007BFF;
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.front-avatar-section {
+    display: flex;
+    align-items: center;
+}
+
+.front-avatar-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-right: 15px;
+}
+
+.front-eye-icon {
+    position: relative;
+    right: 30px;
+    top: 50%;
+    cursor: pointer;
+    color: #CC8C18;
+    z-index: 1;
+}

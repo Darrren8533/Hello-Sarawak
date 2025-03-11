@@ -1,0 +1,254 @@
+.back-profile-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 70vh;
+    padding: 20px;
+}
+
+.back-profile-grid {
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.back-profile-left-column {
+    flex: none;
+    width: 350px;
+    background: #ffffff;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.back-profile-avatar-wrapper {
+    position: relative;
+    width: 130px;
+    height: 130px;
+}
+
+.back-profile-avatar-image {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #ddd;
+}
+
+.back-profile-camera-icon {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: var(--primaryColor);
+    color: white;
+    border-radius: 50%;
+    padding: 6px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 35px;
+    height: 35px;
+    border: 2px solid white;
+}
+
+.back-profile-camera-icon:hover {
+    background: var(--hoverColor);
+    color: var(--blackColor);
+}
+
+.back-user-name h2 {
+    font-size: 22px;
+    margin: 15px 0 10px;
+    color: #333;
+}
+
+.back-profile-save-avatar-button {
+    background-color: var(--primaryColor);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 15px;
+}
+
+.back-profile-save-avatar-button:hover {
+    background: var(--hoverColor);
+    color: var(--blackColor);
+}
+
+.back-profile-right-column {
+    flex: 1;
+    width: 100%;
+    min-width: 500px;
+    padding: 30px;
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.back-profile-tabs {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 2px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.back-profile-tab-button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+    color: #666;
+    transition: color 0.3s ease;
+}
+
+.back-profile-tab-button.active {
+    color: var(--primaryColor);
+    font-weight: bold;
+    border-bottom: 3px solid var(--primaryColor);
+}
+
+.back-profile-tab-content {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.back-profile-tab-content::-webkit-scrollbar {
+    width: 5px;
+}
+
+.back-profile-tab-content::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 5px;
+}
+
+.back-profile-tab-content::-webkit-scrollbar-thumb:hover {
+    background: #aaa;
+}
+
+.back-profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.back-profile-form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.back-profile-form-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.back-profile-form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.back-profile-form-group input,
+.back-profile-form-group select {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+.back-profile-form-group input:focus,
+.back-profile-form-group select:focus {
+    border-color: #007bff;
+}
+
+/* Update Buttons */
+.back-profile-update-button {
+    background-color: var(--primaryColor);
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    width: 100%;
+}
+
+.back-profile-update-button:hover {
+    background: var(--hoverColor);
+    color: var(--blackColor);
+}
+
+.back-password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.back-password-input {
+    padding-right: 30px;
+    box-sizing: border-box;
+    flex: 1;
+}
+
+.back-password-toggle-icon {
+    font-size: 16px;
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.3s ease;
+    z-index: 1;
+}
+
+.back-password-toggle-icon:hover {
+    color: #333;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 900px) {
+    .back-profile-grid {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .back-profile-left-column {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .back-profile-right-column {
+        width: 100%;
+    }
+
+    .back-profile-tab-button {
+        font-size: 13px;
+        padding: 8px;
+    }
+
+    .back-profile-form-row {
+        flex-direction: column;
+    }
+}

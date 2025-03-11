@@ -1,0 +1,76 @@
+/* src/components/ConfirmDialog.css */
+
+.alert-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .alert-dialog {
+    background: white;
+    padding: 50px;
+    width: 600px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+  }
+  
+  .alert-icon {
+    font-size: 90px;
+    color: red;
+    margin-bottom: 10px;
+  }
+  
+  .alert-title {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .alert-message {
+    margin-bottom: 20px;
+    color: #555;
+    font-size: 1.4rem;
+  }
+  
+  .alert-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+  
+  .alert-button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1.3rem;
+  }
+  
+  .alert-button.confirm {
+    background-color: var(--primaryColor);
+    color: white;
+  }
+  
+  .alert-button.cancel {
+    background-color: #7b8a8b;
+    color: white;
+  }
+  
+  .alert-button.confirm:hover {
+    background: var(--hoverColor);
+    color: var(--blackColor); 
+  }
+  
+  .alert-button.cancel:hover {
+    background-color: #6b7a7b; 
+  }
+  

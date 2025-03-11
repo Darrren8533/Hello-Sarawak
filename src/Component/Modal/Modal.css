@@ -1,0 +1,138 @@
+.image-slideshow {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.image-slideshow-image {
+  width: 100%;
+  max-width: 500px;
+  max-height: 200px;
+  min-width: 200px;
+  min-height: 200px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+
+.image-slideshow-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px !important;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  color: white;
+  font-size: 1.5rem;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: background-color 0.3s;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.image-slideshow-button.left {
+  left: 0;
+}
+
+.image-slideshow-button.right {
+  right: 0;
+}
+
+.close-button {
+  background-color: red;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px;
+  margin-top: 20px;
+  display: block;
+  width: 100%;
+  text-align: center;
+}
+
+.close-button:hover {
+  background-color: darkred;
+}
+
+/* Modal-specific styles */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  width: 400px;
+  max-width: 90%;
+  max-height: 100vh; 
+  overflow-y: auto; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: start;
+  position: relative;
+}
+
+
+.modal-title {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.modal-body p {
+  margin: 15px 0;
+  font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 90%;
+    max-width: 500px;
+    padding: 20px;
+  }
+
+  .modal-title {
+    font-size: 1.5rem;
+  }
+
+  .modal-body p {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    width: 95%;
+    max-width: 350px;
+    padding: 15px;
+  }
+
+  .modal-title {
+    font-size: 1.3rem;
+  }
+
+  .modal-body p {
+    font-size: 0.9rem;
+  }
+}

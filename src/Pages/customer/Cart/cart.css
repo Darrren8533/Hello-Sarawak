@@ -1,0 +1,335 @@
+.reservation-container {
+  flex: 0 0 100%; 
+  max-width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-top: 50px;
+}
+
+.reservation-container h2{
+  margin-bottom: 1.25rem; 
+  text-align: center; 
+}
+
+.cart-section {
+  padding: 2rem 0;
+}
+
+.cart-item {
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  margin-bottom: 1.5rem;
+}
+
+.cart-content {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -15px;
+  margin-left: -15px;
+  align-items: center;
+}
+
+.cart-txt {
+  flex: 0 0 66.66667%; 
+  max-width: 66.66667%;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.cart-price {
+  flex: 0 0 25%;
+  max-width: 25%;
+  padding-right: 15px;
+  padding-left: 15px;
+  text-align: right;
+}
+
+.cart-price p{
+  font-weight: bold;
+}
+
+.reservation-total {
+  width: 25%;
+  float: left;
+  padding-right: 15px;
+  padding-left: 15px;
+  text-align: right;
+}
+
+.reservation-total p{
+  font-weight: bold;
+}
+
+.total-container {
+  flex: 0 0 33.3333%;
+  max-width: 33.3333%; 
+}
+
+.cart-subtotal {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.cart-tax {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.cart-total {
+  background: #f9f9f9;
+  padding: 1rem;
+  padding: 1rem !important;
+  border: 1px solid #dee2e6 !important;
+  border-radius: 0.25rem !important;
+}
+
+.cart-finaltotal {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.cart-finaltotal span{
+  font-weight: bold;
+}
+
+.checkout-btn {
+  background: #CC8C18;
+  color: white;
+  font-weight: bold;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.checkout-btn:hover {
+  background-color: #653600;
+}
+
+.filter-cart {
+  background-color: white;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 50px; 
+  flex-grow: 1;
+  min-width: 120px; 
+  flex-basis: 0; 
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  min-width: 150px; 
+  flex-basis: 0; 
+}
+
+.filter-cart select {
+  padding: 8px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  width: 100%;
+}
+
+.filter-item label {
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+/* Grid System */
+.cart-row {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.cart-container {
+  flex: 0 0 66.66667%;
+  max-width: 66.66667%;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.cart-image {
+  max-width: 120px; 
+  flex: 0 0 25%; 
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.cart-image img{
+  max-width: 100%;
+  height: 170px;
+  padding-right: 15px;
+  padding-left: 15px;
+  object-fit: cover;
+  object-fit: cover; 
+}
+
+/* Button Styles */
+.remove-btn {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  background-color: transparent;
+}
+
+.remove-btn:hover {
+  color: #fff;
+  background-color: #dc3545;
+}
+
+.pay-btn{
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  cursor: pointer;
+  color: #28a745;
+  border: 1px solid #28a745;
+  background-color: transparent;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.pay-btn:hover {
+  color: #fff;
+  background-color: #28a745;
+}
+
+.non-pay-btn {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  color: #6c757d;
+  border: 1px solid #6c757d;
+  background-color: transparent;
+  width: 100%;
+  margin-top: 0.5rem;
+  pointer-events: none;
+  opacity: 0.65;
+}
+
+.cancel-btn {
+  display: inline-block;
+  font-weight: 400;
+  text-align: center;
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  color: #dc3545;
+  border: 1px solid #dc3545;
+  background-color: transparent;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.cancel-btn:hover {
+  color: #fff;
+  background-color: #dc3545;
+}
+
+/* Card Style for Cart Item */
+.reservation-item {
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.reservation-content{
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: -15px;
+  margin-left: -15px;
+  align-items: center;
+}
+
+.reservation-image {
+  flex: 0 0 16.66667%;
+  max-width: 16.66667%;
+}
+
+.reservation-image img{
+  max-width: 100%;
+  height: 170px;
+  padding-right: 15px;
+  padding-left: 15px;
+  object-fit: cover;
+}
+
+.reservations-content{
+  width: 50%;
+  float: left;
+}
+
+.cart-status {
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-left: 5px;
+}
+
+.status-pending {
+  color: #ffc107;
+}
+
+.status-canceled {
+  color: #dc3545;
+}
+
+.status-accepted {
+  color: #28a745;
+}
+
+.status-rejected {
+  color: #6c757d;
+}
+
+.status-paid {
+  color: #007bff;
+}
+
+.reservation-total {
+  width: 25%;
+  float: left;
+  padding-right: 15px;
+  padding-left: 15px;
+  text-align: right;
+}
+
+.reservation-total p{
+  font-weight: bold;
+}
+
+.reservation-btn {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
