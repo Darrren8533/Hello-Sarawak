@@ -4,7 +4,7 @@ import { Helmet } from 'react-helmet';
 import { FaBars } from "react-icons/fa";
 import { logoutUser, fetchUserData, fetchGoogleUserData } from '../../../Api/api';
 import './navbar.css';
-import DefaultAvatar from '../../../../Frontend/src/public/avatar.png';
+import DefaultAvatar from '../../public/avatar.png';
 import eventBus from '../EventBus/EventBus';
 
 function Navbar() {
