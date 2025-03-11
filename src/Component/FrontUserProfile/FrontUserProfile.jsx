@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchUserData, updateProfile, uploadAvatar, fetchGoogleUserData } from '../../../../Backend/Api/api';
+import { fetchUserData, updateProfile, uploadAvatar, fetchGoogleUserData } from '../../../Api/api';
 import Toast from '../Toast/Toast';
 import { FaCamera, FaUser, FaLock, FaUsers, FaCog, FaCreditCard, FaShieldAlt, FaEye, FaEyeSlash } from'react-icons/fa';
 import './FrontUserProfile.css';

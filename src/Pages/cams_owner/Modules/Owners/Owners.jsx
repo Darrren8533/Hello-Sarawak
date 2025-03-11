@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchOwners } from '../../../../../../Backend/Api/api';
+import { fetchOwners } from '../../../../../Api/api';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { createModerator, updateUser } from "../../../../Backend/Api/api"; 
+import { createModerator, updateUser } from "../../../Api/api"; 
 import { FaUserCircle, FaUserAlt, FaMailBulk, FaHashtag } from 'react-icons/fa';
 import { RiLockPasswordFill, RiLockPasswordLine, RiGlobalLine } from 'react-icons/ri';
 import { MdCall } from 'react-icons/md';

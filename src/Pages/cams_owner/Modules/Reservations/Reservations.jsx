@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchReservation } from '../../../../../../Backend/Api/api';
+import { fetchReservation } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';

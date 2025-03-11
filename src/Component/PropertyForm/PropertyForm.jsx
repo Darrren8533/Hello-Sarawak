@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { FaWifi, FaParking, FaSwimmingPool, FaHotTub, FaTv, FaUtensils, FaSnowflake, FaPaw, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaLock, FaBell, FaMapMarkerAlt, FaTree, FaMountain, FaCity } from "react-icons/fa";
-import { propertiesListing, updateProperty, propertyListingRequest } from "../../../../Backend/Api/api"; // Import API function for categories
+import { propertiesListing, updateProperty, propertyListingRequest } from "../../../Api/api"; // Import API function for categories
 import Toast from "../Toast/Toast";
 import "./PropertyForm.css";
 

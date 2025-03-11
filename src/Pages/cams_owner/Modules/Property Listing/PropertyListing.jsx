@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {fetchPropertiesListingTable,updatePropertyStatus,deleteProperty} from '../../../../../../Backend/Api/api';
+import {fetchPropertiesListingTable,updatePropertyStatus,deleteProperty} from '../../../../../Api/api';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
 import PropertyForm from '../../../../Component/PropertyForm/PropertyForm';

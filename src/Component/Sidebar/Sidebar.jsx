@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { FiLogOut, FiMenu } from 'react-icons/fi';
-import { logoutUser } from '../../../../Backend/Api/api';
+import { logoutUser } from '../../../Api/api';
 import '../../Component/Sidebar/Sidebar.css';
 
 const Sidebar = ({ title, links, isCollapsed, toggleSidebar }) => {

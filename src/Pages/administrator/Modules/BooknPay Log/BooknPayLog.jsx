@@ -5,7 +5,7 @@ import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable'
 import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown'; // Ensure this is imported
-import { fetchBookLog } from '../../../../../../Backend/Api/api';
+import { fetchBookLog } from '../../../../../Api/api';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
