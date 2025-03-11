@@ -9,7 +9,7 @@ import Footer from '../../../Component/Footer/footer';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
 
 // Import API
-import { fetchProduct} from '../../../../../Backend/Api/api';
+import { fetchProduct} from '../../../../Api/api';
 
 // Import React Icons and CSS
 import { FaStar, FaStarHalfAlt } from 'react-icons/fa';

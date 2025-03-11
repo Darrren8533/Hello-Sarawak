@@ -12,7 +12,7 @@ import { RiLockPasswordFill, RiLockPasswordLine } from 'react-icons/ri';
 import { IoEyeSharp } from "react-icons/io5";
 
 // Import API function
-import { signupUser } from '../../../../../Backend/Api/api';
+import { signupUser } from '../../../../Api/api';
 
 // Import Toast
 import Toast from '../../../Component/Toast/Toast';

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../../Component/Navbar/navbar';
 import Footer from '../../../Component/Footer/footer';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
-import { fetchCart, removeReservation, updateReservationStatus } from '../../../../../Backend/Api/api';
+import { fetchCart, removeReservation, updateReservationStatus } from '../../../../Api/api';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import './cart.css';
 
