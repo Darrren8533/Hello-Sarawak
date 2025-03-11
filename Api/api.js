@@ -19,7 +19,7 @@ export const signupUser = async (userData) => {
 // Login
 export const loginUser = async (userData) => {
   try {
-    const response = await fetch('http://cams-backend.vercel.app/login', {
+    const response = await fetch('https://cams-backend.vercel.app/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
