@@ -5,7 +5,7 @@ import { FaBars } from "react-icons/fa";
 import { logoutUser, fetchUserData, fetchGoogleUserData } from '../../../Api/api';
 import './navbar.css';
 import DefaultAvatar from '../../public/avatar.png';
-import eventBus from '../EventBus/EventBus';
+import eventBus from '../EventBus/Eventbus';
 
 function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
