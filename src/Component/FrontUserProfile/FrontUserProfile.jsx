@@ -3,7 +3,7 @@ import { fetchUserData, updateProfile, uploadAvatar, fetchGoogleUserData } from 
 import Toast from '../Toast/Toast';
 import { FaCamera, FaUser, FaLock, FaUsers, FaCog, FaCreditCard, FaShieldAlt, FaEye, FaEyeSlash } from'react-icons/fa';
 import './FrontUserProfile.css';
-import eventBus from '../EventBus/EventBus';
+import eventBus from '../EventBus/Eventbus';
 import { CountryDropdown } from 'react-country-region-selector';
 
 const FrontUserProfile = () => {
