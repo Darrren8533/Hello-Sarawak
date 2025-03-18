@@ -4,6 +4,7 @@ import React from 'react';
 import Navbar from '../../../Component/Navbar/navbar';
 import Footer from '../../../Component/Footer/footer';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
+import TawkMessenger from '../../../Component/TawkMessenger/TawkMessenger';
 
 //Import css
 import './About_Us.css';
@@ -160,6 +161,7 @@ const About_Us = () => {
 
     <Back_To_Top_Button />
     <Footer />
+    <TawkMessenger />
     </div>
   );
 };
