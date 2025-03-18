@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../../Component/Navbar/navbar';
 import Footer from '../../../Component/Footer/footer';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
-import { fetchCart, removeReservation, updateReservationStatus } from '../../../../Api/api';
+import TawkMessenger from '../../../Component/TawkMessenger/TawkMessenger';
+import Toast from '../../../Component/Toast/Toast';
+
+import { fetchCart, removeReservation, updateReservationStatus } from '../../../../../Backend/Api/api';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import './cart.css';
 
@@ -12,6 +15,11 @@ const Cart = () => {
   const [sortOrder, setSortOrder] = useState('Latest');
   const [filterStatus, setFilterStatus] = useState('All status');
   const taxRate = 0.10; 
+
+  // Toast Function
+  const [toastMessage, setToastMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [toastType, setToastType] = useState('');
 
   useEffect(() => {
     const loadReservations = async () => {
@@ -47,7 +55,7 @@ const Cart = () => {
         )
       );
 
-      alert('Your reservation has been paid.');
+      displayToast('success', 'Your reservation has been paid.');
     } catch (error) {
       console.error('Error pay for reservation:', error);
     }
@@ -66,7 +74,7 @@ const Cart = () => {
         )
       );
 
-      alert('Your reservation has been canceled.');
+      displayToast('success', 'Your reservation has been canceled.');
     } catch (error) {
       console.error('Error canceling reservation:', error);
     }
@@ -105,7 +113,7 @@ const Cart = () => {
         )
       );
   
-      alert('Your reservations have been checked out. Please wait for the response of the operators.');
+      displayToast('success', 'Your reservations have been checked out. Please wait for the response of the operators.');
     } catch (error) {
       console.error('Error during checkout:', error);
     }
@@ -198,7 +206,7 @@ const Cart = () => {
                     </div>
                   ))
               ) : (
-                <p>No reservations available.</p>
+                <p className='no_reservation_text'>No reservations available.</p>
               )}
             </div>
 
@@ -334,6 +342,7 @@ const Cart = () => {
       </div>
       <Back_To_Top_Button />
       <Footer />
+      <TawkMessenger />
     </div>
   );
 };
