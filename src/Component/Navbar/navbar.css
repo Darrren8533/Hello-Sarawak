@@ -21,6 +21,39 @@
 
 .offcanvas {
     background-color: #493829 !important;
+    transition: transform 0.3s ease-in-out !important;
+}
+
+/* 添加滑动动画效果 */
+.offcanvas.offcanvas-end:not(.show) {
+    transform: translateX(100%);
+}
+
+.offcanvas.offcanvas-end.show {
+    transform: translateX(0);
+}
+
+.offcanvas-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    opacity: 0.7;
 }
 
 .offcanvas-body .nav-link {
@@ -29,6 +62,19 @@
 
 .offcanvas-body .nav-link:hover {
     color: #a2a2a1
+}
+
+/* 为导航项添加动画延迟，创造级联效果 */
+.offcanvas-body .nav-item {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    transition-delay: calc(0.05s * var(--item-index, 0));
+}
+
+.offcanvas.show .offcanvas-body .nav-item {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 .login-button {
@@ -90,9 +136,9 @@ a.login-button:hover {
     cursor: pointer;
 }
   
-  .mobile-auth-link:hover {
+.mobile-auth-link:hover {
     color: #a2a2a1;
-  }
+}
 
 @media(max-width: 768px) {
     .nav-link::before {
@@ -119,16 +165,28 @@ a.login-button:hover {
     .login-button, 
     .logout-button,
     .user-icon-button {
-      display: none;
+        display: none;
     }
     
     .mobile-auth-item {
-      display: block;
+        display: block;
     }
-  }
+
+    .offcanvas-header {
+        margin-top: 10px;
+    }
+}
   
-  @media (min-width: 481px) {
+@media (min-width: 481px) {
     .mobile-auth-item {
-      display: none;
+        display: none;
     }
-  }
+    
+    .offcanvas-header {
+        display: none;
+    }
+}
+
+.offcanvas-backdrop {
+    transition: opacity 0.3s ease !important;
+}
