@@ -52,7 +52,30 @@ function Navbar() {
     }, [userID, googleAccessToken]);
 
     useEffect(() => {
- 
+
+        const initOffcanvas = () => {
+            if (typeof bootstrap !== 'undefined') {
+                const offcanvasElement = document.getElementById('offcanvasNavbar');
+                if (offcanvasElement) {
+                    const bsOffcanvas = new bootstrap.Offcanvas(offcanvasElement, {
+                        backdrop: true,
+                        scroll: false
+                    });
+                }
+            }
+        };
+        
+        const bootstrapReady = setInterval(() => {
+            if (typeof bootstrap !== 'undefined') {
+                initOffcanvas();
+                clearInterval(bootstrapReady);
+            }
+        }, 100);
+
+        return () => clearInterval(bootstrapReady);
+    }, []);
+
+    useEffect(() => {
         const handleAvatarUpdate = (newAvatar) => {
             setUserAvatar(newAvatar);
         };
