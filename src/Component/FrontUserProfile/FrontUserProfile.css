@@ -161,3 +161,107 @@
     color: #CC8C18;
     z-index: 1;
 }
+
+/* Responsive styles for tablets - max-width: 768px */
+@media (max-width: 768px) {
+    .front-profile-container {
+        padding: 20px;
+    }
+
+    .front-profile-layout {
+        flex-direction: column;
+    }
+
+    .front-sidebar-card {
+        width: 100%;
+        margin-right: 0;
+        margin-bottom: 20px;
+        position: static;
+    }
+
+    .front-tab {
+        padding: 12px;
+    }
+
+    .front-content-card h2 {
+        font-size: 2rem;
+    }
+
+    .front-profile-field {
+        padding: 20px 15px;
+    }
+
+    .front-field-label {
+        margin: 5px;
+    }
+
+    .front-password-field {
+        position: relative;
+    }
+}
+
+/* Mobile View */
+@media (max-width: 480px) {
+    .front-profile-container {
+        padding: 10px;
+    }
+
+    .front-content-card h2 {
+        font-size: 1.5rem;
+    }
+
+    .front-profile-field {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 15px 10px;
+    }
+
+    .front-field-label {
+        margin: 5px 0;
+        width: 100%;
+    }
+
+    .front-field-value {
+        width: 100%;
+        margin: 5px 0;
+        text-align: left;
+    }
+
+    .front-edit-link {
+        width: 100%;
+        text-align: left;
+        margin-top: 5px;
+    }
+
+    .front-edit-section {
+        margin-top: 15px;
+    }
+
+    .front-edit-section input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+
+    .front-edit-section button {
+        width: 100%;
+        margin-right: 0;
+    }
+    
+    .front-password-field {
+        position: relative;
+        width: 100%;
+    }
+    
+    .front-password-field input {
+        width: 100%;
+        padding-right: 35px;
+    }
+    
+    .front-password-field .front-eye-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}
