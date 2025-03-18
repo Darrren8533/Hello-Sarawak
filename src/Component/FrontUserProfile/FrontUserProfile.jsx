@@ -237,9 +237,6 @@ const FrontUserProfile = () => {
                         onClick={() => setActiveTab('security')}>
                         <FaLock className="front-tab-icon" /> Security settings
                     </div>
-                    <div className="front-tab">
-                        <FaCreditCard className="front-tab-icon" /> Payment methods
-                    </div>
                 </div>
 
                 <div className="front-content-card">
