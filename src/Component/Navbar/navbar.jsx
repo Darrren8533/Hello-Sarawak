@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { FaBars, FaTimes } from "react-icons/fa";
-import DefaultAvatar from '../../../src/public/avatar.png';
 import { logoutUser, fetchUserData, fetchGoogleUserData } from '../../../Api/api';
+import DefaultAvatar from '../../../src/public/avatar.png';
 import './navbar.css';
-import eventBus from '../EventBus/EventBus';
+import eventBus from '../EventBus/Eventbus';
 
 function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
