@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { FaBars, FaTimes } from "react-icons/fa";
-import { logoutUser, fetchUserData, fetchGoogleUserData } from '../../../Api/api';
+import { logoutUser, fetchUserData, fetchGoogleUserData } from '../../../../Api/api';
 import './navbar.css';
-import DefaultAvatar from '../../../src/public/avatar.png';
-import eventBus from '../EventBus/Eventbus';
+import DefaultAvatar from '../../../../Frontend/src/public/avatar.png';
+import eventBus from '../EventBus/EventBus';
 
 function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -52,6 +52,7 @@ function Navbar() {
     }, [userID, googleAccessToken]);
 
     useEffect(() => {
+ 
         const handleAvatarUpdate = (newAvatar) => {
             setUserAvatar(newAvatar);
         };
@@ -60,27 +61,6 @@ function Navbar() {
 
         return () => {
             eventBus.off('avatarUpdated', handleAvatarUpdate);
-        };
-    }, []);
-
-    useEffect(() => {
-        const handleOffcanvasShow = () => {
-
-            const navItems = document.querySelectorAll('.offcanvas-body .nav-item');
-            navItems.forEach((item, index) => {
-                item.style.setProperty('--item-index', index);
-            });
-        };
-
-        const offcanvasElement = document.getElementById('offcanvasNavbar');
-        if (offcanvasElement) {
-            offcanvasElement.addEventListener('show.bs.offcanvas', handleOffcanvasShow);
-        }
-
-        return () => {
-            if (offcanvasElement) {
-                offcanvasElement.removeEventListener('show.bs.offcanvas', handleOffcanvasShow);
-            }
         };
     }, []);
 
@@ -131,47 +111,48 @@ function Navbar() {
 
                     <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
                         <div className="offcanvas-header">
-                            <h2 className="offcanvas-title" id="offcanvasNavbarLabel">Hello Sarawak</h2>
+                        <h5 className="offcanvas-title" id="offcanvasNavbarLabel">Hello Sarawak</h5>
                             <button type="button" className="close-btn" data-bs-dismiss="offcanvas" aria-label="Close">
                                 <FaTimes size={16} color="#fff" />
                             </button>
                         </div>
                         <div className="offcanvas-body">
                             <ul className="navbar-nav justify-content-left flex-grow-1 pe-3">
-                                <li className="nav-item mx-4" style={{ '--item-index': 0 }}>
+                                <li className="nav-item mx-4">
                                     <Link className="nav-link mx-lg-2" to={isLoggedIn ? '/login/home' : '/'}>
                                         Home
                                     </Link>
                                 </li>
-                                <li className="nav-item mx-4" style={{ '--item-index': 1 }}>
+                                <li className="nav-item mx-4">
                                     <Link className="nav-link mx-lg-2" to={isLoggedIn ? '/login/product' : '/product'}>
                                         Rooms
                                     </Link>
                                 </li>
-                                <li className="nav-item mx-4" style={{ '--item-index': 2 }}>
+                                <li className="nav-item mx-4">
                                     <Link className="nav-link mx-lg-2" to={isLoggedIn ? '/login/Cart' : '/Cart'}>
                                         Cart
                                     </Link>
                                 </li>
-                                <li className="nav-item mx-4" style={{ '--item-index': 3 }}>
+                                <li className="nav-item mx-4">
                                     <Link className="nav-link mx-lg-2" to={isLoggedIn ? '/login/about_us' : '/about_us'}>
                                         About Us
                                     </Link>
                                 </li>
-                                <li className="nav-item mx-4" style={{ '--item-index': 4 }}>
+                                <li className="nav-item mx-4">
                                     <Link className="nav-link mx-lg-2" to={isLoggedIn ? '/login/about_sarawak' : '/about_sarawak'}>
                                         About Sarawak
                                     </Link>
                                 </li>
                                 
+                                {/* Add the mobile login/profile/logout options */}
                                 {isLoggedIn ? (
                                     <>
-                                        <li className="nav-item mx-4 mobile-auth-item" style={{ '--item-index': 5 }}>
+                                        <li className="nav-item mx-4 mobile-auth-item">
                                             <Link className="nav-link mx-lg-2" to="/login/profile">
                                                 My Profile
                                             </Link>
                                         </li>
-                                        <li className="nav-item mx-4 mobile-auth-item" style={{ '--item-index': 6 }}>
+                                        <li className="nav-item mx-4 mobile-auth-item">
                                             <span 
                                                 className="nav-link mx-lg-2 mobile-auth-link" 
                                                 onClick={handleLogout}
@@ -181,7 +162,7 @@ function Navbar() {
                                         </li>
                                     </>
                                 ) : (
-                                    <li className="nav-item mx-4 mobile-auth-item" style={{ '--item-index': 5 }}>
+                                    <li className="nav-item mx-4 mobile-auth-item">
                                         <Link className="nav-link mx-lg-2" to="/login">
                                             Login
                                         </Link>
