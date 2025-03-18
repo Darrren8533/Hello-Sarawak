@@ -111,10 +111,6 @@
 
 /* Mobile */
 @media screen and (max-width: 480px) {
-    .main-container-map {
-        padding-top: 10px;
-        padding-bottom: 30px;
-    }
     
     .map-container_sarawak {
         width: 100%;
