@@ -1,3 +1,5 @@
+const API_URL = "https://backend-server-tf6m.onrender.com";
+
 //Register
 export const signupUser = async (userData) => {
   try {
