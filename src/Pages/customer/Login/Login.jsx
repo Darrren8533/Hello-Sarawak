@@ -16,7 +16,7 @@ import { FaFacebook } from "react-icons/fa";
 import { AiFillInstagram } from "react-icons/ai";
 
 // Import API function
-import { loginUser } from '../../../Api/api';
+import { loginUser } from '../../../../Api/api';
 import { useGoogleLogin } from '@react-oauth/google';
 
 // Import Toast
