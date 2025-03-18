@@ -16,7 +16,7 @@ import { FaFacebook } from "react-icons/fa";
 import { AiFillInstagram } from "react-icons/ai";
 
 // Import API function
-import { loginUser } from '../../../../Api/api';
+import { loginUser } from '../../../Api/api';
 import { useGoogleLogin } from '@react-oauth/google';
 
 // Import Toast
@@ -301,6 +301,10 @@ const Login = () => {
                 <span>Login</span>
               </button>
 
+              <button onClick={() => navigate('/register')} className="btn_responsive">
+                <span>Sign Up</span>
+              </button>
+
               <div className="divider">Or</div>
 
             <div class="container_icon">
@@ -316,10 +320,6 @@ const Login = () => {
                 <AiFillInstagram className='icon_insta'/>
               </span>
             </div>
-
-              <button onClick={() => navigate('/register')} className="btn_responsive">
-                <span>Sign Up</span>
-              </button>
             </form>
           )}
         </div>
