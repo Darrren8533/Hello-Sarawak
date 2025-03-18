@@ -129,6 +129,17 @@ a.login-button:hover {
     color: #a2a2a1;
 }
 
+.icon_close{
+  font-size: 16px !important;
+  color: white !important;
+  margin-top: 33px;
+}
+
+.icon_navbar{
+  font-size: 30px;
+  color: white;
+}
+
 @media(max-width: 768px) {
     .nav-link::before {
         content: "";
@@ -159,6 +170,11 @@ a.login-button:hover {
     
     .mobile-auth-item {
         display: block;
+    }
+
+    .offcanvas-title{
+        margin-top: 15px;
+        margin-left: 22px;
     }
 }
   
