@@ -127,13 +127,11 @@ function Navbar() {
 
             <nav className="navbar navbar-expand-lg fixed-top">
                 <div className="container-fluid">
-                    <h1 className="navbar-brand mx-4 mb-0" style={{ fontWeight: 500, color: '#fff', fontSize: '23px', transition: '0.3s color' }}>
-                        Hello Sarawak
-                    </h1>
+                <h1 className="navbar-brand mx-4 mb-0">Hello Sarawak</h1>
 
                     <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
                         <div className="offcanvas-header">
-                            <h5 className="offcanvas-title" id="offcanvasNavbarLabel" style={{ color: '#fff' }}>Hello Sarawak</h5>
+                            <h2 className="offcanvas-title" id="offcanvasNavbarLabel">Hello Sarawak</h2>
                             <button type="button" className="close-btn" data-bs-dismiss="offcanvas" aria-label="Close">
                                 <FaTimes size={16} color="#fff" />
                             </button>
