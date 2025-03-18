@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { FaBars } from "react-icons/fa";
-import { logoutUser, fetchUserData, fetchGoogleUserData } from '../../../Api/api';
+import { logoutUser, fetchUserData, fetchGoogleUserData } from '../../../../Backend/Api/api';
 import './navbar.css';
-import DefaultAvatar from '../../public/avatar.png';
-import eventBus from '../EventBus/Eventbus';
+import DefaultAvatar from '../../../../Frontend/src/public/avatar.png';
+import eventBus from '../EventBus/EventBus';
 
 function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -139,6 +139,31 @@ function Navbar() {
                                         About Sarawak
                                     </Link>
                                 </li>
+                                
+                                {/* Add the mobile login/profile/logout options */}
+                                {isLoggedIn ? (
+                                    <>
+                                        <li className="nav-item mx-4 mobile-auth-item">
+                                            <Link className="nav-link mx-lg-2" to="/login/profile">
+                                                My Profile
+                                            </Link>
+                                        </li>
+                                        <li className="nav-item mx-4 mobile-auth-item">
+                                            <span 
+                                                className="nav-link mx-lg-2 mobile-auth-link" 
+                                                onClick={handleLogout}
+                                            >
+                                                Logout
+                                            </span>
+                                        </li>
+                                    </>
+                                ) : (
+                                    <li className="nav-item mx-4 mobile-auth-item">
+                                        <Link className="nav-link mx-lg-2" to="/login">
+                                            Login
+                                        </Link>
+                                    </li>
+                                )}
                             </ul>
                         </div>
                     </div>
