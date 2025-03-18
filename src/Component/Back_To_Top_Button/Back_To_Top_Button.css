@@ -64,7 +64,7 @@
 
 .progress-wrap {
     position: fixed;
-    right: 32px;
+    right: 30px;
     bottom: 100px;
     height: 50px;
     width: 50px;
@@ -139,3 +139,26 @@
     box-sizing: border-box;
     transition: all 200ms linear;
 }
+
+@media (max-width: 480px) {
+    .progress-wrap {
+      height: 40px;
+      width: 40px;
+      right: 35px;
+      bottom: 90px;
+    }
+    
+    .progress-wrap::after {
+      line-height: 40px;
+      font-size: 20px;
+      height: 40px;
+      width: 40px;
+    }
+    
+    .progress-wrap::before {
+      line-height: 40px;
+      font-size: 20px;
+      height: 40px;
+      width: 40px;
+    }
+  }
