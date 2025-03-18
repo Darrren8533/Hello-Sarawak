@@ -33,7 +33,39 @@
 
 .offcanvas {
     background-color: #493829 !important;
+    transition: transform 0.3s ease-in-out !important;
 }
+
+.offcanvas-end:not(.show) {
+    transform: translateX(100%);
+}
+
+.offcanvas-end.show {
+    transform: translateX(0);
+}
+
+.offcanvas-backdrop {
+    transition: opacity 0.3s ease-in-out;
+}
+
+.offcanvas-body .nav-item {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.offcanvas.show .offcanvas-body .nav-item {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.offcanvas.show .offcanvas-body .nav-item:nth-child(1) { transition-delay: 0.05s; }
+.offcanvas.show .offcanvas-body .nav-item:nth-child(2) { transition-delay: 0.1s; }
+.offcanvas.show .offcanvas-body .nav-item:nth-child(3) { transition-delay: 0.15s; }
+.offcanvas.show .offcanvas-body .nav-item:nth-child(4) { transition-delay: 0.2s; }
+.offcanvas.show .offcanvas-body .nav-item:nth-child(5) { transition-delay: 0.25s; }
+.offcanvas.show .offcanvas-body .nav-item:nth-child(6) { transition-delay: 0.3s; }
+.offcanvas.show .offcanvas-body .nav-item:nth-child(7) { transition-delay: 0.35s; }
 
 .offcanvas-header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -63,7 +95,7 @@
 }
 
 .offcanvas-body .nav-link:hover {
-    color: #a2a2a1
+    color: #a2a2a1;
 }
 
 .login-button {
@@ -138,6 +170,11 @@ a.login-button:hover {
 .icon_navbar{
   font-size: 30px;
   color: white;
+  transition: transform 0.3s ease;
+}
+
+.navbar-toggler:hover .icon_navbar {
+  transform: rotate(90deg);
 }
 
 @media(max-width: 768px) {
@@ -153,7 +190,6 @@ a.login-button:hover {
         visibility: hidden;
         transition: 0.1s ease-in;
     }
-
     .nav-link:hover::before,
     .nav-link.active::before {
         width: 100%;
@@ -171,7 +207,6 @@ a.login-button:hover {
     .mobile-auth-item {
         display: block;
     }
-
     .offcanvas-title{
         margin-top: 15px;
         margin-left: 22px;
@@ -186,4 +221,37 @@ a.login-button:hover {
     .offcanvas-header {
         display: none;
     }
+
+@media (min-width: 481px) {
+    .mobile-auth-item {
+        display: none;
+    }
+    
+    .offcanvas-header {
+        display: none;
+    }
+    
+    .navbar-nav {
+        display: flex;
+        flex-direction: row;
+        position: absolute;
+        left: 38%;
+        bottom: 28%;
+        transform: translateX(-50%);
+    }
+    
+    .navbar-nav .nav-item {
+        opacity: 1 !important;
+        transform: none !important;
+    }
+    
+    .nav-link {
+        color: #fff !important;
+        padding: 0.5rem 1rem;
+    }
+    
+    .nav-link:hover {
+        color: #e0e0e0 !important;
+    }
+}
 }
