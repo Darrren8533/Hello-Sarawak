@@ -333,3 +333,238 @@
   gap: 0.5rem;
   margin-top: 1rem;
 }
+
+@media screen and (max-width: 480px) {
+  .reservation-container {
+    margin-top: 30px;
+    padding: 10px;
+    width: 100%;
+  }
+  
+  .reservation-container h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  
+  .cart-row {
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+  
+  .cart-container, .total-container {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 0;
+    margin-bottom: 20px;
+  }
+  
+  .cart-total {
+    padding: 15px !important;
+    margin-bottom: 15px;
+  }
+  
+  .cart-total h4 {
+    margin-bottom: 12px;
+    text-align: center;
+  }
+  
+  .cart-subtotal, .cart-tax, .cart-finaltotal {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+  }
+  
+  .cart-finaltotal {
+    font-size: 1.1rem;
+    padding-top: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .checkout-btn {
+    padding: 12px;
+    font-size: 1rem;
+    width: 100%;
+    margin-top: 5px;
+  }
+  
+  .cart-item {
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+  
+  .row.align-items-center {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  
+  .cart-image {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin-bottom: 10px;
+    padding: 0;
+  }
+  
+  .cart-image img {
+    width: 100%;
+    height: auto;
+    max-height: 180px;
+    padding: 0;
+    border-radius: 4px;
+  }
+  
+  .col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 0;
+    margin-bottom: 10px;
+  }
+  
+  .col-md-6 h5 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  
+  .col-md-6 p {
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+  }
+  
+  .cart-price {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .cart-price p {
+    margin-bottom: 0;
+    font-size: 1.1rem;
+  }
+  
+  .reservation-item {
+    padding: 12px;
+    margin-bottom: 15px;
+  }
+  
+  .reservation-content {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 0;
+  }
+  
+  .reservation-image {
+    flex: 0 0 100%;
+    max-width: 100%;
+    margin-bottom: 0;
+  }
+  
+  .reservation-image img {
+    width: 100%;
+    height: auto;
+    max-height: 180px;
+    padding: 0;
+    border-radius: 4px;
+  }
+  
+  .reservations-content {
+    width: 100%;
+    padding: 0;
+    margin-bottom: 0;
+  }
+  
+  .reservations-content h5 {
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  
+  .reservations-content p {
+    margin-bottom: 6px;
+    font-size: 0.9rem;
+  }
+  
+  .reservation-total {
+    width: 100%;
+    text-align: left;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .reservation-total p {
+    margin-bottom: 0;
+    font-size: 1.1rem;
+  }
+  
+  .reservation-btn {
+    width: 100%;
+    margin-top: 12px;
+  }
+  
+  .remove-btn, .cancel-btn, .pay-btn, .non-pay-btn {
+    width: auto;
+  }
+  
+  .cart-status {
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-left: 5px;
+  }
+  
+  .status-pending {
+    background-color: rgba(255, 193, 7, 0.1);
+  }
+  
+  .status-canceled {
+    background-color: rgba(220, 53, 69, 0.1);
+  }
+  
+  .status-accepted {
+    background-color: rgba(40, 167, 69, 0.1);
+  }
+  
+  .status-rejected {
+    background-color: rgba(108, 117, 125, 0.1);
+  }
+  
+  .status-paid {
+    background-color: rgba(0, 123, 255, 0.1);
+  }
+  
+  .filter-cart {
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+  }
+  
+  .filter-cart > div {
+    width: 100%;
+  }
+  
+  .filter-cart select {
+    width: 100%;
+  }
+  
+  .pagination-controls {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 15px;
+  }
+  
+  .pagination-button {
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .no_reservation_text {
+    margin: 20px 0;
+    text-align: center;
+  }
+}
