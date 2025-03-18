@@ -1,4 +1,6 @@
 import React, { useEffect, useRef } from 'react';
+import { useNavigate } from "react-router-dom";
+
 import './Destination.css';
 
 // Import Images
@@ -10,8 +12,8 @@ import Culture from '../../public/Culture.png';
 import Kubah from '../../public/Kubah National Park.png';
 import WaterFront from '../../public/Waterfront.jpg';
 import Gunung from '../../public/Gunung.png';
-import LongHouse from '../../public/LongHouse.png'
-import Similajau from '../../public/Similajau.jpg'
+import LongHouse from '../../public/LongHouse.png';
+import Similajau from '../../public/Similajau.jpg';
 
 // Import Icon
 import { MdLocationPin } from "react-icons/md";
@@ -19,10 +21,13 @@ import { MdLocationPin } from "react-icons/md";
 const Destination = () => {
   const imagesRef = useRef([]);
   const sectionRefs = useRef([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // 3D rotation effect
     imagesRef.current.forEach((item) => {
+      if (!item) return; // Guard clause for null refs
+      
       const handleMouseMove = (e) => {
         const rect = item.getBoundingClientRect();
         const positionX = ((e.clientX - rect.left) / rect.width) * 100;
@@ -55,99 +60,89 @@ const Destination = () => {
           }
         });
       },
-      { threshold: 0.3 }
+      { threshold: 0.2, rootMargin: "0px 0px -50px 0px" }
     );
 
     // Observe all elements in sectionRefs (including .t-card elements)
-    sectionRefs.current.forEach((section) => observer.observe(section));
+    sectionRefs.current.forEach((section) => {
+      if (section) observer.observe(section);
+    });
 
     return () => observer.disconnect();
   }, []);
 
   return (
-  <div>
-
+    <div className="destination-container">
       {/* Destination */}
-      <div className='destination'>
+      <div className="destination">
         <h1>Popular Destinations</h1>
 
-        <div className='Main_description' ref={(el) => (sectionRefs.current[1] = el)}>
+        <div className="Main_description" ref={(el) => (sectionRefs.current[1] = el)}>
           <p>Tours give you the opportunity to see a lot within a time frame</p>
         </div>
 
-        <br /><br />
+        <div className="destinations-wrapper">
+          <div className="first-des" ref={(el) => (sectionRefs.current[2] = el)}>
+            <div className="des-text">
+              <h2>Wind Cave Nature Reserve</h2>
+              <p className="location">
+                <MdLocationPin className="icon_location" /> Bau, Sarawak
+              </p>
 
-        <div className='first-des' ref={(el) => (sectionRefs.current[2] = el)}>
-          <div className='des-text'>
+              <p className="location_description">
+                Located near the town of Bau, Wind Cave offers a fascinating glimpse into Sarawak's natural wonders.
+                The cave gets its name from the cool, gentle breeze that flows through its narrow passages, providing
+                a refreshing atmosphere even in the heart of the jungle.
+              </p>
 
-            <h2>Wind Cave Nature Reserve</h2>
-            <p className='location'>
-              <MdLocationPin className='icon_location' /> Bau, Sarawak
-            </p>
+              <div className="buttons_destination">
+                <button onClick={() => navigate('/about_sarawak')}>SEE MORE</button>
+              </div>
+            </div>
 
-            <p className='location_description'>
-              Located near the town of Bau, Wind Cave offers a fascinating glimpse into Sarawak's natural wonders.
-              The cave gets its name from the cool, gentle breeze that flows through its narrow passages, providing
-              a refreshing atmosphere even in the heart of the jungle.
-            </p>
-
-            <br /><br />
-
-            <div className="buttons_destination">
-              <button>SEE MORE</button>
+            <div className="image" ref={(el) => (imagesRef.current[0] = el)}>
+              <img alt="Wind Cave" src={wind_cave} />
+              <img alt="Wind Cave 2" src={wind_cave2} />
             </div>
           </div>
 
-          <div className='image' ref={(el) => (imagesRef.current[0] = el)}>
-            <img alt='Wind Cave' src={wind_cave} />
-            <img alt='Wind Cave 2' src={wind_cave2} />
-          </div>
-        </div>
+          <div className="first-des" ref={(el) => (sectionRefs.current[3] = el)}>
+            <div className="des-text">
+              <h2>Damai Beach</h2>
+              <p className="location">
+                <MdLocationPin className="icon_location" /> Teluk Bandung Santubong
+              </p>
 
-        <br />
+              <p className="location_description">
+                Nestled at the foot of Mount Santubong, Damai Beach is one of Sarawak's most beautiful coastal destinations.
+                With its golden sands and clear waters, it's perfect for swimming, sunbathing, and beach sports. Visitors can
+                enjoy water activities like kayaking and snorkeling in nearby coral reefs.
+              </p>
 
-        <div className='first-des' ref={(el) => (sectionRefs.current[3] = el)}>
-          <div className='des-text'>
+              <div className="buttons_destination">
+                <button onClick={() => navigate('/about_sarawak')}>SEE MORE</button>
+              </div>
+            </div>
 
-            <h2>Damai Beach</h2>
-            <p className='location'>
-              <MdLocationPin className='icon_location' /> Teluk Bandung Santubong
-            </p>
-
-            <p className='location_description'>
-              Nestled at the foot of Mount Santubong, Damai Beach is one of Sarawak's most beautiful coastal destinations.
-              With its golden sands and clear waters, it's perfect for swimming, sunbathing, and beach sports. Visitors can
-              enjoy water activities like kayaking and snorkeling in nearby coral reefs.
-            </p>
-
-            <br /><br />
-
-            <div className="buttons_destination">
-              <button>SEE MORE</button>
+            <div className="image" ref={(el) => (imagesRef.current[1] = el)}>
+              <img alt="Damai Beach 1" src={Damai_1} />
+              <img alt="Damai Beach 2" src={Damai_2} />
             </div>
           </div>
-
-          <div className='image' ref={(el) => (imagesRef.current[1] = el)}>
-            <img alt='Damai Beach 1' src={Damai_1} />
-            <img alt='Damai Beach 2' src={Damai_2} />
-          </div>
         </div>
-        <br />
       </div>
 
       {/* Recent Trip */}
-      <div className='trip'>
+      <div className="trip">
         <h1>Recent Trips</h1>
         <p>Find Your Path, Create Your Memories</p>
 
         {/* Trip Cards */}
-        <div className='tripcard'>
-
+        <div className="tripcard">
           {/* Card 1 */}
-          <div className='t-card' ref={(el) => sectionRefs.current.push(el)}>
-
-            <div className='t-image'>
-              <img alt='Cave' src={Culture} />
+          <div className="t-card" ref={(el) => sectionRefs.current.push(el)}>
+            <div className="t-image">
+              <img alt="Cave" src={Culture} />
             </div>
 
             <h3>Sarawak Cultural Village</h3>
@@ -159,10 +154,9 @@ const Destination = () => {
           </div>
 
           {/* Card 2 */}
-          <div className='t-card' ref={(el) => sectionRefs.current.push(el)}>
-
-            <div className='t-image'>
-              <img alt='Kubah' src={Kubah} />
+          <div className="t-card" ref={(el) => sectionRefs.current.push(el)}>
+            <div className="t-image">
+              <img alt="Kubah" src={Kubah} />
             </div>
 
             <h3>Kubah National Park</h3>
@@ -171,14 +165,12 @@ const Destination = () => {
               It's a great spot for eco-tourism with activities like hiking, bird-watching, and a night trekking trail
               to explore the jungle's nighttime ambiance.
             </p>
-
           </div>
 
           {/* Card 3 */}
-          <div className='t-card' ref={(el) => sectionRefs.current.push(el)}>
-
-            <div className='t-image'>
-              <img alt='Waterfront' src={WaterFront} />
+          <div className="t-card" ref={(el) => sectionRefs.current.push(el)}>
+            <div className="t-image">
+              <img alt="Waterfront" src={WaterFront} />
             </div>
 
             <h3>Sarawak Waterfront</h3>
@@ -187,146 +179,138 @@ const Destination = () => {
               its blend of heritage and modern charm. With historic buildings, local craft shops,
               and riverfront cafes, it's a vibrant spot to experience Sarawak's culture.
             </p>
-            
           </div>
         </div>
 
         {/* Trip Cards Row 2*/}
-        <div className='tripcard'>
-
+        <div className="tripcard">
           {/* Card 1 */}
-          <div className='t-card' ref={(el) => sectionRefs.current.push(el)}>
-
-            <div className='t-image'>
-              <img alt='Gunung' src={Gunung} />
+          <div className="t-card" ref={(el) => sectionRefs.current.push(el)}>
+            <div className="t-image">
+              <img alt="Gunung" src={Gunung} />
             </div>
 
             <h3>Gunung Mulu National Park</h3>
             <p>
               A UNESCO World Heritage Site, this park is famous for its vast cave systems, limestone karsts, 
               and lush rainforest. The Deer Cave and Clearwater Cave are among the world's largest caves, and the Pinnacles, 
-              sharp limestone formations, offer a stunning view for trekkers
+              sharp limestone formations, offer a stunning view for trekkers.
             </p>
           </div>
 
           {/* Card 2 */}
-          <div className='t-card' ref={(el) => sectionRefs.current.push(el)}>
-
-            <div className='t-image'>
-              <img alt='LongHouse' src={LongHouse} />
+          <div className="t-card" ref={(el) => sectionRefs.current.push(el)}>
+            <div className="t-image">
+              <img alt="LongHouse" src={LongHouse} />
             </div>
 
             <h3>Annah Rais Longhouse</h3>
             <p>
               A traditional Bidayuh tribe longhouse where visitors can experience the indigenous lifestyle, 
               interact with locals, and taste their homemade Tuak (rice wine). It offers an authentic insight into Sarawak's 
-              tribal heritage
+              tribal heritage.
             </p>
-
           </div>
 
           {/* Card 3 */}
-          <div className='t-card' ref={(el) => sectionRefs.current.push(el)}>
-
-            <div className='t-image'>
-              <img alt='Similajau' src={Similajau} />
+          <div className="t-card" ref={(el) => sectionRefs.current.push(el)}>
+            <div className="t-image">
+              <img alt="Similajau" src={Similajau} />
             </div>
 
             <h3>Similajau National Park</h3>
             <p>
               This park features golden sandy beaches, mangrove forests, and diverse wildlife. 
               It is a paradise for nature lovers and hikers, offering scenic jungle trails, waterfalls 
-              and a chance to spot dolphins along the coast
+              and a chance to spot dolphins along the coast.
             </p>
-            
           </div>
         </div>
       </div>
 
-    <br/><br/>
+      {/* Rooms & Suites Section */}
+      <div className="room_section">
+        <div className="room_des">
+          <h1>Rooms & Suites</h1>
+          <p>Rest is for going further</p>
+        </div>
 
-    <div className='room_des'>
-      <h1>Rooms & Suites</h1>
-      <p>Rest is for going further</p>
-    </div>
+        <div className="wrapper_room">
+          <div className="container_room">
+            {/* Room 1 */}
+            <input type="radio" name="slide" id="c1" className="room_display" defaultChecked />
+            <label htmlFor="c1" className="card_room">
+              <div className="row">
+                <div className="icon_room">1</div>
+                <div className="description_room">
+                  <h4>Family Suite</h4>
+                  <p>1 King-sized bed / 2 Queen-sized beds</p>
+                </div>
+              </div>
+            </label>
 
-    <div className="wrapper_room">
-      <div className="container_room">
+            {/* Room 2 */}
+            <input type="radio" name="slide" id="c2" className="room_display" />
+            <label htmlFor="c2" className="card_room">
+              <div className="row">
+                <div className="icon_room">2</div>
+                <div className="description_room">
+                  <h4>Seaview Deluxe</h4>
+                  <p>1 King-sized bed / 2 Queen-sized beds</p>
+                </div>
+              </div>
+            </label>
 
-        {/* Room 1 */}
-        <input type="radio" name="slide" id="c1" className='room_display' defaultChecked />
-        <label htmlFor="c1" className="card_room">
-          <div className="row">
-            <div className="icon_room">1</div>
-            <div className="description_room">
-              <h4>Family Suite</h4>
-              <p>1 King-sized bed / 2 Queen-sized beds</p>
-            </div>  
+            {/* Room 3 */}
+            <input type="radio" name="slide" id="c3" className="room_display" />
+            <label htmlFor="c3" className="card_room">
+              <div className="row">
+                <div className="icon_room">3</div>
+                <div className="description_room">
+                  <h4>Superior Poolside</h4>
+                  <p>1 King-sized bed / 2 Queen-sized beds</p>
+                </div>
+              </div>
+            </label>
+
+            {/* Room 4 */}
+            <input type="radio" name="slide" id="c4" className="room_display" />
+            <label htmlFor="c4" className="card_room">
+              <div className="row">
+                <div className="icon_room">4</div>
+                <div className="description_room">
+                  <h4>Presidential Suite</h4>
+                  <p>1 King-sized bed / 2 Queen-sized beds</p>
+                </div>
+              </div>
+            </label>
+
+            {/* Room 5 */}
+            <input type="radio" name="slide" id="c5" className="room_display" />
+            <label htmlFor="c5" className="card_room">
+              <div className="row">
+                <div className="icon_room">5</div>
+                <div className="description_room">
+                  <h4>Chalet</h4>
+                  <p>1 King-sized bed / 2 Queen-sized beds</p>
+                </div>
+              </div>
+            </label>
+
+            {/* Room 6 */}
+            <input type="radio" name="slide" id="c6" className="room_display" />
+            <label htmlFor="c6" className="card_room">
+              <div className="row">
+                <div className="icon_room">6</div>
+                <div className="description_room">
+                  <h4>Baruk Suite</h4>
+                  <p>1 King-sized bed / 2 Queen-sized beds</p>
+                </div>
+              </div>
+            </label>
           </div>
-        </label>
-
-        {/* Room 2 */}
-        <input type="radio" name="slide" id="c2" className='room_display'/>
-        <label htmlFor="c2" className="card_room">
-          <div className="row">
-            <div className="icon_room">2</div>
-            <div className="description_room">
-              <h4>Seaview Deluxe</h4>
-              <p>1 King-sized bed / 2 Queen-sized beds</p>
-            </div>
-          </div>
-        </label>
-
-        {/* Room 3 */}
-        <input type="radio" name="slide" id="c3" className='room_display'/>
-        <label htmlFor="c3" className="card_room">
-          <div className="row">
-            <div className="icon_room">3</div>
-            <div className="description_room">
-              <h4>Superior Poolside</h4>
-              <p>1 King-sized bed / 2 Queen-sized beds</p>
-            </div>
-          </div>
-        </label>
-
-        {/* Room 4 */}
-        <input type="radio" name="slide" id="c4" className='room_display'/>
-        <label htmlFor="c4" className="card_room">
-          <div className="row">
-            <div className="icon_room">4</div>
-            <div className="description_room">
-              <h4>Presidential Suite</h4>
-              <p>1 King-sized bed / 2 Queen-sized beds</p>
-            </div>
-          </div>
-        </label>
-
-        {/* Room 5 */}
-        <input type="radio" name="slide" id="c5" className='room_display'/>
-        <label htmlFor="c5" className="card_room">
-          <div className="row">
-            <div className="icon_room">5</div>
-            <div className="description_room">
-              <h4>Chalet</h4>
-              <p>1 King-sized bed / 2 Queen-sized beds</p>
-            </div>
-          </div>
-        </label>
-
-        {/* Room 6 */}
-        <input type="radio" name="slide" id="c6" className='room_display'/>
-        <label htmlFor="c6" className="card_room">
-          <div className="row">
-            <div className="icon_room">6</div>
-            <div className="description_room">
-              <h4>Baruk Suite</h4>
-              <p>1 King-sized bed / 2 Queen-sized beds</p>
-            </div>
-          </div>
-        </label>
-
+        </div>
       </div>
-    </div>
     </div>
   );
 };
