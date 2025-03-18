@@ -19,6 +19,13 @@
     align-items: center;
 }
 
+.navbar .navbar-brand {
+    font-weight: 500;
+    color: #fff;
+    font-size: 23px;
+    transition: color 0.3s;
+}
+
 .offcanvas {
     background-color: #493829 !important;
     transition: transform 0.3s ease-in-out !important;
@@ -138,6 +145,10 @@ a.login-button:hover {
     color: #a2a2a1;
 }
 
+.offcanvas-backdrop {
+    transition: opacity 0.3s ease !important;
+}
+
 @media(max-width: 768px) {
     .nav-link::before {
         content: "";
@@ -173,6 +184,11 @@ a.login-button:hover {
     .offcanvas-header {
         margin-top: 10px;
     }
+
+    .offcanvas-title {
+        color: #fff;
+        margin-left: 20px;
+    }  
 }
   
 @media (min-width: 481px) {
@@ -183,8 +199,4 @@ a.login-button:hover {
     .offcanvas-header {
         display: none;
     }
-}
-
-.offcanvas-backdrop {
-    transition: opacity 0.3s ease !important;
 }
