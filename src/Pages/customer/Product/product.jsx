@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Toast from '../../../Component/Toast/Toast';
 import ImageSlider from '../../../Component/ImageSlider/ImageSlider';
@@ -9,10 +9,13 @@ import Footer from '../../../Component/Footer/footer';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
 
 // Import API
-import { fetchProduct} from '../../../../Api/api';
+import { fetchProduct } from '../../../../Api/api';
 
 // Import React Icons and CSS
-import { FaStar, FaStarHalfAlt } from 'react-icons/fa';
+import { FaStar, FaStarHalfAlt, FaSearch } from 'react-icons/fa';
+import { HiUsers} from "react-icons/hi2";
+import { CiCalendarDate } from "react-icons/ci";
+import { IoLocationSharp } from "react-icons/io5";
 import './product.css';
 
 const Product = () => {
@@ -33,7 +36,46 @@ const Product = () => {
     adults: 1,
     children: 0,
   });
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
+  const [activeTab, setActiveTab] = useState(null);
   const navigate = useNavigate();
+
+  // Create refs for search segments
+  const locationRef = useRef(null);
+  const checkinRef = useRef(null);
+  const checkoutRef = useRef(null);
+  const guestsRef = useRef(null);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 480);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  // Handle clicks outside search areas to close panel
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (activeTab && 
+          !locationRef.current?.contains(event.target) && 
+          !checkinRef.current?.contains(event.target) && 
+          !checkoutRef.current?.contains(event.target) && 
+          !guestsRef.current?.contains(event.target) &&
+          !event.target.closest('.expanded-panel')) {
+        setActiveTab(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [activeTab]);
 
   const displayToast = (type, message) => {
     setToastType(type);
@@ -49,6 +91,7 @@ const Product = () => {
         setProperties(fetchedProperties);
       } catch (error) {
         console.error('Error fetching properties:', error);
+        displayToast('error', 'Failed to load properties');
       }
     };
 
@@ -64,6 +107,49 @@ const Product = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setBookingData({ ...bookingData, [name]: value });
+  };
+
+  const handleCheckAvailability = (e) => {
+    if (e) e.stopPropagation();
+    
+    // Implement availability check logic here
+    if (!bookingData.arrivalDate || !bookingData.departureDate) {
+      displayToast('error', 'Please select arrival and departure dates');
+      return;
+    }
+    
+    // If dates are valid, proceed with availability check
+    displayToast('success', 'Checking availability...');
+  };
+
+  const handleTabClick = (tab) => {
+    setActiveTab(activeTab === tab ? null : tab);
+  };
+
+  const getPanelStyle = () => {
+    if (!activeTab) return {};
+    
+    let ref;
+    switch (activeTab) {
+      case 'location': ref = locationRef.current; break;
+      case 'checkin': ref = checkinRef.current; break;
+      case 'checkout': ref = checkoutRef.current; break;
+      case 'guests': ref = guestsRef.current; break;
+      default: return {};
+    }
+    
+    if (!ref) return {};
+    
+    const rect = ref.getBoundingClientRect();
+    
+    if (activeTab === 'guests') {
+      return { right: '8px', left: 'auto' };
+    }
+    
+    return { 
+      left: `${ref.offsetLeft}px`,
+      width: isMobile ? '90%' : `${Math.max(280, rect.width)}px`
+    };
   };
 
   const renderStars = (rating) => {
@@ -82,39 +168,202 @@ const Product = () => {
     return stars;
   };
 
-  return (
-    <div>
-      {<Navbar />}
-      <br /><br /><br />
-
+  const renderSearchSection = () => {
+    return (
       <section className="home" id="home">
         <div className="container">
-          <div className="content grid">
-            <div className="box">
-              <span>ARRIVAL DATE</span> <br />
-              <input type="date" name="arrivalDate" onChange={handleInputChange} />
+          
+          {/* Main search bar */}
+          <div className="search-bar">
+            <div 
+              ref={locationRef}
+              className={`search-segment ${activeTab === 'location' ? 'active' : ''}`}
+              onClick={() => handleTabClick('location')}
+            >
+              <IoLocationSharp className='search_bar_icon'/>
+              <div className="search-content">
+                <span className="search-label">Where</span>
+                <span className="search-value">Search destinations</span>
+              </div>
             </div>
-            <div className="box">
-              <span>DEPARTURE DATE</span> <br />
-              <input type="date" name="departureDate" onChange={handleInputChange} />
+            
+            <div className="search-divider"></div>
+            
+            <div 
+              ref={checkinRef}
+              className={`search-segment ${activeTab === 'checkin' ? 'active' : ''}`}
+              onClick={() => handleTabClick('checkin')}
+            >
+              <CiCalendarDate className='search_bar_icon'/>
+              <div className="search-content">
+                <span className="search-label">Check in</span>
+                <span className="search-value">
+                  {bookingData.arrivalDate || 'Add dates'}
+                </span>
+              </div>
             </div>
-            <div className="box">
-              <span>ADULTS</span> <br />
-              <input type="number" name="adults" onChange={handleInputChange} placeholder="1" />
+            
+            <div className="search-divider"></div>
+            
+            <div 
+              ref={checkoutRef}
+              className={`search-segment ${activeTab === 'checkout' ? 'active' : ''}`}
+              onClick={() => handleTabClick('checkout')}
+            >
+              <CiCalendarDate className='search_bar_icon'/>
+              <div className="search-content">
+                <span className="search-label">Check out</span>
+                <span className="search-value">
+                  {bookingData.departureDate || 'Add dates'}
+                </span>
+              </div>
             </div>
-            <div className="box">
-              <span>CHILDREN</span> <br />
-              <input type="number" name="children" onChange={handleInputChange} placeholder="0" />
-            </div>
-            <div className="box">
-              <button className="view_button_availability">
-                Check Availability
-                <i className="fas fa-arrow-circle-right"></i>
+            
+            <div className="search-divider"></div>
+            
+            <div 
+              ref={guestsRef}
+              className={`search-segment ${activeTab === 'guests' ? 'active' : ''}`}
+              onClick={() => handleTabClick('guests')}
+            >
+              <HiUsers className='search_bar_icon'/>
+              <div className="search-content">
+                <span className="search-label">Who</span>
+                <span className="search-value">
+                  {bookingData.adults + bookingData.children > 0 
+                    ? `${bookingData.adults} adults, ${bookingData.children} children` 
+                    : 'Add guests'}
+                </span>
+              </div>
+              <button 
+                className="search-button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCheckAvailability(e);
+                }}
+              >
+                <FaSearch className='Check_icon'/>
               </button>
             </div>
           </div>
+          
+          {/* Conditional expanded panel based on active tab */}
+          {activeTab && (
+            <div 
+              className={`expanded-panel ${activeTab}-panel`}
+              style={getPanelStyle()}
+            >
+              {activeTab === 'location' && (
+                <div>
+                  <h3>Popular destinations</h3>
+                  <div className="destinations-grid">
+                    {properties.slice(0, 4).map(property => (
+                      <div 
+                        key={property.ID} 
+                        className="destination-item"
+                        onClick={() => handleViewDetails(property)}
+                      >
+                        <span>{property.propertyAddress}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              
+              {activeTab === 'checkin' && (
+                <div>
+                  <h3>Select check-in date</h3>
+                  <input 
+                    type="date" 
+                    name="arrivalDate" 
+                    value={bookingData.arrivalDate}
+                    onChange={handleInputChange}
+                    className="date-input"
+                  />
+                </div>
+              )}
+              
+              {activeTab === 'checkout' && (
+                <div>
+                  <h3>Select check-out date</h3>
+                  <input 
+                    type="date" 
+                    name="departureDate" 
+                    value={bookingData.departureDate}
+                    onChange={handleInputChange}
+                    className="date-input"
+                  />
+                </div>
+              )}
+              
+              {activeTab === 'guests' && (
+                <div>
+                  <h3>Who's coming?</h3>
+                  <div className="guest-row">
+                    <div className="guest-info">
+                      <p className="title">Adults</p>
+                      <p className="subtitle">Ages 13+</p>
+                    </div>
+                    <div className="counter-controls">
+                      <button 
+                        className="counter-button"
+                        onClick={() => setBookingData({...bookingData, adults: Math.max(1, bookingData.adults - 1)})}
+                      >
+                        -
+                      </button>
+                      <span className="counter-value">{bookingData.adults}</span>
+                      <button 
+                        className="counter-button"
+                        onClick={() => setBookingData({...bookingData, adults: bookingData.adults + 1})}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  <div className="guest-row">
+                    <div className="guest-info">
+                      <p className="title">Children</p>
+                      <p className="subtitle">Ages 2-12</p>
+                    </div>
+                    <div className="counter-controls">
+                      <button 
+                        className="counter-button"
+                        onClick={() => setBookingData({...bookingData, children: Math.max(0, bookingData.children - 1)})}
+                      >
+                        -
+                      </button>
+                      <span className="counter-value">{bookingData.children}</span>
+                      <button 
+                        className="counter-button"
+                        onClick={() => setBookingData({...bookingData, children: bookingData.children + 1})}
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <button 
+                      className="check-button"
+                      onClick={handleCheckAvailability}
+                    >
+                      Check Availability
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </section>
+    );
+  };
+
+  return (
+    <div>
+      <Navbar />
+      <br /><br /><br />
+
+      {renderSearchSection()}
 
       <div className="property-container">
         <h2>Available Properties</h2>
@@ -133,7 +382,8 @@ const Product = () => {
                   )}
                 </div>
                 <div className="tour-property-info">
-                  <h4>{property.categoryName}</h4>
+                  <h4>{property.propertyAddress}</h4>
+                  <p>{property.nearbyLocation}</p>
                   <div className="tour-property-rating">{renderStars(rating)}</div>
                   <h5>From ${property.rateAmount}/night</h5>
                 </div>
@@ -146,7 +396,7 @@ const Product = () => {
       </div>
 
       {showToast && <Toast type={toastType} message={toastMessage} />}
-      <br /><br />
+      <br /><br /><br /><br /><br /><br />
       <Back_To_Top_Button />
       <Footer />
     </div>
