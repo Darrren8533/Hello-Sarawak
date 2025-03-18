@@ -5,7 +5,7 @@ import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_To
 import TawkMessenger from '../../../Component/TawkMessenger/TawkMessenger';
 import Toast from '../../../Component/Toast/Toast';
 
-import { fetchCart, removeReservation, updateReservationStatus } from '../../../../../Backend/Api/api';
+import { fetchCart, removeReservation, updateReservationStatus } from '../../../../Api/api';
 import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import './cart.css';
 
