@@ -95,3 +95,54 @@
         width: 100%;
     }
 }
+
+@media(max-width: 480px) {
+    .footer {
+        padding: 2rem 1rem;
+    }
+    
+    .footer-row {
+        gap: 3rem;
+    }
+    
+    .top h1 {
+        font-size: 1.8rem;
+    }
+    
+    .top p {
+        font-size: 1.2rem;
+        padding: 0.5rem 0;
+    }
+    
+    .icons_footer {
+        gap: 0.8rem;
+    }
+    
+    .icon_footer {
+        font-size: 1.3rem;
+    }
+    
+    .bottom {
+        gap: 1rem;
+    }
+    
+    .bottom h3 {
+        font-size: 1.2rem;
+        padding: 0.8rem 0 0.5rem 0;
+    }
+    
+    .bottom a {
+        font-size: 0.9rem;
+        padding-bottom: 0.3rem;
+    }
+    
+    .bottom p {
+        font-size: 0.9rem;
+        align-items: center;
+        padding-bottom: 0.3rem;
+    }
+    
+    .bottom p .icon {
+        font-size: 1.2rem;
+    }
+}
