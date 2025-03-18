@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { FaBars, FaTimes } from "react-icons/fa";
+import DefaultAvatar from '../../../src/public/avatar.png';
 import { logoutUser, fetchUserData, fetchGoogleUserData } from '../../../Api/api';
 import './navbar.css';
-import DefaultAvatar from '../../../src/public/avatar.png';
-import eventBus from '../EventBus/Eventbus';
+import eventBus from '../EventBus/EventBus';
 
 function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -111,9 +111,9 @@ function Navbar() {
 
                     <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
                         <div className="offcanvas-header">
-                        <h5 className="offcanvas-title" id="offcanvasNavbarLabel">Hello Sarawak</h5>
+                        <h2 className="offcanvas-title" id="offcanvasNavbarLabel">Hello Sarawak</h2>
                             <button type="button" className="close-btn" data-bs-dismiss="offcanvas" aria-label="Close">
-                                <FaTimes size={16} color="#fff" />
+                                <FaTimes className="icon_close"/>
                             </button>
                         </div>
                         <div className="offcanvas-body">
@@ -199,7 +199,7 @@ function Navbar() {
                         )}
 
                         <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}>
-                            <FaBars size={30} color="#fff" />
+                            <FaBars className="icon_navbar"/>
                         </button>
                     </div>
                 </div>
