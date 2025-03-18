@@ -40,6 +40,7 @@
     justify-content: center;
     align-items: center;
     margin-top: 30px;
+    gap: 25px;
 }
 
 .container_contact_us .google_map {
@@ -143,5 +144,47 @@
 
     .contact .content {
         margin-top: 45px;
+    }
+}
+
+@media (max-width: 480px) {
+    .contact {
+      padding: 20px; 
+      margin-top: 0; 
+    }
+  
+    .contact .content h2 {
+      font-size: 28px; 
+    }
+  
+    .contactForm {
+      padding: 20px; 
+      margin-bottom: 30px;
+    }
+  
+    .contactForm h2 {
+      font-size: 24px; 
+    }
+  
+    .container_contact_us .google_map iframe {
+      height: 250px; 
+    }
+  
+    .contactForm .inputBox input,
+    .contactForm .inputBox textarea {
+      font-size: 14px; 
+    }
+  
+    .contactForm .inputBox span {
+      font-size: 14px; 
+    }
+  
+    .contactForm .btn_submit {
+      width: 100%; 
+      margin-top: 15px;
+    }
+      
+    .container_contact_us .google_map {
+      margin-bottom: 20px; 
     }
 }
