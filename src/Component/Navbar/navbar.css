@@ -24,7 +24,6 @@
     transition: transform 0.3s ease-in-out !important;
 }
 
-/* 添加滑动动画效果 */
 .offcanvas.offcanvas-end:not(.show) {
     transform: translateX(100%);
 }
@@ -64,7 +63,6 @@
     color: #a2a2a1
 }
 
-/* 为导航项添加动画延迟，创造级联效果 */
 .offcanvas-body .nav-item {
     opacity: 0;
     transform: translateX(20px);
