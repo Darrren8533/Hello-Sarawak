@@ -43,16 +43,16 @@ const Map = () => {
   };
 
   return (
-    <div className="main-container">
+    <div className="main-container-map">
         
       {/* Map */}
-      <div className="map-container">
-        <img src={Sarawak_Map} alt="Sarawak Map" className="map-background" />
+      <div className="map-container_sarawak">
+        <img src={Sarawak_Map} alt="Sarawak Map" className="map-background_sarawak" />
 
         {/* Kuching */}
-        <svg className="map-overlay" viewBox="0 0 1300 800">
+        <svg className="map-overlay_sarawak" viewBox="0 0 1300 800">
           <g
-            className="map-sub"
+            className="map-sub_sarawak"
             data-region-name="Kuching"
             data-region-description="Kuching, the vibrant capital of Sarawak, is a unique blend of culture, history and nature. 
             Explore its scenic waterfront, rich heritage, and delicious cuisine, and use it as your gateway to the stunning rainforests and cultural experiences of Sarawak."
@@ -110,7 +110,7 @@ const Map = () => {
 
         {/* Serian */}
           <g
-            className="map-sub"
+            className="map-sub_sarawak"
             data-region-name="Serian"
             data-region-description="Serian, a peaceful town in Sarawak, offers a glimpse into rural Borneo life. Known for its lush landscapes, 
             friendly communities, and traditional markets, Serian is a perfect destination for those seeking authentic cultural experiences and natural 
@@ -163,7 +163,7 @@ const Map = () => {
 
         {/* Samarahan */}
           <g
-            className="map-sub"
+            className="map-sub_sarawak"
             data-region-name="Samarahan"
             data-region-description="Samarahan, a growing hub in Sarawak, blends modern development with traditional charm. Known for its educational 
             institutions, vibrant markets and close proximity to natural attractions, it offers a perfect mix of city life and rural beauty, 
@@ -206,7 +206,7 @@ const Map = () => {
 
        {/* Sri Aman */}
           <g
-            className="map-sub"
+            className="map-sub_sarawak"
             data-region-name="Sri Aman"
             data-region-description="Sri Aman, a peaceful town by the Batang Lupar River, is known for its natural beauty and 
             cultural heritage. Famous for the Sebuyau Waterfall and the Pesta Benak festival, it offers a serene escape with 
@@ -267,7 +267,7 @@ const Map = () => {
 
        {/* Betong */}
           <g
-            className="map-sub"
+            className="map-sub_sarawak"
             data-region-name="Betong"
             data-region-description="Betong, located in the southern part of Sarawak, is a peaceful town known for its natural beauty and rich 
             cultural heritage. Surrounded by lush rainforests and rivers, it offers visitors a chance to explore rural life, 
@@ -312,7 +312,7 @@ const Map = () => {
 
        {/* Sarikai */}
           <g
-            className="map-sub"
+            className="map-sub_sarawak"
             data-region-name="Sarikai"
             data-region-description="Sarikei, often known as the Town of Fruits, is a charming town in Sarawak, 
             renowned for its agriculture and vibrant fruit markets. Famous for its delicious pineapples and other local produce, 
@@ -370,7 +370,7 @@ const Map = () => {
 
        {/* Kapit */}
           <g
-            className="map-sub"
+            className="map-sub_sarawak"
             data-region-name="Kapit"
             data-region-description="Kapit, a hidden gem deep in the heart of Sarawak, is a vibrant town accessible by the mighty Rajang River. 
             Known for its rich Iban culture, traditional longhouses, and lush rainforest surroundings, Kapit offers an authentic experience of 
@@ -486,7 +486,7 @@ const Map = () => {
 
        {/* Miri */}
           <g
-            className="map-sub"
+            className="map-sub_sarawak"
             data-region-name="Miri"
             data-region-description="Miri, the vibrant resort city of Sarawak, is a gateway to breathtaking national parks and rich 
             cultural experiences. Known for its stunning beaches, world-famous diving spots, and attractions like the Niah Caves and 
@@ -570,7 +570,7 @@ const Map = () => {
 
        {/* Miri */}
           <g
-            className="map-sub"
+            className="map-sub_sarawak"
             data-region-name="Limbang"
             data-region-description="Limbang, nestled between Brunei's two territories, is a charming town known for its unique location and 
             cultural diversity. Surrounded by lush landscapes and the winding Limbang River, it's a great spot for exploring traditional longhouses, 
@@ -660,7 +660,7 @@ const Map = () => {
 
        {/* Bintulu */}
           <g
-            className="map-sub"
+            className="map-sub_sarawak"
             data-region-name="Bintulu"
             data-region-description="Bintulu, a bustling coastal town in Sarawak, is known for its role in Malaysia's energy sector and 
             its natural attractions. Visitors can explore the stunning Similajau National Park, famous for its golden beaches and diverse 
@@ -734,7 +734,7 @@ const Map = () => {
 
        {/* Sibu */}
           <g
-            className="map-sub"
+            className="map-sub_sarawak"
             data-region-name="Sibu"
             data-region-description="Sibu, situated along the Rajang River, is a lively town known for its rich cultural heritage and bustling 
             markets. Often called the “Gateway to Central Sarawak,” Sibu is famous for its vibrant Sibu Central Market, beautiful temples, and 
@@ -798,7 +798,7 @@ const Map = () => {
 
        {/* Mukah */}
           <g
-            className="map-sub"
+            className="map-sub_sarawak"
             data-region-name="Mukah"
             data-region-description="Mukah, a coastal town in Sarawak, is the cultural heartland of the Melanau people. 
             Known for its sago production and traditional Melanau villages, Mukah offers a unique cultural experience. 
@@ -851,7 +851,7 @@ const Map = () => {
       </div>
 
       {/* Display card */}
-      <div className={`info_card_map ${animateClass}`}>
+      <div className={`info_card_map_sarawak ${animateClass}`}>
         <img src={selectedRegion.regionImage} alt={selectedRegion.name} />
         <h2>{selectedRegion.name}</h2>
         <p>{selectedRegion.description}</p>
