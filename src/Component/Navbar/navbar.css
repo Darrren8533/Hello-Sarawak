@@ -28,7 +28,7 @@
 
 .offcanvas {
     background-color: #493829 !important;
-    transition: transform 0.3s ease-in-out !important;
+    transition: transform 0.35s ease-in-out !important;
 }
 
 .offcanvas.offcanvas-end:not(.show) {
@@ -146,7 +146,7 @@ a.login-button:hover {
 }
 
 .offcanvas-backdrop {
-    transition: opacity 0.3s ease !important;
+    transition: opacity 0.9s ease !important;
 }
 
 @media(max-width: 768px) {
