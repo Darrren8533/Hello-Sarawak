@@ -129,7 +129,7 @@
 @media (max-width: 480px) {
 
     div[style*="position: fixed"] {
-        right: 1px !important;
+        right: 0px !important;
     }
     
     .toast {
