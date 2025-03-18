@@ -19,8 +19,6 @@ import Toast from '../../../Component/Toast/Toast';
 import VisualCaptcha from '../../../Component/VisualCaptcha/VisualCaptcha'; 
 
 const Register = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -223,9 +221,13 @@ const Register = () => {
 
             <VisualCaptcha onValidationChange={setIsCaptchaValid} />
 
-            <div className="container_button">
-              <button type="submit" className="btn"><span>Sign Up</span></button>
-            </div>
+          <div className="container_button">
+            <button type="submit" className="btn"><span>Sign Up</span></button>
+              <Link to={'/login'}>
+                <button type="button" className="btn" style={{ marginTop: '10px' }}><span>Login</span></button>
+              </Link>
+          </div>
+
           </form>
         </div>
       </div>
