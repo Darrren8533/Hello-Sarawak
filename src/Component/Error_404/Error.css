@@ -52,3 +52,56 @@ img {
   background: #CC8C18;
   transition: 0.3s;
 }
+
+@media screen and (max-width: 768px) {
+  .Error_404 {
+    font-size: 70px;
+  }
+  
+  img {
+    width: 380px;
+  }
+  
+  .Error_Text h2 {
+    font-size: 25px;
+  }
+  
+  .Error_Text p {
+    font-size: 14px;
+  }
+  
+  .button_Error_404 {
+    width: 180px;
+    height: 38px;
+    margin: 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .Error_404_Container {
+    margin-top: 100px;
+  }
+  
+  .Error_404 {
+    font-size: 50px;
+  }
+  
+  img {
+    width: 280px;
+  }
+  
+  .Error_Text h2 {
+    font-size: 20px;
+  }
+  
+  .Error_Text p {
+    font-size: 12px;
+  }
+  
+  .button_Error_404 {
+    width: 160px;
+    height: 35px;
+    margin: 15px;
+    font-size: 14px;
+  }
+}
