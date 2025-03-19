@@ -65,7 +65,7 @@ const Footer = () => {
 
             <h3>Contact Us</h3>
               <p>
-                <MdEmail className='icon' /> Wilson336933@gmail.com
+                <MdEmail className='icon' />  project@webnyou.com
               </p>
 
               <p>
