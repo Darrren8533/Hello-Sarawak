@@ -132,9 +132,9 @@ const Destination = () => {
         </div>
       </div>
 
-      {/* Recent Trip */}
+      {/* Popular Trip */}
       <div className="trip">
-        <h1>Recent Trips</h1>
+        <h1>Popular Trips</h1>
         <p>Find Your Path, Create Your Memories</p>
 
         {/* Trip Cards */}
