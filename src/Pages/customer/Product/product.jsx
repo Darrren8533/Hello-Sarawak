@@ -396,7 +396,7 @@ const Product = () => {
       </div>
 
       {showToast && <Toast type={toastType} message={toastMessage} />}
-      <br /><br /><br /><br />
+      <br /><br /><br /><br /><br />
       <Back_To_Top_Button />
       <Footer />
     </div>
