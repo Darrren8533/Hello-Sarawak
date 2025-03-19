@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useParams, useNavigate } from 'react-router-dom';
 import { IoIosArrowDown, IoIosArrowUp, IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { IoReturnUpBackOutline } from "react-icons/io5";
+import { FaWifi, FaParking, FaSwimmingPool, FaHotTub, FaTv, FaUtensils, FaSnowflake, FaPaw, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaLock, FaBell, FaMapMarkerAlt, FaTree, FaMountain, FaCity } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+
 import Navbar from '../../../Component/Navbar/navbar';
 import Footer from '../../../Component/Footer/footer';
 import Reviews from "../../../Component/Reviews/Reviews";
-import { createReservation, requestBooking } from '../../../../Api/api';
 import './PropertyDetails.css';
-import { FaWifi, FaParking, FaSwimmingPool, FaHotTub, FaTv, FaUtensils, FaSnowflake, FaPaw, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaLock, FaBell, FaMapMarkerAlt, FaTree, FaMountain, FaCity } from "react-icons/fa";
+
+import { createReservation, requestBooking } from '../../../../Api/api';
 
 const facilities = [
     { name: "Wi-Fi", icon: <FaWifi /> },
@@ -58,6 +60,7 @@ const PropertyDetails = () => {
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [isEditingDates, setIsEditingDates] = useState(false);
   const [isEditingGuests, setIsEditingGuests] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [totalNights, setTotalNights] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
   const [bookingForm, setBookingForm] = useState({
@@ -92,6 +95,14 @@ const PropertyDetails = () => {
         name === 'departureDate' ? value : bookingData.departureDate
       );
     }
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev === propertyDetails?.propertyImage.length - 1 ? 0 : prev + 1));
+  };
+  
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev === 0 ? propertyDetails?.propertyImage.length - 1 : prev - 1));
   };
 
   const handleGuestChange = (type, operation) => {
@@ -267,8 +278,36 @@ const PropertyDetails = () => {
         <>
           <Navbar />
           <div className="property-details-container">
-            <h1 className="property-title">{propertyDetails?.propertyName}</h1>
+            <h1 className="property-title">{propertyDetails?.propertyAddress}</h1>
             <div className="gallery-section">
+
+              <div className="mobile-slideshow">
+                {propertyDetails?.propertyImage && propertyDetails.propertyImage.length > 0 && (
+                  <>
+                    <img 
+                      src={`data:image/jpeg;base64,${propertyDetails.propertyImage[currentSlide]}`} 
+                      alt={`slide ${currentSlide + 1}`}
+                      onClick={handleImageClick}
+                    />
+                    <button className="slide-nav prev" onClick={prevSlide}>
+                      <IoIosArrowBack/>
+                    </button>
+                    <button className="slide-nav next" onClick={nextSlide}>
+                      <IoIosArrowForward/>
+                    </button>
+                    <div className="slide-indicators">
+                      {propertyDetails.propertyImage.map((_, index) => (
+                        <span 
+                          key={index} 
+                          className={`indicator ${index === currentSlide ? 'active' : ''}`}
+                          onClick={() => setCurrentSlide(index)}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+              
               <div className="gallery-grid">
                 <div className="gallery-main">
                   {propertyDetails?.propertyImage && propertyDetails.propertyImage.length > 0 && (
@@ -307,7 +346,21 @@ const PropertyDetails = () => {
                 </div>
               </div>
             </div>
-
+  
+            {!showAllPhotos && !isFullscreen && !showBookingForm && (
+              <div className="mobile-booking-bar">
+                <div className="mobile-booking-bar-content">
+                  <div className="mobile-price-info">
+                    <h3>${propertyDetails?.rateAmount} <span>/night</span></h3>
+                    <span>{propertyDetails?.propertyGuestPaxNo} guests max</span>
+                  </div>
+                  <button className="mobile-book-now-btn" onClick={handleBookNowClick}>
+                    Book Now
+                  </button>
+                </div>
+              </div>
+            )}
+  
             {isFullscreen && (
                <div className="fullscreen-overlay">
                <button className="fullscreen-close-btn" onClick={handleCloseFullscreen}>
@@ -319,35 +372,41 @@ const PropertyDetails = () => {
                     prev === 0 ? propertyDetails.propertyImage.length - 1 : prev - 1
                   )}
                 >
-                  ❮
+                   <IoIosArrowBack/>
                 </button>
-
+  
                 <img 
                   src={`data:image/jpeg;base64,${propertyDetails.propertyImage[selectedImageIndex]}`}
                   alt={`fullscreen image ${selectedImageIndex + 1}`}
                   className="fullscreen-image"
                 />
-
+  
                 <button 
                   className="fullscreen-nav-btn next-btn"
                   onClick={() => setSelectedImageIndex((prev) => 
                     prev === propertyDetails.propertyImage.length - 1 ? 0 : prev + 1
                   )}
                 >
-                  ❯
+                   <IoIosArrowForward/>
                 </button>
              </div>
             )}
-
+  
             <div className="content-section">
               <div className="left-content">
                 <div className="property-features">
-                  <h2>{propertyDetails?.propertyLocation}</h2>
-                  <h2>{propertyDetails?.propertyGuestPaxNo}  -  {propertyDetails?.propertyBedType} bed</h2>
+                  <h2>{propertyDetails?.nearbyLocation}</h2>
                 </div>
                 <hr/>
                 <div className="property-features">
-                  <h2>Hosted by {propertyDetails?.username || "Unknown Host"}</h2>
+                  <h2>{propertyDetails?.uImage && (
+                    <img 
+                    src={propertyDetails.uImage.startsWith('http') ? propertyDetails.uImage : `data:image/jpeg;base64,${propertyDetails.uImage}`} 
+                    alt="Host Avatar"
+                    className="front-avatar-image"
+                    /> 
+                    )}
+                    Hosted by {propertyDetails?.username || "Unknown Host"}</h2>
                 </div>
                 <hr/>
                 <div className="property-features">
@@ -368,7 +427,7 @@ const PropertyDetails = () => {
                         );
                     })}
                   </div>
-
+  
                   {facilitiesArray.length > 10 && (
                     <button className="show-all-Facilities" onClick={toggleFacilities}>
                         {showAllFacilities ? "Show Less" : "Show All Facilities"}
@@ -381,9 +440,10 @@ const PropertyDetails = () => {
                 <div className="booking-section">
                   <h2>Booking Information</h2>
                   <div className="price-info">
-                    <h3>${propertyDetails?.rateAmount} <span>/night</span></h3>
+                    <h3>${propertyDetails?.rateAmount} <span>/night</span></h3><br/>
+                    <h6>Maximum Guest: {propertyDetails?.propertyGuestPaxNo} </h6>
+                    <h6>Bed: {propertyDetails?.propertyBedType} Size</h6>
                   </div>
-                  
                   <form className="booking-form" onSubmit={handleBookNowClick}>
                     <div className="date-inputs">
                       <div className="input-group">
@@ -405,9 +465,6 @@ const PropertyDetails = () => {
                         />
                       </div>
                     </div>
-
-                    
-
                     <button type="submit" className="book-now-btn">
                       Book Now
                     </button>
