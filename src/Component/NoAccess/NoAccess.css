@@ -48,3 +48,52 @@ img {
   background: #CC8C18;
   transition: 0.3s;
 }
+
+@media screen and (max-width: 768px) {
+  .No_access {
+    margin-top: 80px;
+  }
+  
+  img {
+    width: 380px;
+  }
+  
+  .No_Access_Text h2 {
+    font-size: 25px;
+  }
+  
+  .No_Access_Text p {
+    font-size: 14px;
+  }
+  
+  .button_No_Access {
+    width: 180px;
+    height: 38px;
+    margin: 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .No_access {
+    margin-top: 50px;
+  }
+  
+  img {
+    width: 280px;
+  }
+  
+  .No_Access_Text h2 {
+    font-size: 20px;
+  }
+  
+  .No_Access_Text p {
+    font-size: 12px;
+  }
+  
+  .button_No_Access {
+    width: 160px;
+    height: 35px;
+    margin: 15px;
+    font-size: 14px;
+  }
+}
