@@ -313,7 +313,6 @@
   color: #CC8C18;
 }
 
-/* Media queries for responsive design */
 @media (max-width: 768px) {
   .home .container {
     max-width: 100%;
@@ -356,7 +355,7 @@
 @media (max-width: 480px) {
   .home .container {
     padding: 10px;
-    margin-top: 40px;
+    margin-top: 60px;
   }
 
   .search-bar {
