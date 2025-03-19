@@ -69,7 +69,7 @@ const Footer = () => {
               </p>
 
               <p>
-                <FaPhoneAlt className='icon' /> +60162681684
+                <FaPhoneAlt className='icon' /> +6016-888 XXXX
               </p>
 
           </div>
