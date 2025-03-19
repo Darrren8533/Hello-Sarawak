@@ -171,7 +171,7 @@ const Product = () => {
   const renderSearchSection = () => {
     return (
       <section className="home" id="home">
-        <div className="container">
+        <div className="container_for_product">
           
           {/* Main search bar */}
           <div className="search-bar">
@@ -365,13 +365,13 @@ const Product = () => {
 
       {renderSearchSection()}
 
-      <div className="property-container">
+      <div className="property-container_for_product">
         <h2>Available Properties</h2>
-        <div className="scrollable-container">
+        <div className="scrollable-container_for_product">
           {properties.length > 0 ? (
             properties.map((property) => (
               <div className="tour-property-item" key={property.ID} onClick={() => handleViewDetails(property)}> 
-                <div className="tour-property-image-container">
+                <div className="tour-property-image-box">
                   {property.propertyImage ? (
                     <ImageSlider images={property.propertyImage}
                     onClick={(e) => {
@@ -396,7 +396,7 @@ const Product = () => {
       </div>
 
       {showToast && <Toast type={toastType} message={toastMessage} />}
-      <br /><br /><br /><br /><br /><br />
+      <br /><br /><br /><br />
       <Back_To_Top_Button />
       <Footer />
     </div>
