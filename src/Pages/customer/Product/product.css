@@ -5,7 +5,6 @@
 }
 
 .home .container_for_product {
-  padding: 20px;
   max-width: 90%;
   margin: 85px auto 5px;
   position: relative;
@@ -235,7 +234,7 @@
 /*------------Property list styles------------*/
 .property-container_for_product {
   padding: 20px;
-  max-width: 1500px;
+  max-width: 1400px;
   width: 100%;
   margin: 0 auto;
   box-sizing: border-box;
