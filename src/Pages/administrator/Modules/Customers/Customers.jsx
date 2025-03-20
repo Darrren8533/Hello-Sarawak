@@ -58,25 +58,27 @@ const Customers = () => {
         },
     ];
 
+    // 修改displayLabels对象
     const displayLabels = {
         firstName: 'First Name',
         lastName: 'Last Name',
         email: 'Email',
         phoneNo: 'Phone Number',
-        uActivation: 'Status',
+        uactivation: 'Status',  // 修改为小写
         gender: 'Gender',
         country: 'Country',
     };
 
+    // 修改处理函数中的字段引用
     const handleAction = async (action, customer) => {
         if (action === 'view') {
             const essentialFields = {
-                firstName: customer.uFirstName || 'N/A',
-                lastName: customer.uLastName || 'N/A',
-                email: customer.uEmail || 'N/A',
-                phoneNo: customer.uPhoneNo || 'N/A',
-                gender: customer.uGender || 'N/A',
-                country: customer.uCountry || 'N/A',
+                firstName: customer.ufirstname || 'N/A',
+                lastName: customer.ulastname || 'N/A',
+                email: customer.uemail || 'N/A',
+                phoneNo: customer.uphoneno || 'N/A',
+                gender: customer.ugender || 'N/A',
+                country: customer.ucountry || 'N/A',
             };
             setSelectedCustomer(essentialFields);
         } else if (action === 'suspend') {
@@ -86,13 +88,14 @@ const Customers = () => {
         }
     };
 
+    // 修改suspend和activate函数
     const handleSuspendUser = async (customer) => {
         try {
-            await suspendUser(customer.userID);
+            await suspendUser(customer.userid);
             setCustomers((prevUsers) =>
-                prevUsers.map((c) => (c.userID === customer.userID ? { ...c, uActivation: 'Inactive' } : c))
+                prevUsers.map((c) => (c.userid === customer.userid ? { ...c, uactivation: 'Inactive' } : c))
             );
-            displayToast('success', `User ${customer.uFirstName} ${customer.uLastName} has been suspended.`);
+            displayToast('success', `User ${customer.ufirstname} ${customer.ulastname} has been suspended.`);
         } catch (error) {
             console.error('Failed to suspend user:', error);
             displayToast('error', 'Error suspending user');
@@ -101,11 +104,11 @@ const Customers = () => {
 
     const handleActivateUser = async (customer) => {
         try {
-            await activateUser(customer.userID);
+            await activateUser(customer.userid);
             setCustomers((prevCustomers) =>
-                prevCustomers.map((c) => (c.userID === customer.userID ? { ...c, uActivation: 'Active' } : c))
+                prevCustomers.map((c) => (c.userid === customer.userid ? { ...c, uactivation: 'Active' } : c))
             );
-            displayToast('success', `User ${customer.uFirstName} ${customer.uLastName} has been activated.`);
+            displayToast('success', `User ${customer.ufirstname} ${customer.ulastname} has been activated.`);
         } catch (error) {
             console.error('Failed to activate user:', error);
             displayToast('error', 'Error activating user');
@@ -129,11 +132,12 @@ const Customers = () => {
     };
 
 
+    // 修改字段引用，从驼峰式改为全小写
     const filteredCustomers = customers.filter(
         (customer) =>
-            (appliedFilters.status === 'All' || customer.uActivation === appliedFilters.status) &&
+            (appliedFilters.status === 'All' || customer.uactivation === appliedFilters.status) &&
             (
-                `${customer.uFirstName} ${customer.uLastName} ${customer.uEmail} ${customer.uPhoneNo} ${customer.uActivation}`
+                `${customer.ufirstname} ${customer.ulastname} ${customer.uemail} ${customer.uphoneno} ${customer.uactivation}`
                     .toLowerCase()
                     .includes(searchKey.toLowerCase())
             )
@@ -143,17 +147,18 @@ const Customers = () => {
         setAppliedFilters({ status: selectedStatus });
     };
 
+    // 修改列定义
     const columns = [
-        { header: 'First Name', accessor: 'uFirstName' },
-        { header: 'Last Name', accessor: 'uLastName' },
-        { header: 'Email', accessor: 'uEmail' },
-        { header: 'Phone', accessor: 'uPhoneNo' },
+        { header: 'First Name', accessor: 'ufirstname' },
+        { header: 'Last Name', accessor: 'ulastname' },
+        { header: 'Email', accessor: 'uemail' },
+        { header: 'Phone', accessor: 'uphoneno' },
         {
             header: 'Status',
-            accessor: 'uActivation',
+            accessor: 'uactivation',
             render: (customer) => (
-                <span className={`status-badge ${(customer.uActivation || 'Active').toLowerCase()}`}>
-                    {customer.uActivation || 'Active'}
+                <span className={`status-badge ${(customer.uactivation || 'Active').toLowerCase()}`}>
+                    {customer.uactivation || 'Active'}
                 </span>
             ),
         },
@@ -162,7 +167,7 @@ const Customers = () => {
             accessor: 'actions',
             render: (customer) => (
                 <ActionDropdown
-                    items={customerDropdownItems(customer.uActivation)}
+                    items={customerDropdownItems(customer.uactivation)}
                     onAction={(action) => handleAction(action, customer)}
                 />
             ),
