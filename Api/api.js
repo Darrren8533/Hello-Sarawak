@@ -3,7 +3,7 @@ const API_URL = "https://backend-server-tf6m.onrender.com";
 //Register
 export const signupUser = async (userData) => {
   try {
-    const response = await fetch('http://localhost:5000/register', {
+    const response = await fetch('https://cams-backend.vercel.app/register', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
