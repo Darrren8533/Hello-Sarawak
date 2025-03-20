@@ -99,7 +99,7 @@ const Product = () => {
   }, []);
 
   const handleViewDetails = (property) => {
-    navigate(`/product/${property.propertyID}`, { 
+    navigate(`/product/${property.propertyid}`, { 
       state: { propertyDetails: property }
     });
   };
@@ -259,11 +259,11 @@ const Product = () => {
                   <div className="destinations-grid">
                     {properties.slice(0, 4).map(property => (
                       <div 
-                        key={property.ID} 
+                        key={property.id} 
                         className="destination-item"
                         onClick={() => handleViewDetails(property)}
                       >
-                        <span>{property.propertyAddress}</span>
+                        <span>{property.propertyaddress}</span>
                       </div>
                     ))}
                   </div>
