@@ -19,7 +19,7 @@ function Navbar() {
         const checkLoginStatus = async () => {
             if (userID) {
                 try {
-                    const response = await fetch(`https://cams-backend.vercel.app/checkStatus?userID=${userID}`);
+                    const response = await fetch(`https://cams-backend.vercel.app/checkStatus?userid=${userID}`);
                     const data = await response.json();
 
                     if (data.uStatus === 'login') {
