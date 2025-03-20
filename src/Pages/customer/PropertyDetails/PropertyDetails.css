@@ -22,7 +22,7 @@
 
 .property-info-section {
     display: grid;
-    grid-template-columns: 3fr 2fr;
+    grid-template-columns: 2fr 2fr;
     gap: 2rem;
     padding: 2rem;
     background: white;
@@ -427,7 +427,7 @@
 }
   
 .gallery-main {
-    height: 450px;
+    height: 470px;
 }
   
 .gallery-main img {
