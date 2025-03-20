@@ -17,7 +17,7 @@ const Sidebar = ({ title, links, isCollapsed, toggleSidebar }) => {
           const response = await fetch(`https://cams-backend.vercel.app/checkStatus?userid=${userID}`);
           const data = await response.json();
 
-          if (data.uStatus === 'login') {
+          if (data.ustatus === 'login') {
             setIsLoggedIn(true);
           } else {
             setIsLoggedIn(false);
