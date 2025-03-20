@@ -41,7 +41,7 @@ const PropertyListing = () => {
         try {
             const propertyData = await fetchPropertiesListingTable();
             const validProperties = (propertyData?.properties || []).filter(
-                (property) => property.propertyID !== undefined
+                (property) => property.propertyid !== undefined
             );
             setProperties(validProperties);
         } catch (error) {
@@ -53,27 +53,27 @@ const PropertyListing = () => {
     const handleAction = async (action, property) => {
         if (action === 'view') {
             setSelectedProperty({
-                propertyName: property.propertyAddress || 'N/A',
-                clusterName: property.clusterName || 'N/A',
-                categoryName: property.categoryName || 'N/A',
-                propertyPrice: property.rateAmount|| 'N/A',
-                propertyLocation: property.nearbyLocation || 'N/A',
-                propertyGuestPaxNo: property.propertyGuestPaxNo || 'N/A',
-                propertyStatus: property.propertyStatus || 'N/A',
-                propertyBedType: property.propertyBedType || 'N/A',
-                propertyDescription: property.propertyDescription || 'N/A',
-                images: property.propertyImage || [],
+                propertyName: property.propertyaddress || 'N/A',
+                clusterName: property.clustername || 'N/A',
+                categoryName: property.categoryname || 'N/A',
+                propertyPrice: property.rateamount|| 'N/A',
+                propertyLocation: property.nearbylocation || 'N/A',
+                propertyGuestPaxNo: property.propertyguestpaxno || 'N/A',
+                propertyStatus: property.propertystatus || 'N/A',
+                propertyBedType: property.propertybedtype || 'N/A',
+                propertyDescription: property.propertydescription || 'N/A',
+                images: property.propertyimage || [],
                 username: property.username || 'N/A',
             });
         } else if (action === 'accept') {
             const newStatus = 'Available';
-            await propertyListingAccept(property.propertyID);
-            updatePropertyStatus(property.propertyID, newStatus)
+            await propertyListingAccept(property.propertyid);
+            updatePropertyStatus(property.propertyid, newStatus)
                 .then(() => {
                     setProperties((prevProperties) =>
                         prevProperties.map((res) =>
-                            res.propertyID === property.propertyID
-                                ? { ...res, propertyStatus: newStatus }
+                            res.propertyid === property.propertyid
+                                ? { ...res, propertystatus: newStatus }
                                 : res
                         )
                     );
@@ -85,13 +85,13 @@ const PropertyListing = () => {
                 });
         } else if (action === 'reject') {
             const newStatus = 'Unavailable';
-            await propertyListingReject(property.propertyID);
-            updatePropertyStatus(property.propertyID, newStatus)
+            await propertyListingReject(property.propertyid);
+            updatePropertyStatus(property.propertyid, newStatus)
                 .then(() => {
                     setProperties((prevProperties) =>
                         prevProperties.map((res) =>
-                            res.propertyID === property.propertyID
-                                ? { ...res, propertyStatus: newStatus }
+                            res.propertyid === property.propertyid
+                                ? { ...res, propertystatus: newStatus }
                                 : res
                         )
                     );
@@ -102,9 +102,9 @@ const PropertyListing = () => {
                     displayToast('error', 'Failed to reject property listing request');
                 });
         } else if (action === 'delete') {
-            if (property.propertyStatus === 'Unavailable' && property.username === username) {
+            if (property.propertystatus === 'Unavailable' && property.username === username) {
                 // Allow delete only if Unavailable and owned by the logged-in user
-                setPropertyToDelete(property.propertyID);
+                setPropertyToDelete(property.propertyid);
                 setIsDialogOpen(true);
             } else {
                 displayToast('error', 'You do not have permission to delete this property.');
@@ -116,7 +116,7 @@ const PropertyListing = () => {
     const handleDeleteProperty = async () => {
         try {
             // Find the property to delete from the current properties list
-            const property = properties.find((prop) => prop.propertyID === propertyToDelete);
+            const property = properties.find((prop) => prop.propertyid === propertyToDelete);
     
             // If property is not found, show an error and return
             if (!property) {
@@ -127,7 +127,7 @@ const PropertyListing = () => {
             }
     
             // Check if the property status is not "Unavailable"
-            if (property.propertyStatus !== 'Unavailable') {
+            if (property.propertystatus !== 'Unavailable') {
                 displayToast('error', 'Only unavailable properties can be deleted.');
                 setIsDialogOpen(false);
                 setPropertyToDelete(null);
@@ -137,7 +137,7 @@ const PropertyListing = () => {
             // Proceed with deletion if the property is "Unavailable"
             await deleteProperty(propertyToDelete);
             setProperties((prevProperties) =>
-                prevProperties.filter((prop) => prop.propertyID !== propertyToDelete)
+                prevProperties.filter((prop) => prop.propertyid !== propertyToDelete)
             );
             displayToast('success', 'Property deleted successfully');
         } catch (error) {
@@ -185,13 +185,13 @@ const PropertyListing = () => {
 
     const filteredProperties = properties.filter(
         (property) =>
-            (appliedFilters.status === 'All' || (property.propertyStatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
+            (appliedFilters.status === 'All' || (property.propertystatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
             (
-                (property.propertyID?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.propertyAddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.nearbyLocation?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.rateAmount?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.propertyStatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
+                (property.propertyid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.propertyaddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.nearbylocation?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.rateamount?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.propertystatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
             )
     );
 
@@ -201,19 +201,19 @@ const PropertyListing = () => {
     const isModerator = userGroup === 'Moderator';
     const isAdmin = userGroup === 'Administrator';
 
-    const { propertyStatus } = property;
+    const { propertystatus } = property;
 
     if (isModerator) {
         // Logic for moderator
-        if (propertyStatus === 'Pending') {
+        if (propertystatus === 'Pending') {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
             ];
-        } else if (propertyStatus === 'Available') {
+        } else if (propertystatus === 'Available') {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
             ];
-        } else if (propertyStatus === 'Unavailable') {
+        } else if (propertystatus === 'Unavailable') {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Edit', icon: <FaEdit />, action: 'edit' },
@@ -228,18 +228,18 @@ const PropertyListing = () => {
                 // Current admin cannot reject or manage another admin's property
                 return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
             }
-            if (propertyStatus === 'Pending') {
+            if (propertystatus === 'Pending') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
                     { label: 'Accept', icon: <FaCheck />, action: 'accept' },
                     { label: 'Reject', icon: <FaTimes />, action: 'reject' },
                 ];
-            } else if (propertyStatus === 'Available') {
+            } else if (propertystatus === 'Available') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
                     { label: 'Reject', icon: <FaTimes />, action: 'reject' },
                 ];
-            } else if (propertyStatus === 'Unavailable') {
+            } else if (propertystatus === 'Unavailable') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
                     { label: 'Accept', icon: <FaCheck />, action: 'accept' },
@@ -247,12 +247,12 @@ const PropertyListing = () => {
             }
         } else {
             // Admin managing their own property
-            if (propertyStatus === 'Available') {
+            if (propertystatus === 'Available') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
                     { label: 'Reject', icon: <FaTimes />, action: 'reject' },
                 ];
-            } else if (propertyStatus === 'Unavailable') {
+            } else if (propertystatus === 'Unavailable') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
                     { label: 'Edit', icon: <FaEdit />, action: 'edit' },
@@ -272,15 +272,15 @@ const username = localStorage.getItem('username');
 const userGroup = localStorage.getItem('userGroup'); 
 
 const columns = [
-    { header: 'ID', accessor: 'propertyID' },
+    { header: 'ID', accessor: 'propertyid' },
     {
         header: 'Image',
-        accessor: 'propertyImage',
+        accessor: 'propertyimage',
         render: (property) => (
-            property.propertyImage && property.propertyImage.length > 0 ? (
+            property.propertyimage && property.propertyimage.length > 0 ? (
                 <img
-                    src={`data:image/jpeg;base64,${property.propertyImage[0]}`}
-                    alt={property.propertyName}
+                    src={`data:image/jpeg;base64,${property.propertyimage[0]}`}
+                    alt={property.propertyname}
                     style={{ width: 80, height: 80 }}
                 />
             ) : (
@@ -288,15 +288,15 @@ const columns = [
             )
         ),
     },
-    { header: 'Name', accessor: 'propertyAddress' },
-    { header: 'Price', accessor: 'rateAmount' },
-    { header: 'Location', accessor: 'nearbyLocation' },
+    { header: 'Name', accessor: 'propertyaddress' },
+    { header: 'Price', accessor: 'rateamount' },
+    { header: 'Location', accessor: 'nearbylocation' },
     {
         header: 'Status',
-        accessor: 'propertyStatus',
+        accessor: 'propertystatus',
         render: (property) => (
-            <span className={`property-status ${(property.propertyStatus ?? 'Pending').toLowerCase()}`}>
-                {property.propertyStatus || 'Pending'}
+            <span className={`property-status ${(property.propertystatus ?? 'Pending').toLowerCase()}`}>
+                {property.propertystatus || 'Pending'}
             </span>
         ),
     },
@@ -335,8 +335,7 @@ const columns = [
             <PaginatedTable
                 data={filteredProperties}
                 columns={columns}
-                rowKey="propertyID"
-
+                rowKey="propertyid"
             />
 
             <Modal
