@@ -1,9 +1,9 @@
-const API_URL = "https://backend-server-tf6m.onrender.com";
+const API_URL = "https://cams-backend.vercel.app";
 
 //Register
 export const signupUser = async (userData) => {
   try {
-    const response = await fetch('https://cams-backend.vercel.app/register', {
+    const response = await fetch(`${API_URL}/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -21,7 +21,7 @@ export const signupUser = async (userData) => {
 // Login
 export const loginUser = async (userData) => {
   try {
-    const response = await fetch('https://cams-backend.vercel.app/login', {
+    const response = await fetch(`${API_URL}/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export const loginUser = async (userData) => {
 // Logout
 export const logoutUser = async (userID) => {
   try {
-    const response = await fetch('http://localhost:5000/logout', {
+    const response = await fetch(`${API_URL}/logout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export const logoutUser = async (userID) => {
 // Properties Listing
 export const propertiesListing = async (propertyData) => {
   try {
-    const response = await fetch('http://localhost:5000/propertiesListing', {
+    const response = await fetch(`${API_URL}/propertiesListing`, {
       method: 'POST',
       body: propertyData,
     });
@@ -79,7 +79,7 @@ export const propertiesListing = async (propertyData) => {
 // Fetch Properties (Product)
 export const fetchProduct = async () => {
   try {
-    const response = await fetch('http://localhost:5000/product');
+    const response = await fetch(`${API_URL}/product`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch properties');
@@ -97,7 +97,7 @@ export const fetchPropertiesListingTable = async () => {
 
   const username = localStorage.getItem('username'); 
   try {
-    const response = await fetch(`http://localhost:5000/propertiesListingTable?username=${username}`);
+    const response = await fetch(`${API_URL}/propertiesListingTable?username=${username}`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch properties');
@@ -114,7 +114,7 @@ export const fetchPropertiesListingTable = async () => {
 // Update Property
 export const updateProperty = async (propertyData, propertyID) => {
   try {
-    const response = await fetch(`http://localhost:5000/propertiesListing/${propertyID}`, {
+    const response = await fetch(`${API_URL}/propertiesListing/${propertyID}`, {
       method: 'PUT',
       body: propertyData, // Ensure this is FormData to handle images properly
     });
@@ -134,7 +134,7 @@ export const updateProperty = async (propertyData, propertyID) => {
 // Update property status
 export const updatePropertyStatus = async (propertyID, status) => {
   try {
-    const response = await fetch(`http://localhost:5000/updatePropertyStatus/${propertyID}`, {
+    const response = await fetch(`${API_URL}/updatePropertyStatus/${propertyID}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ propertyStatus: status }),
@@ -154,7 +154,7 @@ export const updatePropertyStatus = async (propertyID, status) => {
 // Delete Property
 export const deleteProperty = async (propertyID) => {
   try {
-    const response = await fetch(`http://localhost:5000/propertiesListing/${propertyID}`, {
+    const response = await fetch(`${API_URL}/propertiesListing/${propertyID}`, {
       method: 'DELETE',
     });
 
@@ -173,7 +173,7 @@ export const deleteProperty = async (propertyID) => {
 // Fetch Customers
 export const fetchCustomers = async () => {
   try {
-    const response = await fetch('http://localhost:5000/users/customers');
+    const response = await fetch(`${API_URL}/users/customers`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch customers');
@@ -189,7 +189,7 @@ export const fetchCustomers = async () => {
 //Fetch Owners
 export const fetchOwners = async () => {
   try {
-    const response = await fetch('http://localhost:5000/users/owners');
+    const response = await fetch(`${API_URL}/users/owners`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch owners');
@@ -205,7 +205,7 @@ export const fetchOwners = async () => {
 //Fetch Moderators
 export const fetchModerators = async () => {
   try {
-    const response = await fetch('http://localhost:5000/users/moderators');
+    const response = await fetch(`${API_URL}/users/moderators`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch moderators');
@@ -221,7 +221,7 @@ export const fetchModerators = async () => {
 //Fetch Operators
 export const fetchOperators = async () => {
   try {
-    const response = await fetch('http://localhost:5000/users/operators');
+    const response = await fetch(`${API_URL}/users/operators`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch operators');
@@ -237,7 +237,7 @@ export const fetchOperators = async () => {
 //Fetch Administrator
 export const fetchAdministrators = async () => {
   try {
-    const response = await fetch('http://localhost:5000/users/administrators');
+    const response = await fetch(`${API_URL}/users/administrators`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch administrators');
@@ -253,7 +253,7 @@ export const fetchAdministrators = async () => {
 // Create Moderator
 export const createModerator = async (userData) => {
   try {
-    const response = await fetch('http://localhost:5000/users/createModerator', {
+    const response = await fetch(`${API_URL}/users/createModerator`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -275,7 +275,7 @@ export const createModerator = async (userData) => {
 // Update User
 export const updateUser = async (userData, userID) => {
   try {
-    const response = await fetch(`http://localhost:5000/users/updateUser/${userID}`, {
+    const response = await fetch(`${API_URL}/users/updateUser/${userID}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -302,7 +302,7 @@ export const updateUser = async (userData, userID) => {
 // Remove User
 export const removeUser = async (userID) => {
   try {
-    const response = await fetch(`http://localhost:5000/users/removeUser/${userID}`, {
+    const response = await fetch(`${API_URL}/users/removeUser/${userID}`, {
       method: 'DELETE',
     });
 
@@ -320,7 +320,7 @@ export const removeUser = async (userID) => {
 // Suspend User
 export const suspendUser = async (userID) => {
   try {
-    const response = await fetch(`http://localhost:5000/users/suspendUser/${userID}`, {
+    const response = await fetch(`${API_URL}/users/suspendUser/${userID}`, {
       method: 'PUT',
     });
 
@@ -338,7 +338,7 @@ export const suspendUser = async (userID) => {
 // Activate User
 export const activateUser = async (userID) => {
   try {
-    const response = await fetch(`http://localhost:5000/users/activateUser/${userID}`, {
+    const response = await fetch(`${API_URL}/users/activateUser/${userID}`, {
       method: 'PUT',
     });
 
@@ -356,7 +356,7 @@ export const activateUser = async (userID) => {
 // Nodemailer For Contact Us
 export const sendContactEmail = async (emailData) => {
   try {
-    const response = await fetch('http://localhost:5000/contact_us', {
+    const response = await fetch(`${API_URL}/contact_us`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -374,7 +374,7 @@ export const sendContactEmail = async (emailData) => {
 // Booking Request Notification
 export const requestBooking = async (reservationID) => {
   try {
-    const response = await fetch(`http://localhost:5000/requestBooking/${reservationID}`, {
+    const response = await fetch(`${API_URL}/requestBooking/${reservationID}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -396,7 +396,7 @@ export const requestBooking = async (reservationID) => {
 // Booking Accepted Notification
 export const acceptBooking = async (reservationID) => {
   try {
-    const response = await fetch(`http://localhost:5000/accept_booking/${reservationID}`, {
+    const response = await fetch(`${API_URL}/accept_booking/${reservationID}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -418,7 +418,7 @@ export const acceptBooking = async (reservationID) => {
 // Suggest New Room
 export const suggestNewRoom = async (propertyID, reservationID) => {
   try {
-    const response = await fetch(`http://localhost:5000/suggestNewRoom/${propertyID}/${reservationID}`, {
+    const response = await fetch(`${API_URL}/suggestNewRoom/${propertyID}/${reservationID}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -440,7 +440,7 @@ export const suggestNewRoom = async (propertyID, reservationID) => {
 // Property Listing Request Notification
 export const propertyListingRequest = async (propertyID) => {
   try {
-    const response = await fetch(`http://localhost:5000/propertyListingRequest/${propertyID}`, {
+    const response = await fetch(`${API_URL}/propertyListingRequest/${propertyID}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -462,7 +462,7 @@ export const propertyListingRequest = async (propertyID) => {
 // Property Listing Request Accepted Notification
 export const propertyListingAccept = async (propertyID) => {
   try {
-    const response = await fetch(`http://localhost:5000/propertyListingAccept/${propertyID}`, {
+    const response = await fetch(`${API_URL}/propertyListingAccept/${propertyID}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -484,7 +484,7 @@ export const propertyListingAccept = async (propertyID) => {
 // Property Listing Request Notification
 export const propertyListingReject = async (propertyID) => {
   try {
-    const response = await fetch(`http://localhost:5000/propertyListingReject/${propertyID}`, {
+    const response = await fetch(`${API_URL}/propertyListingReject/${propertyID}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -506,7 +506,7 @@ export const propertyListingReject = async (propertyID) => {
 // Send Suggest Notification 
 export const sendSuggestNotification = async (reservationID, selectedOperators) => {
   try {
-    const response = await fetch(`http://localhost:5000/sendSuggestNotification/${reservationID}`, {
+    const response = await fetch(`${API_URL}/sendSuggestNotification/${reservationID}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -543,7 +543,7 @@ export const createReservation = async (reservationData) => {
     const reservationWithUserID = { ...reservationData, userID };
 
 
-    const response = await fetch(`http://localhost:5000/reservation/${userID}`, {
+    const response = await fetch(`${API_URL}/reservation/${userID}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -573,7 +573,7 @@ export const fetchReservation = async () => {
       throw new Error('Username is not found in localStorage. Please log in.');
     }
 
-    const response = await fetch(`http://localhost:5000/reservationTable?username=${encodeURIComponent(username)}`);
+    const response = await fetch(`${API_URL}/reservationTable?username=${encodeURIComponent(username)}`);
 
     if (!response.ok) {
       throw new Error(`API error: ${response.status} ${response.statusText}`);
@@ -590,7 +590,7 @@ export const fetchReservation = async () => {
 // Update reservation status
 export const updateReservationStatus = async (reservationID, status) => {
   try {
-    const response = await fetch(`http://localhost:5000/updateReservationStatus/${reservationID}`, {
+    const response = await fetch(`${API_URL}/updateReservationStatus/${reservationID}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ reservationStatus: status }),
@@ -607,10 +607,11 @@ export const updateReservationStatus = async (reservationID, status) => {
   }
 };
 
+//Cart
 export const fetchCart = async () => {
   try {
       const userID = localStorage.getItem('userID');
-      const response = await fetch(`http://localhost:5000/cart?userID=${userID}`);
+      const response = await fetch(`${API_URL}/cart?userID=${userID}`);
       if (!response.ok) {
           throw new Error('Failed to fetch reservations');
       }
@@ -627,7 +628,7 @@ export const fetchCart = async () => {
 // Cancel a reservation
 export const cancelReservation = async (reservationID) => {
   try {
-    const response = await fetch(`http://localhost:5000/cancelReservation/${reservationID}`, {
+    const response = await fetch(`${API_URL}/cancelReservation/${reservationID}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -649,7 +650,7 @@ export const cancelReservation = async (reservationID) => {
 // Remove Reservation
 export const removeReservation = async (reservationID) => {
   try {
-    const response = await fetch(`http://localhost:5000/removeReservation/${reservationID}`, {
+    const response = await fetch(`${API_URL}/removeReservation/${reservationID}`, {
       method: 'DELETE',
     });
 
@@ -664,9 +665,10 @@ export const removeReservation = async (reservationID) => {
   }
 };
 
+//Booking Log
 export const fetchBookLog = async () => {
   try {
-    const response = await fetch('http://localhost:5000/users/booklog');
+    const response = await fetch(`${API_URL}/users/booklog`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch book logs');
@@ -684,7 +686,7 @@ export const fetchBookLog = async () => {
 
 export const fetchFinance = async () => {
   try {
-      const response = await fetch(`http://localhost:5000/users/finance`);
+      const response = await fetch(`${API_URL}/users/finance`);
       const data = await response.json();
       return data; 
   } catch (error) {
@@ -696,7 +698,7 @@ export const fetchFinance = async () => {
 // Get Properties Of Administrator For "Suggest"
 export const getOperatorProperties = async (userID) => {
   try {
-    const response = await fetch(`http://localhost:5000/operatorProperties/${userID}`, {
+    const response = await fetch(`${API_URL}/operatorProperties/${userID}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -719,7 +721,7 @@ export const getOperatorProperties = async (userID) => {
 // fetch normal user data
 export const fetchUserData = async (userId) => {
   try {
-      const response = await fetch(`http://localhost:5000/users/${userId}`);
+      const response = await fetch(`${API_URL}/users/${userId}`);
       if (!response.ok) {
           throw new Error('Failed to fetch user data');
       }
@@ -756,7 +758,7 @@ export const fetchGoogleUserData = async (accessToken) => {
 // Update User Profile
 export const updateProfile = async (userData) => {
   try {
-    const response = await fetch(`http://localhost:5000/users/updateProfile/${userData.userID}`, {
+    const response = await fetch(`${API_URL}/users/updateProfile/${userData.userID}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -776,8 +778,9 @@ export const updateProfile = async (userData) => {
   }
 };
 
+//Upload Avatar
 export const uploadAvatar = async (userID, base64String) => {
-  const response = await fetch(`http://localhost:5000/users/uploadAvatar/${userID}`, {
+  const response = await fetch(`${API_URL}/users/uploadAvatar/${userID}`, {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json',
