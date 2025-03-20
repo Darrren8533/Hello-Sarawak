@@ -244,7 +244,7 @@ const PropertyDetails = () => {
     if (!userID) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/getUserInfo/${userID}`);
+      const response = await fetch(`https://cams-backend.vercel.app/getUserInfo/${userID}`);
       if (!response.ok) {
         throw new Error('Failed to get user information');
       }
