@@ -296,7 +296,7 @@ const PropertyDetails = () => {
                       <IoIosArrowForward/>
                     </button>
                     <div className="slide-indicators">
-                      {propertyDetails.propertyImage.map((_, index) => (
+                      {propertyDetails?.propertyimage && propertyDetails.propertyimage.map((_, index) => (
                         <span 
                           key={index} 
                           className={`indicator ${index === currentSlide ? 'active' : ''}`}
