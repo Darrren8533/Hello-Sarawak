@@ -72,8 +72,8 @@ const Register = () => {
     }
 
     const userData = {
-      firstName,
-      lastName,
+      // firstName,
+      // lastName,
       username,
       email,
       password,
