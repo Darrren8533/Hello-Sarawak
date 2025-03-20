@@ -36,6 +36,18 @@ export const loginUser = async (userData) => {
   }
 };
 
+export const checkstatus = async (userID) => {
+  try {
+    const response = await fetch(`${API_URL}/checkStatus?userID=${userID}`, {
+      method: 'GET'
+    });
+    return response;
+  } catch (error) {
+    console.error('API error:', error);
+    throw error; 
+  }
+};
+
 // Logout
 export const logoutUser = async (userID) => {
   try {
