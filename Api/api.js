@@ -38,7 +38,7 @@ export const loginUser = async (userData) => {
 
 export const checkstatus = async (userID) => {
   try {
-    const response = await fetch(`${API_URL}/checkStatus?userID=${userID}`, {
+    const response = await fetch(`${API_URL}/checkStatus?userid=${userID}`, {
       method: 'GET'
     });
     return response;
