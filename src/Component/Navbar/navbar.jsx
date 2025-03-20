@@ -55,6 +55,10 @@ function Navbar() {
     }, [userID, googleAccessToken]);
 
     useEffect(() => {
+        console.log('isLoggedIn state changed to:', isLoggedIn);
+      }, [isLoggedIn]);
+
+    useEffect(() => {
 
         const initOffcanvas = () => {
             if (typeof bootstrap !== 'undefined') {
@@ -77,6 +81,8 @@ function Navbar() {
 
         return () => clearInterval(bootstrapReady);
     }, []);
+
+
 
     useEffect(() => {
         const handleAvatarUpdate = (newAvatar) => {
