@@ -289,7 +289,21 @@ const PropertyDetails = () => {
                       alt={`slide ${currentSlide + 1}`}
                       onClick={handleImageClick}
                     />
-                    {/* 其他导航按钮不变 */}
+                    <button className="slide-nav prev" onClick={prevSlide}>
+                      <IoIosArrowBack/>
+                    </button>
+                    <button className="slide-nav next" onClick={nextSlide}>
+                      <IoIosArrowForward/>
+                    </button>
+                    <div className="slide-indicators">
+                      {propertyDetails.propertyImage.map((_, index) => (
+                        <span 
+                          key={index} 
+                          className={`indicator ${index === currentSlide ? 'active' : ''}`}
+                          onClick={() => setCurrentSlide(index)}
+                        />
+                      ))}
+                    </div>
                   </>
                 )}
               </div>
@@ -313,7 +327,19 @@ const PropertyDetails = () => {
                           alt={`${index + 1}`}
                           onClick={handleImageClick}
                         />
-                        {/* 其他按钮不变 */}
+                        {index === 3 && (
+                          <button 
+                            className="show-all-photos"
+                            onClick={handleShowAllPhotos}
+                          >
+                            <span className="show-all-photos-icon">
+                              <svg viewBox="0 0 16 16" width="16" height="16">
+                                <path d="M1 3h14v10H1V3zm1 1v8h12V4H2zm1 1h4v3H3V5zm0 4h4v3H3V9zm5-4h4v3H8V5zm0 4h4v3H8V9z" fill="currentColor"/>
+                              </svg>
+                            </span>
+                            Show all photos
+                          </button>
+                        )}
                       </div>
                     ))
                   }
@@ -388,7 +414,26 @@ const PropertyDetails = () => {
                   <p>{propertyDetails?.propertydescription}</p>
                 </div>
                 <hr/>
-                {/* 设施部分不变 */}
+                <div className="property-features">
+                  <h2>What this place offers</h2>
+                  <div className="facilities-list">
+                    {(showAllFacilities ? facilitiesArray : facilitiesArray.slice(0, 10)).map((facilityName, index) => {
+                        const facility = facilities.find(f => f.name === facilityName.trim());
+                        return (
+                            <div key={index} className="facility-item">
+                                {facility ? facility.icon : null}
+                                <span>{facilityName.trim()}</span>
+                            </div>
+                        );
+                    })}
+                  </div>
+  
+                  {facilitiesArray.length > 10 && (
+                    <button className="show-all-Facilities" onClick={toggleFacilities}>
+                        {showAllFacilities ? "Show Less" : "Show All Facilities"}
+                    </button>
+                  )}
+                </div>
               </div>
 
               <div className="right-content">
@@ -399,7 +444,31 @@ const PropertyDetails = () => {
                     <h6>Maximum Guest: {propertyDetails?.propertyguestpaxno} </h6>
                     <h6>Bed: {propertyDetails?.propertybedtype} Size</h6>
                   </div>
-                  {/* 表单部分不变 */}
+                  <form className="booking-form" onSubmit={handleBookNowClick}>
+                    <div className="date-inputs">
+                      <div className="input-group">
+                        <label>CHECK-IN</label>
+                        <input 
+                          type="date" 
+                          name="arrivalDate"
+                          value={bookingData.arrivalDate}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      <div className="input-group">
+                        <label>CHECKOUT</label>
+                        <input 
+                          type="date" 
+                          name="departureDate"
+                          value={bookingData.departureDate}
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                    </div>
+                    <button type="submit" className="book-now-btn">
+                      Book Now
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>
