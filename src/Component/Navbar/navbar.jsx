@@ -12,7 +12,7 @@ function Navbar() {
     const [userAvatar, setUserAvatar] = useState(DefaultAvatar);
     const navigate = useNavigate();
 
-    const userID = localStorage.getItem('userID');
+    const userID = localStorage.getItem('userid');
     const googleAccessToken = localStorage.getItem('googleAccessToken');
 
     useEffect(() => {
