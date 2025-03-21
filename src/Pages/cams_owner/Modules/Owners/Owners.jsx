@@ -16,12 +16,12 @@ const Owners = () => {
   const [openDropdown, setOpenDropdown] = useState(null);
 
   const displayLabels = {
-    uFirstName: 'First Name',
-    uLastName: 'Last Name',
-    uEmail: 'Email',
-    uPhoneNo: 'Phone Number',
-    uGender: 'Gender',
-    uCountry: 'Country'
+    ufirstname: 'First Name',
+    ulastname: 'Last Name',
+    uemail: 'Email',
+    uphoneno: 'Phone Number',
+    ugender: 'Gender',
+    ucountry: 'Country'
   };
 
   useEffect(() => {
@@ -39,12 +39,12 @@ const Owners = () => {
   const handleAction = (action, owner) => {
     if (action === 'view') {
       const essentialFields = {
-        uFirstName: owner.uFirstName || 'N/A',
-        uLastName: owner.uLastName || 'N/A',
-        uEmail: owner.uEmail || 'N/A',
-        uPhoneNo: owner.uPhoneNo || 'N/A',
-        uGender: owner.uGender || 'N/A',
-        uCountry: owner.uCountry || 'N/A'
+        ufirstname: owner.ufirstname || 'N/A',
+        ulastname: owner.ulastname || 'N/A',
+        uemail: owner.uemail || 'N/A',
+        uphoneno: owner.uphoneno || 'N/A',
+        ugender: owner.ugender || 'N/A',
+        ucountry: owner.ucountry || 'N/A'
       };
       setSelectedOwner(essentialFields);
     }
@@ -58,16 +58,16 @@ const Owners = () => {
   ];
 
   const filteredOwners = owners.filter((owner) =>
-    `${owner.uFirstName} ${owner.uLastName} ${owner.uEmail} ${owner.uPhoneNo}`
+    `${owner.ufirstname} ${owner.ulastname} ${owner.uemail} ${owner.uphoneno}`
       .toLowerCase()
       .includes(searchKey.toLowerCase())
   );
 
   const columns = [
-    { header: 'First Name', accessor: 'uFirstName', type: 'text' },
-    { header: 'Last Name', accessor: 'uLastName', type: 'text' },
-    { header: 'Email', accessor: 'uEmail', type: 'text' },
-    { header: 'Phone', accessor: 'uPhoneNo', type: 'text' },
+    { header: 'First Name', accessor: 'ufirstname', type: 'text' },
+    { header: 'Last Name', accessor: 'ulastname', type: 'text' },
+    { header: 'Email', accessor: 'uemail', type: 'text' },
+    { header: 'Phone', accessor: 'uphoneno', type: 'text' },
     {
       header: 'Actions',
       accessor: 'actions',
@@ -98,7 +98,7 @@ const Owners = () => {
 
       <Modal
         isOpen={!!selectedOwner}
-        title={`${selectedOwner?.uFirstName} ${selectedOwner?.uLastName}`}
+        title={`${selectedOwner?.ufirstname} ${selectedOwner?.ulastname}`}
         data={selectedOwner || {}}
         labels={displayLabels}
         onClose={() => setSelectedOwner(null)}
