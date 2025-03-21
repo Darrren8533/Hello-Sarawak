@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Toast from '../../../Component/Toast/Toast';
-import ImageSlider from '../../../Component/ImageSlider/ImageSlider';
 
 // Import Components
 import Navbar from '../../../Component/Navbar/navbar';
 import Footer from '../../../Component/Footer/footer';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
+import Toast from '../../../Component/Toast/Toast';
+import ImageSlider from '../../../Component/ImageSlider/ImageSlider';
+import Loader from '../../../Component/Loader/Loader';
 
 // Import API
 import { fetchProduct } from '../../../../Api/api';
@@ -21,6 +22,7 @@ import './product.css';
 const Product = () => {
   const [properties, setProperties] = useState([]);
   const [rating] = useState(4.5);
+  const [isLoading, setIsLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('');
@@ -86,12 +88,19 @@ const Product = () => {
 
   useEffect(() => {
     const loadProperties = async () => {
+      setIsLoading(true);
       try {
         const fetchedProperties = await fetchProduct();
         setProperties(fetchedProperties);
-      } catch (error) {
+      } 
+      
+      catch (error) {
         console.error('Error fetching properties:', error);
         displayToast('error', 'Failed to load properties');
+      }
+      
+      finally {
+        setIsLoading(false);
       }
     };
 
@@ -99,7 +108,7 @@ const Product = () => {
   }, []);
 
   const handleViewDetails = (property) => {
-    navigate(`/product/${property.propertyid}`, { 
+    navigate(`/product/${property.propertyID}`, { 
       state: { propertyDetails: property }
     });
   };
@@ -259,11 +268,11 @@ const Product = () => {
                   <div className="destinations-grid">
                     {properties.slice(0, 4).map(property => (
                       <div 
-                        key={property.id} 
+                        key={property.ID} 
                         className="destination-item"
                         onClick={() => handleViewDetails(property)}
                       >
-                        <span>{property.propertyaddress}</span>
+                        <span>{property.propertyAddress}</span>
                       </div>
                     ))}
                   </div>
@@ -367,13 +376,19 @@ const Product = () => {
 
       <div className="property-container_for_product">
         <h2>Available Properties</h2>
+
+        {isLoading ? (
+          <div className="loader-box">
+            <Loader />
+          </div>
+      ) : (
         <div className="scrollable-container_for_product">
           {properties.length > 0 ? (
             properties.map((property) => (
-              <div className="tour-property-item" key={property.propertyid} onClick={() => handleViewDetails(property)}> 
+              <div className="tour-property-item" key={property.ID} onClick={() => handleViewDetails(property)}> 
                 <div className="tour-property-image-box">
-                  {property.propertyimage && property.propertyimage.length > 0 ? (
-                    <ImageSlider images={property.propertyimage}
+                  {property.propertyImage ? (
+                    <ImageSlider images={property.propertyImage}
                     onClick={(e) => {
                       e.stopPropagation();
                     }} />
@@ -382,10 +397,10 @@ const Product = () => {
                   )}
                 </div>
                 <div className="tour-property-info">
-                  <h4>{property.propertyaddress}</h4>
-                  <p>{property.nearbylocation}</p>
+                  <h4>{property.propertyAddress}</h4>
+                  <p>{property.nearbyLocation}</p>
                   <div className="tour-property-rating">{renderStars(rating)}</div>
-                  <h5>From ${property.rateamount}/night</h5>
+                  <h5>From ${property.rateAmount}/night</h5>
                 </div>
               </div>
             ))
@@ -393,6 +408,7 @@ const Product = () => {
             <p>No properties available.</p>
           )}
         </div>
+      )}
       </div>
 
       {showToast && <Toast type={toastType} message={toastMessage} />}
