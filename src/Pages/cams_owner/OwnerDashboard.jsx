@@ -25,9 +25,9 @@ const OwnerDashboard = () => {
 
   useEffect(() => {
     const loggedInStatus = localStorage.getItem('isLoggedIn');
-    const userGroup = localStorage.getItem('userGroup');
+    const usergroup = localStorage.getItem('usergroup');
 
-    if (loggedInStatus === 'true' && userGroup === 'Owner') {
+    if (loggedInStatus === 'true' && usergroup === 'Owner') {
       setIsAuthorized(true);
     } else {
       setIsAuthorized(false);
