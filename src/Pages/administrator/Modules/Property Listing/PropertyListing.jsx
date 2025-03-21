@@ -53,15 +53,15 @@ const PropertyListing = () => {
     const handleAction = async (action, property) => {
         if (action === 'view') {
             setSelectedProperty({
-                propertyname: property.propertyaddress || 'N/A',
-                clustername: property.clustername || 'N/A',
-                categoryname: property.categoryname || 'N/A',
-                propertyprice: property.rateamount|| 'N/A',
-                propertylocation: property.nearbylocation || 'N/A',
-                propertyguestpaxno: property.propertyguestpaxno || 'N/A',
-                propertystatus: property.propertystatus || 'N/A',
-                propertybedtype: property.propertybedtype || 'N/A',
-                propertydescription: property.propertydescription || 'N/A',
+                propertyName: property.propertyaddress || 'N/A',
+                clusterName: property.clustername || 'N/A',
+                categoryName: property.categoryname || 'N/A',
+                propertyPrice: property.rateamount|| 'N/A',
+                propertyLocation: property.nearbylocation || 'N/A',
+                propertyGuestPaxNo: property.propertyguestpaxno || 'N/A',
+                propertyStatus: property.propertystatus || 'N/A',
+                propertyBedType: property.propertybedtype || 'N/A',
+                propertyDescription: property.propertydescription || 'N/A',
                 images: property.propertyimage || [],
                 username: property.username || 'N/A',
             });
@@ -170,15 +170,15 @@ const PropertyListing = () => {
     ];
 
     const displayLabels = {
-        propertyname: "Property Name",
-        clustername: "Cluster Name",
-        categoryname: "Category Name",
-        propertyprice: "Property Price",
-        propertylocation: "Property Location",
-        propertyguestpaxno: "Guest Capacity",
-        propertystatus: "Property Status",
-        propertybedtype: "Bed Type",
-        propertydescription: "Description",
+        propertyName: "Property Name",
+        clusterName: "Cluster Name",
+        categoryName: "Category Name",
+        propertyPrice: "Property Price",
+        propertyLocation: "Property Location",
+        propertyGuestPaxNo: "Guest Capacity",
+        propertyStatus: "Property Status",
+        propertyBedType: "Bed Type",
+        propertyDescription: "Description",
         images: "Images",
         username: "Operator Name"
     };
@@ -196,10 +196,10 @@ const PropertyListing = () => {
     );
 
 
-    const propertyDropdownItems = (property, username, usergroup) => {
+    const propertyDropdownItems = (property, username, userGroup) => {
     const isOwner = property.username === username; 
-    const isModerator = usergroup === 'Moderator';
-    const isAdmin = usergroup === 'Administrator';
+    const isModerator = userGroup === 'Moderator';
+    const isAdmin = userGroup === 'Administrator';
 
     const { propertystatus } = property;
 
@@ -269,7 +269,7 @@ const PropertyListing = () => {
 
     
 const username = localStorage.getItem('username');
-const usergroup = localStorage.getItem('usergroup'); 
+const userGroup = localStorage.getItem('userGroup'); 
 
 const columns = [
     { header: 'ID', accessor: 'propertyid' },
@@ -305,7 +305,7 @@ const columns = [
         accessor: 'actions',
         render: (property) => (
             <ActionDropdown
-                items={propertyDropdownItems(property, username, usergroup)}
+                items={propertyDropdownItems(property, username, userGroup)}
                 onAction={(action) => handleAction(action, property)}
             />
         ),
@@ -340,7 +340,7 @@ const columns = [
 
             <Modal
                 isOpen={!!selectedProperty}
-                title={`${selectedProperty?.propertyname}`}
+                title={`${selectedProperty?.propertyName}`}
                 data={selectedProperty || {}}
                 labels={displayLabels}
                 onClose={() => setSelectedProperty(null)}
