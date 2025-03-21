@@ -151,7 +151,7 @@ const Customers = () => {
     const columns = [
         { header: 'First Name', accessor: 'ufirstname' },
         { header: 'Last Name', accessor: 'ulastname' },
-        { header: 'Email', accessor: 'uEmail' },
+        { header: 'Email', accessor: 'uemail' },
         { header: 'Phone', accessor: 'uphoneno' },
         {
             header: 'Status',
