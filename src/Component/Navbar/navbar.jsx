@@ -12,14 +12,14 @@ function Navbar() {
     const [userAvatar, setUserAvatar] = useState(DefaultAvatar);
     const navigate = useNavigate();
 
-    const userid = localStorage.getItem('userID');
+    const userID = localStorage.getItem('userID');
     const googleAccessToken = localStorage.getItem('googleAccessToken');
 
     useEffect(() => {
         const checkLoginStatus = async () => {
-            if (userid) {
+            if (userID) {
                 const userData = {
-                    userid
+                    userID
                 };
                 try {
                     const response = await checkstatus(userData);
