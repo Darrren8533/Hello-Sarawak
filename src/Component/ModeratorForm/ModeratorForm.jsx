@@ -24,14 +24,14 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
 
     useEffect(() => {
         if (initialData) {
-            setFirstName(initialData.uFirstName || '');
-            setLastName(initialData.uLastName || '');
+            setFirstName(initialData.ufirstname || '');
+            setLastName(initialData.ulastname || '');
             setUsername(initialData.username || '');
-            setEmail(initialData.uEmail || '');
-            setPhoneNo(initialData.uPhoneNo || '');
-            setCountry(initialData.uCountry || '');
-            setZipCode(initialData.uZipCode|| '');
-            setTitle(initialData.uTitle || '');
+            setEmail(initialData.uemail || '');
+            setPhoneNo(initialData.uphoneno || '');
+            setCountry(initialData.ucountry || '');
+            setZipCode(initialData.uzipcode|| '');
+            setTitle(initialData.utitle || '');
             setPassword('');
             setConfirmPassword('');
         }
@@ -62,14 +62,14 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
             country,
             zipCode,
             title,
-            userGroup: "Moderator",
-            uActivation: "Active",
+            usergroup: "Moderator",
+            uactivation: "Active",
         };
 
         try {
             let response;
             if (initialData) {
-                response = await updateUser(userData, initialData.userID);
+                response = await updateUser(userData, initialData.userid);
             } else {
                 response = await createModerator(userData);
             }
