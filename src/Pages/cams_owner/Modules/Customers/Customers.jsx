@@ -31,12 +31,12 @@ const Customers = () => {
     const handleAction = (action, customer) => {
         if (action === 'view') {
             const essentialFields = {
-                firstName: customer.uFirstName || 'N/A',
-                lastName: customer.uLastName || 'N/A',
-                email: customer.uEmail || 'N/A',
-                phoneNo: customer.uPhoneNo || 'N/A',
-                gender: customer.uGender || 'N/A',
-                country: customer.uCountry || 'N/A',
+                firstName: customer.ufirstname || 'N/A',
+                lastName: customer.ulastname || 'N/A',
+                email: customer.uemail || 'N/A',
+                phoneNo: customer.uphoneno || 'N/A',
+                gender: customer.ugender || 'N/A',
+                country: customer.ucountry || 'N/A',
             };
             setSelectedCustomer(essentialFields);
         }
@@ -56,10 +56,10 @@ const Customers = () => {
     };
 
     const columns = [
-        { header: 'First Name', accessor: 'uFirstName' },
-        { header: 'Last Name', accessor: 'uLastName' },
-        { header: 'Email', accessor: 'uEmail' },
-        { header: 'Phone', accessor: 'uPhoneNo' },
+        { header: 'First Name', accessor: 'ufirstname' },
+        { header: 'Last Name', accessor: 'ulastname' },
+        { header: 'Email', accessor: 'uemail' },
+        { header: 'Phone', accessor: 'uphoneno' },
         {
             header: 'Actions',
             accessor: 'actions',
@@ -74,7 +74,7 @@ const Customers = () => {
     ];
 
     const filteredCustomers = customers.filter((customer) =>
-        `${customer.uFirstName} ${customer.uLastName} ${customer.uEmail} ${customer.uPhoneNo}`
+        `${customer.ufirstname} ${customer.ulastname} ${customer.uemail} ${customer.uphoneno}`
             .toLowerCase()
             .includes(searchKey.toLowerCase())
     );
@@ -89,7 +89,7 @@ const Customers = () => {
             <PaginatedTable
                 data={filteredCustomers}
                 columns={columns}
-                rowKey="userID"
+                rowKey="userid"
                 enableCheckbox={false}
             />
 
