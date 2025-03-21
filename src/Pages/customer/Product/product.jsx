@@ -271,7 +271,7 @@ const Product = () => {
                         className="destination-item"
                         onClick={() => handleViewDetails(property)}
                       >
-                        <span>{property.propertyAddress}</span>
+                        <span>{property.propertyaddress}</span>
                       </div>
                     ))}
                   </div>
@@ -386,8 +386,8 @@ const Product = () => {
             properties.map((property) => (
               <div className="tour-property-item" key={property.ID} onClick={() => handleViewDetails(property)}> 
                 <div className="tour-property-image-box">
-                  {property.propertyImage && property.propertyImage.length > 0 ? (
-                     <ImageSlider images={property.propertyImage}
+                  {property.propertyimage && property.propertyimage.length > 0 ? (
+                     <ImageSlider images={property.propertyimage}
                     onClick={(e) => {
                       e.stopPropagation();
                     }} />
@@ -396,10 +396,10 @@ const Product = () => {
                   )}
                 </div>
                 <div className="tour-property-info">
-                  <h4>{property.propertyAddress}</h4>
+                  <h4>{property.propertyaddress}</h4>
                   <p>{property.nearbyLocation}</p>
                   <div className="tour-property-rating">{renderStars(rating)}</div>
-                  <h5>From ${property.rateAmount}/night</h5>
+                  <h5>From ${property.rateamount}/night</h5>
                 </div>
               </div>
             ))
