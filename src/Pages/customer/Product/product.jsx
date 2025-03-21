@@ -60,7 +60,6 @@ const Product = () => {
     };
   }, []);
 
-  // Handle clicks outside search areas to close panel
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (activeTab && 
