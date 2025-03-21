@@ -59,14 +59,14 @@ const Moderators = () => {
   const applyFilters = () => {
     const filtered = users.filter(
       (user) =>
-        (appliedFilters.status === 'All' || (user.uActivation ?? 'Active').toLowerCase() === appliedFilters.status.toLowerCase()) &&
+        (appliedFilters.status === 'All' || (user.uactivation ?? 'Active').toLowerCase() === appliedFilters.status.toLowerCase()) &&
         (
-          (user.userID?.toString().includes(searchKey.toLowerCase()) || '') ||
-          (user.uFirstName?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-          (user.uLastName?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-          (user.uEmail?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-          (user.uPhoneNo?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-          (user.uActivation?.toLowerCase().includes(searchKey.toLowerCase()) || '')
+          (user.userid?.toString().includes(searchKey.toLowerCase()) || '') ||
+          (user.ufirstname?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+          (user.ulastname?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+          (user.uemail?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+          (user.uphoneno?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+          (user.uactivation?.toLowerCase().includes(searchKey.toLowerCase()) || '')
         )
     );
     setFilteredUsers(filtered);
@@ -96,25 +96,25 @@ const Moderators = () => {
   ];
 
   const displayLabels = {
-    uFirstName: 'First Name',
-    uLastName: 'Last Name',
-    uEmail: 'Email',
-    uPhoneNo: 'Phone Number',
-    uActivation: 'Status',
-    uGender: 'Gender',
-    uCountry: 'Country'
+    ufirstname: 'First Name',
+    ulastname: 'Last Name',
+    uemail: 'Email',
+    uphoneno: 'Phone Number',
+    uactivation: 'Status',
+    ugender: 'Gender',
+    ucountry: 'Country'
   };
 
   const handleAction = async (action, user) => {
     if (action === 'view') {
       setSelectedUser({
-        uFirstName: user.uFirstName || 'N/A',
-        uLastName: user.uLastName || 'N/A',
-        uEmail: user.uEmail || 'N/A',
-        uPhoneNo: user.uPhoneNo || 'N/A',
-        uActivation: user.uActivation,
-        uGender: user.uGender || 'N/A',
-        uCountry: user.uCountry || 'N/A',
+        ufirstname: user.ufirstname || 'N/A',
+        ulastname: user.ulastname || 'N/A',
+        uemail: user.uemail || 'N/A',
+        uphoneno: user.uphoneno || 'N/A',
+        uactivation: user.uactivation,
+        ugender: user.ugender || 'N/A',
+        ucountry: user.ucountry || 'N/A',
       });
     } else if (action === 'edit') {
       setEditUser(user);
@@ -131,11 +131,11 @@ const Moderators = () => {
 
   const handleSuspendUser = async (user) => {
     try {
-      await suspendUser(user.userID);
+      await suspendUser(user.userid);
       setUsers((prevUsers) =>
-        prevUsers.map((u) => (u.userID === user.userID ? { ...u, uActivation: 'Inactive' } : u))
+        prevUsers.map((u) => (u.userid === user.userid ? { ...u, uactivation: 'Inactive' } : u))
       );
-      displayToast('success', `User ${user.uFirstName} ${user.uLastName} has been suspended.`);
+      displayToast('success', `User ${user.ufirstname} ${user.ulastname} has been suspended.`);
     } catch (error) {
       console.error('Failed to suspend user:', error);
       displayToast('error', 'Error suspending user');
@@ -144,11 +144,11 @@ const Moderators = () => {
 
   const handleActivateUser = async (user) => {
     try {
-      await activateUser(user.userID);
+      await activateUser(user.userid);
       setUsers((prevUsers) =>
-        prevUsers.map((u) => (u.userID === user.userID ? { ...u, uActivation: 'Active' } : u))
+        prevUsers.map((u) => (u.userid === user.userid ? { ...u, uactivation: 'Active' } : u))
       );
-      displayToast('success', `User ${user.uFirstName} ${user.uLastName} has been activated.`);
+      displayToast('success', `User ${user.ufirstname} ${user.ulastname} has been activated.`);
     } catch (error) {
       console.error('Failed to activate user:', error);
       displayToast('error', 'Error activating user');
@@ -157,14 +157,14 @@ const Moderators = () => {
 
   const handleRemoveUser = async () => {
     try {
-        await removeUser(userToDelete.userID);
+        await removeUser(userToDelete.userid);
         setUsers((prevUsers) => {
             // Remove the user from the list
-            const updatedUsers = prevUsers.filter((u) => u.userID !== userToDelete.userID);
+            const updatedUsers = prevUsers.filter((u) => u.userid !== userToDelete.userid);
             setFilteredUsers(updatedUsers);
             return updatedUsers;
         });
-        displayToast('success', `User ${userToDelete.uFirstName} ${userToDelete.uLastName} removed successfully.`);
+        displayToast('success', `User ${userToDelete.ufirstname} ${userToDelete.ulastname} removed successfully.`);
     } catch (error) {
         console.error('Error removing user:', error);
         displayToast('error', 'Failed to remove user.');
@@ -200,17 +200,17 @@ const Moderators = () => {
   
 
   const columns = [
-    { header: 'ID', accessor: 'userID' },
-    { header: 'First Name', accessor: 'uFirstName' },
-    { header: 'Last Name', accessor: 'uLastName' },
-    { header: 'Email', accessor: 'uEmail' },
-    { header: 'Phone', accessor: 'uPhoneNo' },
+    { header: 'ID', accessor: 'userid' },
+    { header: 'First Name', accessor: 'ufirstname' },
+    { header: 'Last Name', accessor: 'ulastname' },
+    { header: 'Email', accessor: 'uemail' },
+    { header: 'Phone', accessor: 'uphoneno' },
     {
       header: 'Status',
-      accessor: 'uActivation',
+      accessor: 'uactivation',
       render: (user) => (
-        <span className={`status-badge ${(user.uActivation || 'Active').toLowerCase()}`}>
-          {user.uActivation || 'Active'}
+        <span className={`status-badge ${(user.uactivation || 'Active').toLowerCase()}`}>
+          {user.uactivation || 'Active'}
         </span>
       ),
     },
@@ -219,7 +219,7 @@ const Moderators = () => {
       accessor: 'actions',
       render: (user) => (
         <ActionDropdown
-          items={userDropdownItems(user.uActivation)} 
+          items={userDropdownItems(user.uactivation)} 
           onAction={(action) => handleAction(action, user)}
         />
       ),
@@ -240,13 +240,13 @@ const Moderators = () => {
       <PaginatedTable
         data={filteredUsers}
         columns={columns}
-        rowKey="userID"
+        rowKey="userid"
         enableCheckbox={false}
       />
 
       <Modal
         isOpen={!!selectedUser}
-        title={`${selectedUser?.uFirstName} ${selectedUser?.uLastName}`}
+        title={`${selectedUser?.ufirstname} ${selectedUser?.ulastname}`}
         data={selectedUser || {}}
         labels={displayLabels}
         onClose={() => setSelectedUser(null)}
@@ -267,7 +267,7 @@ const Moderators = () => {
       <Alert
         isOpen={isDialogOpen}
         title="Confirm Remove"
-        message={`Are you sure you want to remove Moderator ${userToDelete?.uFirstName} ${userToDelete?.uLastName}?`}
+        message={`Are you sure you want to remove Moderator ${userToDelete?.ufirstname} ${userToDelete?.ulastname}?`}
         onConfirm={handleRemoveUser}
         onCancel={() => setIsDialogOpen(false)}
       />
