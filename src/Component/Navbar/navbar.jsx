@@ -18,9 +18,7 @@ function Navbar() {
     useEffect(() => {
         const checkLoginStatus = async () => {
             if (userID) {
-                const userData = {
-                    userID
-                };
+                
                 try {
                     const response = await checkstatus(userID);
                     const data = await response.json();
