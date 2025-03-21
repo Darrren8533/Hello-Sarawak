@@ -51,24 +51,24 @@ const Operators = () => {
   ];
 
   const displayLabels = {
-    uFirstName: 'First Name',
-    uLastName: 'Last Name',
-    uEmail: 'Email',
-    uPhoneNo: 'Phone Number',
-    userGroup: 'Role',
-    uGender: 'Gender',
-    uCountry: 'Country',
+    ufirstname: 'First Name',
+    ulastname: 'Last Name',
+    uemail: 'Email',
+    uphoneno: 'Phone Number',
+    usergroup: 'Role',
+    ugender: 'Gender',
+    ucountry: 'Country',
   };
 
   // Filter logic for both search key and role
   const filteredUsers = users.filter((user) => {
     const searchInFields =
-      `${user.uFirstName} ${user.uLastName} ${user.uEmail} ${user.uPhoneNo} ${user.userGroup}`
+      `${user.ufirstname} ${user.ulastname} ${user.uemail} ${user.uphoneno} ${user.usergroup}`
         .toLowerCase()
         .includes(searchKey.toLowerCase());
 
     const roleFilter =
-      appliedFilters.role === 'All' || user.userGroup === appliedFilters.role;
+      appliedFilters.role === 'All' || user.usergroup === appliedFilters.role;
 
     return searchInFields && roleFilter;
   });
@@ -76,13 +76,13 @@ const Operators = () => {
   const handleAction = (action, user) => {
     if (action === 'view') {
       const essentialFields = {
-        uFirstName: user.uFirstName || 'N/A',
-        uLastName: user.uLastName || 'N/A',
-        uEmail: user.uEmail || 'N/A',
-        uPhoneNo: user.uPhoneNo || 'N/A',
-        userGroup: user.userGroup || 'N/A',
-        uGender: user.uGender || 'N/A',
-        uCountry: user.uCountry || 'N/A',
+        ufirstname: user.ufirstname || 'N/A',
+        ulastname: user.ulastname || 'N/A',
+        uemail: user.uemail || 'N/A',
+        uphoneno: user.uphoneno || 'N/A',
+        usergroup: user.usergroup || 'N/A',
+        ugender: user.ugender || 'N/A',
+        ucountry: user.ucountry || 'N/A',
       };
       setSelectedOperator(essentialFields);
     }
@@ -93,16 +93,16 @@ const Operators = () => {
   ];
 
   const columns = [
-    { header: 'First Name', accessor: 'uFirstName' },
-    { header: 'Last Name', accessor: 'uLastName' },
-    { header: 'Email', accessor: 'uEmail' },
-    { header: 'Phone', accessor: 'uPhoneNo' },
+    { header: 'First Name', accessor: 'ufirstname' },
+    { header: 'Last Name', accessor: 'ulastname' },
+    { header: 'Email', accessor: 'uemail' },
+    { header: 'Phone', accessor: 'uphoneno' },
     {
       header: 'Role',
-      accessor: 'userGroup',
+      accessor: 'usergroup',
       render: (user) => (
-        <span className={`role-badge ${user.userGroup.toLowerCase()}`}>
-          {user.userGroup}
+        <span className={`role-badge ${user.usergroup.toLowerCase()}`}>
+          {user.usergroup}
         </span>
       ),
     },
@@ -135,13 +135,13 @@ const Operators = () => {
       <PaginatedTable
         data={filteredUsers}
         columns={columns}
-        rowKey="userID"
+        rowKey="userid"
         enableCheckbox={false}
       />
 
       <Modal
         isOpen={!!selectedOperator}
-        title={`${selectedOperator?.uFirstName} ${selectedOperator?.uLastName}`}
+        title={`${selectedOperator?.ufirstname} ${selectedOperator?.ulastname}`}
         data={selectedOperator || {}}
         labels={displayLabels}
         onClose={() => setSelectedOperator(null)}
