@@ -21,25 +21,25 @@ import '../../Component/MainContent/MainContent.css';
 
 const AdminDashboard = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userGroup, setUserGroup] = useState('');
+  const [usergroup, setusergroup] = useState('');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const loggedInStatus = localStorage.getItem('isLoggedIn');
-    const userGroupStatus = localStorage.getItem('userGroup');
+    const usergroupStatus = localStorage.getItem('usergroup');
 
     setIsLoggedIn(loggedInStatus === 'true');
-    setUserGroup(userGroupStatus);
+    setusergroup(usergroupStatus);
 
-    // Redirect to NoAccess page if not logged in or userGroup is not 'Administrator'
-    if (loggedInStatus !== 'true' || userGroupStatus !== 'Administrator') {
+    // Redirect to NoAccess page if not logged in or usergroup is not 'Administrator'
+    if (loggedInStatus !== 'true' || usergroupStatus !== 'Administrator') {
       navigate('/no-access');
     }
   }, [navigate]);
 
   // Display a loading state until authentication is confirmed
-  if (!isLoggedIn || userGroup !== 'Administrator') {
+  if (!isLoggedIn || usergroup !== 'Administrator') {
     return <div>Loading...</div>;
   }
 
