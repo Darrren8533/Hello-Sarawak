@@ -83,7 +83,7 @@ export const propertiesListing = async (propertyData) => {
     const responseData = await response.json();
     return responseData;
   }catch (error) {
-    console.error('propertieslisting API error: ', error);
+    console.error('API error: ', error);
     throw error;
   }
 };
@@ -466,7 +466,7 @@ export const propertyListingRequest = async (propertyID) => {
 
     return await response.json();
   }catch (error) {
-    console.error('API error: ', error);
+    console.error('request API error: ', error);
     throw error;
   }
 };
