@@ -10,11 +10,11 @@ const Sidebar = ({ title, links, isCollapsed, toggleSidebar }) => {
 
   useEffect(() => {
     const checkLoginStatus = async () => {
-      const userID = localStorage.getItem('userID');
+      const userid = localStorage.getItem('userid');
 
-      if (userID) {
+      if (userid) {
         try {
-          const response = await fetch(`https://cams-backend.vercel.app/checkStatus?userid=${userID}`);
+          const response = await fetch(`https://cams-backend.vercel.app/checkStatus?userid=${userid}`);
           const data = await response.json();
 
           if (data.ustatus === 'login') {
@@ -34,16 +34,16 @@ const Sidebar = ({ title, links, isCollapsed, toggleSidebar }) => {
   }, []);
 
   const handleLogout = async () => {
-    const userID = localStorage.getItem('userID');
+    const userid = localStorage.getItem('userid');
 
     try {
-      const response = await logoutUser(userID);
+      const response = await logoutUser(userid);
 
       if (response.success) {
         localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('userID');
+        localStorage.removeItem('userid');
         localStorage.removeItem('username');
-        localStorage.removeItem('userGroup');
+        localStorage.removeItem('usergroup');
         setIsLoggedIn(false);
         navigate('/login'); // Redirect to login page
       } else {
