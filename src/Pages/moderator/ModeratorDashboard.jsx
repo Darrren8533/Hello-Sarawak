@@ -13,25 +13,25 @@ import '../../Component/MainContent/MainContent.css';
 
 const ModeratorDashboard = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [userGroup, setUserGroup] = useState('');
+  const [usergroup, setusergroup] = useState('');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const loggedInStatus = localStorage.getItem('isLoggedIn');
-    const userGroupStatus = localStorage.getItem('userGroup');
+    const usergroupStatus = localStorage.getItem('usergroup');
 
     setIsLoggedIn(loggedInStatus === 'true');
-    setUserGroup(userGroupStatus);
+    setusergroup(usergroupStatus);
 
-    // Redirect to NoAccess page if not logged in or userGroup is not 'Moderator'
-    if (loggedInStatus !== 'true' || userGroupStatus !== 'Moderator') {
+    // Redirect to NoAccess page if not logged in or usergroup is not 'Moderator'
+    if (loggedInStatus !== 'true' || usergroupStatus !== 'Moderator') {
       navigate('/no-access');
     }
   }, [navigate]);
 
   // Display a loading state until authentication is confirmed
-  if (!isLoggedIn || userGroup !== 'Moderator') {
+  if (!isLoggedIn || usergroup !== 'Moderator') {
     return <div>Loading...</div>;
   }
 
