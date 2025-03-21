@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Toast from '../../../Component/Toast/Toast';
+import ImageSlider from '../../../Component/ImageSlider/ImageSlider';
 
 // Import Components
 import Navbar from '../../../Component/Navbar/navbar';
 import Footer from '../../../Component/Footer/footer';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
-import Toast from '../../../Component/Toast/Toast';
-import ImageSlider from '../../../Component/ImageSlider/ImageSlider';
-import Loader from '../../../Component/Loader/Loader';
 
 // Import API
 import { fetchProduct } from '../../../../Api/api';
@@ -22,7 +21,6 @@ import './product.css';
 const Product = () => {
   const [properties, setProperties] = useState([]);
   const [rating] = useState(4.5);
-  const [isLoading, setIsLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('');
@@ -60,6 +58,7 @@ const Product = () => {
     };
   }, []);
 
+  // Handle clicks outside search areas to close panel
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (activeTab && 
@@ -87,19 +86,12 @@ const Product = () => {
 
   useEffect(() => {
     const loadProperties = async () => {
-      setIsLoading(true);
       try {
         const fetchedProperties = await fetchProduct();
         setProperties(fetchedProperties);
-      } 
-      
-      catch (error) {
+      } catch (error) {
         console.error('Error fetching properties:', error);
         displayToast('error', 'Failed to load properties');
-      }
-      
-      finally {
-        setIsLoading(false);
       }
     };
 
@@ -375,12 +367,6 @@ const Product = () => {
 
       <div className="property-container_for_product">
         <h2>Available Properties</h2>
-
-        {isLoading ? (
-          <div className="loader-box">
-            <Loader />
-          </div>
-      ) : (
         <div className="scrollable-container_for_product">
           {properties.length > 0 ? (
             properties.map((property) => (
@@ -407,7 +393,6 @@ const Product = () => {
             <p>No properties available.</p>
           )}
         </div>
-      )}
       </div>
 
       {showToast && <Toast type={toastType} message={toastMessage} />}
