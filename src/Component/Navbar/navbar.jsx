@@ -22,7 +22,7 @@ function Navbar() {
                     userID
                 };
                 try {
-                    const response = await checkstatus(userID);
+                    const response = await checkstatus(userData);
                     const data = await response.json();
 
                     if (data.ustatus === 'login') {
