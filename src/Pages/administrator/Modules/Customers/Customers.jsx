@@ -60,10 +60,10 @@ const Customers = () => {
 
     // 修改displayLabels对象
     const displayLabels = {
-        firstName: 'First Name',
-        lastName: 'Last Name',
+        firstname: 'First Name',
+        lastname: 'Last Name',
         email: 'Email',
-        phoneNo: 'Phone Number',
+        phoneno: 'Phone Number',
         uactivation: 'Status',  // 修改为小写
         gender: 'Gender',
         country: 'Country',
@@ -73,10 +73,10 @@ const Customers = () => {
     const handleAction = async (action, customer) => {
         if (action === 'view') {
             const essentialFields = {
-                firstName: customer.ufirstname || 'N/A',
-                lastName: customer.ulastname || 'N/A',
+                firstname: customer.ufirstname || 'N/A',
+                lastname: customer.ulastname || 'N/A',
                 email: customer.uemail || 'N/A',
-                phoneNo: customer.uphoneno || 'N/A',
+                phoneno: customer.uphoneno || 'N/A',
                 gender: customer.ugender || 'N/A',
                 country: customer.ucountry || 'N/A',
             };
@@ -192,7 +192,7 @@ const Customers = () => {
 
             <Modal
                 isOpen={!!selectedCustomer}
-                title={`${selectedCustomer?.firstName} ${selectedCustomer?.lastName}`}
+                title={`${selectedCustomer?.firstname} ${selectedCustomer?.lastname}`}
                 data={selectedCustomer || {}}
                 labels={displayLabels}
                 onClose={() => setSelectedCustomer(null)}
