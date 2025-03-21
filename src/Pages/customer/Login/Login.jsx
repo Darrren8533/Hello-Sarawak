@@ -50,35 +50,35 @@ const Login = () => {
         // Save data to localStorage
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('username', username);
-        localStorage.setItem('userGroup', data.userGroup);
-        localStorage.setItem('userID', data.userID);
-        localStorage.setItem('uActivation', data.uActivation);
+        localStorage.setItem('usergroup', data.usergroup);
+        localStorage.setItem('userid', data.userid);
+        localStorage.setItem('uactivation', data.uactivation);
 
         // Logging for verification
-        console.log('User Group:', data.userGroup);
-        console.log('User Activation:', data.uActivation);
+        console.log('User Group:', data.usergroup);
+        console.log('User Activation:', data.uactivation);
 
         // Show toast and navigate after a delay
-        if (data.uActivation === 'Inactive') {
+        if (data.uactivation === 'Inactive') {
           displayToast('error', 'Your account is inactive.');
         } 
         
-        else if (data.userGroup === 'Customer') {
+        else if (data.usergroup === 'Customer') {
           displayToast('success', 'Login successful! Redirecting...');
           setTimeout(() => navigate('/login/home'), 2000); 
         } 
         
-        else if (data.userGroup === 'Owner') {
+        else if (data.usergroup === 'Owner') {
           displayToast('success', 'Login successful! Redirecting...');
           setTimeout(() => navigate('/login/owner_dashboard'), 2000); 
         } 
         
-        else if (data.userGroup === 'Moderator') {
+        else if (data.usergroup === 'Moderator') {
           displayToast('success', 'Login successful! Redirecting...');
           setTimeout(() => navigate('/login/moderator_dashboard'), 2000); 
         } 
         
-        else if (data.userGroup === 'Administrator') {
+        else if (data.usergroup === 'Administrator') {
           displayToast('success', 'Login successful! Redirecting...');
           setTimeout(() => navigate('/login/administrator_dashboard'), 2000); 
         } 
@@ -156,22 +156,22 @@ const Login = () => {
   
         if (response.ok && data.success) {
           localStorage.setItem("isLoggedIn", "true");
-          localStorage.setItem("userID", data.userID);
+          localStorage.setItem("userid", data.userid);
           localStorage.setItem("username", data.username);
-          localStorage.setItem("userGroup", data.userGroup);
-          localStorage.setItem("uImage", data.uImage);
+          localStorage.setItem("usergroup", data.usergroup);
+          localStorage.setItem("uimage", data.uimage);
   
           displayToast("success", "Login successful! Redirecting...");
   
-          if (data.uActivation === 'Inactive') {
+          if (data.uactivation === 'Inactive') {
             displayToast('error', 'Your account is inactive.');
-          } else if (data.userGroup === 'Customer') {
+          } else if (data.usergroup === 'Customer') {
             setTimeout(() => navigate('/login/home'), 2000);
-          } else if (data.userGroup === 'Owner') {
+          } else if (data.usergroup === 'Owner') {
             setTimeout(() => navigate('/login/owner_dashboard'), 2000);
-          } else if (data.userGroup === 'Moderator') {
+          } else if (data.usergroup === 'Moderator') {
             setTimeout(() => navigate('/login/moderator_dashboard'), 2000);
-          } else if (data.userGroup === 'Administrator') {
+          } else if (data.usergroup === 'Administrator') {
             setTimeout(() => navigate('/login/administrator_dashboard'), 2000);
           } else {
             displayToast('error', 'Invalid User Group.');
