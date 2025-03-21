@@ -506,7 +506,7 @@ const PropertyDetails = () => {
                   <h3>Price details</h3>
                   <div className="price-breakdown">
                     <div className="price-row">
-                    <span>RM {propertyDetails?.rateamount} × {totalNights} night</span>
+                    <span>RM {propertyDetails?.rateamount} x {totalNights} night</span>
                     <span>RM{propertyDetails?.rateamount * totalNights}</span>
                     </div>
                     <div className="price-row">
