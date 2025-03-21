@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+oimport React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Import Components
@@ -107,7 +107,7 @@ const Product = () => {
   }, []);
 
   const handleViewDetails = (property) => {
-    navigate(`/product/${property.propertyid}`, { 
+    navigate(`/product/${property.propertyID}`, { 
       state: { propertyDetails: property }
     });
   };
@@ -386,8 +386,8 @@ const Product = () => {
             properties.map((property) => (
               <div className="tour-property-item" key={property.ID} onClick={() => handleViewDetails(property)}> 
                 <div className="tour-property-image-box">
-                  {property.propertyimage && property.propertyimage.length > 0 ? (
-                     <ImageSlider images={property.propertyimage}
+                  {property.propertyImage && property.propertyImage.length > 0 ? (
+                     <ImageSlider images={property.propertyImage}
                     onClick={(e) => {
                       e.stopPropagation();
                     }} />
@@ -396,10 +396,10 @@ const Product = () => {
                   )}
                 </div>
                 <div className="tour-property-info">
-                  <h4>{property.propertyaddress}</h4>
-                  <p>{property.nearbylocation}</p>
+                  <h4>{property.propertyAddress}</h4>
+                  <p>{property.nearbyLocation}</p>
                   <div className="tour-property-rating">{renderStars(rating)}</div>
-                  <h5>From ${property.rateamount}/night</h5>
+                  <h5>From ${property.rateAmount}/night</h5>
                 </div>
               </div>
             ))
