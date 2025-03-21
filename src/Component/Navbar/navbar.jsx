@@ -22,7 +22,7 @@ function Navbar() {
                     userID
                 };
                 try {
-                    const response = await await fetch(`https://cams-backend.vercel.app/checkStatus?userid=${userID}`);
+                    const response = await fetch(`https://cams-backend.vercel.app/checkStatus?userid=${userID}`);
                     const data = await response.json();
 
                     if (data.ustatus === 'login') {
