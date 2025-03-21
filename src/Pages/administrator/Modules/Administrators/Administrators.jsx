@@ -51,25 +51,25 @@ const Administrators = () => {
   ];
 
   const displayLabels = {
-    userID: 'User ID',
-    uFirstName: 'First Name',
-    uLastName: 'Last Name',
-    uEmail: 'Email',
-    uPhoneNo: 'Phone Number',
-    uActivation: 'Status',
-    uGender: 'Gender',
-    uCountry: 'Country',
+    userid: 'User ID',
+    ufirstname: 'First Name',
+    ulastname: 'Last Name',
+    uemail: 'Email',
+    uphoneno: 'Phone Number',
+    uactivation: 'Status',
+    ugender: 'Gender',
+    ucountry: 'Country',
   };
 
   // Filter logic for both search key and status
   const filteredUsers = users.filter((user) => {
     const searchInFields =
-      `${user.userID} ${user.uFirstName} ${user.uLastName} ${user.uEmail} ${user.uPhoneNo} ${user.uActivation}`
+      `${user.userid} ${user.ufirstname} ${user.ulastname} ${user.uemail} ${user.uphoneno} ${user.uactivation}`
         .toLowerCase()
         .includes(searchKey.toLowerCase());
 
     const statusFilter =
-      appliedFilters.status === 'All' || user.uActivation === appliedFilters.status;
+      appliedFilters.status === 'All' || user.uactivation === appliedFilters.status;
 
     return searchInFields && statusFilter;
   });
@@ -77,14 +77,14 @@ const Administrators = () => {
   const handleAction = (action, user) => {
     if (action === 'view') {
       const essentialFields = {
-        userID: user.userID || 'N/A',
-        uFirstName: user.uFirstName || 'N/A',
-        uLastName: user.uLastName || 'N/A',
-        uEmail: user.uEmail || 'N/A',
-        uPhoneNo: user.uPhoneNo || 'N/A',
-        uActivation: user.uActivation || 'N/A',
-        uGender: user.uGender || 'N/A',
-        uCountry: user.uCountry || 'N/A',
+        userid: user.userid || 'N/A',
+        ufirstname: user.ufirstname || 'N/A',
+        ulastname: user.ulastname || 'N/A',
+        uemail: user.uemail || 'N/A',
+        uphoneno: user.uphoneno || 'N/A',
+        uactivation: user.uactivation || 'N/A',
+        ugender: user.ugender || 'N/A',
+        ucountry: user.ucountry || 'N/A',
       };
       setSelectedOperator(essentialFields);
     }
@@ -95,17 +95,17 @@ const Administrators = () => {
   ];
 
   const columns = [
-    { header: 'ID', accessor: 'userID' },
-    { header: 'First Name', accessor: 'uFirstName' },
-    { header: 'Last Name', accessor: 'uLastName' },
-    { header: 'Email', accessor: 'uEmail' },
-    { header: 'Phone', accessor: 'uPhoneNo' },
+    { header: 'ID', accessor: 'userid' },
+    { header: 'First Name', accessor: 'ufirstname' },
+    { header: 'Last Name', accessor: 'ulastname' },
+    { header: 'Email', accessor: 'uemail' },
+    { header: 'Phone', accessor: 'uphoneno' },
     {
       header: 'Status',
-      accessor: 'uActivation',
+      accessor: 'uactivation',
       render: (user) => (
-        <span className={`status-badge ${user.uActivation?.toLowerCase() || 'active'}`}>
-          {user.uActivation || 'Active'}
+        <span className={`status-badge ${user.uactivation?.toLowerCase() || 'active'}`}>
+          {user.uactivation || 'Active'}
         </span>
       ),
     },
@@ -138,13 +138,13 @@ const Administrators = () => {
       <PaginatedTable
         data={filteredUsers}
         columns={columns}
-        rowKey="userID"
+        rowKey="userid"
         enableCheckbox={false}
       />
 
       <Modal
         isOpen={!!selectedOperator}
-        title={`${selectedOperator?.uFirstName} ${selectedOperator?.uLastName}`}
+        title={`${selectedOperator?.ufirstname} ${selectedOperator?.ulastname}`}
         data={selectedOperator || {}}
         labels={displayLabels}
         onClose={() => setSelectedOperator(null)}
