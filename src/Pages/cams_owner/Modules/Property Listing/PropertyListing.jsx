@@ -38,7 +38,7 @@ const PropertyListing = () => {
         try {
             const propertyData = await fetchPropertiesListingTable();
             const validProperties = (propertyData?.properties || []).filter(
-                (property) => property.propertyID !== undefined
+                (property) => property.propertyid !== undefined
             );
             setProperties(validProperties);
         } catch (error) {
@@ -50,14 +50,14 @@ const PropertyListing = () => {
     const handleAction = (action, property) => {
         if (action === 'view') {
             setSelectedProperty({
-                propertyName: property.propertyName || 'N/A',
-                propertyPrice: property.propertyPrice || 'N/A',
-                propertyLocation: property.propertyLocation || 'N/A',
-                propertyGuestPaxNo: property.propertyGuestPaxNo || 'N/A',
-                propertyStatus: property.propertyStatus || 'N/A',
-                propertyBedType: property.propertyBedType || 'N/A',
-                propertyDescription: property.propertyDescription || 'N/A',
-                images: property.propertyImage || [],
+                propertyname: property.propertyname || 'N/A',
+                propertyprice: property.propertyprice || 'N/A',
+                propertylocation: property.propertylocation || 'N/A',
+                propertyguestpaxno: property.propertyguestpaxno || 'N/A',
+                propertystatus: property.propertystatus || 'N/A',
+                propertybedtype: property.propertybedtype || 'N/A',
+                propertydescription: property.propertydescription || 'N/A',
+                images: property.propertyimage || [],
                 username:property.username || 'N/A',
             });
         } 
@@ -83,26 +83,26 @@ const PropertyListing = () => {
     ];
 
     const displayLabels = {
-        propertyName: "Property Name",
-        propertyPrice: "Property Price",
-        propertyLocation: "Property Location",
-        propertyGuestPaxNo: "Guest Capacity",
-        propertyStatus: "Property Status",
-        propertyBedType: "Bed Type",
-        propertyDescription: "Description",
+        propertyname: "Property Name",
+        propertyprice: "Property Price",
+        propertylocation: "Property Location",
+        propertyguestpaxno: "Guest Capacity",
+        propertystatus: "Property Status",
+        propertybedtype: "Bed Type",
+        propertydescription: "Description",
         images: "Images",
         username: "Operator Name"
     };
 
     const filteredProperties = properties.filter(
         (property) =>
-            (appliedFilters.status === 'All' || (property.propertyStatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
+            (appliedFilters.status === 'All' || (property.propertystatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
             (
-                (property.propertyID?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.propertyName?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.propertyLocation?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.propertyPrice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.propertyStatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
+                (property.propertyid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.propertyname?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.propertylocation?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.propertyprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.propertystatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
             )
     );
 
@@ -111,15 +111,15 @@ const PropertyListing = () => {
     ];
 
     const columns = [
-        { header: 'ID', accessor: 'propertyID' },
+        { header: 'ID', accessor: 'propertyid' },
         {
             header: 'Image',
-            accessor: 'propertyImage',
+            accessor: 'propertyimage',
             render: (property) => (
-                property.propertyImage && property.propertyImage.length > 0 ? (
+                property.propertyimage && property.propertyimage.length > 0 ? (
                     <img
-                        src={`data:image/jpeg;base64,${property.propertyImage[0]}`}
-                        alt={property.propertyName}
+                        src={`data:image/jpeg;base64,${property.propertyimage[0]}`}
+                        alt={property.propertyname}
                         style={{ width: 80, height: 80 }}
                     />
                 ) : (
@@ -127,15 +127,15 @@ const PropertyListing = () => {
                 )
             )
         },
-        { header: 'Name', accessor: 'propertyName' },
-        { header: 'Price', accessor: 'propertyPrice' },
-        { header: 'Location', accessor: 'propertyLocation' },
+        { header: 'Name', accessor: 'propertyname' },
+        { header: 'Price', accessor: 'propertyprice' },
+        { header: 'Location', accessor: 'propertylocation' },
         {
             header: 'Status',
-            accessor: 'propertyStatus',
+            accessor: 'propertystatus',
             render: (property) => (
-              <span className={`property-status ${(property.propertyStatus ?? 'Pending').toLowerCase()}`}>
-                {property.propertyStatus || 'Pending'}
+              <span className={`property-status ${(property.propertystatus ?? 'Pending').toLowerCase()}`}>
+                {property.propertystatus || 'Pending'}
               </span>
             )
         },
@@ -163,13 +163,13 @@ const PropertyListing = () => {
             <PaginatedTable
                 data={filteredProperties}
                 columns={columns}
-                rowKey="propertyID"
+                rowKey="propertyid"
               
             />
 
             <Modal
                 isOpen={!!selectedProperty}
-                title={`${selectedProperty?.propertyName}`}
+                title={`${selectedProperty?.propertyname}`}
                 data={selectedProperty || {}}
                 labels={displayLabels}
                 onClose={() => setSelectedProperty(null)}
