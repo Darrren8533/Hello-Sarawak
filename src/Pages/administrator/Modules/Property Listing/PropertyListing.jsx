@@ -197,37 +197,13 @@ const PropertyListing = () => {
 
 
     const propertyDropdownItems = (property, username, usergroup) => {
-    const isOwner = property.username === username; 
-    const isModerator = usergroup === 'Moderator';
-    const isAdmin = usergroup === 'Administrator';
+        const isOwner = property.username === username; 
+        const isModerator = usergroup === 'Moderator';
+        const isAdmin = usergroup === 'Administrator';
 
-    const { propertystatus } = property;
+        const { propertystatus } = property;
 
-    if (isModerator) {
-        // Logic for moderator
-        if (propertystatus === 'Pending') {
-            return [
-                { label: 'View Details', icon: <FaEye />, action: 'view' },
-            ];
-        } else if (propertystatus === 'Available') {
-            return [
-                { label: 'View Details', icon: <FaEye />, action: 'view' },
-            ];
-        } else if (propertystatus === 'Unavailable') {
-            return [
-                { label: 'View Details', icon: <FaEye />, action: 'view' },
-                { label: 'Edit', icon: <FaEdit />, action: 'edit' },
-            ];
-        }
-    }
-
-    if (isAdmin) {
-        if (!isOwner) {
-            // Admin managing moderator's property
-            if (property.username !== username && property.username.includes('admin')) {
-                // Current admin cannot reject or manage another admin's property
-                return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
-            }
+        if (isAdmin) {
             if (propertystatus === 'Pending') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
@@ -245,27 +221,16 @@ const PropertyListing = () => {
                     { label: 'Accept', icon: <FaCheck />, action: 'accept' },
                 ];
             }
-        } else {
-            // Admin managing their own property
-            if (propertystatus === 'Available') {
-                return [
-                    { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Reject', icon: <FaTimes />, action: 'reject' },
-                ];
-            } else if (propertystatus === 'Unavailable') {
-                return [
-                    { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Edit', icon: <FaEdit />, action: 'edit' },
-                    { label: 'Accept', icon: <FaCheck />, action: 'accept' },
-                    { label: 'Delete', icon: <FaTrash />, action: 'delete' },
-                ];
-            }
         }
-    }
 
-    // Default: View only
-    return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
-};
+        if (isModerator) {
+            return [
+                { label: 'View Details', icon: <FaEye />, action: 'view' },
+            ];
+        }
+
+        return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
+    };
 
     
 const username = localStorage.getItem('username');
