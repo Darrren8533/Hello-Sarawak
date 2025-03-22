@@ -47,7 +47,7 @@ const PropertyDetails = () => {
   const [isGuestDropdownOpen, setIsGuestDropdownOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const { propertyID } = useParams();
+  const { propertyid } = useParams();
   const { propertyDetails } = location.state || {};
   const [bookingData, setBookingData] = useState({
     arrivalDate: '',
@@ -62,7 +62,7 @@ const PropertyDetails = () => {
   const [isEditingGuests, setIsEditingGuests] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [totalNights, setTotalNights] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(0);
+  const [totalprice, settotalprice] = useState(0);
   const [bookingForm, setBookingForm] = useState({
     title: 'Mr.',
     firstName: '',
@@ -90,7 +90,7 @@ const PropertyDetails = () => {
     }));
 
     if (name === 'arrivalDate' || name === 'departureDate') {
-      calculateTotalPrice(
+      calculatetotalprice(
         name === 'arrivalDate' ? value : bookingData.arrivalDate,
         name === 'departureDate' ? value : bookingData.departureDate
       );
@@ -98,11 +98,11 @@ const PropertyDetails = () => {
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev === propertyDetails?.propertyImage.length - 1 ? 0 : prev + 1));
+    setCurrentSlide((prev) => (prev === propertyDetails?.propertyimage.length - 1 ? 0 : prev + 1));
   };
   
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? propertyDetails?.propertyImage.length - 1 : prev - 1));
+    setCurrentSlide((prev) => (prev === 0 ? propertyDetails?.propertyimage.length - 1 : prev - 1));
   };
 
   const handleGuestChange = (type, operation) => {
@@ -151,7 +151,7 @@ const PropertyDetails = () => {
     document.body.style.overflow = 'hidden';
   };
 
-  const calculateTotalPrice = (arrival, departure) => {
+  const calculatetotalprice = (arrival, departure) => {
     if (arrival && departure) {
       const start = new Date(arrival);
       const end = new Date(departure);
@@ -159,9 +159,9 @@ const PropertyDetails = () => {
       
       if (nights > 0) {
         setTotalNights(nights);
-        const basePrice = propertyDetails?.rateAmount * nights;
+        const basePrice = propertyDetails?.rateamount * nights;
         const taxes = basePrice * 0.1;
-        setTotalPrice(basePrice + taxes);
+        settotalprice(basePrice + taxes);
       }
     }
   };
@@ -178,8 +178,8 @@ const PropertyDetails = () => {
     e.preventDefault();
     console.log('Starting...');
 
-    const userID = localStorage.getItem('userID');
-    if (!userID) {
+    const userid = localStorage.getItem('userid');
+    if (!userid) {
       alert('Please Login First');
       return;
     }
@@ -202,32 +202,32 @@ const PropertyDetails = () => {
       });
 
       const reservationData = {
-        propertyID: propertyDetails.propertyID,
-        checkInDateTime: bookingData.arrivalDate,
-        checkOutDateTime: bookingData.departureDate,
-        reservationBlockTime: new Date(new Date(bookingData.arrivalDate) - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        propertyid: propertyDetails.propertyid,
+        checkindatetime: bookingData.arrivalDate,
+        checkoutdatetime: bookingData.departureDate,
+        reservationblocktime: new Date(new Date(bookingData.arrivalDate) - 3 * 24 * 60 * 60 * 1000).toISOString(),
         request: bookingForm.additionalRequests || '',
-        totalPrice: totalPrice,
-        rcFirstName: bookingForm.firstName,
-        rcLastName: bookingForm.lastName,
-        rcEmail: bookingForm.email,
-        rcPhoneNo: bookingForm.phoneNumber,
-        rcTitle: bookingForm.title,
+        totalprice: totalprice,
+        rcfirstname: bookingForm.firstName,
+        rclastname: bookingForm.lastName,
+        rcemail: bookingForm.email,
+        rcphoneno: bookingForm.phoneNumber,
+        rctitle: bookingForm.title,
         adults: bookingData.adults,
         children: bookingData.children,
-        userID: parseInt(userID),
+        userid: parseInt(userid),
         //reservationPaxNo: parseInt(bookingData.adults) + parseInt(bookingData.children),
-        reservationStatus: 'Pending'
+        reservationstatus: 'Pending'
       };
 
 
       const createdReservation = await createReservation(reservationData);
 
-      if (!createdReservation || !createdReservation.reservationID) {
+      if (!createdReservation || !createdReservation.reservationid) {
         throw new Error('Failed to create reservation: No valid reservation ID received');
       }
 
-      await requestBooking(createdReservation.reservationID);
+      await requestBooking(createdReservation.reservationid);
       console.log('Booking request sent');
 
       alert('Reservation added to cart');
@@ -240,11 +240,11 @@ const PropertyDetails = () => {
   };
 
   const fetchUserInfo = async () => {
-    const userID = localStorage.getItem('userID');
-    if (!userID) return;
+    const userid = localStorage.getItem('userid');
+    if (!userid) return;
 
     try {
-      const response = await fetch(`https://cams-backend.vercel.app/getUserInfo/${userID}`);
+      const response = await fetch(`https://cams-backend.vercel.app/getUserInfo/${userid}`);
       if (!response.ok) {
         throw new Error('Failed to get user information');
       }
@@ -254,11 +254,11 @@ const PropertyDetails = () => {
       
       setBookingForm(prev => ({
         ...prev,
-        title: userData.uTitle || 'Mr.',
-        firstName: userData.uFirstName || '',
-        lastName: userData.uLastName || '',
-        email: userData.uEmail || '',
-        phoneNumber: userData.uPhoneNo || '',
+        title: userData.utitle || 'Mr.',
+        firstName: userData.ufirstname || '',
+        lastName: userData.ulastname || '',
+        email: userData.uemail || '',
+        phoneNumber: userData.uphoneno || '',
         additionalRequests: '' 
       }));
     } catch (error) {
@@ -484,20 +484,181 @@ const PropertyDetails = () => {
       ) : (
         <div className="booking-overlay">
           <div className="booking-modal">
-            {/* 预订模态框部分 */}
+            <div className="booking-header">
+              <button className="back-button" onClick={() => setShowBookingForm(false)}>
+                <span><IoReturnUpBackOutline/></span> Request to book
+              </button>
+            </div>
+
             <div className="booking-content">
               <div className="booking-left">
-                {/* 左侧内容 */}
+                <div className="trip-section">
+                  <h2>Your trip</h2>
+
+                  <br/>
+                  
+                  <div className="trip-dates">
+                    <div className="section-header">
+                      <h3>Dates</h3>
+                      <button 
+                        className="edit-button"
+                        onClick={() => setIsEditingDates(!isEditingDates)}
+                      >
+                        Edit
+                      </button>
+                    </div>
+                    {isEditingDates ? (
+                      <div className="dates-editor">
+                        <div className="date-input-group">
+                          <label>Check-in</label>
+                          <input 
+                            type="date" 
+                            value={bookingData.arrivalDate}
+                            onChange={handleInputChange}
+                            name="arrivalDate"
+                          />
+                        </div>
+                        <div className="date-input-group">
+                          <label>Check-out</label>
+                          <input 
+                            type="date" 
+                            value={bookingData.departureDate}
+                            onChange={handleInputChange}
+                            name="departureDate"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <p>{bookingData.arrivalDate} - {bookingData.departureDate}</p>
+                    )}
+                  </div>
+
+                  <br/>
+
+                  
+                </div>
+
+                <div className="login-section">
+                <div className="guest-details-section">
+                  <h2>Guest details</h2>
+                  <div className="form-grid">
+                    <div className="form-group title-group">
+                      <label>Title</label>
+                      <div className="title-options">
+                        <label className="radio-label">
+                          <input 
+                            type="radio" 
+                            name="title" 
+                            value="Mr." 
+                            checked={bookingForm.title === 'Mr.'} 
+                            onChange={handleFormChange}
+                          />
+                          <span>Mr.</span>
+                        </label>
+                        <label className="radio-label">
+                          <input 
+                            type="radio" 
+                            name="title" 
+                            value="Mrs." 
+                            checked={bookingForm.title === 'Mrs.'} 
+                            onChange={handleFormChange}
+                          />
+                          <span>Mrs.</span>
+                        </label>
+                        <label className="radio-label">
+                          <input 
+                            type="radio" 
+                            name="title" 
+                            value="Ms." 
+                            checked={bookingForm.title === 'Ms.'} 
+                            onChange={handleFormChange}
+                          />
+                          <span>Ms.</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label>First name</label>
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={bookingForm.firstName}
+                        onChange={handleFormChange}
+                        placeholder="Enter your first name"
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Last name</label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={bookingForm.lastName}
+                        onChange={handleFormChange}
+                        placeholder="Enter your last name"
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={bookingForm.email}
+                        onChange={handleFormChange}
+                        placeholder="Enter your email"
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Phone number</label>
+                      <input
+                        type="tel"
+                        name="phoneNumber"
+                        value={bookingForm.phoneNumber}
+                        onChange={handleFormChange}
+                        placeholder="Enter your phone number"
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group full-width">
+                      <label>Additional requests</label>
+                      <textarea
+                        name="additionalRequests"
+                        value={bookingForm.additionalRequests}
+                        onChange={handleFormChange}
+                        placeholder="Any special requests?"
+                        rows="4"
+                      />
+                    </div>
+                  </div>
+                </div><br/><br/>
+                <button className="continue-button" onClick={handleAddToCart}>Add to Cart</button>
+
+                <div className="divider">or</div>
+
+                <div className="social-buttons">
+                  <button className="social-button google">
+                    <FcGoogle />
+                    Continue with Google
+                  </button>
+                </div>
+              </div>
               </div>
 
               <div className="booking-right">
                 <div className="property-card">
                   <img 
                     src={`data:image/jpeg;base64,${propertyDetails?.propertyimage[0]}`} 
-                    alt={propertyDetails?.propertyaddress}
+                    alt={propertyDetails?.propertyname}
                   />
                   <div className="property-info">
-                    <h3>{propertyDetails?.propertyaddress}</h3>
+                    <h3>{propertyDetails?.propertyname}</h3>
                   </div>
                 </div>
 
@@ -506,7 +667,7 @@ const PropertyDetails = () => {
                   <h3>Price details</h3>
                   <div className="price-breakdown">
                     <div className="price-row">
-                    <span>RM {propertyDetails?.rateamount} x {totalNights} night</span>
+                    <span>RM {propertyDetails?.rateamount} × {totalNights} night</span>
                     <span>RM{propertyDetails?.rateamount * totalNights}</span>
                     </div>
                     <div className="price-row">

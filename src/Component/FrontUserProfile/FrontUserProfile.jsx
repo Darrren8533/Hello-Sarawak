@@ -21,19 +21,19 @@ const FrontUserProfile = () => {
     const [avatarKey, setAvatarKey] = useState(0);
     const [originalUserData, setOriginalUserData] = useState({});
 
-    const userID = localStorage.getItem('userID');
+    const userid = localStorage.getItem('userid');
     const googleAccessToken = localStorage.getItem('googleAccessToken');
 
     useEffect(() => {
         const loadUserDetails = async () => {
             try {
-                const data = await fetchUserData(userID);
+                const data = await fetchUserData(userid);
                 setUserData(data);
                 setOriginalUserData(data);
 
                 let imageSrc;
-                if (data.uImage) {
-                    imageSrc = data.uImage.startsWith('http') ? data.uImage : `data:image/jpeg;base64,${data.uImage}`;
+                if (data.uimage) {
+                    imageSrc = data.uimage.startsWith('http') ? data.uimage : `data:image/jpeg;base64,${data.uimage}`;
                 } else if (googleAccessToken) {
                     const googleData = await fetchGoogleUserData(googleAccessToken);
                     imageSrc = googleData.picture;
@@ -41,14 +41,14 @@ const FrontUserProfile = () => {
                     imageSrc = '/avatar.png';
                 }
                 setPreviewAvatar(imageSrc);
-                localStorage.setItem("uImage", imageSrc);
+                localStorage.setItem("uimage", imageSrc);
             } catch (error) {
                 displayToast('error', 'Error fetching user data');
             }
         };
 
         loadUserDetails();
-    }, [userID, googleAccessToken]);
+    }, [userid, googleAccessToken]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -92,21 +92,21 @@ const FrontUserProfile = () => {
                 const base64String = resizedImage.split(',')[1];
 
                 setPreviewAvatar(resizedImage);
-                setUserData((prevData) => ({ ...prevData, uImage: base64String }));
+                setUserData((prevData) => ({ ...prevData, uimage: base64String }));
                 setAvatarKey(prev => prev + 1);
 
                 try {
-                    const response = await uploadAvatar(userID, base64String);
+                    const response = await uploadAvatar(userid, base64String);
                     displayToast('success', 'Avatar updated successfully');
 
-                    const updatedData = await fetchUserData(userID);
+                    const updatedData = await fetchUserData(userid);
                     setUserData(updatedData);
                     setOriginalUserData(updatedData);
-                    let updatedAvatar = updatedData.uImage?.startsWith('http')
-                        ? updatedData.uImage
-                        : `data:image/jpeg;base64,${updatedData.uImage}` || '/avatar.png';
+                    let updatedAvatar = updatedData.uimage?.startsWith('http')
+                        ? updatedData.uimage
+                        : `data:image/jpeg;base64,${updatedData.uimage}` || '/avatar.png';
                     setPreviewAvatar(updatedAvatar);
-                    localStorage.setItem("uImage", updatedAvatar);
+                    localStorage.setItem("uimage", updatedAvatar);
 
                     eventBus.emit('avatarUpdated', updatedAvatar);
                 } catch (error) {
@@ -128,17 +128,17 @@ const FrontUserProfile = () => {
         try {
             // Field-specific validations
             if (editingField === 'name') {
-                if (!userData.uFirstName?.trim() || !userData.uLastName?.trim()) {
+                if (!userData.ufirstname?.trim() || !userData.ulastname?.trim()) {
                     throw new Error('First and last name cannot be empty');
                 }
-                if (!nameRegex.test(userData.uFirstName) || !nameRegex.test(userData.uLastName)) {
+                if (!nameRegex.test(userData.ufirstname) || !nameRegex.test(userData.ulastname)) {
                     throw new Error('Name should only contain letters and spaces');
                 }
             }
 
             if (editingField === 'phone') {
-                if (!userData.uPhoneNo?.trim()) throw new Error('Phone cannot be empty');
-                if (!phoneRegex.test(userData.uPhoneNo)) throw new Error('Phone number should contain only numbers');
+                if (!userData.uphoneno?.trim()) throw new Error('Phone cannot be empty');
+                if (!phoneRegex.test(userData.uphoneno)) throw new Error('Phone number should contain only numbers');
             }
 
             if (editingField === 'username') {
@@ -157,16 +157,16 @@ const FrontUserProfile = () => {
             }
 
             if (editingField === 'email') {
-                if (!userData.uEmail?.trim()) throw new Error('Email cannot be empty');
-                if (!emailRegex.test(userData.uEmail)) throw new Error('Please enter a valid email address');
+                if (!userData.uemail?.trim()) throw new Error('Email cannot be empty');
+                if (!emailRegex.test(userData.uemail)) throw new Error('Please enter a valid email address');
             }
 
             if (editingField === 'dob') {
-                if (!userData.uDOB?.trim()) throw new Error('Date of birth cannot be empty');
+                if (!userData.udob?.trim()) throw new Error('Date of birth cannot be empty');
             }
 
             if (editingField === 'country') {
-                if (!userData.uCountry?.trim()) throw new Error('Country cannot be empty');
+                if (!userData.ucountry?.trim()) throw new Error('Country cannot be empty');
             }
 
            
@@ -188,12 +188,12 @@ const FrontUserProfile = () => {
             const handleCountryChange = (val) => {
         setUserData((prevUserData) => ({
             ...prevUserData,
-            uCountry: val
+            ucountry: val
         }));
     };
 
         // Refresh data
-        const updatedData = await fetchUserData(userID);
+        const updatedData = await fetchUserData(userid);
         setUserData(updatedData);
         setOriginalUserData(updatedData);
 
@@ -219,7 +219,7 @@ const FrontUserProfile = () => {
     const handleCountryChange = (val) => {
         setUserData((prevUserData) => ({
             ...prevUserData,
-            uCountry: val
+            ucountry: val
         }));
     };
 
@@ -259,7 +259,7 @@ const FrontUserProfile = () => {
                             {/* Name Field */}
                             <div className="front-profile-field">
                                 <span className="front-field-label">Name</span>
-                                <span className="front-field-value">{userData.uFirstName} {userData.uLastName}</span>
+                                <span className="front-field-value">{userData.ufirstname} {userData.ulastname}</span>
                                 <span className="front-edit-link"
                                     onClick={() => editingField === 'name' ? cancelEditing() : setEditingField('name')}>
                                     {editingField === 'name' ? 'Cancel' : 'Edit'}
@@ -267,10 +267,10 @@ const FrontUserProfile = () => {
                             </div>
                             {editingField === 'name' && (
                                 <div className="front-edit-section">
-                                    <input type="text" name="uFirstName" placeholder="First Name"
-                                        value={userData.uFirstName || ''} onChange={handleInputChange} />
-                                    <input type="text" name="uLastName" placeholder="Last Name"
-                                        value={userData.uLastName || ''} onChange={handleInputChange} />
+                                    <input type="text" name="ufirstname" placeholder="First Name"
+                                        value={userData.ufirstname || ''} onChange={handleInputChange} />
+                                    <input type="text" name="ulastname" placeholder="Last Name"
+                                        value={userData.ulastname || ''} onChange={handleInputChange} />
                                     <button onClick={handleUpdate}>Save</button>
                                 </div>
                             )}
@@ -278,7 +278,7 @@ const FrontUserProfile = () => {
                             {/* Email Field */}
                             <div className="front-profile-field">
                                 <span className="front-field-label">Email Address</span>
-                                <span className="front-field-value">{userData.uEmail || 'Not provided'}</span>
+                                <span className="front-field-value">{userData.uemail || 'Not provided'}</span>
                                 <span className="front-edit-link"
                                     onClick={() => editingField === 'email' ? cancelEditing() : setEditingField('email')}>
                                     {editingField === 'email' ? 'Cancel' : 'Edit'}
@@ -286,8 +286,8 @@ const FrontUserProfile = () => {
                             </div>
                             {editingField === 'email' && (
                                 <div className="front-edit-section">
-                                    <input type="email" name="uEmail" placeholder="Email Address"
-                                        value={userData.uEmail || ''} onChange={handleInputChange} />
+                                    <input type="email" name="uemail" placeholder="Email Address"
+                                        value={userData.uemail || ''} onChange={handleInputChange} />
                                     <button onClick={handleUpdate}>Save</button>
                                 </div>
                             )}
@@ -295,7 +295,7 @@ const FrontUserProfile = () => {
                             {/* Phone Field */}
                             <div className="front-profile-field">
                                 <span className="front-field-label">Phone Number</span>
-                                <span className="front-field-value">{userData.uPhoneNo || 'Not provided'}</span>
+                                <span className="front-field-value">{userData.uphoneno || 'Not provided'}</span>
                                 <span className="front-edit-link"
                                     onClick={() => editingField === 'phone' ? cancelEditing() : setEditingField('phone')}>
                                     {editingField === 'phone' ? 'Cancel' : 'Edit'}
@@ -303,8 +303,8 @@ const FrontUserProfile = () => {
                             </div>
                             {editingField === 'phone' && (
                                 <div className="front-edit-section">
-                                    <input type="text" name="uPhoneNo" placeholder="Phone Number"
-                                        value={userData.uPhoneNo || ''} onChange={handleInputChange} />
+                                    <input type="text" name="uphoneno" placeholder="Phone Number"
+                                        value={userData.uphoneno || ''} onChange={handleInputChange} />
                                     <button onClick={handleUpdate}>Save</button>
                                 </div>
                             )}
@@ -312,7 +312,7 @@ const FrontUserProfile = () => {
                             {/* Date of Birth Field */}
                             <div className="front-profile-field">
                                 <span className="front-field-label">Date of Birth</span>
-                                <span className="front-field-value">{userData.uDOB || 'Not provided'}</span>
+                                <span className="front-field-value">{userData.udob || 'Not provided'}</span>
                                 <span className="front-edit-link"
                                     onClick={() => editingField === 'dob' ? cancelEditing() : setEditingField('dob')}>
                                     {editingField === 'dob' ? 'Cancel' : 'Edit'}
@@ -320,8 +320,8 @@ const FrontUserProfile = () => {
                             </div>
                             {editingField === 'dob' && (
                                 <div className="front-edit-section">
-                                    <input type="date" name="uDOB"
-                                        value={userData.uDOB || ''} onChange={handleInputChange} />
+                                    <input type="date" name="udob"
+                                        value={userData.udob || ''} onChange={handleInputChange} />
                                     <button onClick={handleUpdate}>Save</button>
                                 </div>
                             )}
@@ -329,7 +329,7 @@ const FrontUserProfile = () => {
                             {/* Country Field */}
                             <div className="front-profile-field">
                                 <span className="front-field-label">Country</span>
-                                <span className="front-field-value">{userData.uCountry || 'Not provided'}</span>
+                                <span className="front-field-value">{userData.ucountry || 'Not provided'}</span>
                                 <span
                                     className="front-edit-link"
                                     onClick={() => editingField === 'country'? cancelEditing() : setEditingField('country')}
@@ -340,7 +340,7 @@ const FrontUserProfile = () => {
                             {editingField === 'country' && (
                                 <div className="front-edit-section">
                                     <CountryDropdown className='country-dropdown'
-                                        value={userData.uCountry || ''}                  
+                                        value={userData.ucountry || ''}                  
                                         onChange={handleCountryChange}
                                     />
                                     <button onClick={handleUpdate}>Save</button>
