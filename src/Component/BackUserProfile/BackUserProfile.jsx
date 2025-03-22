@@ -138,52 +138,63 @@ const BackUserProfile = () => {
 };
 
     const handleUpdate = async () => {
-        const nameRegex = /^[A-Za-z\s]*$/;
-        const usernameRegex = /^[a-zA-Z0-9]*$/;
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-        const phoneRegex = /^[0-9]*$/;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const nameRegex = /^[A-Za-z\s]*$/;
+    const usernameRegex = /^[a-zA-Z0-9_]{6,15}$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; 
+    const phoneRegex = /^[0-9]{10,15}$/; 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
 
-        try {
-            // Validate fields based on active tab
-            if (activeTab === 'account') {
-                // Name validation
-                if (!userData.ufirstname?.trim() || !userData.ulastname?.trim()) {
-                    throw new Error('First and last name cannot be empty');
-                }
-                if (!nameRegex.test(userData.ufirstname) || !nameRegex.test(userData.ulastname)) {
-                    throw new Error('Name should only contain letters and spaces');
-                }
-
-                // Phone validation
-                if (userData.uphoneno && !phoneRegex.test(userData.uphoneno)) {
-                    throw new Error('Phone number should contain only numbers');
-                }
-
-                // Email validation
-                if (!emailRegex.test(userData.uemail)) {
-                    throw new Error('Please enter a valid email address');
-                }
-            } else if (activeTab === 'security') {
-                // Username validation
-                if (!usernameRegex.test(userData.username)) {
-                    throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
-                }
-
-                // Password validation
-                if (userData.password && !passwordRegex.test(userData.password)) {
-                    throw new Error('Password must be 6-20 characters with at least 1 letter and 1 number');
-                }
+    try {
+        // Validate fields based on active tab
+        if (activeTab === 'account') {
+            // Name validation
+            if (!userData.ufirstname?.trim() || !userData.ulastname?.trim()) {
+                throw new Error('First and last name cannot be empty');
+            }
+            if (!nameRegex.test(userData.ufirstname) || !nameRegex.test(userData.ulastname)) {
+                throw new Error('Name should only contain letters and spaces');
             }
 
-            // Update profile
-            const response = await updateProfile(userData);
-            if (!response.success) throw new Error('Failed to update profile');
-            displayToast('success', 'Profile updated successfully');
-        } catch (error) {
-            displayToast('error', error.message);
+            // Phone validation
+            if (userData.uphoneno && !phoneRegex.test(userData.uphoneno)) {
+                throw new Error('Phone number should contain 10-15 digits');
+            }
+
+            // Email validation
+            if (!emailRegex.test(userData.uemail)) {
+                throw new Error('Please enter a valid email address');
+            }
+        } else if (activeTab === 'security') {
+            // Username validation
+            if (!usernameRegex.test(userData.username)) {
+                throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
+            }
+
+            // Password validation
+            if (userData.password && !passwordRegex.test(userData.password)) {
+                throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
+            }
         }
-    };
+
+        // Add userid to the payload
+        const payload = { ...userData, userid };
+
+
+        console.log('Update Payload:', payload);
+
+
+        const response = await updateProfile(payload);
+        if (!response.success) {
+            throw new Error(response.message || 'Failed to update profile');
+        }
+
+
+        displayToast('success', 'Profile updated successfully');
+    } catch (error) {
+        console.error('Update Error:', error);
+        displayToast('error', error.message);
+    }
+};
 
     const displayToast = (type, message) => {
         setToastType(type);
