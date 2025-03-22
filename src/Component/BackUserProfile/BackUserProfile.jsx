@@ -113,26 +113,29 @@ const BackUserProfile = () => {
     };
 
     const handleAvatarUpload = async () => {
-        if (!avatar) return displayToast('error', 'Please select an avatar to upload');
+    if (!avatar) return displayToast('error', 'Please select an avatar to upload');
 
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            const base64String = reader.result.split(',')[1]; // Extract Base64 data
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+        const base64String = reader.result.split(',')[1]; // This extracts the base64 data
 
-            try {
-                const data = await uploadAvatar(userid, base64String); // Send Base64 string
-                displayToast('success', 'Avatar uploaded successfully');
+        try {
+            const data = await uploadAvatar(userid, base64String);
+            displayToast('success', 'Avatar uploaded successfully');
 
-                const updatedUserData = await fetchUserData(userid);
-                setUserData(updatedUserData);
-                setPreviewAvatar(`data:image/jpeg;base64,${updatedUserData.uimage}`);
-            } catch (error) {
-                console.error("Avatar Upload Error:", error);
-                displayToast('error', error.message || 'Failed to upload avatar');
-            }
-        };
-        reader.readAsDataURL(avatar); // Convert image to Base64
+            // Refresh user data
+            const updatedUserData = await fetchUserData(userid);
+            setUserData(updatedUserData);
+            
+            // Set preview with the full data URL format
+            setPreviewAvatar(`data:image/jpeg;base64,${updatedUserData.uimage}`);
+        } catch (error) {
+            console.error("Avatar Upload Error:", error);
+            displayToast('error', error.message || 'Failed to upload avatar');
+        }
     };
+    reader.readAsDataURL(avatar);
+};
 
     const handleUpdate = async () => {
         const nameRegex = /^[A-Za-z\s]*$/;
