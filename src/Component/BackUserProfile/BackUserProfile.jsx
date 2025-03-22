@@ -98,21 +98,22 @@ const BackUserProfile = () => {
     };
 
     const handleAvatarChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setAvatar(file);
+    const file = e.target.files[0];
+    if (file) {
+        setAvatar(file);
 
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                const base64String = reader.result.split(',')[1];
-                setPreviewAvatar(reader.result);
-                setUserData((prevData) => ({ ...prevData, uimage: base64String }));
-            };
-            reader.readAsDataURL(file);
-        }
-    };
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            let base64String = reader.result.split(',')[1]; 
+            setPreviewAvatar(reader.result);
+            setUserData((prevData) => ({ ...prevData, uimage: base64String }));
+        };
+        reader.readAsDataURL(file);
+    }
+};
 
-   const handleAvatarUpload = async () => {
+
+const handleAvatarUpload = async () => {
   if (!avatar) {
     return displayToast('error', 'Please select an avatar to upload');
   }
@@ -122,7 +123,7 @@ const BackUserProfile = () => {
     let base64String = reader.result.split(',')[1];  
 
     try {
-      const response = await uploadAvatar(userData.userid, base64String);
+      const response = await uploadAvatar(userData.userid, base64String); 
       if (response.success) {
         displayToast('success', response.message);
         setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`);
