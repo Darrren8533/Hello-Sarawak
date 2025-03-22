@@ -767,27 +767,32 @@ export const fetchGoogleUserData = async (accessToken) => {
   }
 };
 
-// Update User Profile
+// Update user profile
 export const updateProfile = async (userData) => {
-  try {
-    const response = await fetch(`${API_URL}/users/updateProfile/${userData.userID}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-    });
+    try {
+        // Validate user ID
+        if (!userData.userid) {
+            throw new Error('User ID is missing');
+        }
+      
+        const response = await fetch(`${API_URL}/users/updateProfile/${userData.userid}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData),
+        });
 
-    if (!response.ok) {
-      const errorData = await response.json(); 
-      throw new Error(errorData.message || 'Failed to update user profile');
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to update user profile');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('API error:', error);
+        throw error;
     }
-
-    return await response.json();
-  } catch (error) {
-    console.error('API error:', error);
-    throw error;
-  }
 };
 
 //Upload Avatar
