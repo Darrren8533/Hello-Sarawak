@@ -113,31 +113,34 @@ const BackUserProfile = () => {
     };
 
    const handleAvatarUpload = async () => {
-    if (!avatar) {
-        return displayToast('error', 'Please select an avatar to upload');
+  if (!avatar) {
+    return displayToast('error', 'Please select an avatar to upload');
+  }
+
+  const reader = new FileReader();
+  reader.onloadend = async () => {
+    const base64String = reader.result.split(',')[1]; 
+
+    try {
+      const response = await uploadAvatar(userData, base64String);
+      if (response.success) {
+        displayToast('success', response.message);
+
+        // Update userData with the returned data
+        setUserData((prevData) => ({
+          ...prevData,
+          uimage: response.data.uimage,
+        }));
+
+        // Set preview avatar with the base64 string
+        setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`);
+      }
+    } catch (error) {
+      console.error('Avatar Upload Error:', error);
+      displayToast('error', error.message || 'Failed to upload avatar');
     }
-
-    const reader = new FileReader();
-    reader.onloadend = async () => {
-        const base64String = reader.result.split(',')[1]; 
-
-        try {
-            
-            const data = await uploadAvatar(userData, base64String);
-            displayToast('success', 'Avatar uploaded successfully');
-
-            
-            const updatedUserData = await fetchUserData(userData.userid);
-            setUserData(updatedUserData);
-
-            
-            setPreviewAvatar(`data:image/jpeg;base64,${updatedUserData.uimage}`);
-        } catch (error) {
-            console.error('Avatar Upload Error:', error);
-            displayToast('error', error.message || 'Failed to upload avatar');
-        }
-    };
-    reader.readAsDataURL(avatar);
+  };
+  reader.readAsDataURL(avatar);
 };
 
 
