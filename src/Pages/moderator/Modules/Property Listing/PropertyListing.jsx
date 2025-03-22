@@ -42,7 +42,7 @@ const PropertyListing = () => {
         try {
             const propertyData = await fetchPropertiesListingTable();
             const validProperties = (propertyData?.properties || []).filter(
-                (property) => property.propertyID !== undefined
+                (property) => property.propertyid !== undefined
             );
             setProperties(validProperties);
         } catch (error) {
@@ -71,15 +71,15 @@ const PropertyListing = () => {
     ];
 
     const displayLabels = {
-        propertyName: "Property Name",
-        clusterName: "Cluster Name",
-        categoryName: "Category Name",
-        propertyPrice: "Property Price",
-        propertyLocation: "Property Location",
-        propertyGuestPaxNo: "Guest Capacity",
-        propertyStatus: "Property Status",
-        propertyBedType: "Bed Type",
-        propertyDescription: "Description",
+        propertyname: "Property Name",
+        clustername: "Cluster Name",
+        categoryname: "Category Name",
+        propertyprice: "Property Price",
+        propertylocation: "Property Location",
+        propertyguestpaxno: "Guest Capacity",
+        propertystatus: "Property Status",
+        propertybedtype: "Bed Type",
+        propertydescription: "Description",
         images: "Images",
         username: "Operator Name"
     };
@@ -87,37 +87,37 @@ const PropertyListing = () => {
     const filteredProperties = properties.filter(
         (property) =>
             (appliedFilters.status === 'All' ||
-                (property.propertyStatus ?? 'Pending').toLowerCase() ===
+                (property.propertystatus ?? 'Pending').toLowerCase() ===
                     appliedFilters.status.toLowerCase()) &&
             (
-                (property.propertyID?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.propertyAddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.nearbyLocation?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.rateAmount?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.propertyStatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
+                (property.propertyid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.propertyaddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.nearbylocation?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.rateamount?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.propertystatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
             )
     );
 
     const handleAction = async (action, property) => {
         if (action === 'view') {
             setSelectedProperty({
-                propertyName: property.propertyAddress || 'N/A',
-                clusterName: property.clusterName || 'N/A',
-                categoryName: property.categoryName || 'N/A',
-                propertyPrice: property.rateAmount|| 'N/A',
-                propertyLocation: property.nearbyLocation || 'N/A',
-                propertyGuestPaxNo: property.propertyGuestPaxNo || 'N/A',
-                propertyStatus: property.propertyStatus || 'N/A',
-                propertyBedType: property.propertyBedType || 'N/A',
-                propertyDescription: property.propertyDescription || 'N/A',
-                images: property.propertyImage || [],
+                propertyname: property.propertyaddress || 'N/A',
+                clustername: property.clustername || 'N/A',
+                categoryname: property.categoryname || 'N/A',
+                propertyprice: property.rateamount|| 'N/A',
+                propertylocation: property.nearbylocation || 'N/A',
+                propertyguestpaxno: property.propertyguestpaxno || 'N/A',
+                propertystatus: property.propertystatus || 'N/A',
+                propertybedtype: property.propertybedtype || 'N/A',
+                propertydescription: property.propertydescription || 'N/A',
+                images: property.propertyimage || [],
                 username: property.username || 'N/A',
             });
         } else if (action === 'edit') {
             setEditProperty(property);
             setIsPropertyFormOpen(true);
         } else if (action === 'delete') {
-            setPropertyToDelete(property.propertyID);
+            setPropertyToDelete(property.propertyid);
             setIsDialogOpen(true);
         }
     };
@@ -126,7 +126,7 @@ const PropertyListing = () => {
         try {
             await deleteProperty(propertyToDelete);
             setProperties((prevProperties) =>
-                prevProperties.filter((property) => property.propertyID !== propertyToDelete)
+                prevProperties.filter((property) => property.propertyid !== propertyToDelete)
             );
             displayToast('success', 'Property deleted successfully');
         } catch (error) {
@@ -138,13 +138,13 @@ const PropertyListing = () => {
         }
     };
 
-    const propertyDropdownItems = (propertyStatus) => {
-        if (propertyStatus === 'Pending') {
+    const propertyDropdownItems = (propertystatus) => {
+        if (propertystatus === 'Pending') {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Edit', icon: <FaEdit />, action: 'edit' },
             ];
-        } else if (propertyStatus === 'Unavailable') {
+        } else if (propertystatus === 'Unavailable') {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Delete', icon: <FaTrash />, action: 'delete' },
@@ -154,34 +154,34 @@ const PropertyListing = () => {
     };
 
     const columns = [
-        { header: 'ID', accessor: 'propertyID' },
+        { header: 'ID', accessor: 'propertyid' },
         {
             header: 'Image',
-            accessor: 'propertyImage',
+            accessor: 'propertyimage',
             render: (property) =>
-                property.propertyImage && property.propertyImage.length > 0 ? (
+                property.propertyimage && property.propertyimage.length > 0 ? (
                     <img
-                        src={`data:image/jpeg;base64,${property.propertyImage[0]}`}
-                        alt={property.propertyName}
+                        src={`data:image/jpeg;base64,${property.propertyimage[0]}`}
+                        alt={property.propertyname}
                         style={{ width: 80, height: 80 }}
                     />
                 ) : (
                     <span>No Image</span>
                 ),
         },
-        { header: 'Name', accessor: 'propertyAddress' },
-        { header: 'Price', accessor: 'rateAmount' },
-        { header: 'Location', accessor: 'nearbyLocation' },
+        { header: 'Name', accessor: 'propertyaddress' },
+        { header: 'Price', accessor: 'rateamount' },
+        { header: 'Location', accessor: 'nearbylocation' },
         {
             header: 'Status',
-            accessor: 'propertyStatus',
+            accessor: 'propertystatus',
             render: (property) => (
                 <span
                     className={`property-status ${
-                        (property.propertyStatus ?? 'Pending').toLowerCase()
+                        (property.propertystatus ?? 'Pending').toLowerCase()
                     }`}
                 >
-                    {property.propertyStatus || 'Pending'}
+                    {property.propertystatus || 'Pending'}
                 </span>
             ),
         },
@@ -190,7 +190,7 @@ const PropertyListing = () => {
             accessor: 'actions',
             render: (property) => (
                 <ActionDropdown
-                    items={propertyDropdownItems(property.propertyStatus)}
+                    items={propertyDropdownItems(property.propertystatus)}
                     onAction={(action) => handleAction(action, property)}
                 />
             ),
@@ -224,12 +224,12 @@ const PropertyListing = () => {
             <PaginatedTable
                 data={filteredProperties}
                 columns={columns}
-                rowKey="propertyID"
+                rowKey="propertyid"
             />
 
             <Modal
                 isOpen={!!selectedProperty}
-                title={`Property: ${selectedProperty?.propertyName}`}
+                title={`Property: ${selectedProperty?.propertyname}`}
                 data={selectedProperty || {}}
                 labels={displayLabels}
                 onClose={() => setSelectedProperty(null)}
