@@ -7,7 +7,7 @@ import { CountryDropdown } from 'react-country-region-selector';
 
 const BackUserProfile = () => {
     const [userData, setUserData] = useState({});
-    const [avatar, setAvatar] = useState('');
+    const [avatar, setAvatar] = useState(null);
     const [previewAvatar, setPreviewAvatar] = useState('');
     const [toastMessage, setToastMessage] = useState('');
     const [showToast, setShowToast] = useState(false);
