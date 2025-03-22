@@ -112,30 +112,34 @@ const BackUserProfile = () => {
         }
     };
 
-    const handleAvatarUpload = async () => {
-    if (!avatar) return displayToast('error', 'Please select an avatar to upload');
+   const handleAvatarUpload = async () => {
+    if (!avatar) {
+        return displayToast('error', 'Please select an avatar to upload');
+    }
 
     const reader = new FileReader();
     reader.onloadend = async () => {
-        const base64String = reader.result.split(',')[1]; // This extracts the base64 data
+        const base64String = reader.result.split(',')[1]; 
 
         try {
-            const data = await uploadAvatar(userid, base64String);
+            
+            const data = await uploadAvatar(userData, base64String);
             displayToast('success', 'Avatar uploaded successfully');
 
-            // Refresh user data
-            const updatedUserData = await fetchUserData(userid);
-            setUserData(updatedUserData);
             
-            // Set preview with the full data URL format
+            const updatedUserData = await fetchUserData(userData.userid);
+            setUserData(updatedUserData);
+
+            
             setPreviewAvatar(`data:image/jpeg;base64,${updatedUserData.uimage}`);
         } catch (error) {
-            console.error("Avatar Upload Error:", error);
+            console.error('Avatar Upload Error:', error);
             displayToast('error', error.message || 'Failed to upload avatar');
         }
     };
     reader.readAsDataURL(avatar);
 };
+
 
     const handleUpdate = async () => {
     const nameRegex = /^[A-Za-z\s]*$/;
