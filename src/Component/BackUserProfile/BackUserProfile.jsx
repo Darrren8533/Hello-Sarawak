@@ -122,18 +122,14 @@ const BackUserProfile = () => {
     const base64String = reader.result.split(',')[1]; 
 
     try {
-      const response = await uploadAvatar(userData, base64String);
+      const response = await uploadAvatar(userData.userid, base64String);
       if (response.success) {
         displayToast('success', response.message);
-
-        // Update userData with the returned data
+        setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`);
         setUserData((prevData) => ({
           ...prevData,
           uimage: response.data.uimage,
         }));
-
-        // Set preview avatar with the base64 string
-        setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`);
       }
     } catch (error) {
       console.error('Avatar Upload Error:', error);
