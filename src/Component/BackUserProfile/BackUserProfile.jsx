@@ -15,38 +15,38 @@ const BackUserProfile = () => {
     const [activeTab, setActiveTab] = useState('account');
     const [showPassword, setShowPassword] = useState(false);
 
-    const userID = localStorage.getItem('userID');
+    const userid = localStorage.getItem('userid');
     const googleAccessToken = localStorage.getItem('googleAccessToken');
 
     const generateRandomNumber = () => Math.floor(100000 + Math.random() * 900000);
 
     useEffect(() => {
         const loadUserDetails = async () => {
-            if (!userID || isNaN(userID)) {
+            if (!userid || isNaN(userid)) {
                 displayToast('error', 'Invalid or missing user ID');
                 return;
             }
 
             try {
-                const data = await fetchUserData(userID);
+                const data = await fetchUserData(userid);
 
                 // Assign a username if missing
                 if (!data.username) {
                     const randomNumber = generateRandomNumber();
-                    data.username = data.uFirstName ? `${data.uFirstName}_${randomNumber}` : `user_${randomNumber}`;
+                    data.username = data.ufirstname ? `${data.ufirstname}_${randomNumber}` : `user_${randomNumber}`;
                 }
 
-                if (data.uDOB) {
-                    data.uDOB = new Date(data.uDOB).toISOString().split('T')[0];
+                if (data.udob) {
+                    data.udob = new Date(data.udob).toISOString().split('T')[0];
                 }
 
                 let imageSrc = '../../public/avatar.png';
 
-                if (data.uImage) {
-                    if (data.uImage.startsWith('http')) {
-                        imageSrc = data.uImage;
+                if (data.uimage) {
+                    if (data.uimage.startsWith('http')) {
+                        imageSrc = data.uimage;
                     } else {
-                        imageSrc = `data:image/jpeg;base64,${data.uImage}`;
+                        imageSrc = `data:image/jpeg;base64,${data.uimage}`;
                     }
                 }
 
@@ -64,9 +64,9 @@ const BackUserProfile = () => {
                         const randomNumber = generateRandomNumber();
                         const updatedUserData = {
                             ...prevUserData,
-                            uFirstName: profile.given_name,
-                            uLastName: profile.family_name,
-                            uEmail: profile.email,
+                            ufirstname: profile.given_name,
+                            ulastname: profile.family_name,
+                            uemail: profile.email,
                         };
 
                         if (!prevUserData.username) {
@@ -75,8 +75,8 @@ const BackUserProfile = () => {
                                 : `user_${randomNumber}`;
                         }
 
-                        if (!prevUserData.uImage) {
-                            updatedUserData.uImage = profile.picture;
+                        if (!prevUserData.uimage) {
+                            updatedUserData.uimage = profile.picture;
                             setPreviewAvatar(profile.picture);
                         }
 
@@ -87,7 +87,7 @@ const BackUserProfile = () => {
         }
 
         loadUserDetails();
-    }, [userID, googleAccessToken]);
+    }, [userid, googleAccessToken]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -106,7 +106,7 @@ const BackUserProfile = () => {
             reader.onloadend = () => {
                 const base64String = reader.result.split(',')[1];
                 setPreviewAvatar(reader.result);
-                setUserData((prevData) => ({ ...prevData, uImage: base64String }));
+                setUserData((prevData) => ({ ...prevData, uimage: base64String }));
             };
             reader.readAsDataURL(file);
         }
@@ -120,12 +120,12 @@ const BackUserProfile = () => {
             const base64String = reader.result.split(',')[1]; // Extract Base64 data
 
             try {
-                const data = await uploadAvatar(userID, base64String); // Send Base64 string
+                const data = await uploadAvatar(userid, base64String); // Send Base64 string
                 displayToast('success', 'Avatar uploaded successfully');
 
-                const updatedUserData = await fetchUserData(userID);
+                const updatedUserData = await fetchUserData(userid);
                 setUserData(updatedUserData);
-                setPreviewAvatar(`data:image/jpeg;base64,${updatedUserData.uImage}`);
+                setPreviewAvatar(`data:image/jpeg;base64,${updatedUserData.uimage}`);
             } catch (error) {
                 console.error("Avatar Upload Error:", error);
                 displayToast('error', error.message || 'Failed to upload avatar');
@@ -145,20 +145,20 @@ const BackUserProfile = () => {
             // Validate fields based on active tab
             if (activeTab === 'account') {
                 // Name validation
-                if (!userData.uFirstName?.trim() || !userData.uLastName?.trim()) {
+                if (!userData.ufirstname?.trim() || !userData.ulastname?.trim()) {
                     throw new Error('First and last name cannot be empty');
                 }
-                if (!nameRegex.test(userData.uFirstName) || !nameRegex.test(userData.uLastName)) {
+                if (!nameRegex.test(userData.ufirstname) || !nameRegex.test(userData.ulastname)) {
                     throw new Error('Name should only contain letters and spaces');
                 }
 
                 // Phone validation
-                if (userData.uPhoneNo && !phoneRegex.test(userData.uPhoneNo)) {
+                if (userData.uphoneno && !phoneRegex.test(userData.uphoneno)) {
                     throw new Error('Phone number should contain only numbers');
                 }
 
                 // Email validation
-                if (!emailRegex.test(userData.uEmail)) {
+                if (!emailRegex.test(userData.uemail)) {
                     throw new Error('Please enter a valid email address');
                 }
             } else if (activeTab === 'security') {
@@ -192,7 +192,7 @@ const BackUserProfile = () => {
     const handleCountryChange = (val) => {
         setUserData((prevUserData) => ({
             ...prevUserData,
-            uCountry: val,
+            ucountry: val,
         }));
     };
 
@@ -221,7 +221,7 @@ const BackUserProfile = () => {
                             </label>
                         </div>
                         <div className="back-user-name">
-                            <h2>{userData.uFirstName || ''} {userData.uLastName || ''}</h2>
+                            <h2>{userData.ufirstname || ''} {userData.ulastname || ''}</h2>
                         </div>
                         <button type="button" className="back-profile-save-avatar-button" onClick={handleAvatarUpload}>
                             Save Avatar
@@ -244,17 +244,17 @@ const BackUserProfile = () => {
                             <form className="back-profile-form">
                                 <div className="back-profile-form-group">
                                     <label>First Name</label>
-                                    <input type="text" name="uFirstName" value={userData.uFirstName || ''} onChange={handleInputChange} />
+                                    <input type="text" name="ufirstname" value={userData.ufirstname || ''} onChange={handleInputChange} />
                                 </div>
 
                                 <div className="back-profile-form-group">
                                     <label>Last Name</label>
-                                    <input type="text" name="uLastName" value={userData.uLastName || ''} onChange={handleInputChange} />
+                                    <input type="text" name="ulastname" value={userData.ulastname || ''} onChange={handleInputChange} />
                                 </div>
 
                                 <div className="back-profile-form-group">
                                     <label>Date of Birth</label>
-                                    <input type="date" name="uDOB" value={userData.uDOB || ''} onChange={handleInputChange} />
+                                    <input type="date" name="udob" value={userData.udob || ''} onChange={handleInputChange} />
                                 </div>
 
                                 <div className="back-profile-form-group">
@@ -276,8 +276,8 @@ const BackUserProfile = () => {
                                     <label>Email</label>
                                     <input
                                         type="email"
-                                        name="uEmail"
-                                        value={userData.uEmail || ''}
+                                        name="uemail"
+                                        value={userData.uemail || ''}
                                         onChange={handleInputChange}
                                         readOnly
                                     />
@@ -285,20 +285,20 @@ const BackUserProfile = () => {
 
                                 <div className="back-profile-form-group">
                                     <label>Phone Number</label>
-                                    <input type="text" name="uPhoneNo" value={userData.uPhoneNo || ''} onChange={handleInputChange} />
+                                    <input type="text" name="uphoneno" value={userData.uphoneno || ''} onChange={handleInputChange} />
                                 </div>
 
                                 <div className="back-profile-form-group">
                                     <label>Country</label>
                                     <CountryDropdown
-                                        value={userData.uCountry || ''}
+                                        value={userData.ucountry || ''}
                                         onChange={handleCountryChange}
                                     />
                                 </div>
 
                                 <div className="back-profile-form-group">
                                     <label>Zip Code</label>
-                                    <input type="text" name="uZipCode" value={userData.uZipCode || ''} onChange={handleInputChange} />
+                                    <input type="text" name="uzipcode" value={userData.uzipcode || ''} onChange={handleInputChange} />
                                 </div>
 
                                 <button type="button" className="back-profile-update-button" onClick={handleUpdate}>
