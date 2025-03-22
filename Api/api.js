@@ -466,7 +466,7 @@ export const propertyListingRequest = async (propertyID) => {
 
     return await response.json();
   }catch (error) {
-    console.error('request API error: ', error);
+    console.error('API error: ', error);
     throw error;
   }
 };
