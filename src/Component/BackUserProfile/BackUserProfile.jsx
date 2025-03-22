@@ -119,7 +119,7 @@ const BackUserProfile = () => {
 
   const reader = new FileReader();
   reader.onloadend = async () => {
-    const base64String = reader.result.split(',')[1]; 
+    let base64String = reader.result.split(',')[1];  
 
     try {
       const response = await uploadAvatar(userData.userid, base64String);
