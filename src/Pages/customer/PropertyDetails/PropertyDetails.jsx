@@ -47,7 +47,7 @@ const PropertyDetails = () => {
   const [isGuestDropdownOpen, setIsGuestDropdownOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const { propertyID } = useParams();
+  const { propertyid } = useParams();
   const { propertyDetails } = location.state || {};
   const [bookingData, setBookingData] = useState({
     arrivalDate: '',
@@ -62,7 +62,7 @@ const PropertyDetails = () => {
   const [isEditingGuests, setIsEditingGuests] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [totalNights, setTotalNights] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(0);
+  const [totalprice, settotalprice] = useState(0);
   const [bookingForm, setBookingForm] = useState({
     title: 'Mr.',
     firstName: '',
@@ -90,7 +90,7 @@ const PropertyDetails = () => {
     }));
 
     if (name === 'arrivalDate' || name === 'departureDate') {
-      calculateTotalPrice(
+      calculatetotalprice(
         name === 'arrivalDate' ? value : bookingData.arrivalDate,
         name === 'departureDate' ? value : bookingData.departureDate
       );
@@ -98,11 +98,11 @@ const PropertyDetails = () => {
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev === propertyDetails?.propertyImage.length - 1 ? 0 : prev + 1));
+    setCurrentSlide((prev) => (prev === propertyDetails?.propertyimage.length - 1 ? 0 : prev + 1));
   };
   
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? propertyDetails?.propertyImage.length - 1 : prev - 1));
+    setCurrentSlide((prev) => (prev === 0 ? propertyDetails?.propertyimage.length - 1 : prev - 1));
   };
 
   const handleGuestChange = (type, operation) => {
@@ -151,7 +151,7 @@ const PropertyDetails = () => {
     document.body.style.overflow = 'hidden';
   };
 
-  const calculateTotalPrice = (arrival, departure) => {
+  const calculatetotalprice = (arrival, departure) => {
     if (arrival && departure) {
       const start = new Date(arrival);
       const end = new Date(departure);
@@ -161,7 +161,7 @@ const PropertyDetails = () => {
         setTotalNights(nights);
         const basePrice = propertyDetails?.rateAmount * nights;
         const taxes = basePrice * 0.1;
-        setTotalPrice(basePrice + taxes);
+        settotalprice(basePrice + taxes);
       }
     }
   };
@@ -178,8 +178,8 @@ const PropertyDetails = () => {
     e.preventDefault();
     console.log('Starting...');
 
-    const userID = localStorage.getItem('userID');
-    if (!userID) {
+    const userid = localStorage.getItem('userid');
+    if (!userid) {
       alert('Please Login First');
       return;
     }
@@ -202,32 +202,32 @@ const PropertyDetails = () => {
       });
 
       const reservationData = {
-        propertyID: propertyDetails.propertyID,
-        checkInDateTime: bookingData.arrivalDate,
-        checkOutDateTime: bookingData.departureDate,
-        reservationBlockTime: new Date(new Date(bookingData.arrivalDate) - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        propertyid: propertyDetails.propertyid,
+        checkindatetime: bookingData.arrivalDate,
+        checkoutdatetime: bookingData.departureDate,
+        reservationblocktime: new Date(new Date(bookingData.arrivalDate) - 3 * 24 * 60 * 60 * 1000).toISOString(),
         request: bookingForm.additionalRequests || '',
-        totalPrice: totalPrice,
-        rcFirstName: bookingForm.firstName,
-        rcLastName: bookingForm.lastName,
-        rcEmail: bookingForm.email,
-        rcPhoneNo: bookingForm.phoneNumber,
-        rcTitle: bookingForm.title,
+        totalprice: totalprice,
+        rcfirstname: bookingForm.firstName,
+        rclastname: bookingForm.lastName,
+        rcemail: bookingForm.email,
+        rcphoneno: bookingForm.phoneNumber,
+        rctitle: bookingForm.title,
         adults: bookingData.adults,
         children: bookingData.children,
-        userID: parseInt(userID),
+        userid: parseInt(userid),
         //reservationPaxNo: parseInt(bookingData.adults) + parseInt(bookingData.children),
-        reservationStatus: 'Pending'
+        reservationstatus: 'Pending'
       };
 
 
       const createdReservation = await createReservation(reservationData);
 
-      if (!createdReservation || !createdReservation.reservationID) {
+      if (!createdReservation || !createdReservation.reservationid) {
         throw new Error('Failed to create reservation: No valid reservation ID received');
       }
 
-      await requestBooking(createdReservation.reservationID);
+      await requestBooking(createdReservation.reservationid);
       console.log('Booking request sent');
 
       alert('Reservation added to cart');
@@ -240,11 +240,11 @@ const PropertyDetails = () => {
   };
 
   const fetchUserInfo = async () => {
-    const userID = localStorage.getItem('userID');
-    if (!userID) return;
+    const userid = localStorage.getItem('userid');
+    if (!userid) return;
 
     try {
-      const response = await fetch(`https://cams-backend.vercel.app/getUserInfo/${userID}`);
+      const response = await fetch(`https://cams-backend.vercel.app/getUserInfo/${userid}`);
       if (!response.ok) {
         throw new Error('Failed to get user information');
       }
@@ -254,11 +254,11 @@ const PropertyDetails = () => {
       
       setBookingForm(prev => ({
         ...prev,
-        title: userData.uTitle || 'Mr.',
-        firstName: userData.uFirstName || '',
-        lastName: userData.uLastName || '',
-        email: userData.uEmail || '',
-        phoneNumber: userData.uPhoneNo || '',
+        title: userData.utitle || 'Mr.',
+        firstName: userData.ufirstname || '',
+        lastName: userData.ulastname || '',
+        email: userData.uemail || '',
+        phoneNumber: userData.uphoneno || '',
         additionalRequests: '' 
       }));
     } catch (error) {
@@ -515,7 +515,7 @@ const PropertyDetails = () => {
                     </div>
                     <div className="price-total">
                       <span>Total (MYR)</span>
-                      <span>RM{totalPrice}</span>
+                      <span>RM{totalprice}</span>
                     </div>
                   </div>
                 </div>
