@@ -484,20 +484,181 @@ const PropertyDetails = () => {
       ) : (
         <div className="booking-overlay">
           <div className="booking-modal">
-            {/* 预订模态框部分 */}
+            <div className="booking-header">
+              <button className="back-button" onClick={() => setShowBookingForm(false)}>
+                <span><IoReturnUpBackOutline/></span> Request to book
+              </button>
+            </div>
+
             <div className="booking-content">
               <div className="booking-left">
-                {/* 左侧内容 */}
+                <div className="trip-section">
+                  <h2>Your trip</h2>
+
+                  <br/>
+                  
+                  <div className="trip-dates">
+                    <div className="section-header">
+                      <h3>Dates</h3>
+                      <button 
+                        className="edit-button"
+                        onClick={() => setIsEditingDates(!isEditingDates)}
+                      >
+                        Edit
+                      </button>
+                    </div>
+                    {isEditingDates ? (
+                      <div className="dates-editor">
+                        <div className="date-input-group">
+                          <label>Check-in</label>
+                          <input 
+                            type="date" 
+                            value={bookingData.arrivalDate}
+                            onChange={handleInputChange}
+                            name="arrivalDate"
+                          />
+                        </div>
+                        <div className="date-input-group">
+                          <label>Check-out</label>
+                          <input 
+                            type="date" 
+                            value={bookingData.departureDate}
+                            onChange={handleInputChange}
+                            name="departureDate"
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <p>{bookingData.arrivalDate} - {bookingData.departureDate}</p>
+                    )}
+                  </div>
+
+                  <br/>
+
+                  
+                </div>
+
+                <div className="login-section">
+                <div className="guest-details-section">
+                  <h2>Guest details</h2>
+                  <div className="form-grid">
+                    <div className="form-group title-group">
+                      <label>Title</label>
+                      <div className="title-options">
+                        <label className="radio-label">
+                          <input 
+                            type="radio" 
+                            name="title" 
+                            value="Mr." 
+                            checked={bookingForm.title === 'Mr.'} 
+                            onChange={handleFormChange}
+                          />
+                          <span>Mr.</span>
+                        </label>
+                        <label className="radio-label">
+                          <input 
+                            type="radio" 
+                            name="title" 
+                            value="Mrs." 
+                            checked={bookingForm.title === 'Mrs.'} 
+                            onChange={handleFormChange}
+                          />
+                          <span>Mrs.</span>
+                        </label>
+                        <label className="radio-label">
+                          <input 
+                            type="radio" 
+                            name="title" 
+                            value="Ms." 
+                            checked={bookingForm.title === 'Ms.'} 
+                            onChange={handleFormChange}
+                          />
+                          <span>Ms.</span>
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label>First name</label>
+                      <input
+                        type="text"
+                        name="firstName"
+                        value={bookingForm.firstName}
+                        onChange={handleFormChange}
+                        placeholder="Enter your first name"
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Last name</label>
+                      <input
+                        type="text"
+                        name="lastName"
+                        value={bookingForm.lastName}
+                        onChange={handleFormChange}
+                        placeholder="Enter your last name"
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Email</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={bookingForm.email}
+                        onChange={handleFormChange}
+                        placeholder="Enter your email"
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group">
+                      <label>Phone number</label>
+                      <input
+                        type="tel"
+                        name="phoneNumber"
+                        value={bookingForm.phoneNumber}
+                        onChange={handleFormChange}
+                        placeholder="Enter your phone number"
+                        required
+                      />
+                    </div>
+
+                    <div className="form-group full-width">
+                      <label>Additional requests</label>
+                      <textarea
+                        name="additionalRequests"
+                        value={bookingForm.additionalRequests}
+                        onChange={handleFormChange}
+                        placeholder="Any special requests?"
+                        rows="4"
+                      />
+                    </div>
+                  </div>
+                </div><br/><br/>
+                <button className="continue-button" onClick={handleAddToCart}>Add to Cart</button>
+
+                <div className="divider">or</div>
+
+                <div className="social-buttons">
+                  <button className="social-button google">
+                    <FcGoogle />
+                    Continue with Google
+                  </button>
+                </div>
+              </div>
               </div>
 
               <div className="booking-right">
                 <div className="property-card">
                   <img 
-                    src={`data:image/jpeg;base64,${propertyDetails?.propertyimage[0]}`} 
-                    alt={propertyDetails?.propertyaddress}
+                    src={`data:image/jpeg;base64,${propertyDetails?.propertyImage[0]}`} 
+                    alt={propertyDetails?.propertyName}
                   />
                   <div className="property-info">
-                    <h3>{propertyDetails?.propertyaddress}</h3>
+                    <h3>{propertyDetails?.propertyName}</h3>
                   </div>
                 </div>
 
@@ -506,16 +667,16 @@ const PropertyDetails = () => {
                   <h3>Price details</h3>
                   <div className="price-breakdown">
                     <div className="price-row">
-                    <span>RM {propertyDetails?.rateamount} x {totalNights} night</span>
-                    <span>RM{propertyDetails?.rateamount * totalNights}</span>
+                    <span>RM {propertyDetails?.rateAmount} × {totalNights} night</span>
+                    <span>RM{propertyDetails?.rateAmount * totalNights}</span>
                     </div>
                     <div className="price-row">
                       <span>Taxes (10%)</span>
-                      <span>RM{Math.floor(propertyDetails?.rateamount * totalNights * 0.1)}</span>
+                      <span>RM{Math.floor(propertyDetails?.rateAmount * totalNights * 0.1)}</span>
                     </div>
                     <div className="price-total">
                       <span>Total (MYR)</span>
-                      <span>RM{totalprice}</span>
+                      <span>RM{totalPrice}</span>
                     </div>
                   </div>
                 </div>
