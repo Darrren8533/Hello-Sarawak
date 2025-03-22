@@ -796,14 +796,13 @@ export const updateProfile = async (userData) => {
 };
 
 //Upload Avatar
-export const uploadAvatar = async (userData, base64String) => {
+export const uploadAvatar = async (userid, base64String) => {
   try {
-    // Validate user ID
-    if (!userData?.userid) {
+    if (!userid) {
       throw new Error('User ID is missing');
     }
 
-    const response = await fetch(`${API_URL}/users/uploadAvatar/${userData.userid}`, {
+    const response = await fetch(`${API_URL}/users/uploadAvatar/${userid}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -822,5 +821,6 @@ export const uploadAvatar = async (userData, base64String) => {
     throw error;
   }
 };
+
 
 
