@@ -27,7 +27,7 @@ const Contact = () => {
     console.log(formData);
     
     try {
-      const response = await fetch('http://localhost:5000/contact_us', {
+      const response = await fetch('https://cams-backend.vercel.app/contact_us', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
