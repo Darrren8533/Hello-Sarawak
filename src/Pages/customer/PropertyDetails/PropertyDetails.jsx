@@ -159,7 +159,7 @@ const PropertyDetails = () => {
       
       if (nights > 0) {
         setTotalNights(nights);
-        const basePrice = propertyDetails?.rateAmount * nights;
+        const basePrice = propertyDetails?.rateamount * nights;
         const taxes = basePrice * 0.1;
         settotalprice(basePrice + taxes);
       }
@@ -654,11 +654,11 @@ const PropertyDetails = () => {
               <div className="booking-right">
                 <div className="property-card">
                   <img 
-                    src={`data:image/jpeg;base64,${propertyDetails?.propertyImage[0]}`} 
-                    alt={propertyDetails?.propertyName}
+                    src={`data:image/jpeg;base64,${propertyDetails?.propertyimage[0]}`} 
+                    alt={propertyDetails?.propertyname}
                   />
                   <div className="property-info">
-                    <h3>{propertyDetails?.propertyName}</h3>
+                    <h3>{propertyDetails?.propertyname}</h3>
                   </div>
                 </div>
 
@@ -667,12 +667,12 @@ const PropertyDetails = () => {
                   <h3>Price details</h3>
                   <div className="price-breakdown">
                     <div className="price-row">
-                    <span>RM {propertyDetails?.rateAmount} × {totalNights} night</span>
-                    <span>RM{propertyDetails?.rateAmount * totalNights}</span>
+                    <span>RM {propertyDetails?.rateamount} × {totalNights} night</span>
+                    <span>RM{propertyDetails?.rateamount * totalNights}</span>
                     </div>
                     <div className="price-row">
                       <span>Taxes (10%)</span>
-                      <span>RM{Math.floor(propertyDetails?.rateAmount * totalNights * 0.1)}</span>
+                      <span>RM{Math.floor(propertyDetails?.rateamount * totalNights * 0.1)}</span>
                     </div>
                     <div className="price-total">
                       <span>Total (MYR)</span>
