@@ -107,7 +107,7 @@ const Product = () => {
   }, []);
 
   const handleViewDetails = (property) => {
-    navigate(`/product/${property.propertyID}`, { 
+    navigate(`/product/${property.propertyid}`, { 
       state: { propertyDetails: property }
     });
   };
