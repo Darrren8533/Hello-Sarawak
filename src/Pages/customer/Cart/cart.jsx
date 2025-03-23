@@ -106,8 +106,8 @@ const Cart = () => {
       
       setReservations(prevReservations =>
         prevReservations.map(reservation =>
-          reservation.reservationID === reservationID
-            ? { ...reservation, reservationStatus: 'Paid' }
+          reservation.reservationid === reservationID
+            ? { ...reservation, reservationstatus: 'Paid' }
             : reservation
         )
       );
@@ -126,8 +126,8 @@ const Cart = () => {
       
       setReservations(prevReservations =>
         prevReservations.map(reservation =>
-          reservation.reservationID === reservationID
-            ? { ...reservation, reservationStatus: 'Canceled' }
+          reservation.reservationid === reservationID
+            ? { ...reservation, reservationstatus: 'Canceled' }
             : reservation
         )
       );
@@ -144,7 +144,7 @@ const Cart = () => {
     try {
       await removeReservation(reservationID);
       setReservations(prevReservations =>
-        prevReservations.filter(reservation => reservation.reservationID !== reservationID)
+        prevReservations.filter(reservation => reservation.reservationid !== reservationID)
       );
       displayToast('success', 'Reservation removed from your list.');
     } catch (error) {
@@ -157,7 +157,7 @@ const Cart = () => {
     try {
       // Filter out the reservations that have a status of 'Booking'
       const bookingReservations = reservations.filter(reservation => 
-        reservation.reservationStatus === 'Booking');
+        reservation.reservationstatus === 'Booking');
       
       if (bookingReservations.length === 0) {
         displayToast('info', 'No bookings to checkout.');
@@ -167,15 +167,15 @@ const Cart = () => {
       // Update each reservation status to 'Pending' via API
       await Promise.all(
         bookingReservations.map(async (reservation) => {
-          await updateReservationStatus(reservation.reservationID, 'Pending');
+          await updateReservationStatus(reservation.reservationid, 'Pending');
         })
       );
   
       // Update local state to reflect the 'Pending' status for these reservations
       setReservations(prevReservations =>
         prevReservations.map(reservation =>
-          reservation.reservationStatus === 'Booking'
-            ? { ...reservation, reservationStatus: 'Pending' }
+          reservation.reservationstatus === 'Booking'
+            ? { ...reservation, reservationstatus: 'Pending' }
             : reservation
         )
       );
@@ -209,9 +209,9 @@ const Cart = () => {
     if (sortOrder === 'Latest') {
       return sorted.reverse();
     } else if (sortOrder === 'Price High to Low') {
-      return sorted.sort((a, b) => b.totalPrice - a.totalPrice);
+      return sorted.sort((a, b) => b.totalprice - a.totalprice);
     } else if (sortOrder === 'Price Low to High') {
-      return sorted.sort((a, b) => a.totalPrice - b.totalPrice);
+      return sorted.sort((a, b) => a.totalprice - b.totalprice);
     }
     return sorted;
   })();
@@ -220,7 +220,7 @@ const Cart = () => {
     filterStatus === 'All status'
       ? sortedReservations
       : sortedReservations.filter((reservation) => 
-        reservation.reservationStatus === filterStatus
+        reservation.reservationstatus === filterStatus
       );
 
   // Pagination
@@ -231,17 +231,17 @@ const Cart = () => {
 
   // Calculate cart totals
   const acceptedReservations = reservations.filter(reservation => 
-    reservation.reservationStatus === 'Accepted');
+    reservation.reservationstatus === 'Accepted');
   
   const subTotal = acceptedReservations.reduce((acc, reservation) => 
-    acc + reservation.totalPrice, 0);
+    acc + reservation.totalprice, 0);
   const tax = subTotal * taxRate;
   const total = subTotal + tax;
   
   // Calculate total nights booked
   const totalNights = acceptedReservations.reduce((acc, reservation) => {
-    const checkIn = new Date(reservation.checkInDateTime);
-    const checkOut = new Date(reservation.checkOutDateTime);
+    const checkIn = new Date(reservation.checkindatetime);
+    const checkOut = new Date(reservation.checkoutdatetime);
     const days = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
     return acc + days;
   }, 0);
@@ -338,6 +338,45 @@ const Cart = () => {
     );
   };
 
+  const CartItem = ({ reservation }) => (
+    <div className="cart-item" key={reservation.reservationid}>
+      <div className="row align-items-center">
+        <div className="cart-image">
+          {reservation.propertyimage ? (
+            <img
+              src={`data:image/jpeg;base64,${reservation.propertyimage[0]}`}
+              alt={reservation.propertyname}
+              loading="lazy"
+            />
+          ) : (
+            <div className="placeholder-image">No Image</div>
+          )}
+        </div>
+        <div className="col-md-6">
+          <h5>{reservation.propertyname}</h5>
+          <p>
+            <FaCalendarAlt className="icon-inline" /> 
+            Arrival: {new Date(reservation.checkindatetime).toLocaleDateString()}
+          </p>
+          <p>
+            <FaCalendarAlt className="icon-inline" /> 
+            Departure: {new Date(reservation.checkoutdatetime).toLocaleDateString()}
+          </p>
+          <p>Status: <StatusBadge status={reservation.reservationstatus} /></p>
+        </div>
+        <div className="cart-price">
+          <p>${reservation.totalprice.toFixed(2)}</p>
+          <button
+            className="btn-action btn-cancel"
+            onClick={() => confirmAction('cancel', reservation.reservationid)}
+          >
+            Cancel Booking
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div>
       <Navbar />
@@ -360,46 +399,10 @@ const Cart = () => {
           <div className="cart-row">
             <div className="cart-container">
               {loading ? (
-
                 Array(2).fill().map((_, index) => <CartItemSkeleton key={index} />)
               ) : acceptedReservations.length > 0 ? (
                 acceptedReservations.map((reservation) => (
-                  <div className="cart-item" key={reservation.reservationID}>
-                    <div className="row align-items-center">
-                      <div className="cart-image">
-                        {reservation.propertyImage ? (
-                          <img
-                            src={`data:image/jpeg;base64,${reservation.propertyImage[0]}`}
-                            alt={reservation.propertyName}
-                            loading="lazy"
-                          />
-                        ) : (
-                          <div className="placeholder-image">No Image</div>
-                        )}
-                      </div>
-                      <div className="col-md-6">
-                        <h5>{reservation.propertyName}</h5>
-                        <p>
-                          <FaCalendarAlt className="icon-inline" /> 
-                          Arrival: {new Date(reservation.checkInDateTime).toLocaleDateString()}
-                        </p>
-                        <p>
-                          <FaCalendarAlt className="icon-inline" /> 
-                          Departure: {new Date(reservation.checkOutDateTime).toLocaleDateString()}
-                        </p>
-                        <p>Status: <StatusBadge status={reservation.reservationStatus} /></p>
-                      </div>
-                      <div className="cart-price">
-                        <p>${reservation.totalPrice.toFixed(2)}</p>
-                        <button
-                          className="btn-action btn-cancel"
-                          onClick={() => confirmAction('cancel', reservation.reservationID)}
-                        >
-                          Cancel Booking
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <CartItem reservation={reservation} />
                 ))
               ) : (
                 <div className="empty-cart">
@@ -450,153 +453,153 @@ const Cart = () => {
       </div>
       
       {/* Reservations History Section */}
-<div className="cart-section">
-  <div className="reservation-container">
-    <div className="section-header">
-      <FaHistory className="section-icon" />
-      <h2>Reservations History</h2>
-    </div>
-    
-    {/* Filter Controls */}
-    <div className="filter-cart">
-      <div className="filter-item">
-        <label htmlFor="sortOrder">
-          <FaSort className="filter-icon" /> Sort By:
-        </label>
-        <select id="sortOrder" value={sortOrder} onChange={handleSortChange}>
-          <option value="Latest">Latest First</option>
-          <option value="Oldest">Oldest First</option>
-          <option value="Price High to Low">Price: High to Low</option>
-          <option value="Price Low to High">Price: Low to High</option>
-        </select>
-      </div>
+      <div className="cart-section">
+        <div className="reservation-container">
+          <div className="section-header">
+            <FaHistory className="section-icon" />
+            <h2>Reservations History</h2>
+          </div>
+          
+          {/* Filter Controls */}
+          <div className="filter-cart">
+            <div className="filter-item">
+              <label htmlFor="sortOrder">
+                <FaSort className="filter-icon" /> Sort By:
+              </label>
+              <select id="sortOrder" value={sortOrder} onChange={handleSortChange}>
+                <option value="Latest">Latest First</option>
+                <option value="Oldest">Oldest First</option>
+                <option value="Price High to Low">Price: High to Low</option>
+                <option value="Price Low to High">Price: Low to High</option>
+              </select>
+            </div>
 
-      <div className="filter-item">
-        <label htmlFor="filterStatus">
-          <FaFilter className="filter-icon" /> Filter By Status:
-        </label>
-        <select id="filterStatus" value={filterStatus} onChange={handleFilterChange}>
-          <option value="All status">All Statuses</option>
-          <option value="Pending">Pending</option>
-          <option value="Canceled">Canceled</option>
-          <option value="Rejected">Rejected</option>
-          <option value="Paid">Paid</option>
-          <option value="Accepted">Accepted</option>
-        </select>
-      </div>
-      
-      <div className="filter-item">
-        <label htmlFor="dateRange">
-          <FaCalendarAlt className="filter-icon" /> Date Range:
-        </label>
-        <select id="dateRange" onChange={() => {}}>
-          <option value="all">All Time</option>
-          <option value="30days">Last 30 Days</option>
-          <option value="90days">Last 90 Days</option>
-          <option value="year">This Year</option>
-        </select>
-      </div>
-    </div>
-
-    {/* Reservation List */}
-    <div className="reservation-list">
-      {loading ? (
-        Array(3).fill().map((_, index) => <CartItemSkeleton key={index} />)
-      ) : currentReservations.length > 0 ? (
-        currentReservations.map((reservation) => (
-          <div className="reservation-item" key={reservation.reservationID}>
-            <div className="reservation-content">
-              <div className="reservation-image">
-                {reservation.propertyImage ? (
-                  <img
-                    src={`data:image/jpeg;base64,${reservation.propertyImage[0]}`}
-                    alt={reservation.propertyName}
-                    loading="lazy"
-                  />
-                ) : (
-                  <div className="placeholder-image">No Image</div>
-                )}
-              </div>
-              <div className="reservations-content">
-                <h5>{reservation.propertyName}</h5>
-                <p>
-                  <FaCalendarAlt className="icon-inline" /> 
-                  Check-in: {new Date(reservation.checkInDateTime).toLocaleDateString()}
-                </p>
-                <p>
-                  <FaCalendarAlt className="icon-inline" /> 
-                  Check-out: {new Date(reservation.checkOutDateTime).toLocaleDateString()}
-                </p>
-                <p>Status: <StatusBadge status={reservation.reservationStatus} /></p>
-              </div>
-              <div className="reservation-total">
-                <p>${(reservation.totalPrice).toFixed(2)}</p>
-              </div>
+            <div className="filter-item">
+              <label htmlFor="filterStatus">
+                <FaFilter className="filter-icon" /> Filter By Status:
+              </label>
+              <select id="filterStatus" value={filterStatus} onChange={handleFilterChange}>
+                <option value="All status">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Canceled">Canceled</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Paid">Paid</option>
+                <option value="Accepted">Accepted</option>
+              </select>
+            </div>
+            
+            <div className="filter-item">
+              <label htmlFor="dateRange">
+                <FaCalendarAlt className="filter-icon" /> Date Range:
+              </label>
+              <select id="dateRange" onChange={() => {}}>
+                <option value="all">All Time</option>
+                <option value="30days">Last 30 Days</option>
+                <option value="90days">Last 90 Days</option>
+                <option value="year">This Year</option>
+              </select>
             </div>
           </div>
-        ))
-      ) : (
-        <div className="empty-reservations">
-          <div className="empty-cart-icon">
-            <FaHistory />
-          </div>
-          <p className="empty-cart-text">No reservations found</p>
-          <p className="empty-cart-subtext">
-            {filterStatus !== 'All status' 
-              ? `No reservations with status "${filterStatus}"`
-              : "You don't have any reservations yet"}
-          </p>
-        </div>
-      )}
-    </div>
-    
-    {/* Pagination Controls */}
-    {currentReservations.length > 0 && (
-      <div className="pagination-controls">
-        <button
-          className="pagination-button"
-          onClick={handlePreviousPage}
-          disabled={currentPage === 1}
-        >
-          <FaArrowLeft/>
-        </button>
-        {[...Array(totalPages)].map((_, index) => {
-          const pageNum = index + 1;
 
-          if (
-            pageNum === 1 ||
-            pageNum === totalPages ||
-            (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
-          ) {
-            return (
+          {/* Reservation List */}
+          <div className="reservation-list">
+            {loading ? (
+              Array(3).fill().map((_, index) => <CartItemSkeleton key={index} />)
+            ) : currentReservations.length > 0 ? (
+              currentReservations.map((reservation) => (
+                <div className="reservation-item" key={reservation.reservationid}>
+                  <div className="reservation-content">
+                    <div className="reservation-image">
+                      {reservation.propertyimage ? (
+                        <img
+                          src={`data:image/jpeg;base64,${reservation.propertyimage[0]}`}
+                          alt={reservation.propertyname}
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="placeholder-image">No Image</div>
+                      )}
+                    </div>
+                    <div className="reservations-content">
+                      <h5>{reservation.propertyname}</h5>
+                      <p>
+                        <FaCalendarAlt className="icon-inline" /> 
+                        Check-in: {new Date(reservation.checkindatetime).toLocaleDateString()}
+                      </p>
+                      <p>
+                        <FaCalendarAlt className="icon-inline" /> 
+                        Check-out: {new Date(reservation.checkoutdatetime).toLocaleDateString()}
+                      </p>
+                      <p>Status: <StatusBadge status={reservation.reservationstatus} /></p>
+                    </div>
+                    <div className="reservation-total">
+                      <p>${(reservation.totalprice).toFixed(2)}</p>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="empty-reservations">
+                <div className="empty-cart-icon">
+                  <FaHistory />
+                </div>
+                <p className="empty-cart-text">No reservations found</p>
+                <p className="empty-cart-subtext">
+                  {filterStatus !== 'All status' 
+                    ? `No reservations with status "${filterStatus}"`
+                    : "You don't have any reservations yet"}
+                </p>
+              </div>
+            )}
+          </div>
+          
+          {/* Pagination Controls */}
+          {currentReservations.length > 0 && (
+            <div className="pagination-controls">
               <button
-                key={index}
-                className={`pagination-button ${currentPage === pageNum ? 'active' : ''}`}
-                onClick={() => handlePageChange(pageNum)}
-                disabled={currentPage === pageNum}
+                className="pagination-button"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
               >
-                {pageNum}
+                <FaArrowLeft/>
               </button>
-            );
-          } else if (
-            (pageNum === currentPage - 2 && currentPage > 3) ||
-            (pageNum === currentPage + 2 && currentPage < totalPages - 2)
-          ) {
-            return <span key={index} className="pagination-ellipsis">...</span>;
-          }
-          return null;
-        })}
-        <button
-          className="pagination-button"
-          onClick={handleNextPage}
-          disabled={currentPage === totalPages || totalPages === 0}
-        >
-          <FaArrowRight/>
-        </button>
+              {[...Array(totalPages)].map((_, index) => {
+                const pageNum = index + 1;
+
+                if (
+                  pageNum === 1 ||
+                  pageNum === totalPages ||
+                  (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)
+                ) {
+                  return (
+                    <button
+                      key={index}
+                      className={`pagination-button ${currentPage === pageNum ? 'active' : ''}`}
+                      onClick={() => handlePageChange(pageNum)}
+                      disabled={currentPage === pageNum}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                } else if (
+                  (pageNum === currentPage - 2 && currentPage > 3) ||
+                  (pageNum === currentPage + 2 && currentPage < totalPages - 2)
+                ) {
+                  return <span key={index} className="pagination-ellipsis">...</span>;
+                }
+                return null;
+              })}
+              <button
+                className="pagination-button"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages || totalPages === 0}
+              >
+                <FaArrowRight/>
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-    )}
-  </div>
-</div>
       <Back_To_Top_Button />
       <Footer />
       <TawkMessenger />
