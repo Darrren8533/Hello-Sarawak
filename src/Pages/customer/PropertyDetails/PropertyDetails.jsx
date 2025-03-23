@@ -179,6 +179,7 @@ const PropertyDetails = () => {
     console.log('Starting...');
 
     const userid = localStorage.getItem('userid');
+    console.log('user id is ' , userid);
     if (!userid) {
       alert('Please Login First');
       return;
