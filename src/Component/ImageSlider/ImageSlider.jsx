@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useRef, useMemo } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -22,6 +22,8 @@ const ImageSlider = ({ images }) => {
     }
   };
 
+  const optimizedImages = useMemo(() => images, [images]);
+
   return (
     <div className="tour-slider">
       <Swiper
@@ -32,13 +34,16 @@ const ImageSlider = ({ images }) => {
         }}
         modules={[Pagination]}
         className="mySwiper"
+        spaceBetween={10}
+        lazy={true}
       >
-        {images.map((image, index) => (
+        {optimizedImages.map((image, index) => (
           <SwiperSlide key={index}>
             <img
               src={`data:image/jpeg;base64,${image}`}
               alt={`Slide ${index + 1}`}
               className="tour-property-image"
+              loading="lazy"
             />
           </SwiperSlide>
         ))}
