@@ -627,7 +627,7 @@ export const updateReservationStatus = async (reservationID, status) => {
 //Cart
 export const fetchCart = async () => {
   try {
-      const userID = localStorage.getItem('userID');
+      const userID = localStorage.getItem('userid');
       const response = await fetch(`${API_URL}/cart?userID=${userID}`);
       if (!response.ok) {
           throw new Error('Failed to fetch reservations');
