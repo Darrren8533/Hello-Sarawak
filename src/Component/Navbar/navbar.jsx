@@ -1,8 +1,8 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { FaBars, FaTimes } from "react-icons/fa";
-import { logoutUser, fetchUserData, fetchGoogleUserData } from '../../../Api/api';
+import { logoutUser, fetchUserData, fetchGoogleUserData,checkstatus } from '../../../Api/api';
 import DefaultAvatar from '../../../src/public/avatar.png';
 import './navbar.css';
 import eventBus from '../EventBus/Eventbus';
@@ -10,71 +10,56 @@ import eventBus from '../EventBus/Eventbus';
 function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userAvatar, setUserAvatar] = useState(DefaultAvatar);
-    const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
-    const didInitialCheckRef = useRef(false);
 
-    const USER_ID_KEY = 'userid';
-    const userID = localStorage.getItem(USER_ID_KEY);
+    const userID = localStorage.getItem('userid');
     const googleAccessToken = localStorage.getItem('googleAccessToken');
 
     useEffect(() => {
+        const checkLoginStatus = async () => {
+            if (userID) {
+                const userData = {
+                    userID
+                };
+                try {
+                    const response = await checkstatus(userID);
+                    const data = await response.json();
 
-        if (!didInitialCheckRef.current || localStorage.getItem(USER_ID_KEY) !== userID) {
-            const checkLoginStatus = async () => {
-                setIsLoading(true);
-                
-                if (localStorage.getItem(USER_ID_KEY)) {
-                    try {
-                        const response = await fetch(`http://localhost:5000/checkStatus?userID=${localStorage.getItem(USER_ID_KEY)}`);
-                        const data = await response.json();
+                    if (data.ustatus === 'login') {
+                        setIsLoggedIn(true);
 
-                        if (data.uStatus === 'login') {
-                            setIsLoggedIn(true);
-                            localStorage.setItem('isAuthenticated', 'true');
-
-                            let avatarUrl;
-                            if (localStorage.getItem('googleAccessToken')) {
-                                const googleProfile = await fetchGoogleUserData(localStorage.getItem('googleAccessToken'));
-                                avatarUrl = googleProfile.picture;
-                            }
-
-                            const userData = await fetchUserData(localStorage.getItem(USER_ID_KEY));
-                            if (userData.uImage) {
-                                avatarUrl = userData.uImage.startsWith('http') ? userData.uImage : `data:image/jpeg;base64,${userData.uImage}`;
-                            } else if (!avatarUrl) {
-                                avatarUrl = DefaultAvatar;
-                            }
-
-                            setUserAvatar(avatarUrl);
-                        } else {
-                            setIsLoggedIn(false);
-                            localStorage.removeItem('isAuthenticated');
+                        let avatarUrl;
+                        if (googleAccessToken) {
+                            const googleProfile = await fetchGoogleUserData(googleAccessToken);
+                            avatarUrl = googleProfile.picture;
                         }
-                    } catch (error) {
-                        console.error('Error fetching user status:', error);
-                        setIsLoggedIn(false);
-                        localStorage.removeItem('isAuthenticated');
-                    } finally {
-                        setIsLoading(false);
-                        didInitialCheckRef.current = true;
-                    }
-                } else {
-                    setIsLoggedIn(false);
-                    localStorage.removeItem('isAuthenticated');
-                    setIsLoading(false);
-                    didInitialCheckRef.current = true;
-                }
-            };
 
-            checkLoginStatus();
-        } else {
-            setIsLoggedIn(localStorage.getItem('isAuthenticated') === 'true');
-            setIsLoading(false);
-        }
-    }, [userID]);
+                        const userData = await fetchUserData(userID);
+                        if (userData.uImage) {
+                            avatarUrl = userData.uImage.startsWith('http') ? userData.uImage : `data:image/jpeg;base64,${userData.uImage}`;
+                        } else if (!avatarUrl) {
+                            avatarUrl = DefaultAvatar;
+                        }
+
+                        setUserAvatar(avatarUrl);
+                    } else {
+                        setIsLoggedIn(false);
+                    }
+                } catch (error) {
+                    console.error('Error fetching user status:', error);
+                }
+            }
+        };
+
+        checkLoginStatus();
+    }, [userID, googleAccessToken]);
 
     useEffect(() => {
+        console.log('isLoggedIn state changed to:', isLoggedIn);
+      }, [isLoggedIn]);
+
+    useEffect(() => {
+
         const initOffcanvas = () => {
             if (typeof bootstrap !== 'undefined') {
                 const offcanvasElement = document.getElementById('offcanvasNavbar');
@@ -97,6 +82,8 @@ function Navbar() {
         return () => clearInterval(bootstrapReady);
     }, []);
 
+
+
     useEffect(() => {
         const handleAvatarUpdate = (newAvatar) => {
             setUserAvatar(newAvatar);
@@ -110,20 +97,18 @@ function Navbar() {
     }, []);
 
     const handleLogout = async () => {
-        const currentUserID = localStorage.getItem(USER_ID_KEY);
+        const userID = localStorage.getItem('userID');
         const googleToken = localStorage.getItem('googleAccessToken');
 
-        setIsLoading(true);
         try {
             if (googleToken) {
                 await fetch(`https://accounts.google.com/o/oauth2/revoke?token=${googleToken}`, { method: 'POST' });
             }
 
-            const response = await logoutUser(currentUserID);
+            const response = await logoutUser(userID);
 
             if (response.success) {
                 localStorage.clear();
-                localStorage.removeItem('isAuthenticated');
                 setIsLoggedIn(false);
                 navigate('/');
             } else {
@@ -131,8 +116,6 @@ function Navbar() {
             }
         } catch (error) {
             console.error('Error during logout:', error);
-        } finally {
-            setIsLoading(false);
         }
     };
 
@@ -156,11 +139,11 @@ function Navbar() {
 
             <nav className="navbar navbar-expand-lg fixed-top">
                 <div className="container-fluid">
-                    <h1 className="navbar_brand mx-4 mb-0">Hello Sarawak</h1>
+                <h1 className="navbar_brand mx-4 mb-0">Hello Sarawak</h1>
 
                     <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
                         <div className="offcanvas-header">
-                            <h2 className="offcanvas-title" id="offcanvasNavbarLabel">Hello Sarawak</h2>
+                        <h2 className="offcanvas-title" id="offcanvasNavbarLabel">Hello Sarawak</h2>
                             <button type="button" className="close-btn" data-bs-dismiss="offcanvas" aria-label="Close">
                                 <FaTimes className="icon_close"/>
                             </button>
@@ -193,6 +176,7 @@ function Navbar() {
                                     </Link>
                                 </li>
                                 
+                                {/* Add the mobile login/profile/logout options */}
                                 {isLoggedIn ? (
                                     <>
                                         <li className="nav-item mx-4 mobile-auth-item">
@@ -221,33 +205,29 @@ function Navbar() {
                     </div>
 
                     <div className="d-flex justify-content-end">
-                        {!isLoading && (
-                            <>
-                                {isLoggedIn && (
-                                    <button
-                                        className="user-icon-button"
-                                        onClick={() => navigate('/login/profile')}
-                                        style={{ border: 'none', background: 'transparent', cursor: 'pointer', marginRight: '20px' }}
-                                    >
-                                        <img
-                                            src={userAvatar}
-                                            alt="User Avatar"
-                                            style={{ width: '40px', height: '40px', borderRadius: '50%' }}
-                                            onError={handleImageError}
-                                        />
-                                    </button>
-                                )}
+                        {isLoggedIn && (
+                            <button
+                                className="user-icon-button"
+                                onClick={() => navigate('/login/profile')}
+                                style={{ border: 'none', background: 'transparent', cursor: 'pointer', marginRight: '20px' }}
+                            >
+                                <img
+                                    src={userAvatar}
+                                    alt="User Avatar"
+                                    style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+                                    onError={handleImageError}
+                                />
+                            </button>
+                        )}
 
-                                {isLoggedIn ? (
-                                    <button onClick={handleLogout} className="logout-button">
-                                        Logout
-                                    </button>
-                                ) : (
-                                    <Link to="/login" className="login-button">
-                                        Login
-                                    </Link>
-                                )}
-                            </>
+                        {isLoggedIn ? (
+                            <button onClick={handleLogout} className="logout-button">
+                                Logout
+                            </button>
+                        ) : (
+                            <Link to="/login" className="login-button">
+                                Login
+                            </Link>
                         )}
 
                         <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}>
