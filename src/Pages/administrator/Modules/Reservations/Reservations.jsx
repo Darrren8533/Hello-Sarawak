@@ -95,67 +95,64 @@ const Reservations = () => {
     ];
 
     const displayLabels = {
-        reservationID: "Reservation ID",
-        propertyName: "Property Name",
-        totalPrice: "Total Price",
-        reservationPaxNo: "Reservation Pax No",
-        reservationStatus: "Reservation Status",
-        checkInDateTime: "Check-In Date Time",
-        checkOutDateTime: "Check-Out Date Time",
+        reservationid: "Reservation ID",
+        propertyid: "Property ID",
+        checkindatetime: "Check-In Date Time",
+        checkoutdatetime: "Check-Out Date Time",
+        reservationblocktime: "Block Time",
         request: "Request",
+        totalprice: "Total Price",
+        rcid: "RC ID",
+        reservationstatus: "Status",
+        userid: "User ID",
         images: "Images",
-
-
-
     };
 
     const filteredReservations = Array.isArray(reservations)
         ? reservations.filter(
             (reservation) =>
-                (appliedFilters.status === 'All' || (reservation.reservationStatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
+                (appliedFilters.status === 'All' || (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
                 (
-                    (reservation.reservationID?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.propertyName?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.totalPrice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.reservationPaxNo?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.reservationStatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.reservationid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.propertyid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '')
                 )
         )
         : [];
 
         const handleAction = async (action, reservation) => {
-            if (reservation.reservationStatus === 'expired') {
+            if (reservation.reservationstatus === 'expired') {
                 displayToast('error', 'Action cannot be performed. This reservation has expired.');
                 return;
             }
         
             if (action === 'view') {
                 const essentialFields = {
-                    reservationID: reservation.reservationID || 'N/A',
-                    propertyName: reservation.propertyName || 'N/A',
-                    totalPrice: reservation.totalPrice || 'N/A',
-                    reservationPaxNo: reservation.reservationPaxNo || 'N/A',
-                    reservationStatus: reservation.reservationStatus || 'N/A',
-                    checkInDateTime: reservation.checkInDateTime || 'N/A',
-                    checkOutDateTime: reservation.checkOutDateTime || 'N/A',
+                    reservationid: reservation.reservationid || 'N/A',
+                    propertyid: reservation.propertyid || 'N/A',
+                    checkindatetime: reservation.checkindatetime || 'N/A',
+                    checkoutdatetime: reservation.checkoutdatetime || 'N/A',
+                    reservationblocktime: reservation.reservationblocktime || 'N/A',
                     request: reservation.request || 'N/A',
-                    images: reservation.propertyImage || [],
-
-
+                    totalprice: reservation.totalprice || 'N/A',
+                    rcid: reservation.rcid || 'N/A',
+                    reservationstatus: reservation.reservationstatus || 'N/A',
+                    userid: reservation.userid || 'N/A',
+                    images: reservation.propertyimage || [],
                 };
                 setSelectedReservation(essentialFields);
             } else if (action === 'accept') {
                 const newStatus = 'Accepted';
         
                 try {
-                    await updateReservationStatus(reservation.reservationID, newStatus);
-                    await acceptBooking(reservation.reservationID);
+                    await updateReservationStatus(reservation.reservationid, newStatus);
+                    await acceptBooking(reservation.reservationid);
         
                     setReservations((prevReservations) =>
                         prevReservations.map((res) =>
-                            res.reservationID === reservation.reservationID
-                               ? { ...res, reservationStatus: newStatus }
+                            res.reservationid === reservation.reservationid
+                               ? { ...res, reservationstatus: newStatus }
                                 : res
                         )
                     );
@@ -166,7 +163,7 @@ const Reservations = () => {
                 }
             } else if (action ==='reject') {
                 const rejectedID = {
-                    reservationID: reservation.reservationID || 'N/A',
+                    reservationid: reservation.reservationid || 'N/A',
                 };
         
                 setRejectedReservationID(rejectedID);
@@ -174,12 +171,12 @@ const Reservations = () => {
                 const newStatus = 'Rejected';
         
                 try {
-                    await updateReservationStatus(reservation.reservationID, newStatus);
+                    await updateReservationStatus(reservation.reservationid, newStatus);
         
                     setReservations((prevReservations) =>
                         prevReservations.map((res) =>
-                            res.reservationID === reservation.reservationID
-                               ? { ...res, reservationStatus: newStatus }
+                            res.reservationid === reservation.reservationid
+                               ? { ...res, reservationstatus: newStatus }
                                 : res
                         )
                     );
@@ -215,9 +212,9 @@ const Reservations = () => {
     };
 
     const handleConfirmSuggestion = async () => {
-        if (selectedProperty && rejectedReservationID.reservationID) {
+        if (selectedProperty && rejectedReservationID.reservationid) {
             try {
-                await suggestNewRoom(selectedProperty, rejectedReservationID.reservationID);
+                await suggestNewRoom(selectedProperty, rejectedReservationID.reservationid);
 
                 displayToast('success', 'New Room Suggestion Email Sent Successfully');
 
@@ -239,9 +236,9 @@ const Reservations = () => {
     };
 
     const handleConfirmNotification = async () => {
-        if (selectedOperators.length > 0 && rejectedReservationID.reservationID) {
+        if (selectedOperators.length > 0 && rejectedReservationID.reservationid) {
             try {
-                await sendSuggestNotification(rejectedReservationID.reservationID, selectedOperators);
+                await sendSuggestNotification(rejectedReservationID.reservationid, selectedOperators);
 
                 displayToast('success', 'Suggest Notification Sent Successfully');
 
@@ -274,7 +271,7 @@ const Reservations = () => {
 
     const getFilteredProperties = () => {
         return administratorProperties.filter(property => {
-            const matchesSearch = property.propertyName.toLowerCase().includes(suggestSearchKey.toLowerCase());
+            const matchesSearch = property.propertyid.toLowerCase().includes(suggestSearchKey.toLowerCase());
             const matchesPrice = (!priceRange.min || property.propertyPrice >= Number(priceRange.min)) &&
                 (!priceRange.max || property.propertyPrice <= Number(priceRange.max));
             return matchesSearch && matchesPrice;
@@ -282,30 +279,30 @@ const Reservations = () => {
     };
 
     const columns = [
-        { header: 'ID', accessor: 'reservationID' },
+        { header: 'ID', accessor: 'reservationid' },
         {
             header: 'Image',
-            accessor: 'propertyImage',
+            accessor: 'propertyimage',
             render: (reservation) =>
-                reservation.propertyImage && reservation.propertyImage.length > 0 ? (
+                reservation.propertyimage && reservation.propertyimage.length > 0 ? (
                     <img
-                        src={`data:image/jpeg;base64,${reservation.propertyImage[0]}`}
-                        alt={reservation.propertyName}
+                        src={`data:image/jpeg;base64,${reservation.propertyimage[0]}`}
+                        alt={`Property ${reservation.propertyid}`}
                         style={{ width: 80, height: 80 }}
                     />
                 ) : (
                     <span>No Image</span>
                 ),
         },
-        { header: 'Property Name', accessor: 'propertyName' },
-        { header: 'Total Price', accessor: 'totalPrice' },
-        { header: 'Pax', accessor: 'reservationPaxNo' },
+        { header: 'Property ID', accessor: 'propertyid' },
+        { header: 'Total Price', accessor: 'totalprice' },
+        { header: 'RC ID', accessor: 'rcid' },
         {
             header: 'Status',
-            accessor: 'reservationStatus',
+            accessor: 'reservationstatus',
             render: (reservation) => (
-                <span className={`reservation-status ${reservation.reservationStatus?.toLowerCase()}`}>
-                    {reservation.reservationStatus}
+                <span className={`reservation-status ${reservation.reservationstatus?.toLowerCase()}`}>
+                    {reservation.reservationstatus}
                 </span>
             ),
         },
@@ -314,7 +311,7 @@ const Reservations = () => {
             accessor: 'actions',
             render: (reservation) => (
                 <ActionDropdown
-                    items={reservationDropdownItems(reservation.reservationStatus)}
+                    items={reservationDropdownItems(reservation.reservationstatus)}
                     onAction={(action) => handleAction(action, reservation)}
                 />
             ),
@@ -334,13 +331,13 @@ const Reservations = () => {
             <PaginatedTable
                 data={filteredReservations}
                 columns={columns}
-                rowKey="reservationID"
+                rowKey="reservationid"
                 enableCheckbox={false}
             />
 
             <Modal
                 isOpen={!!selectedReservation}
-                title={`Reservation ID: ${selectedReservation?.reservationID}`}
+                title={`Reservation ID: ${selectedReservation?.reservationid}`}
                 data={selectedReservation || {}}
                 labels={displayLabels}
                 onClose={() => setSelectedReservation(null)}
@@ -402,25 +399,25 @@ const Reservations = () => {
                         <div className="property-list">
                             {getFilteredProperties().length > 0 ? (
                                 getFilteredProperties().map((property) => (
-                                    <div key={property.propertyID} className="property-card">
+                                    <div key={property.propertyid} className="property-card">
                                         <input
                                             type="radio"
-                                            id={`property-${property.propertyID}`}
+                                            id={`property-${property.propertyid}`}
                                             name="property"
-                                            value={property.propertyID}
-                                            onChange={() => handlePropertySelect(property.propertyID)}
+                                            value={property.propertyid}
+                                            onChange={() => handlePropertySelect(property.propertyid)}
                                             className="property-radio"
                                         />
-                                        <label htmlFor={`property-${property.propertyID}`} className="property-label">
+                                        <label htmlFor={`property-${property.propertyid}`} className="property-label">
                                             <div className="property-image-container">
                                                 <img
                                                     src={`data:image/jpeg;base64,${property.images[0]}`}
-                                                    alt={property.propertyName}
+                                                    alt={property.propertyid}
                                                     className="property-image"
                                                 />
                                             </div>
                                             <div className="property-details">
-                                                <h3 className="property-title">{property.propertyName}</h3>
+                                                <h3 className="property-title">{property.propertyid}</h3>
                                                 <p className="property-info-text">{property.propertyGuestPaxNo} Pax</p>
                                                 <p className="property-price">RM {property.propertyPrice}</p>
                                             </div>
