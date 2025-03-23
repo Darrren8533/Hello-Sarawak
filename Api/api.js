@@ -544,7 +544,7 @@ export const sendSuggestNotification = async (reservationID, selectedOperators) 
 export const createReservation = async (reservationData) => {
   try {
     const userID = localStorage.getItem('userid');
-    console.log("123");
+    console.log('user id is ' , userID);
     if (!userID) {
       throw new Error('User not logged in. Please log in to create a reservation.');
     }
