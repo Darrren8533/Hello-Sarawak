@@ -767,41 +767,60 @@ export const fetchGoogleUserData = async (accessToken) => {
   }
 };
 
-// Update User Profile
+// Update user profile
 export const updateProfile = async (userData) => {
+    try {
+        // Validate user ID
+        if (!userData.userid) {
+            throw new Error('User ID is missing');
+        }
+      
+        const response = await fetch(`${API_URL}/users/updateProfile/${userData.userid}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(userData),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Failed to update user profile');
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('API error:', error);
+        throw error;
+    }
+};
+
+//Upload Avatar
+export const uploadAvatar = async (userid, base64String) => {
   try {
-    const response = await fetch(`${API_URL}/users/updateProfile/${userData.userID}`, {
-      method: 'PUT',
+    if (!userid) {
+      throw new Error('User ID is missing');
+    }
+
+    const response = await fetch(`${API_URL}/users/uploadAvatar/${userid}`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(userData),
+      body: JSON.stringify({ uimage: base64String }), 
     });
 
+    const data = await response.json();
     if (!response.ok) {
-      const errorData = await response.json(); 
-      throw new Error(errorData.message || 'Failed to update user profile');
+      throw new Error(data.message || 'Failed to upload avatar');
     }
 
-    return await response.json();
+    return data; 
   } catch (error) {
     console.error('API error:', error);
     throw error;
   }
 };
 
-//Upload Avatar
-export const uploadAvatar = async (userID, base64String) => {
-  const response = await fetch(`${API_URL}/users/uploadAvatar/${userID}`, {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ uImage: base64String }) 
-  });
 
-  if (!response.ok) {
-      throw new Error('Failed to upload avatar');
-  }
-  return await response.json();
-};
+
