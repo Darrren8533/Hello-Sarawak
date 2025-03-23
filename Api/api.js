@@ -543,18 +543,13 @@ export const sendSuggestNotification = async (reservationID, selectedOperators) 
 // Store Reservation Data
 export const createReservation = async (reservationData) => {
   try {
-
     const userID = localStorage.getItem('userid');
     
     if (!userID) {
-      alert(`a ${userID} User not logged in. Please log in to create a reservation.`);
-      return;
+      throw new Error('User not logged in. Please log in to create a reservation.');
     }
 
-
     const reservationWithUserID = { ...reservationData, userID };
-
-
     const response = await fetch(`${API_URL}/reservation/${userID}`, {
       method: 'POST',
       headers: {
@@ -568,7 +563,12 @@ export const createReservation = async (reservationData) => {
       throw new Error(errorData.error || 'Failed to create reservation');
     }
 
-    return await response.json();
+    const result = await response.json();
+    if (!result || !result.reservationid) {
+      throw new Error('No valid reservation ID received from server');
+    }
+
+    return result;
   } catch (error) {
     console.error('API error:', error);
     throw error;
