@@ -545,9 +545,14 @@
     flex: 1;
 }
 
+.trip-dates{
+    width: 100%;
+}
+
 .section-header {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     margin-bottom: 16px;
 }
 
@@ -557,6 +562,7 @@
     color: #1a73e8;
     cursor: pointer;
     text-decoration: underline;
+    margin-left: auto;
 }
 
 .property-card {
