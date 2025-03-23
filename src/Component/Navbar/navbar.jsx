@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { FaBars, FaTimes } from "react-icons/fa";
-import { logoutUser, fetchUserData, fetchGoogleUserData,checkstatus } from '../../../Api/api';
+import { logoutUser, fetchUserData, fetchGoogleUserData, checkstatus } from '../../../Api/api';
 import DefaultAvatar from '../../../src/public/avatar.png';
 import './navbar.css';
 import eventBus from '../EventBus/Eventbus';
@@ -10,6 +10,7 @@ import eventBus from '../EventBus/Eventbus';
 function Navbar() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [userAvatar, setUserAvatar] = useState(DefaultAvatar);
+    const [isLoading, setIsLoading] = useState(true);
     const navigate = useNavigate();
 
     const userID = localStorage.getItem('userid');
@@ -17,10 +18,8 @@ function Navbar() {
 
     useEffect(() => {
         const checkLoginStatus = async () => {
+            setIsLoading(true);
             if (userID) {
-                const userData = {
-                    userID
-                };
                 try {
                     const response = await checkstatus(userID);
                     const data = await response.json();
@@ -30,24 +29,38 @@ function Navbar() {
 
                         let avatarUrl;
                         if (googleAccessToken) {
-                            const googleProfile = await fetchGoogleUserData(googleAccessToken);
-                            avatarUrl = googleProfile.picture;
+                            try {
+                                const googleProfile = await fetchGoogleUserData(googleAccessToken);
+                                avatarUrl = googleProfile.picture;
+                            } catch (googleError) {
+                                console.error('Error fetching Google user data:', googleError);
+                            }
                         }
 
-                        const userData = await fetchUserData(userID);
-                        if (userData.uImage) {
-                            avatarUrl = userData.uImage.startsWith('http') ? userData.uImage : `data:image/jpeg;base64,${userData.uImage}`;
-                        } else if (!avatarUrl) {
-                            avatarUrl = DefaultAvatar;
+                        try {
+                            const userData = await fetchUserData(userID);
+                            if (userData.uImage) {
+                                avatarUrl = userData.uImage.startsWith('http') ? userData.uImage : `data:image/jpeg;base64,${userData.uImage}`;
+                            } else if (!avatarUrl) {
+                                avatarUrl = DefaultAvatar;
+                            }
+                            setUserAvatar(avatarUrl);
+                        } catch (userDataError) {
+                            console.error('Error fetching user data:', userDataError);
+                            setUserAvatar(DefaultAvatar);
                         }
-
-                        setUserAvatar(avatarUrl);
                     } else {
                         setIsLoggedIn(false);
                     }
                 } catch (error) {
                     console.error('Error fetching user status:', error);
+                    setIsLoggedIn(false);
+                } finally {
+                    setIsLoading(false);
                 }
+            } else {
+                setIsLoggedIn(false);
+                setIsLoading(false);
             }
         };
 
@@ -55,11 +68,6 @@ function Navbar() {
     }, [userID, googleAccessToken]);
 
     useEffect(() => {
-        console.log('isLoggedIn state changed to:', isLoggedIn);
-      }, [isLoggedIn]);
-
-    useEffect(() => {
-
         const initOffcanvas = () => {
             if (typeof bootstrap !== 'undefined') {
                 const offcanvasElement = document.getElementById('offcanvasNavbar');
@@ -82,8 +90,6 @@ function Navbar() {
         return () => clearInterval(bootstrapReady);
     }, []);
 
-
-
     useEffect(() => {
         const handleAvatarUpdate = (newAvatar) => {
             setUserAvatar(newAvatar);
@@ -97,10 +103,10 @@ function Navbar() {
     }, []);
 
     const handleLogout = async () => {
-        const userID = localStorage.getItem('userID');
-        const googleToken = localStorage.getItem('googleAccessToken');
-
         try {
+
+            const googleToken = localStorage.getItem('googleAccessToken');
+
             if (googleToken) {
                 await fetch(`https://accounts.google.com/o/oauth2/revoke?token=${googleToken}`, { method: 'POST' });
             }
@@ -176,7 +182,6 @@ function Navbar() {
                                     </Link>
                                 </li>
                                 
-                                {/* Add the mobile login/profile/logout options */}
                                 {isLoggedIn ? (
                                     <>
                                         <li className="nav-item mx-4 mobile-auth-item">
