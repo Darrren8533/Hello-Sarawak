@@ -676,7 +676,7 @@ const PropertyDetails = () => {
                     </div>
                     <div className="price-total">
                       <span>Total (MYR)</span>
-                      <span>RM{totalPrice}</span>
+                      <span>RM{totalprice}</span>
                     </div>
                   </div>
                 </div>
