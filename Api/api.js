@@ -544,7 +544,6 @@ export const sendSuggestNotification = async (reservationID, selectedOperators) 
 export const createReservation = async (reservationData) => {
   try {
     const userID = localStorage.getItem('userid');
-    console.log('user id is ' , userID);
     if (!userID) {
       throw new Error('User not logged in. Please log in to create a reservation.');
     }
@@ -560,6 +559,12 @@ export const createReservation = async (reservationData) => {
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('服务器返回错误:', {
+        status: response.status,
+        statusText: response.statusText,
+        errorData: errorData,
+        url: response.url
+      });
       throw new Error(errorData.error || 'Failed to create reservation');
     }
 
