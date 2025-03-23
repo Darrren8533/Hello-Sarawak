@@ -547,7 +547,7 @@ export const createReservation = async (reservationData) => {
     const userID = localStorage.getItem('userid');
     
     if (!userID) {
-      alert('User not logged in. Please log in to create a reservation.');
+      alert(`${userID} User not logged in. Please log in to create a reservation.`);
       return;
     }
 
