@@ -12,6 +12,66 @@ import { FaEye, FaEdit, FaTrash, FaCheck, FaTimes } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../Property Listing/PropertyListing.css';
 
+const resizeImage = (file, maxWidth = 800, maxHeight = 800, quality = 0.7) => {
+    return new Promise((resolve, reject) => {
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
+                    }
+                } else {
+                    if (height > maxHeight) {
+                        width = Math.round((width * maxHeight) / height);
+                        height = maxHeight;
+                    }
+                }
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                canvas.toBlob((blob) => {
+
+                    const resizedFile = new File([blob], file.name, {
+                        type: file.type,
+                        lastModified: Date.now()
+                    });
+                    resolve(resizedFile);
+                }, file.type, quality);
+            };
+            img.onerror = error => reject(error);
+        };
+        reader.onerror = error => reject(error);
+    });
+};
+
+const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+
+            const base64String = reader.result.split(',')[1];
+            resolve(base64String);
+        };
+        reader.onerror = error => reject(error);
+    });
+};
+
 const PropertyListing = () => {
     const [properties, setProperties] = useState([]);
     const [searchKey, setSearchKey] = useState('');
@@ -25,6 +85,7 @@ const PropertyListing = () => {
     const [toastType, setToastType] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [propertyToDelete, setPropertyToDelete] = useState(null);
+    const [isUploading, setIsUploading] = useState(false);
 
     useEffect(() => {
         fetchProperties();
@@ -65,45 +126,46 @@ const PropertyListing = () => {
                 images: property.propertyimage || [],
                 username: property.username || 'N/A',
             });
+        } else if (action === 'edit') {
+            setEditProperty(property);
+            setIsPropertyFormOpen(true);
         } else if (action === 'accept') {
             const newStatus = 'Available';
-            await propertyListingAccept(property.propertyid);
-            updatePropertyStatus(property.propertyid, newStatus)
-                .then(() => {
-                    setProperties((prevProperties) =>
-                        prevProperties.map((res) =>
-                            res.propertyid === property.propertyid
-                                ? { ...res, propertystatus: newStatus }
-                                : res
-                        )
-                    );
-                    displayToast('success', 'Property Listing Request Accepted Successfully');
-                })
-                .catch((error) => {
-                    console.error('Failed to update property status', error);
-                    displayToast('error', 'Failed to accept property listing request');
-                });
+            try {
+                await propertyListingAccept(property.propertyid);
+                await updatePropertyStatus(property.propertyid, newStatus);
+                setProperties((prevProperties) =>
+                    prevProperties.map((res) =>
+                        res.propertyid === property.propertyid
+                            ? { ...res, propertystatus: newStatus }
+                            : res
+                    )
+                );
+                displayToast('success', 'Property Listing Request Accepted Successfully');
+            } catch (error) {
+                console.error('Failed to update property status', error);
+                displayToast('error', 'Failed to accept property listing request');
+            }
         } else if (action === 'reject') {
             const newStatus = 'Unavailable';
-            await propertyListingReject(property.propertyid);
-            updatePropertyStatus(property.propertyid, newStatus)
-                .then(() => {
-                    setProperties((prevProperties) =>
-                        prevProperties.map((res) =>
-                            res.propertyid === property.propertyid
-                                ? { ...res, propertystatus: newStatus }
-                                : res
-                        )
-                    );
-                    displayToast('success', 'Property Listing Request Rejected Successfully');
-                })
-                .catch((error) => {
-                    console.error('Failed to update property status', error);
-                    displayToast('error', 'Failed to reject property listing request');
-                });
+            try {
+                await propertyListingReject(property.propertyid);
+                await updatePropertyStatus(property.propertyid, newStatus);
+                setProperties((prevProperties) =>
+                    prevProperties.map((res) =>
+                        res.propertyid === property.propertyid
+                            ? { ...res, propertystatus: newStatus }
+                            : res
+                    )
+                );
+                displayToast('success', 'Property Listing Request Rejected Successfully');
+            } catch (error) {
+                console.error('Failed to update property status', error);
+                displayToast('error', 'Failed to reject property listing request');
+            }
         } else if (action === 'delete') {
             if (property.propertystatus === 'Unavailable' && property.username === username) {
-                // Allow delete only if Unavailable and owned by the logged-in user
+
                 setPropertyToDelete(property.propertyid);
                 setIsDialogOpen(true);
             } else {
@@ -112,13 +174,11 @@ const PropertyListing = () => {
         }
     };
     
-    
     const handleDeleteProperty = async () => {
         try {
-            // Find the property to delete from the current properties list
+
             const property = properties.find((prop) => prop.propertyid === propertyToDelete);
     
-            // If property is not found, show an error and return
             if (!property) {
                 displayToast('error', 'Property not found. Please refresh the page and try again.');
                 setIsDialogOpen(false);
@@ -126,15 +186,13 @@ const PropertyListing = () => {
                 return;
             }
     
-            // Check if the property status is not "Unavailable"
             if (property.propertystatus !== 'Unavailable') {
                 displayToast('error', 'Only unavailable properties can be deleted.');
                 setIsDialogOpen(false);
                 setPropertyToDelete(null);
-                return; // Exit the function
+                return;
             }
     
-            // Proceed with deletion if the property is "Unavailable"
             await deleteProperty(propertyToDelete);
             setProperties((prevProperties) =>
                 prevProperties.filter((prop) => prop.propertyid !== propertyToDelete)
@@ -148,7 +206,6 @@ const PropertyListing = () => {
             setPropertyToDelete(null);
         }
     };
-    
 
     const handleApplyFilters = () => {
         setAppliedFilters({ status: selectedStatus });
@@ -195,123 +252,153 @@ const PropertyListing = () => {
             )
     );
 
-
     const propertyDropdownItems = (property, username, usergroup) => {
-    const isOwner = property.username === username; 
-    const isModerator = usergroup === 'Moderator';
-    const isAdmin = usergroup === 'Administrator';
+        const isOwner = property.username === username; 
+        const isModerator = usergroup === 'Moderator';
+        const isAdmin = usergroup === 'Administrator';
 
-    const { propertystatus } = property;
+        const { propertystatus } = property;
 
-    if (isModerator) {
-        // Logic for moderator
-        if (propertystatus === 'Pending') {
-            return [
-                { label: 'View Details', icon: <FaEye />, action: 'view' },
-            ];
-        } else if (propertystatus === 'Available') {
-            return [
-                { label: 'View Details', icon: <FaEye />, action: 'view' },
-            ];
-        } else if (propertystatus === 'Unavailable') {
-            return [
-                { label: 'View Details', icon: <FaEye />, action: 'view' },
-                { label: 'Edit', icon: <FaEdit />, action: 'edit' },
-            ];
-        }
-    }
+        if (isModerator) {
 
-    if (isAdmin) {
-        if (!isOwner) {
-            // Admin managing moderator's property
-            if (property.username !== username && property.username.includes('admin')) {
-                // Current admin cannot reject or manage another admin's property
-                return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
-            }
             if (propertystatus === 'Pending') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Accept', icon: <FaCheck />, action: 'accept' },
-                    { label: 'Reject', icon: <FaTimes />, action: 'reject' },
                 ];
             } else if (propertystatus === 'Available') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Reject', icon: <FaTimes />, action: 'reject' },
-                ];
-            } else if (propertystatus === 'Unavailable') {
-                return [
-                    { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Accept', icon: <FaCheck />, action: 'accept' },
-                ];
-            }
-        } else {
-            // Admin managing their own property
-            if (propertystatus === 'Available') {
-                return [
-                    { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Reject', icon: <FaTimes />, action: 'reject' },
                 ];
             } else if (propertystatus === 'Unavailable') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
                     { label: 'Edit', icon: <FaEdit />, action: 'edit' },
-                    { label: 'Accept', icon: <FaCheck />, action: 'accept' },
-                    { label: 'Delete', icon: <FaTrash />, action: 'delete' },
                 ];
             }
         }
-    }
 
-    // Default: View only
-    return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
-};
+        if (isAdmin) {
+            if (!isOwner) {
 
-    
-const username = localStorage.getItem('username');
-const usergroup = localStorage.getItem('usergroup'); 
+                if (property.username !== username && property.username.includes('admin')) {
 
-const columns = [
-    { header: 'ID', accessor: 'propertyid' },
-    {
-        header: 'Image',
-        accessor: 'propertyimage',
-        render: (property) => (
-            property.propertyimage && property.propertyimage.length > 0 ? (
-                <img
-                    src={`data:image/jpeg;base64,${property.propertyimage[0]}`}
-                    alt={property.propertyname}
-                    style={{ width: 80, height: 80 }}
+                    return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
+                }
+                if (propertystatus === 'Pending') {
+                    return [
+                        { label: 'View Details', icon: <FaEye />, action: 'view' },
+                        { label: 'Accept', icon: <FaCheck />, action: 'accept' },
+                        { label: 'Reject', icon: <FaTimes />, action: 'reject' },
+                    ];
+                } else if (propertystatus === 'Available') {
+                    return [
+                        { label: 'View Details', icon: <FaEye />, action: 'view' },
+                        { label: 'Reject', icon: <FaTimes />, action: 'reject' },
+                    ];
+                } else if (propertystatus === 'Unavailable') {
+                    return [
+                        { label: 'View Details', icon: <FaEye />, action: 'view' },
+                        { label: 'Accept', icon: <FaCheck />, action: 'accept' },
+                    ];
+                }
+            } else {
+
+                if (propertystatus === 'Available') {
+                    return [
+                        { label: 'View Details', icon: <FaEye />, action: 'view' },
+                        { label: 'Reject', icon: <FaTimes />, action: 'reject' },
+                    ];
+                } else if (propertystatus === 'Unavailable') {
+                    return [
+                        { label: 'View Details', icon: <FaEye />, action: 'view' },
+                        { label: 'Edit', icon: <FaEdit />, action: 'edit' },
+                        { label: 'Accept', icon: <FaCheck />, action: 'accept' },
+                        { label: 'Delete', icon: <FaTrash />, action: 'delete' },
+                    ];
+                }
+            }
+        }
+
+        return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
+    };
+
+    const username = localStorage.getItem('username');
+    const usergroup = localStorage.getItem('usergroup'); 
+
+    const columns = [
+        { header: 'ID', accessor: 'propertyid' },
+        {
+            header: 'Image',
+            accessor: 'propertyimage',
+            render: (property) => (
+                property.propertyimage && property.propertyimage.length > 0 ? (
+                    <img
+                        src={`data:image/jpeg;base64,${property.propertyimage[0]}`}
+                        alt={property.propertyname}
+                        style={{ width: 80, height: 80 }}
+                    />
+                ) : (
+                    <span>No Image</span>
+                )
+            ),
+        },
+        { header: 'Name', accessor: 'propertyaddress' },
+        { header: 'Price', accessor: 'rateamount' },
+        { header: 'Location', accessor: 'nearbylocation' },
+        {
+            header: 'Status',
+            accessor: 'propertystatus',
+            render: (property) => (
+                <span className={`property-status ${(property.propertystatus ?? 'Pending').toLowerCase()}`}>
+                    {property.propertystatus || 'Pending'}
+                </span>
+            ),
+        },
+        {
+            header: 'Actions',
+            accessor: 'actions',
+            render: (property) => (
+                <ActionDropdown
+                    items={propertyDropdownItems(property, username, usergroup)}
+                    onAction={(action) => handleAction(action, property)}
                 />
-            ) : (
-                <span>No Image</span>
-            )
-        ),
-    },
-    { header: 'Name', accessor: 'propertyaddress' },
-    { header: 'Price', accessor: 'rateamount' },
-    { header: 'Location', accessor: 'nearbylocation' },
-    {
-        header: 'Status',
-        accessor: 'propertystatus',
-        render: (property) => (
-            <span className={`property-status ${(property.propertystatus ?? 'Pending').toLowerCase()}`}>
-                {property.propertystatus || 'Pending'}
-            </span>
-        ),
-    },
-    {
-        header: 'Actions',
-        accessor: 'actions',
-        render: (property) => (
-            <ActionDropdown
-                items={propertyDropdownItems(property, username, usergroup)}
-                onAction={(action) => handleAction(action, property)}
-            />
-        ),
-    },
-];
+            ),
+        },
+    ];
 
+    const handlePropertySubmit = async (formData) => {
+        setIsUploading(true);
+        try {
+
+            if (formData.images && formData.images.length > 0) {
+                const resizedImages = [];
+                
+                for (const imageFile of formData.images) {
+
+                    if (imageFile instanceof File) {
+                        const resizedImage = await resizeImage(imageFile, 800, 800, 0.7);
+                        const base64Image = await convertToBase64(resizedImage);
+                        resizedImages.push(base64Image);
+                    } else {
+                        resizedImages.push(imageFile);
+                    }
+                }
+                
+                formData.images = resizedImages;
+            }
+            
+            await formData.onSubmit(formData);
+            
+            setIsPropertyFormOpen(false);
+            fetchProperties();
+            displayToast('success', editProperty ? 'Property updated successfully' : 'Property created successfully');
+        } catch (error) {
+            console.error('Error processing images:', error);
+            displayToast('error', 'Failed to process images. Please try again.');
+        } finally {
+            setIsUploading(false);
+        }
+    };
 
     return (
         <div>
@@ -349,12 +436,9 @@ const columns = [
             {isPropertyFormOpen && (
                 <PropertyForm
                     initialData={editProperty}
-                    onSubmit={() => {
-                        setIsPropertyFormOpen(false);
-                        fetchProperties();
-                        displayToast('success', editProperty ? 'Property updated successfully' : 'Property created successfully');
-                    }}
+                    onSubmit={handlePropertySubmit}
                     onClose={() => setIsPropertyFormOpen(false)}
+                    isUploading={isUploading}
                 />
             )}
 
