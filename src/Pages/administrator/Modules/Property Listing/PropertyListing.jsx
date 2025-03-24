@@ -12,6 +12,158 @@ import { FaEye, FaEdit, FaTrash, FaCheck, FaTimes } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../Property Listing/PropertyListing.css';
 
+// Image utilities
+const resizeImage = (file, maxWidth = 800, maxHeight = 600, quality = 0.7) => {
+    return new Promise((resolve, reject) => {
+        // Create file reader
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            
+            img.onload = () => {
+
+                let width = img.width;
+                let height = img.height;
+                
+                if (width > maxWidth) {
+                    const ratio = maxWidth / width;
+                    width = maxWidth;
+                    height = height * ratio;
+                }
+                
+                if (height > maxHeight) {
+                    const ratio = maxHeight / height;
+                    height = height * ratio;
+                    width = width * ratio;
+                }
+                
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        reject(new Error('Canvas to Blob conversion failed'));
+                        return;
+                    }
+
+                    const resizedFile = new File([blob], file.name, {
+                        type: file.type,
+                        lastModified: Date.now()
+                    });
+                    
+                    resolve({
+                        file: resizedFile,
+                        dataUrl: canvas.toDataURL(file.type, quality),
+                        width,
+                        height,
+                        size: blob.size,
+                        originalSize: file.size
+                    });
+                }, file.type, quality);
+            };
+            
+            img.onerror = (error) => {
+                reject(error);
+            };
+        };
+        
+        reader.onerror = (error) => {
+            reject(error);
+        };
+    });
+};
+
+const resizeBase64Image = (base64String, maxWidth = 800, maxHeight = 600, quality = 0.7) => {
+    return new Promise((resolve, reject) => {
+
+        if (!base64String || typeof base64String !== 'string') {
+            reject(new Error('Invalid base64 string'));
+            return;
+        }
+
+        const img = new Image();
+
+        const dataUrl = base64String.includes('data:') 
+            ? base64String 
+            : `data:image/jpeg;base64,${base64String}`;
+            
+        img.src = dataUrl;
+        
+        img.onload = () => {
+
+            let width = img.width;
+            let height = img.height;
+            
+            if (width > maxWidth) {
+                const ratio = maxWidth / width;
+                width = maxWidth;
+                height = height * ratio;
+            }
+            
+            if (height > maxHeight) {
+                const ratio = maxHeight / height;
+                height = height * ratio;
+                width = width * ratio;
+            }
+            
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            
+            const resizedBase64 = canvas.toDataURL('image/jpeg', quality);
+            
+            const base64Data = resizedBase64.split(',')[1];
+            
+            resolve({
+                dataUrl: resizedBase64,
+                base64Data: base64Data,
+                width,
+                height,
+                originalWidth: img.width,
+                originalHeight: img.height
+            });
+        };
+        
+        img.onerror = (error) => {
+            reject(error);
+        };
+    });
+};
+
+const processPropertyImages = async (propertyImages, maxWidth = 800, maxHeight = 600, quality = 0.7) => {
+    if (!propertyImages || !Array.isArray(propertyImages) || propertyImages.length === 0) {
+        return [];
+    }
+
+    try {
+        return await Promise.all(
+            propertyImages.map(async (image) => {
+
+                if (typeof image === 'string') {
+                    const result = await resizeBase64Image(image, maxWidth, maxHeight, quality);
+                    return result.base64Data;
+                }
+                return image;
+            })
+        );
+    } catch (error) {
+        console.error('Error processing property images:', error);
+        return propertyImages;
+    }
+};
+
 const PropertyListing = () => {
     const [properties, setProperties] = useState([]);
     const [searchKey, setSearchKey] = useState('');
@@ -25,6 +177,7 @@ const PropertyListing = () => {
     const [toastType, setToastType] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [propertyToDelete, setPropertyToDelete] = useState(null);
+    const [isProcessingImages, setIsProcessingImages] = useState(false);
 
     useEffect(() => {
         fetchProperties();
@@ -43,15 +196,45 @@ const PropertyListing = () => {
             const validProperties = (propertyData?.properties || []).filter(
                 (property) => property.propertyid !== undefined
             );
-            setProperties(validProperties);
+            
+            setIsProcessingImages(true);
+            
+            const propertiesWithOptimizedImages = await Promise.all(
+                validProperties.map(async (property) => {
+                    if (property.propertyimage && Array.isArray(property.propertyimage) && property.propertyimage.length > 0) {
+                        try {
+                            const optimizedImages = await processPropertyImages(property.propertyimage);
+                            return { ...property, propertyimage: optimizedImages };
+                        } catch (error) {
+                            console.error(`Failed to optimize images for property ${property.propertyid}:`, error);
+                            return property;
+                        }
+                    }
+                    return property;
+                })
+            );
+            
+            setProperties(propertiesWithOptimizedImages);
+            setIsProcessingImages(false);
         } catch (error) {
             console.error('Failed to fetch property details', error);
             displayToast('error', 'Failed to load properties. Please try again.');
+            setIsProcessingImages(false);
         }
     };
 
     const handleAction = async (action, property) => {
         if (action === 'view') {
+
+            let optimizedImages = property.propertyimage;
+            if (property.propertyimage && Array.isArray(property.propertyimage) && property.propertyimage.length > 0) {
+                try {
+                    optimizedImages = await processPropertyImages(property.propertyimage);
+                } catch (error) {
+                    console.error('Failed to optimize images for view:', error);
+                }
+            }
+            
             setSelectedProperty({
                 propertyname: property.propertyaddress || 'N/A',
                 clustername: property.clustername || 'N/A',
@@ -62,9 +245,24 @@ const PropertyListing = () => {
                 propertystatus: property.propertystatus || 'N/A',
                 propertybedtype: property.propertybedtype || 'N/A',
                 propertydescription: property.propertydescription || 'N/A',
-                images: property.propertyimage || [],
+                images: optimizedImages || [],
                 username: property.username || 'N/A',
             });
+        } else if (action === 'edit') {
+            let optimizedImages = property.propertyimage;
+            if (property.propertyimage && Array.isArray(property.propertyimage) && property.propertyimage.length > 0) {
+                try {
+                    optimizedImages = await processPropertyImages(property.propertyimage);
+                } catch (error) {
+                    console.error('Failed to optimize images for edit:', error);
+                }
+            }
+            
+            setEditProperty({
+                ...property,
+                propertyimage: optimizedImages
+            });
+            setIsPropertyFormOpen(true);
         } else if (action === 'accept') {
             const newStatus = 'Available';
             await propertyListingAccept(property.propertyid);
@@ -103,7 +301,6 @@ const PropertyListing = () => {
                 });
         } else if (action === 'delete') {
             if (property.propertystatus === 'Unavailable' && property.username === username) {
-                // Allow delete only if Unavailable and owned by the logged-in user
                 setPropertyToDelete(property.propertyid);
                 setIsDialogOpen(true);
             } else {
@@ -112,13 +309,10 @@ const PropertyListing = () => {
         }
     };
     
-    
     const handleDeleteProperty = async () => {
         try {
-            // Find the property to delete from the current properties list
             const property = properties.find((prop) => prop.propertyid === propertyToDelete);
     
-            // If property is not found, show an error and return
             if (!property) {
                 displayToast('error', 'Property not found. Please refresh the page and try again.');
                 setIsDialogOpen(false);
@@ -126,15 +320,13 @@ const PropertyListing = () => {
                 return;
             }
     
-            // Check if the property status is not "Unavailable"
             if (property.propertystatus !== 'Unavailable') {
                 displayToast('error', 'Only unavailable properties can be deleted.');
                 setIsDialogOpen(false);
                 setPropertyToDelete(null);
-                return; // Exit the function
+                return;
             }
     
-            // Proceed with deletion if the property is "Unavailable"
             await deleteProperty(propertyToDelete);
             setProperties((prevProperties) =>
                 prevProperties.filter((prop) => prop.propertyid !== propertyToDelete)
@@ -149,7 +341,6 @@ const PropertyListing = () => {
         }
     };
     
-
     const handleApplyFilters = () => {
         setAppliedFilters({ status: selectedStatus });
     };
@@ -195,123 +386,129 @@ const PropertyListing = () => {
             )
     );
 
-
     const propertyDropdownItems = (property, username, usergroup) => {
-    const isOwner = property.username === username; 
-    const isModerator = usergroup === 'Moderator';
-    const isAdmin = usergroup === 'Administrator';
+        const isOwner = property.username === username; 
+        const isModerator = usergroup === 'Moderator';
+        const isAdmin = usergroup === 'Administrator';
 
-    const { propertystatus } = property;
+        const { propertystatus } = property;
 
-    if (isModerator) {
-        // Logic for moderator
-        if (propertystatus === 'Pending') {
-            return [
-                { label: 'View Details', icon: <FaEye />, action: 'view' },
-            ];
-        } else if (propertystatus === 'Available') {
-            return [
-                { label: 'View Details', icon: <FaEye />, action: 'view' },
-            ];
-        } else if (propertystatus === 'Unavailable') {
-            return [
-                { label: 'View Details', icon: <FaEye />, action: 'view' },
-                { label: 'Edit', icon: <FaEdit />, action: 'edit' },
-            ];
-        }
-    }
-
-    if (isAdmin) {
-        if (!isOwner) {
-            // Admin managing moderator's property
-            if (property.username !== username && property.username.includes('admin')) {
-                // Current admin cannot reject or manage another admin's property
-                return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
-            }
+        if (isModerator) {
             if (propertystatus === 'Pending') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Accept', icon: <FaCheck />, action: 'accept' },
-                    { label: 'Reject', icon: <FaTimes />, action: 'reject' },
                 ];
             } else if (propertystatus === 'Available') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Reject', icon: <FaTimes />, action: 'reject' },
-                ];
-            } else if (propertystatus === 'Unavailable') {
-                return [
-                    { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Accept', icon: <FaCheck />, action: 'accept' },
-                ];
-            }
-        } else {
-            // Admin managing their own property
-            if (propertystatus === 'Available') {
-                return [
-                    { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Reject', icon: <FaTimes />, action: 'reject' },
                 ];
             } else if (propertystatus === 'Unavailable') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
                     { label: 'Edit', icon: <FaEdit />, action: 'edit' },
-                    { label: 'Accept', icon: <FaCheck />, action: 'accept' },
-                    { label: 'Delete', icon: <FaTrash />, action: 'delete' },
                 ];
             }
         }
-    }
 
-    // Default: View only
-    return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
-};
+        if (isAdmin) {
+            if (!isOwner) {
+                if (property.username !== username && property.username.includes('admin')) {
 
-    
-const username = localStorage.getItem('username');
-const usergroup = localStorage.getItem('usergroup'); 
+                    return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
+                }
+                if (propertystatus === 'Pending') {
+                    return [
+                        { label: 'View Details', icon: <FaEye />, action: 'view' },
+                        { label: 'Accept', icon: <FaCheck />, action: 'accept' },
+                        { label: 'Reject', icon: <FaTimes />, action: 'reject' },
+                    ];
+                } else if (propertystatus === 'Available') {
+                    return [
+                        { label: 'View Details', icon: <FaEye />, action: 'view' },
+                        { label: 'Reject', icon: <FaTimes />, action: 'reject' },
+                    ];
+                } else if (propertystatus === 'Unavailable') {
+                    return [
+                        { label: 'View Details', icon: <FaEye />, action: 'view' },
+                        { label: 'Accept', icon: <FaCheck />, action: 'accept' },
+                    ];
+                }
+            } else {
+                // Admin managing their own property
+                if (propertystatus === 'Available') {
+                    return [
+                        { label: 'View Details', icon: <FaEye />, action: 'view' },
+                        { label: 'Reject', icon: <FaTimes />, action: 'reject' },
+                    ];
+                } else if (propertystatus === 'Unavailable') {
+                    return [
+                        { label: 'View Details', icon: <FaEye />, action: 'view' },
+                        { label: 'Edit', icon: <FaEdit />, action: 'edit' },
+                        { label: 'Accept', icon: <FaCheck />, action: 'accept' },
+                        { label: 'Delete', icon: <FaTrash />, action: 'delete' },
+                    ];
+                }
+            }
+        }
 
-const columns = [
-    { header: 'ID', accessor: 'propertyid' },
-    {
-        header: 'Image',
-        accessor: 'propertyimage',
-        render: (property) => (
-            property.propertyimage && property.propertyimage.length > 0 ? (
-                <img
-                    src={`data:image/jpeg;base64,${property.propertyimage[0]}`}
-                    alt={property.propertyname}
-                    style={{ width: 80, height: 80 }}
+        return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
+    };
+
+    const username = localStorage.getItem('username');
+    const usergroup = localStorage.getItem('usergroup'); 
+
+    const columns = [
+        { header: 'ID', accessor: 'propertyid' },
+        {
+            header: 'Image',
+            accessor: 'propertyimage',
+            render: (property) => (
+                property.propertyimage && property.propertyimage.length > 0 ? (
+                    <img
+                        src={`data:image/jpeg;base64,${property.propertyimage[0]}`}
+                        alt={property.propertyname}
+                        style={{ width: 80, height: 80, objectFit: 'cover' }}
+                    />
+                ) : (
+                    <span>No Image</span>
+                )
+            ),
+        },
+        { header: 'Name', accessor: 'propertyaddress' },
+        { header: 'Price', accessor: 'rateamount' },
+        { header: 'Location', accessor: 'nearbylocation' },
+        {
+            header: 'Status',
+            accessor: 'propertystatus',
+            render: (property) => (
+                <span className={`property-status ${(property.propertystatus ?? 'Pending').toLowerCase()}`}>
+                    {property.propertystatus || 'Pending'}
+                </span>
+            ),
+        },
+        {
+            header: 'Actions',
+            accessor: 'actions',
+            render: (property) => (
+                <ActionDropdown
+                    items={propertyDropdownItems(property, username, usergroup)}
+                    onAction={(action) => handleAction(action, property)}
                 />
-            ) : (
-                <span>No Image</span>
-            )
-        ),
-    },
-    { header: 'Name', accessor: 'propertyaddress' },
-    { header: 'Price', accessor: 'rateamount' },
-    { header: 'Location', accessor: 'nearbylocation' },
-    {
-        header: 'Status',
-        accessor: 'propertystatus',
-        render: (property) => (
-            <span className={`property-status ${(property.propertystatus ?? 'Pending').toLowerCase()}`}>
-                {property.propertystatus || 'Pending'}
-            </span>
-        ),
-    },
-    {
-        header: 'Actions',
-        accessor: 'actions',
-        render: (property) => (
-            <ActionDropdown
-                items={propertyDropdownItems(property, username, usergroup)}
-                onAction={(action) => handleAction(action, property)}
-            />
-        ),
-    },
-];
+            ),
+        },
+    ];
 
+    // Handle property form submission with image resizing
+    const handlePropertyFormSubmit = async (formData, isEdit) => {
+        try {
+            setIsPropertyFormOpen(false);
+            await fetchProperties();
+            displayToast('success', isEdit ? 'Property updated successfully' : 'Property created successfully');
+        } catch (error) {
+            console.error('Error handling property form submission:', error);
+            displayToast('error', 'Failed to process property. Please try again.');
+        }
+    };
 
     return (
         <div>
@@ -332,6 +529,10 @@ const columns = [
                 Create New Property
             </button>
 
+            {isProcessingImages && (
+                <div className="loading-message">Optimizing property images...</div>
+            )}
+
             <PaginatedTable
                 data={filteredProperties}
                 columns={columns}
@@ -349,12 +550,10 @@ const columns = [
             {isPropertyFormOpen && (
                 <PropertyForm
                     initialData={editProperty}
-                    onSubmit={() => {
-                        setIsPropertyFormOpen(false);
-                        fetchProperties();
-                        displayToast('success', editProperty ? 'Property updated successfully' : 'Property created successfully');
-                    }}
+                    onSubmit={handlePropertyFormSubmit}
                     onClose={() => setIsPropertyFormOpen(false)}
+                    resizeImage={resizeImage}
+                    resizeBase64Image={resizeBase64Image}
                 />
             )}
 
