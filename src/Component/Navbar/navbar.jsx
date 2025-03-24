@@ -23,7 +23,7 @@ function Navbar() {
                     const response = await checkstatus(userID);
                     const data = await response.json();
 
-                    if (data.ustatus === 'login') {
+                    if (data.ustatus === 'login' && data.usergroup === 'Customer') {
                         setIsLoggedIn(true);
 
                         let avatarUrl;
