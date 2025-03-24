@@ -120,16 +120,16 @@ const handleAvatarUpload = async () => {
 
   const reader = new FileReader();
   reader.onloadend = async () => {
-    let base64String = reader.result.split(',')[1];  
+    let base64String = reader.result.split(',')[1]; 
 
     try {
       const response = await uploadAvatar(userData.userid, base64String); 
       if (response.success) {
         displayToast('success', response.message);
-        setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`);
+        setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`); 
         setUserData((prevData) => ({
           ...prevData,
-          uimage: response.data.uimage,
+          uimage: response.data.uimage, 
         }));
       }
     } catch (error) {
@@ -139,6 +139,7 @@ const handleAvatarUpload = async () => {
   };
   reader.readAsDataURL(avatar);
 };
+
 
 
     const handleUpdate = async () => {
