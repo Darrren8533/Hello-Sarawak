@@ -194,8 +194,8 @@ const Reservations = () => {
     const handleMessageBoxSelect = async (mode) => {
         if (mode === 'suggest') {
             try {
-                const userID = localStorage.getItem('userID');
-                const response = await getOperatorProperties(userID);
+                const userid = localStorage.getItem('userid');
+                const response = await getOperatorProperties(userid);
 
                 setAdministratorProperties(response.data);
             } catch (error) {
@@ -207,8 +207,8 @@ const Reservations = () => {
         setShowMessageBox(false);
     };
 
-    const handlePropertySelect = (propertyID) => {
-        setSelectedProperty(propertyID);
+    const handlePropertySelect = (propertyid) => {
+        setSelectedProperty(propertyid);
     };
 
     const handleConfirmSuggestion = async () => {
@@ -227,11 +227,11 @@ const Reservations = () => {
         }
     };
 
-    const handleOperatorSelect = (userID) => {
+    const handleOperatorSelect = (userid) => {
         setSelectedOperators((prevSelectedOperators) =>
-            prevSelectedOperators.includes(userID)
-                ? prevSelectedOperators.filter((id) => id !== userID)
-                : [...prevSelectedOperators, userID]
+            prevSelectedOperators.includes(userid)
+                ? prevSelectedOperators.filter((id) => id !== userid)
+                : [...prevSelectedOperators, userid]
         );
     };
 
@@ -447,7 +447,7 @@ const Reservations = () => {
                                     id="select-all-operators"
                                     onChange={(e) => {
                                         const checked = e.target.checked;
-                                        setSelectedOperators(checked ? operators.map(operator => operator.userID) : []);
+                                        setSelectedOperators(checked ? operators.map(operator => operator.userid) : []);
                                     }}
                                 />
                                 <label htmlFor="select-all-operators">Select All</label>
@@ -455,15 +455,15 @@ const Reservations = () => {
 
                             {operators.length > 0 ? (
                                 operators.map((operator) => (
-                                    <div key={operator.userID} className="operator-option">
+                                    <div key={operator.userid} className="operator-option">
                                         <input
                                             type="checkbox"
-                                            id={`operator-${operator.userID}`}
-                                            value={operator.userID}
-                                            checked={selectedOperators.includes(operator.userID)}
-                                            onChange={() => handleOperatorSelect(operator.userID)}
+                                            id={`operator-${operator.userid}`}
+                                            value={operator.userid}
+                                            checked={selectedOperators.includes(operator.userid)}
+                                            onChange={() => handleOperatorSelect(operator.userid)}
                                         />
-                                        <label htmlFor={`operator-${operator.userID}`}>
+                                        <label htmlFor={`operator-${operator.userid}`}>
                                             {operator.uFirstName} {operator.uLastName} ({operator.username}) - {operator.userGroup}
                                         </label>
                                     </div>
