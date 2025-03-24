@@ -272,7 +272,7 @@ const Reservations = () => {
     const getFilteredProperties = () => {
         if (!Array.isArray(administratorProperties)) return []; // Ensure an array
         return administratorProperties.filter(property => {
-            const matchesSearch = property.propertyid..toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
+            const matchesSearch = property.propertyid.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
             const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
                 (!priceRange.max || property.rateamount <= Number(priceRange.max));
             return matchesSearch && matchesPrice;
