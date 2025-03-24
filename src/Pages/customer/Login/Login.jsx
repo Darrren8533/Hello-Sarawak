@@ -100,7 +100,7 @@ const Login = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch('https://cams-backend.vercel.app/', {
+      const response = await fetch('https://cams-backend.vercel.app/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
