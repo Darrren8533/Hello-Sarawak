@@ -419,7 +419,7 @@ const Reservations = () => {
                                             </div>
                                             <div className="property-details">
                                                 <h3 className="property-title">{property.propertyid}</h3>
-                                                <p className="property-info-text">{property.propertyGuestPaxNo} Pax</p>
+                                                <p className="property-info-text">{property.propertyguestpaxno} Pax</p>
                                                 <p className="property-price">RM {property.rateamount}</p>
                                             </div>
                                         </label>
@@ -465,7 +465,7 @@ const Reservations = () => {
                                             onChange={() => handleOperatorSelect(operator.userid)}
                                         />
                                         <label htmlFor={`operator-${operator.userid}`}>
-                                            {operator.uFirstName} {operator.uLastName} ({operator.username}) - {operator.userGroup}
+                                            {operator.ufirstname} {operator.ulastname} ({operator.username}) - {operator.usergroup}
                                         </label>
                                     </div>
                                 ))
