@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useState, useCallback, useEffect } from "react";
+import React, { useRef, useState, useCallback, useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import "swiper/css/pagination";
@@ -7,9 +7,10 @@ import { Pagination } from "swiper/modules";
 
 // Utility function to optimize base64 images
 const optimizeBase64Image = (base64String, quality = 0.7, maxWidth = 1200) => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     // Create an image element
     const img = new Image();
+    
     img.onload = () => {
       // Create a canvas element
       const canvas = document.createElement('canvas');
@@ -34,7 +35,10 @@ const optimizeBase64Image = (base64String, quality = 0.7, maxWidth = 1200) => {
       resolve(optimizedString);
     };
     
-    // Set source of image
+    img.onerror = () => {
+      reject(new Error('Image loading failed'));
+    };
+    
     img.src = `data:image/jpeg;base64,${base64String}`;
   });
 };
@@ -45,24 +49,38 @@ const ImageSlider = ({ images }) => {
   const [isOptimizing, setIsOptimizing] = useState(true);
   
   useEffect(() => {
+    let isMounted = true;
+    setIsOptimizing(true);
+    
     const optimizeImages = async () => {
-      setIsOptimizing(true);
-      
-      const optimized = [];
-      for (const base64Image of images) {
-        optimized.push(base64Image);
-        setOptimizedImages([...optimized]);
+      try {
+        if (isMounted) {
+          setOptimizedImages(images);
+        }
         
-        const optimizedImage = await optimizeBase64Image(base64Image, 0.7, 1200);
+        const optimizationPromises = images.map(img => 
+          optimizeBase64Image(img, 0.7, 1200)
+        );
         
-        optimized[optimized.length - 1] = optimizedImage;
-        setOptimizedImages([...optimized]);
+        const optimizedResults = await Promise.all(optimizationPromises);
+        
+        if (isMounted) {
+          setOptimizedImages(optimizedResults);
+          setIsOptimizing(false);
+        }
+      } catch (error) {
+        console.error("Image optimization failed:", error);
+        if (isMounted) {
+          setIsOptimizing(false);
+        }
       }
-      
-      setIsOptimizing(false);
     };
     
     optimizeImages();
+    
+    return () => {
+      isMounted = false;
+    };
   }, [images]);
   
   const handlePrev = useCallback((e) => {
@@ -79,14 +97,11 @@ const ImageSlider = ({ images }) => {
     }
   }, []);
   
-  // Image cache for decoded images
-  const imageCache = useMemo(() => {
-    return optimizedImages.map(img => `data:image/jpeg;base64,${img}`);
-  }, [optimizedImages]);
+  // Generate image URLs only when optimizedImages changes
+  const imageUrls = optimizedImages.map(img => `data:image/jpeg;base64,${img}`);
   
   return (
     <div className="tour-slider">
-      
       <Swiper
         onSwiper={(swiper) => (swiperRef.current = swiper)}
         pagination={{
@@ -98,22 +113,34 @@ const ImageSlider = ({ images }) => {
         spaceBetween={10}
         lazy={true}
       >
-        {optimizedImages.map((image, index) => (
+        {imageUrls.map((imageUrl, index) => (
           <SwiperSlide key={index}>
-            <img
-              src={imageCache[index]}
-              alt={`Slide ${index + 1}`}
-              className="tour-property-image"
-              loading="lazy"
-            />
+            {isOptimizing && index === 0 ? (
+              <div className="loading-indicator">Optimizing images...</div>
+            ) : (
+              <img
+                src={imageUrl}
+                alt={`Slide ${index + 1}`}
+                className="tour-property-image"
+                loading="lazy"
+              />
+            )}
           </SwiperSlide>
         ))}
       </Swiper>
       
-      <button className="custom-prev-btn" onClick={handlePrev}>
+      <button 
+        className="custom-prev-btn" 
+        onClick={handlePrev}
+        disabled={isOptimizing}
+      >
         &#8249;
       </button>
-      <button className="custom-next-btn" onClick={handleNext}>
+      <button 
+        className="custom-next-btn" 
+        onClick={handleNext}
+        disabled={isOptimizing}
+      >
         &#8250;
       </button>
     </div>
