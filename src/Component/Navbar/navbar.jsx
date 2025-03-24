@@ -18,9 +18,7 @@ function Navbar() {
     useEffect(() => {
         const checkLoginStatus = async () => {
             if (userID) {
-                const userData = {
-                    userID
-                };
+                
                 try {
                     const response = await checkstatus(userID);
                     const data = await response.json();
@@ -35,8 +33,8 @@ function Navbar() {
                         }
 
                         const userData = await fetchUserData(userID);
-                        if (userData.uImage) {
-                            avatarUrl = userData.uImage.startsWith('http') ? userData.uImage : `data:image/jpeg;base64,${userData.uImage}`;
+                        if (userData.uimage) {
+                            avatarUrl = userData.uimage.startsWith('http') ? userData.uimage : `data:image/jpeg;base64,${userData.uimage}`;
                         } else if (!avatarUrl) {
                             avatarUrl = DefaultAvatar;
                         }
