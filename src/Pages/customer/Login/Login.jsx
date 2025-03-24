@@ -146,7 +146,7 @@ const Login = () => {
       localStorage.setItem("googleAccessToken", tokenResponse.access_token);
   
       try {
-        const response = await fetch("http://localhost:5000/google-login", {
+        const response = await fetch("https://cams-backend.vercel.app/google-login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token: tokenResponse.access_token }),
