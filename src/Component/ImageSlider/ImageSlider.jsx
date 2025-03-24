@@ -40,10 +40,12 @@ const ImageSlider = ({ images }) => {
         {optimizedImages.map((image, index) => (
           <SwiperSlide key={index}>
             <img
-              src={`data:image/jpeg;base64,${image}`}
+              src={image.url || image} 
               alt={`Slide ${index + 1}`}
               className="tour-property-image"
               loading="lazy"
+              width={image.width || 800} 
+              height={image.height || 600} 
             />
           </SwiperSlide>
         ))}
