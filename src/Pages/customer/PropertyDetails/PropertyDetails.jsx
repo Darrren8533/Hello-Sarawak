@@ -752,8 +752,6 @@ const PropertyDetails = () => {
           </div>
         </div>
       )}
-      
-      {/* 设施覆盖层不变 */}
     </div>
   );
 };
