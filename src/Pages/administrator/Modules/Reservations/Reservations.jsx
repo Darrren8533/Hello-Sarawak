@@ -272,8 +272,8 @@ const Reservations = () => {
     const getFilteredProperties = () => {
         return administratorProperties.filter(property => {
             const matchesSearch = property.propertyid.toLowerCase().includes(suggestSearchKey.toLowerCase());
-            const matchesPrice = (!priceRange.min || property.propertyPrice >= Number(priceRange.min)) &&
-                (!priceRange.max || property.propertyPrice <= Number(priceRange.max));
+            const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
+                (!priceRange.max || property.rateamount <= Number(priceRange.max));
             return matchesSearch && matchesPrice;
         });
     };
@@ -419,7 +419,7 @@ const Reservations = () => {
                                             <div className="property-details">
                                                 <h3 className="property-title">{property.propertyid}</h3>
                                                 <p className="property-info-text">{property.propertyGuestPaxNo} Pax</p>
-                                                <p className="property-price">RM {property.propertyPrice}</p>
+                                                <p className="property-price">RM {property.rateamount}</p>
                                             </div>
                                         </label>
                                     </div>
