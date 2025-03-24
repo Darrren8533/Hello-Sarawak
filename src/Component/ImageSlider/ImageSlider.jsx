@@ -86,9 +86,6 @@ const ImageSlider = ({ images }) => {
   
   return (
     <div className="tour-slider">
-      {isOptimizing && (
-        <div className="optimization-indicator">Optimizing images...</div>
-      )}
       
       <Swiper
         onSwiper={(swiper) => (swiperRef.current = swiper)}
