@@ -51,66 +51,69 @@ const PropertyListing = () => {
     };
 
     const handleAction = async (action, property) => {
-        if (action === 'view') {
-            setSelectedProperty({
-                propertyname: property.propertyaddress || 'N/A',
-                clustername: property.clustername || 'N/A',
-                categoryname: property.categoryname || 'N/A',
-                propertyprice: property.rateamount|| 'N/A',
-                propertylocation: property.nearbylocation || 'N/A',
-                propertyguestpaxno: property.propertyguestpaxno || 'N/A',
-                propertystatus: property.propertystatus || 'N/A',
-                propertybedtype: property.propertybedtype || 'N/A',
-                propertydescription: property.propertydescription || 'N/A',
-                images: property.propertyimage || [],
-                username: property.username || 'N/A',
+       if (action === 'view') {
+        setSelectedProperty({
+            propertyname: property.propertyaddress || 'N/A',
+            clustername: property.clustername || 'N/A',
+            categoryname: property.categoryname || 'N/A',
+            propertyprice: property.rateamount || 'N/A',
+            propertylocation: property.nearbylocation || 'N/A',
+            propertyguestpaxno: property.propertyguestpaxno || 'N/A',
+            propertystatus: property.propertystatus || 'N/A',
+            propertybedtype: property.propertybedtype || 'N/A',
+            propertydescription: property.propertydescription || 'N/A',
+            images: property.propertyimage || [],
+            username: property.username || 'N/A',
+        });
+    } else if (action === 'edit') {
+        
+        setEditProperty(property);
+        setIsPropertyFormOpen(true);
+    } else if (action === 'accept') {
+        const newStatus = 'Available';
+        await propertyListingAccept(property.propertyid);
+        updatePropertyStatus(property.propertyid, newStatus)
+            .then(() => {
+                setProperties((prevProperties) =>
+                    prevProperties.map((res) =>
+                        res.propertyid === property.propertyid
+                            ? { ...res, propertystatus: newStatus }
+                            : res
+                    )
+                );
+                displayToast('success', 'Property Listing Request Accepted Successfully');
+            })
+            .catch((error) => {
+                console.error('Failed to update property status', error);
+                displayToast('error', 'Failed to accept property listing request');
             });
-        } else if (action === 'accept') {
-            const newStatus = 'Available';
-            await propertyListingAccept(property.propertyid);
-            updatePropertyStatus(property.propertyid, newStatus)
-                .then(() => {
-                    setProperties((prevProperties) =>
-                        prevProperties.map((res) =>
-                            res.propertyid === property.propertyid
-                                ? { ...res, propertystatus: newStatus }
-                                : res
-                        )
-                    );
-                    displayToast('success', 'Property Listing Request Accepted Successfully');
-                })
-                .catch((error) => {
-                    console.error('Failed to update property status', error);
-                    displayToast('error', 'Failed to accept property listing request');
-                });
-        } else if (action === 'reject') {
-            const newStatus = 'Unavailable';
-            await propertyListingReject(property.propertyid);
-            updatePropertyStatus(property.propertyid, newStatus)
-                .then(() => {
-                    setProperties((prevProperties) =>
-                        prevProperties.map((res) =>
-                            res.propertyid === property.propertyid
-                                ? { ...res, propertystatus: newStatus }
-                                : res
-                        )
-                    );
-                    displayToast('success', 'Property Listing Request Rejected Successfully');
-                })
-                .catch((error) => {
-                    console.error('Failed to update property status', error);
-                    displayToast('error', 'Failed to reject property listing request');
-                });
-        } else if (action === 'delete') {
-            if (property.propertystatus === 'Unavailable' && property.username === username) {
-                // Allow delete only if Unavailable and owned by the logged-in user
-                setPropertyToDelete(property.propertyid);
-                setIsDialogOpen(true);
-            } else {
-                displayToast('error', 'You do not have permission to delete this property.');
-            }
+    } else if (action === 'reject') {
+        const newStatus = 'Unavailable';
+        await propertyListingReject(property.propertyid);
+        updatePropertyStatus(property.propertyid, newStatus)
+            .then(() => {
+                setProperties((prevProperties) =>
+                    prevProperties.map((res) =>
+                        res.propertyid === property.propertyid
+                            ? { ...res, propertystatus: newStatus }
+                            : res
+                    )
+                );
+                displayToast('success', 'Property Listing Request Rejected Successfully');
+            })
+            .catch((error) => {
+                console.error('Failed to update property status', error);
+                displayToast('error', 'Failed to reject property listing request');
+            });
+    } else if (action === 'delete') {
+        if (property.propertystatus === 'Unavailable' && property.username === username) {
+            setPropertyToDelete(property.propertyid);
+            setIsDialogOpen(true);
+        } else {
+            displayToast('error', 'You do not have permission to delete this property.');
         }
-    };
+    }
+};
     
     
     const handleDeleteProperty = async () => {
