@@ -10,7 +10,7 @@ import ImageSlider from '../../../Component/ImageSlider/ImageSlider';
 import Loader from '../../../Component/Loader/Loader';
 
 // Import API
-import { fetchProduct } from '../../../../Api/api';
+import { fetchProduct, fetchCart } from '../../../../Api/api';
 
 // Import React Icons and CSS
 import { FaStar, FaStarHalfAlt, FaSearch } from 'react-icons/fa';
@@ -26,6 +26,7 @@ const Product = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('');
+  const [filteredProperties, setFilteredProperties] = useState([]);
   const [bookingData, setBookingData] = useState({
     arrivalDate: '',
     departureDate: '',
@@ -129,20 +130,24 @@ const Product = () => {
   
       // Fetch properties and existing reservations
       const fetchedProperties = await fetchProduct();
+
   
       // Filter available properties
       const availableProperties = fetchedProperties.filter((property) => {
         // Ensure property can accommodate guests
         if (property.propertyguestpaxno < totalGuests) return false;
   
+
+  
         return true; // Property is available
       });
+
+      setFilteredProperties(availableProperties); // Update filtered properties
   
       if (availableProperties.length === 0) {
         displayToast('error', 'No available properties match your criteria');
       } else {
         displayToast('success', `Found ${availableProperties.length} available properties`);
-        setProperties(availableProperties); // Update state to display available properties
       }
     } catch (error) {
       console.error('Error checking availability:', error);
@@ -402,10 +407,9 @@ const Product = () => {
           <div className="loader-box">
             <Loader />
           </div>
-      ) : (
+        ) : filteredProperties.length > 0 ? (
         <div className="scrollable-container_for_product">
-          {properties.length > 0 ? (
-            properties.map((property) => (
+          {filteredProperties.map((property) => (
               <div className="tour-property-item" key={property.ID} onClick={() => handleViewDetails(property)}> 
                 <div className="tour-property-image-box">
                   {property.propertyimage && property.propertyimage.length > 0 ? (
@@ -424,12 +428,11 @@ const Product = () => {
                   <h5>From ${property.rateamount}/night</h5>
                 </div>
               </div>
-            ))
-          ) : (
-            <p>No properties available.</p>
-          )}
+            ))}
         </div>
-      )}
+        ) : (
+          <p>No available properties.</p>
+        )}
       </div>
 
       {showToast && <Toast type={toastType} message={toastMessage} />}
