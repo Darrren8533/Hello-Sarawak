@@ -26,7 +26,6 @@ const Product = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('');
-  const [filteredProperties, setFilteredProperties] = useState([]);
   const [bookingData, setBookingData] = useState({
     arrivalDate: '',
     departureDate: '',
@@ -112,7 +111,7 @@ const Product = () => {
     setBookingData({ ...bookingData, [name]: value });
   };
 
-  const handleCheckAvailability = async (e) => {
+  const handleCheckAvailability = (e) => {
     if (e) e.stopPropagation();
   
     if (!bookingData.arrivalDate || !bookingData.departureDate) {
@@ -120,43 +119,47 @@ const Product = () => {
       return;
     }
   
-    try {
-      displayToast('info', 'Checking availability...');
+    const arrivalDate = new Date(bookingData.arrivalDate);
+    const departureDate = new Date(bookingData.departureDate);
+    const totalGuests = bookingData.adults + bookingData.children;
   
-      // Convert to Date objects
-      const arrivalDate = new Date(bookingData.arrivalDate);
-      const departureDate = new Date(bookingData.departureDate);
-      const totalGuests = bookingData.adults + bookingData.children;
-  
-      // Fetch properties and existing reservations
-      const fetchedProperties = await fetchProduct();
-
-  
-      // Filter available properties
-      const availableProperties = fetchedProperties.filter((property) => {
-        // Ensure property can accommodate guests
-        if (property.propertyguestpaxno < totalGuests) return false;
-  
-
-  
-        return true; // Property is available
-      });
-
-      setFilteredProperties(availableProperties); // Update filtered properties
-  
-      if (availableProperties.length === 0) {
-        displayToast('error', 'No available properties match your criteria');
-      } else {
-        displayToast('success', `Found ${availableProperties.length} available properties`);
+    // Filter available properties
+    const availableProperties = properties.filter((property) => {
+      // Check if guest capacity is sufficient
+      if (property.propertyguestpaxno < totalGuests) {
+        return false;
       }
-    } catch (error) {
-      console.error('Error checking availability:', error);
-      displayToast('error', 'Failed to check availability');
+  
+      // Check for overlapping reservations
+      if (property.reservations) {
+        for (const reservation of property.reservations) {
+          const existingCheckin = new Date(reservation.checkindatetime);
+          const existingCheckout = new Date(reservation.checkoutdatetime);
+  
+          // Check if dates overlap
+          if (
+            (arrivalDate >= existingCheckin && arrivalDate < existingCheckout) || 
+            (departureDate > existingCheckin && departureDate <= existingCheckout) || 
+            (arrivalDate <= existingCheckin && departureDate >= existingCheckout)
+          ) {
+            return false;
+          }
+        }
+      }
+  
+      return true; // Property is available
+    });
+  
+    if (availableProperties.length === 0) {
+      displayToast('error', 'No available properties match your criteria');
+      setProperties(availableProperties); // Update state to show available properties
+    } else {
+      displayToast('success', `Found ${availableProperties.length} available properties`);
+      setProperties(availableProperties); // Update state to show available properties
     }
   };
   
   
-
   const handleTabClick = (tab) => {
     setActiveTab(activeTab === tab ? null : tab);
   };
@@ -407,9 +410,10 @@ const Product = () => {
           <div className="loader-box">
             <Loader />
           </div>
-        ) : filteredProperties.length > 0 ? (
+      ) : (
         <div className="scrollable-container_for_product">
-          {filteredProperties.map((property) => (
+          {properties.length > 0 ? (
+            properties.map((property) => (
               <div className="tour-property-item" key={property.ID} onClick={() => handleViewDetails(property)}> 
                 <div className="tour-property-image-box">
                   {property.propertyimage && property.propertyimage.length > 0 ? (
@@ -428,11 +432,12 @@ const Product = () => {
                   <h5>From ${property.rateamount}/night</h5>
                 </div>
               </div>
-            ))}
+            ))
+          ) : (
+            <p>No properties available.</p>
+          )}
         </div>
-        ) : (
-          <p>No available properties.</p>
-        )}
+      )}
       </div>
 
       {showToast && <Toast type={toastType} message={toastMessage} />}
