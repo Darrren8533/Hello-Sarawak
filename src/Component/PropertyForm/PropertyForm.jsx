@@ -102,16 +102,16 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         if (initialData) {
             setFormData({
                 username: initialData.username || "",
-                propertyPrice: initialData.propertyPrice || "",
-                propertyAddress: initialData.propertyAddress || "",
-                nearbyLocation: initialData.nearbyLocation || "",
-                propertyBedType: initialData.propertyBedType || "",
-                propertyGuestPaxNo: initialData.propertyGuestPaxNo || "",
-                propertyDescription: initialData.propertyDescription || "",
-                propertyFacilities: initialData.propertyFacilities || [],
-                propertyImage: initialData.propertyImage || [],
-                clusterName: initialData.clusterName || "", // Pre-fill clusterName if editing
-                categoryName: initialData.categoryName || "", // Pre-fill categoryName if editing
+                propertyPrice: initialData.propertyprice || "",
+                propertyAddress: initialData.propertyaddress || "",
+                nearbyLocation: initialData.nearbylocation || "",
+                propertyBedType: initialData.propertybedtype || "",
+                propertyGuestPaxNo: initialData.propertyguestpaxno || "",
+                propertyDescription: initialData.propertydescription || "",
+                propertyFacilities: initialData.propertyfacilities || [],
+                propertyImage: initialData.propertyimage || [],
+                clusterName: initialData.clustername || "", // Pre-fill clusterName if editing
+                categoryName: initialData.categoryname || "", // Pre-fill categoryName if editing
             });
         }
     }, [initialData]);
@@ -167,15 +167,15 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         e.preventDefault();
         const data = new FormData();
         data.append("username", formData.username);
-        data.append("propertyPrice", formData.propertyPrice);
-        data.append("propertyAddress", formData.propertyAddress);
-        data.append("nearbyLocation", formData.nearbyLocation);
-        data.append("propertyBedType", formData.propertyBedType);
-        data.append("propertyGuestPaxNo", formData.propertyGuestPaxNo);
-        data.append("propertyDescription", formData.propertyDescription);
-        data.append("facilities", formData.propertyFacilities.join(","));
-        data.append("clusterName", formData.clusterName); // Add clusterName to FormData
-        data.append("categoryName", formData.categoryName); // Add categoryName to FormData
+        data.append("propertyPrice", formData.propertyprice);
+        data.append("propertyAddress", formData.propertyaddress);
+        data.append("nearbyLocation", formData.nearbylocation);
+        data.append("propertyBedType", formData.propertybedtype);
+        data.append("propertyGuestPaxNo", formData.propertyguestpaxno);
+        data.append("propertyDescription", formData.propertydescription);
+        data.append("facilities", formData.propertyfacilities.join(","));
+        data.append("clusterName", formData.clustername); // Add clusterName to FormData
+        data.append("categoryName", formData.categoryname); // Add categoryName to FormData
 
         // Only include propertyStatus when creating a new property
         if (!initialData) {
