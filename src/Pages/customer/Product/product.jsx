@@ -119,8 +119,8 @@ const Product = () => {
       return;
     }
   
-    const arrivalDate = new Date(bookingData.arrivalDate);
-    const departureDate = new Date(bookingData.departureDate);
+    const arrivalDate = new Date(bookingData.arrivalDate).getTime();
+    const departureDate = new Date(bookingData.departureDate).getTime();
     const totalGuests = bookingData.adults + bookingData.children;
   
     try {
