@@ -353,13 +353,13 @@ const columns = [
                 <PropertyForm
                     initialData={editProperty}
                     onSubmit={() => {
-                        setIsPropertyFormOpen(false);
-                        fetchProperties();
-                        displayToast('success', editProperty ? 'Property updated successfully' : 'Property created successfully');
-                    }}
+                    setIsPropertyFormOpen(false);
+                    fetchProperties();
+                    displayToast('success', editProperty? 'Property updated successfully' : 'Property created successfully');
+                }}
                     onClose={() => setIsPropertyFormOpen(false)}
-                />
-            )}
+            />
+        )}
 
             <Alert
                 isOpen={isDialogOpen}
