@@ -130,6 +130,8 @@ const Product = () => {
         if (property.propertyguestpaxno < totalGuests) return false;
   
         if (property.reservations) {
+          console.log(`Reservations for Property ID ${property.propertyid}:`, property.reservations);
+      
           for (const reservation of property.reservations) {
             const existingCheckin = new Date(reservation.checkindatetime).getTime();
             const existingCheckout = new Date(reservation.checkoutdatetime).getTime();
