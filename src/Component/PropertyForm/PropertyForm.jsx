@@ -193,12 +193,12 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         try {
             let response;
             if (initialData) {
-                response = await updateProperty(data, initialData.propertyID);
+                response = await updateProperty(data, initialData.propertyid);
             } else {
                 const response = await propertiesListing(data);
-                const { propertyID } = response;
+                const { propertyid } = response;
 
-                await propertyListingRequest(propertyID);
+                await propertyListingRequest(propertyid);
             }
 
             if (response && response.message) {
