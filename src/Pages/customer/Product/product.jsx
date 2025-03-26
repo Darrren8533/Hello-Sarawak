@@ -111,54 +111,48 @@ const Product = () => {
     setBookingData({ ...bookingData, [name]: value });
   };
 
-  const handleCheckAvailability = (e) => {
+  const handleCheckAvailability = async (e) => {
     if (e) e.stopPropagation();
-  
-    if (!bookingData.arrivalDate || !bookingData.departureDate) {
-      displayToast('error', 'Please select arrival and departure dates');
-      return;
-    }
   
     const arrivalDate = new Date(bookingData.arrivalDate);
     const departureDate = new Date(bookingData.departureDate);
     const totalGuests = bookingData.adults + bookingData.children;
   
-    // Filter available properties
-    const availableProperties = properties.filter((property) => {
-      // Check if guest capacity is sufficient
-      if (property.propertyguestpaxno < totalGuests) {
-        return false;
-      }
+    try {
+      const allProperties = await fetchProduct(); // Fetch the original dataset again
+      const availableProperties = allProperties.filter((property) => {
+        if (property.propertyguestpaxno < totalGuests) return false;
   
-      // Check for overlapping reservations
-      if (property.reservations) {
-        for (const reservation of property.reservations) {
-          const existingCheckin = new Date(reservation.checkindatetime);
-          const existingCheckout = new Date(reservation.checkoutdatetime);
+        if (property.reservations) {
+          for (const reservation of property.reservations) {
+            const existingCheckin = new Date(reservation.checkindatetime);
+            const existingCheckout = new Date(reservation.checkoutdatetime);
   
-          // Check if dates overlap
-          if (
-            (arrivalDate >= existingCheckin && arrivalDate < existingCheckout) || 
-            (departureDate > existingCheckin && departureDate <= existingCheckout) || 
-            (arrivalDate <= existingCheckin && departureDate >= existingCheckout)
-          ) {
-            return false;
+            if (
+              (arrivalDate >= existingCheckin && arrivalDate < existingCheckout) ||
+              (departureDate > existingCheckin && departureDate <= existingCheckout) ||
+              (arrivalDate <= existingCheckin && departureDate >= existingCheckout)
+            ) {
+              return false;
+            }
           }
         }
+  
+        return true;
+      });
+  
+      if (availableProperties.length === 0) {
+        displayToast('error', 'No available properties match your criteria');
+      } else {
+        displayToast('success', `Found ${availableProperties.length} available properties`);
       }
   
-      return true; // Property is available
-    });
-  
-    if (availableProperties.length === 0) {
-      displayToast('error', 'No available properties match your criteria');
-      setProperties(availableProperties); // Update state to show available properties
-    } else {
-      displayToast('success', `Found ${availableProperties.length} available properties`);
-      setProperties(availableProperties); // Update state to show available properties
+      setProperties(availableProperties); // Update the state with the filtered list
+    } catch (error) {
+      console.error('Error fetching properties:', error);
+      displayToast('error', 'Failed to load properties');
     }
-  };
-  
+  };  
   
   const handleTabClick = (tab) => {
     setActiveTab(activeTab === tab ? null : tab);
