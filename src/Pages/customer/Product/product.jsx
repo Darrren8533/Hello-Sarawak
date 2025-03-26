@@ -397,7 +397,7 @@ const Product = () => {
                 </div>
                 <div className="tour-property-info">
                   <h4>{property.propertyaddress}</h4>
-                  <p>{property.nearbyLocation}</p>
+                  <p>{property.nearbylocation}</p>
                   <div className="tour-property-rating">{renderStars(rating)}</div>
                   <h5>From ${property.rateamount}/night</h5>
                 </div>
