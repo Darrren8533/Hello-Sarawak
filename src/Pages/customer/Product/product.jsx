@@ -134,16 +134,16 @@ const Product = () => {
       // Filter available properties
       const availableProperties = fetchedProperties.filter((property) => {
         // Ensure property can accommodate guests
-        if (property.propertyGuestPaxNo < totalGuests) return false;
+        if (property.propertyguestpaxno < totalGuests) return false;
   
         // Check for overlapping reservations
         const propertyReservations = existingReservations.filter(
-          (res) => res.propertyID === property.propertyID
+          (res) => res.propertyid === property.propertyid
         );
   
         for (const reservation of propertyReservations) {
-          const existingCheckin = new Date(reservation.checkinDatetime);
-          const existingCheckout = new Date(reservation.checkoutDatetime);
+          const existingCheckin = new Date(reservation.checkindatetime);
+          const existingCheckout = new Date(reservation.checkoutdatetime);
   
           // Check for any overlap
           if (
