@@ -130,8 +130,6 @@ const Product = () => {
         if (property.propertyguestpaxno < totalGuests) return false;
   
         if (property.reservations) {
-          console.log(`Reservations for Property ID ${property.propertyid}:`, property.reservations);
-      
           for (const reservation of property.reservations) {
             const existingCheckin = new Date(reservation.checkindatetime).getTime();
             const existingCheckout = new Date(reservation.checkoutdatetime).getTime();
@@ -430,6 +428,7 @@ const Product = () => {
                 </div>
                 <div className="tour-property-info">
                   <h4>{property.propertyaddress}</h4>
+                  <p>{property.checkindatetime}</p>
                   <p>{property.nearbylocation}</p>
                   <div className="tour-property-rating">{renderStars(rating)}</div>
                   <h5>From ${property.rateamount}/night</h5>
