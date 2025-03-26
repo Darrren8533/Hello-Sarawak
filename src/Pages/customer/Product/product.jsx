@@ -119,8 +119,8 @@ const Product = () => {
       return;
     }
   
-    const arrivalDate = new Date(bookingData.arrivalDate).getTime();
-    const departureDate = new Date(bookingData.departureDate).getTime();
+    const arrivalDate = new Date(bookingData.arrivalDate);
+    const departureDate = new Date(bookingData.departureDate);
     const totalGuests = bookingData.adults + bookingData.children;
   
     try {
@@ -129,21 +129,16 @@ const Product = () => {
       const availableProperties = allProperties.filter((property) => {
         if (property.propertyguestpaxno < totalGuests) return false;
   
-        if (property.reservations) {
-          for (const reservation of property.reservations) {
-            const existingCheckin = new Date(reservation.checkindatetime).getTime();
-            const existingCheckout = new Date(reservation.checkoutdatetime).getTime();
+            const existingCheckin = new Date(property.checkindatetime);
+            const existingCheckout = new Date(property.checkoutdatetime);
   
             // Fix overlapping logic
-            if (["Accepted", "Pending"].includes(reservation.reservationstatus)) {
-              if (
-                (arrivalDate < existingCheckout && departureDate > existingCheckin) // Strict overlap check
-              ) {
-                return false; // Property is reserved for that period
-              }
+            if (
+              (arrivalDate < existingCheckout && departureDate > existingCheckin) // Strict overlap check
+            ) {
+              return false; // Property is reserved for that period
             }
-          }
-        }
+
   
         return true; // Property is available
       });
