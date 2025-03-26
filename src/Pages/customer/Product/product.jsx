@@ -131,8 +131,8 @@ const Product = () => {
   
         if (property.reservations) {
           for (const reservation of property.reservations) {
-            const existingCheckin = new Date(reservation.checkindatetime);
-            const existingCheckout = new Date(reservation.checkoutdatetime);
+            const existingCheckin = new Date(reservation.checkindatetime).getTime();
+            const existingCheckout = new Date(reservation.checkoutdatetime).getTime();
   
             // Fix overlapping logic
             if (
