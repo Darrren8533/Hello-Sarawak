@@ -135,10 +135,12 @@ const Product = () => {
             const existingCheckout = new Date(reservation.checkoutdatetime).getTime();
   
             // Fix overlapping logic
-            if (
-              (arrivalDate < existingCheckout && departureDate > existingCheckin) // Strict overlap check
-            ) {
-              return false; // Property is reserved for that period
+            if (["Accepted", "Pending"].includes(reservation.reservationstatus)) {
+              if (
+                (arrivalDate < existingCheckout && departureDate > existingCheckin) // Strict overlap check
+              ) {
+                return false; // Property is reserved for that period
+              }
             }
           }
         }
