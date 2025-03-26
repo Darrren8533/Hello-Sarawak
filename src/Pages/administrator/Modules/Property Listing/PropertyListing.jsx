@@ -67,7 +67,7 @@ const PropertyListing = () => {
         });
     } else if (action === 'edit') {
         
-        setEditProperty(property);
+        setEditProperty({ ...property });
         setIsPropertyFormOpen(true);
     } else if (action === 'accept') {
         const newStatus = 'Available';
