@@ -10,7 +10,7 @@ import ImageSlider from '../../../Component/ImageSlider/ImageSlider';
 import Loader from '../../../Component/Loader/Loader';
 
 // Import API
-import { fetchProduct, fetchCart } from '../../../../Api/api';
+import { fetchProduct } from '../../../../Api/api';
 
 // Import React Icons and CSS
 import { FaStar, FaStarHalfAlt, FaSearch } from 'react-icons/fa';
@@ -129,31 +129,11 @@ const Product = () => {
   
       // Fetch properties and existing reservations
       const fetchedProperties = await fetchProduct();
-      const existingReservations = await fetchCart();
   
       // Filter available properties
       const availableProperties = fetchedProperties.filter((property) => {
         // Ensure property can accommodate guests
         if (property.propertyguestpaxno < totalGuests) return false;
-  
-        // Check for overlapping reservations
-        const propertyReservations = existingReservations.filter(
-          (res) => res.propertyid === property.propertyid
-        );
-  
-        for (const reservation of propertyReservations) {
-          const existingCheckin = new Date(reservation.checkindatetime);
-          const existingCheckout = new Date(reservation.checkoutdatetime);
-  
-          // Check for any overlap
-          if (
-            (arrivalDate >= existingCheckin && arrivalDate < existingCheckout) || 
-            (departureDate > existingCheckin && departureDate <= existingCheckout) || 
-            (arrivalDate <= existingCheckin && departureDate >= existingCheckout)
-          ) {
-            return false; // Exclude property due to conflict
-          }
-        }
   
         return true; // Property is available
       });
