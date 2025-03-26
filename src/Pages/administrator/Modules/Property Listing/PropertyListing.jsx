@@ -53,7 +53,7 @@ const PropertyListing = () => {
     const handleAction = async (action, property) => {
        if (action === 'view') {
         setSelectedProperty({
-            propertyname: property.propertyaddress || 'N/A',
+            propertyname: property.propertyAddress || 'N/A',
             clustername: property.clustername || 'N/A',
             categoryname: property.categoryname || 'N/A',
             propertyprice: property.rateamount || 'N/A',
