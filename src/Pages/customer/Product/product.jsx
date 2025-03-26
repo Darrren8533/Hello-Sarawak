@@ -10,7 +10,7 @@ import ImageSlider from '../../../Component/ImageSlider/ImageSlider';
 import Loader from '../../../Component/Loader/Loader';
 
 // Import API
-import { fetchProduct } from '../../../../Api/api';
+import { fetchProduct, fetchCart } from '../../../../Api/api';
 
 // Import React Icons and CSS
 import { FaStar, FaStarHalfAlt, FaSearch } from 'react-icons/fa';
@@ -29,12 +29,6 @@ const Product = () => {
   const [bookingData, setBookingData] = useState({
     arrivalDate: '',
     departureDate: '',
-    firstname: '',
-    lastname: '',
-    email: '',
-    phonenumber: '',
-    rcTitle: 'Mr.',
-    request: '',
     adults: 1,
     children: 0,
   });
@@ -117,18 +111,66 @@ const Product = () => {
     setBookingData({ ...bookingData, [name]: value });
   };
 
-  const handleCheckAvailability = (e) => {
+  const handleCheckAvailability = async (e) => {
     if (e) e.stopPropagation();
-    
-    // Implement availability check logic here
+  
     if (!bookingData.arrivalDate || !bookingData.departureDate) {
       displayToast('error', 'Please select arrival and departure dates');
       return;
     }
-    
-    // If dates are valid, proceed with availability check
-    displayToast('success', 'Checking availability...');
+  
+    try {
+      displayToast('info', 'Checking availability...');
+  
+      // Convert to Date objects
+      const arrivalDate = new Date(bookingData.arrivalDate);
+      const departureDate = new Date(bookingData.departureDate);
+      const totalGuests = bookingData.adults + bookingData.children;
+  
+      // Fetch properties and existing reservations
+      const fetchedProperties = await fetchProduct();
+      const existingReservations = await fetchCart();
+  
+      // Filter available properties
+      const availableProperties = fetchedProperties.filter((property) => {
+        // Ensure property can accommodate guests
+        if (property.propertyGuestPaxNo < totalGuests) return false;
+  
+        // Check for overlapping reservations
+        const propertyReservations = existingReservations.filter(
+          (res) => res.propertyID === property.propertyID
+        );
+  
+        for (const reservation of propertyReservations) {
+          const existingCheckin = new Date(reservation.checkinDatetime);
+          const existingCheckout = new Date(reservation.checkoutDatetime);
+  
+          // Check for any overlap
+          if (
+            (arrivalDate >= existingCheckin && arrivalDate < existingCheckout) || 
+            (departureDate > existingCheckin && departureDate <= existingCheckout) || 
+            (arrivalDate <= existingCheckin && departureDate >= existingCheckout)
+          ) {
+            return false; // Exclude property due to conflict
+          }
+        }
+  
+        return true; // Property is available
+      });
+  
+      if (availableProperties.length === 0) {
+        displayToast('error', 'No available properties match your criteria');
+      } else {
+        displayToast('success', `Found ${availableProperties.length} available properties`);
+        setProperties(availableProperties); // Update state to display available properties
+      }
+    } catch (error) {
+      console.error('Error checking availability:', error);
+      displayToast('error', 'Failed to check availability');
+    }
   };
+  
+  
 
   const handleTabClick = (tab) => {
     setActiveTab(activeTab === tab ? null : tab);
