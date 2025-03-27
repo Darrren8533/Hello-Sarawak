@@ -346,7 +346,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                     <div className="property-listing-form-group">
                         <label>Guest Capacity:</label>
                         <input
-                            type="text"
+                            type="number"
                             name="propertyGuestPaxNo"
                             value={formData.propertyGuestPaxNo}
                             onChange={handleChange}
