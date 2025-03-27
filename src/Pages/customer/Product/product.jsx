@@ -115,11 +115,6 @@ const Product = () => {
   const handleCheckAvailability = async (e) => {
     if (e) e.stopPropagation();
   
-    if (!bookingData.arrivalDate || !bookingData.departureDate) {
-      displayToast('error', 'Please select arrival and departure dates');
-      return;
-    }
-  
     const arrivalDate = new Date(bookingData.arrivalDate);
     const departureDate = new Date(bookingData.departureDate);
     const totalGuests = bookingData.adults + bookingData.children;
