@@ -169,7 +169,7 @@ export const updatePropertyStatus = async (propertyid, status) => {
 // Delete Property
 export const deleteProperty = async (propertyid) => {
   try {
-    const response = await fetch(`${API_URL}/propertiesListing/${propertyid}`, {
+    const response = await fetch(`${API_URL}/removePropertiesListing/${propertyid}`, {
       method: 'DELETE',
     });
 
