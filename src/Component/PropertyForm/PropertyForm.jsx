@@ -102,16 +102,16 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         if (initialData) {
             setFormData({
                 username: initialData.username || "",
-                propertyPrice: initialData.propertyPrice || "",
-                propertyAddress: initialData.propertyAddress || "",
-                nearbyLocation: initialData.nearbyLocation || "",
-                propertyBedType: initialData.propertyBedType || "",
-                propertyGuestPaxNo: initialData.propertyGuestPaxNo || "",
-                propertyDescription: initialData.propertyDescription || "",
-                propertyFacilities: initialData.propertyFacilities || [],
-                propertyImage: initialData.propertyImage || [],
-                clusterName: initialData.clusterName || "", // Pre-fill clusterName if editing
-                categoryName: initialData.categoryName || "", // Pre-fill categoryName if editing
+                propertyPrice: initialData.propertyprice || "",
+                propertyAddress: initialData.propertyaddress || "",
+                nearbyLocation: initialData.nearbylocation || "",
+                propertyBedType: initialData.propertybedtype || "",
+                propertyGuestPaxNo: initialData.propertyguestpaxno || "",
+                propertyDescription: initialData.propertydescription || "",
+                propertyFacilities: initialData.propertyfacilities || [],
+                propertyImage: initialData.propertyimage || [],
+                clusterName: initialData.clustername || "", // Pre-fill clusterName if editing
+                categoryName: initialData.categoryname || "", // Pre-fill categoryName if editing
             });
         }
     }, [initialData]);
@@ -167,22 +167,22 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         e.preventDefault();
         const data = new FormData();
         data.append("username", formData.username);
-        data.append("propertyPrice", formData.propertyPrice);
-        data.append("propertyAddress", formData.propertyAddress);
-        data.append("nearbyLocation", formData.nearbyLocation);
-        data.append("propertyBedType", formData.propertyBedType);
-        data.append("propertyGuestPaxNo", formData.propertyGuestPaxNo);
-        data.append("propertyDescription", formData.propertyDescription);
-        data.append("facilities", formData.propertyFacilities.join(","));
-        data.append("clusterName", formData.clusterName); // Add clusterName to FormData
-        data.append("categoryName", formData.categoryName); // Add categoryName to FormData
+        data.append("propertyPrice", formData.propertyprice);
+        data.append("propertyAddress", formData.propertyaddress);
+        data.append("nearbyLocation", formData.nearbylocation);
+        data.append("propertyBedType", formData.propertybedtype);
+        data.append("propertyGuestPaxNo", formData.propertyguestpaxno);
+        data.append("propertyDescription", formData.propertydescription);
+        data.append("facilities", formData.propertyfacilities.join(","));
+        data.append("clusterName", formData.clustername); // Add clusterName to FormData
+        data.append("categoryName", formData.categoryname); // Add categoryName to FormData
 
         // Only include propertyStatus when creating a new property
         if (!initialData) {
             data.append("propertyStatus", "Pending");
         }
 
-        formData.propertyImage.forEach((file) => {
+        formData.propertyimage.forEach((file) => {
             if (file instanceof File) {
                 data.append("propertyImage", file);
             }
@@ -193,12 +193,12 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         try {
             let response;
             if (initialData) {
-                response = await updateProperty(data, initialData.propertyID);
+                response = await updateProperty(data, initialData.propertyid);
             } else {
                 const response = await propertiesListing(data);
-                const { propertyID } = response;
+                const { propertyid } = response;
 
-                await propertyListingRequest(propertyID);
+                await propertyListingRequest(propertyid);
             }
 
             if (response && response.message) {
@@ -289,7 +289,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <input
                             type="text"
                             name="propertyAddress"
-                            value={formData.propertyAddress}
+                            value={formData.propertyaddress}
                             onChange={handleChange}
                             placeholder="e.g. Property"
                             required
@@ -299,7 +299,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <label>Cluster (City):</label>
                         <select
                             name="clusterName"
-                            value={formData.clusterName}
+                            value={formData.clustername}
                             onChange={handleChange}
                             required
                         >
@@ -316,14 +316,14 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <label>Categories:</label>
                         <select
                             name="categoryName"
-                            value={formData.categoryName}
+                            value={formData.categoryname}
                             onChange={handleChange}
                             required
                         >
                             <option value="">Select Category</option>
-                            {categories.map((categoryName, index) => (
-                                <option key={index} value={categoryName}>
-                                    {categoryName}
+                            {categories.map((categoryname, index) => (
+                                <option key={index} value={categoryname}>
+                                    {categoryname}
                                 </option>
                             ))}
                         </select>
@@ -333,7 +333,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <input
                             type="number"
                             name="propertyPrice"
-                            value={formData.propertyPrice}
+                            value={formData.propertyprice}
                             onChange={handleChange}
                             placeholder="e.g. 123.12"
                             required
@@ -344,7 +344,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <input
                             type="text"
                             name="propertyGuestPaxNo"
-                            value={formData.propertyGuestPaxNo}
+                            value={formData.propertyguestpaxno}
                             onChange={handleChange}
                             placeholder="e.g. 2 Adults 2 Kids"
                             required
@@ -355,7 +355,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <input
                             type="text"
                             name="propertyBedType"
-                            value={formData.propertyBedType}
+                            value={formData.propertybedtype}
                             onChange={handleChange}
                             placeholder="1 King 1 Queen"
                             required
@@ -366,7 +366,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <input
                             type="text"
                             name="nearbyLocation"
-                            value={formData.nearbyLocation}
+                            value={formData.nearbylocation}
                             onChange={handleChange}
                             placeholder="e.g. No.123, LOT 1234, Lorong 1, Jalan ABC, Kuching, Sarawak"
                             required
@@ -376,7 +376,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <label>Property Description:</label>
                         <textarea
                             name="propertyDescription"
-                            value={formData.propertyDescription}
+                            value={formData.propertydescription}
                             onChange={handleChange}
                             placeholder="e.g. This Property Has Good View"
                             required
@@ -387,7 +387,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <div className="Facilities-list">
                             {predefinedFacilities.map((facility, index) => (
                                 <div key={index} className={`facility-item ${
-                                    formData.propertyFacilities.includes(facility.name) ? "selected" : ""
+                                    formData.propertyfacilities.includes(facility.name) ? "selected" : ""
                                 }`}
                                 onClick={() => toggleFacility(facility.name)}>
                                     {facility.icon} {facility.name}
@@ -406,9 +406,9 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                             ref={fileInputRef}
                             multiple
                         />
-                        {formData.propertyImage.length < 5 && (
+                        {formData.propertyimage.length < 5 && (
                             <div className="validation-warning">
-                                Minimum 5 images required ({formData.propertyImage.length}/5 uploaded)
+                                Minimum 5 images required ({formData.propertyimage.length}/5 uploaded)
                             </div>
                         )}
                     </div>
@@ -421,7 +421,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                                     ref={provided.innerRef}
                                     className="existing-images-container"
                                 >
-                                    {formData.propertyImage.map((image, index) => (
+                                    {formData.propertyimage.map((image, index) => (
                                         <Draggable 
                                             key={image instanceof File ? image.name : `image-${index}`} 
                                             draggableId={image instanceof File ? image.name : `image-${index}`} 
