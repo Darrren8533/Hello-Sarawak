@@ -102,16 +102,16 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         if (initialData) {
             setFormData({
                 username: initialData.username || "",
-                propertyPrice: initialData.propertyPrice || "",
+                propertyPrice: initialData.propertyprice || "",
                 propertyAddress: initialData.propertyaddress || "",
-                nearbyLocation: initialData.nearbyLocation || "",
-                propertyBedType: initialData.propertyBedType || "",
-                propertyGuestPaxNo: initialData.propertyGuestPaxNo || "",
-                propertyDescription: initialData.propertyDescription || "",
-                propertyFacilities: initialData.propertyFacilities || [],
-                propertyImage: initialData.propertyImage || [],
-                clusterName: initialData.clusterName || "", // Pre-fill clusterName if editing
-                categoryName: initialData.categoryName || "", // Pre-fill categoryName if editing
+                nearbyLocation: initialData.nearbylocation || "",
+                propertyBedType: initialData.propertybedtype || "",
+                propertyGuestPaxNo: initialData.propertyguestpaxno || "",
+                propertyDescription: initialData.propertydescription || "",
+                propertyFacilities: initialData.propertyfacilities || [],
+                propertyImage: initialData.propertyimage || [],
+                clusterName: initialData.clustername || "", // Pre-fill clusterName if editing
+                categoryName: initialData.categoryname || "", // Pre-fill categoryName if editing
             });
         }
     }, [initialData]);
