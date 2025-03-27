@@ -1,63 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { FaBars, FaTimes } from "react-icons/fa";
-import { logoutUser, fetchUserData, fetchGoogleUserData,checkstatus } from '../../../Api/api';
+import { logoutUser, fetchUserData, fetchGoogleUserData } from '../../../Api/api';
 import DefaultAvatar from '../../../src/public/avatar.png';
-import './navbar.css';
 import eventBus from '../EventBus/Eventbus';
+import { useAuth } from '../AuthContext/AuthContext';
+import './navbar.css';
 
 function Navbar() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [userAvatar, setUserAvatar] = useState(DefaultAvatar);
     const navigate = useNavigate();
-
-    const userID = localStorage.getItem('userid');
-    const googleAccessToken = localStorage.getItem('googleAccessToken');
+    const { isLoggedIn, userAvatar, logout, userID, updateAvatar } = useAuth();
 
     useEffect(() => {
-        const checkLoginStatus = async () => {
-            if (userID) {
-                
-                try {
-                    const response = await checkstatus(userID);
-                    const data = await response.json();
-
-                    if (data.ustatus === 'login') {
-                        setIsLoggedIn(true);
-
-                        let avatarUrl;
-                        if (googleAccessToken) {
-                            const googleProfile = await fetchGoogleUserData(googleAccessToken);
-                            avatarUrl = googleProfile.picture;
-                        }
-
-                        const userData = await fetchUserData(userID);
-                        if (userData.uimage) {
-                            avatarUrl = userData.uimage.startsWith('http') ? userData.uimage : `data:image/jpeg;base64,${userData.uimage}`;
-                        } else if (!avatarUrl) {
-                            avatarUrl = DefaultAvatar;
-                        }
-
-                        setUserAvatar(avatarUrl);
-                    } else {
-                        setIsLoggedIn(false);
-                    }
-                } catch (error) {
-                    console.error('Error fetching user status:', error);
-                }
-            }
-        };
-
-        checkLoginStatus();
-    }, [userID, googleAccessToken]);
-
-    useEffect(() => {
-        console.log('isLoggedIn state changed to:', isLoggedIn);
-      }, [isLoggedIn]);
-
-    useEffect(() => {
-
         const initOffcanvas = () => {
             if (typeof bootstrap !== 'undefined') {
                 const offcanvasElement = document.getElementById('offcanvasNavbar');
@@ -80,11 +35,9 @@ function Navbar() {
         return () => clearInterval(bootstrapReady);
     }, []);
 
-
-
     useEffect(() => {
         const handleAvatarUpdate = (newAvatar) => {
-            setUserAvatar(newAvatar);
+            updateAvatar(newAvatar);
         };
 
         eventBus.on('avatarUpdated', handleAvatarUpdate);
@@ -92,13 +45,12 @@ function Navbar() {
         return () => {
             eventBus.off('avatarUpdated', handleAvatarUpdate);
         };
-    }, []);
+    }, [updateAvatar]);
 
     const handleLogout = async () => {
-        const userID = localStorage.getItem('userID');
-        const googleToken = localStorage.getItem('googleAccessToken');
-
         try {
+            const googleToken = localStorage.getItem('googleAccessToken');
+            
             if (googleToken) {
                 await fetch(`https://accounts.google.com/o/oauth2/revoke?token=${googleToken}`, { method: 'POST' });
             }
@@ -106,8 +58,7 @@ function Navbar() {
             const response = await logoutUser(userID);
 
             if (response.success) {
-                localStorage.clear();
-                setIsLoggedIn(false);
+                logout();
                 navigate('/');
             } else {
                 alert('Failed to logout');
@@ -137,11 +88,11 @@ function Navbar() {
 
             <nav className="navbar navbar-expand-lg fixed-top">
                 <div className="container-fluid">
-                <h1 className="navbar_brand mx-4 mb-0">Hello Sarawak</h1>
+                    <h1 className="navbar_brand mx-4 mb-0">Hello Sarawak</h1>
 
                     <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
                         <div className="offcanvas-header">
-                        <h2 className="offcanvas-title" id="offcanvasNavbarLabel">Hello Sarawak</h2>
+                            <h2 className="offcanvas-title" id="offcanvasNavbarLabel">Hello Sarawak</h2>
                             <button type="button" className="close-btn" data-bs-dismiss="offcanvas" aria-label="Close">
                                 <FaTimes className="icon_close"/>
                             </button>
@@ -174,7 +125,7 @@ function Navbar() {
                                     </Link>
                                 </li>
                                 
-                                {/* Add the mobile login/profile/logout options */}
+                                {/* Mobile login/profile/logout options */}
                                 {isLoggedIn ? (
                                     <>
                                         <li className="nav-item mx-4 mobile-auth-item">
@@ -210,7 +161,7 @@ function Navbar() {
                                 style={{ border: 'none', background: 'transparent', cursor: 'pointer', marginRight: '20px' }}
                             >
                                 <img
-                                    src={userAvatar}
+                                    src={userAvatar || DefaultAvatar}
                                     alt="User Avatar"
                                     style={{ width: '40px', height: '40px', borderRadius: '50%' }}
                                     onError={handleImageError}
@@ -228,7 +179,14 @@ function Navbar() {
                             </Link>
                         )}
 
-                        <button className="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}>
+                        <button 
+                            className="navbar-toggler" 
+                            type="button" 
+                            data-bs-toggle="offcanvas" 
+                            data-bs-target="#offcanvasNavbar" 
+                            aria-controls="offcanvasNavbar" 
+                            style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}
+                        >
                             <FaBars className="icon_navbar"/>
                         </button>
                     </div>
