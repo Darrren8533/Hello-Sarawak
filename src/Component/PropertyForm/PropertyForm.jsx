@@ -38,50 +38,50 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
 
     const clusters = [
         "Kuching",
-        "Miri",
-        "Sibu",
-        "Bintulu",
-        "Limbang",
-        "Sarikei",
-        "Sri Aman",
+        "Miri", 
+        "Sibu", 
+        "Bintulu", 
+        "Limbang", 
+        "Sarikei", 
+        "Sri Aman", 
         "Kapit",
-        "Mukah",
-        "Betong",
-        "Samarahan",
-        "Serian",
-        "Lundu",
-        "Lawas",
-        "Marudi",
+        "Mukah", 
+        "Betong", 
+        "Samarahan", 
+        "Serian", 
+        "Lundu", 
+        "Lawas", 
+        "Marudi", 
         "Simunjan",
-        "Tatau",
-        "Belaga",
-        "Debak",
-        "Kabong",
-        "Pusa",
-        "Sebuyau",
-        "Saratok",
-        "Selangau",
+        "Tatau", 
+        "Belaga", 
+        "Debak", 
+        "Kabong", 
+        "Pusa", 
+        "Sebuyau", 
+        "Saratok", 
+        "Selangau", 
         "Tebedu",
     ];
 
     const categories = [
-        "Single Room",
-        "Double Room",
-        "Triple Room",
+        "Single Room", 
+        "Double Room", 
+        "Triple Room"
     ];
 
     const [formData, setFormData] = useState({
         username: "",
-        propertyPrice: "",
-        propertyAddress: "",
-        nearbyLocation: "",
-        propertyBedType: "",
-        propertyGuestPaxNo: "",
-        propertyDescription: "",
-        propertyFacilities: [],
-        propertyImage: [],
-        clusterName: "", // Add clusterName to formData
-        categoryName: "", // Add categoryName to formData
+        propertyprice: "",
+        propertyaddress: "",
+        nearbylocation: "",
+        propertybedtype: "",
+        propertyguestpaxno: "",
+        propertydescription: "",
+        propertyfacilities: [],
+        propertyimage: [],
+        clustername: "",
+        categoryname: "",
     });
 
     const [removedImages, setRemovedImages] = useState([]);
@@ -95,37 +95,36 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         if (storedUsername) {
             setFormData((prev) => ({
                 ...prev,
-                username: storedUsername, // pre-fill the username field from localStorage
+                username: storedUsername,
             }));
         }
-
         if (initialData) {
             setFormData({
                 username: initialData.username || "",
-                propertyPrice: initialData.propertyprice || "",
-                propertyAddress: initialData.propertyaddress || "",
-                nearbyLocation: initialData.nearbylocation || "",
-                propertyBedType: initialData.propertybedtype || "",
-                propertyGuestPaxNo: initialData.propertyguestpaxno || "",
-                propertyDescription: initialData.propertydescription || "",
-                propertyFacilities: initialData.propertyfacilities || [],
-                propertyImage: initialData.propertyimage || [],
-                clusterName: initialData.clustername || "", // Pre-fill clusterName if editing
-                categoryName: initialData.categoryname || "", // Pre-fill categoryName if editing
+                propertyprice: initialData.propertyprice || "",
+                propertyaddress: initialData.propertyaddress || "",
+                nearbylocation: initialData.nearbylocation || "",
+                propertybedtype: initialData.propertybedtype || "",
+                propertyguestpaxno: initialData.propertyguestpaxno || "",
+                propertydescription: initialData.propertydescription || "",
+                propertyfacilities: initialData.propertyfacilities || [],
+                propertyimage: initialData.propertyimage || [],
+                clustername: initialData.clustername || "",
+                categoryname: initialData.categoryname || "",
             });
         }
     }, [initialData]);
 
     const toggleFacility = (facilityName) => {
         setFormData((prev) => {
-            const currentFacilities = Array.isArray(prev.propertyFacilities) ? prev.propertyFacilities : [];
+            const currentFacilities = Array.isArray(prev.propertyfacilities) ? prev.propertyfacilities : [];
             const updatedFacilities = currentFacilities.includes(facilityName)
                 ? currentFacilities.filter((name) => name !== facilityName)
                 : [...currentFacilities, facilityName];
 
             return {
                 ...prev,
-                propertyFacilities: updatedFacilities,
+                propertyfacilities: updatedFacilities,
             };
         });
     };
@@ -142,23 +141,23 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         const newFiles = Array.from(e.target.files);
         setFormData((prev) => ({
             ...prev,
-            propertyImage: [...prev.propertyImage, ...newFiles],
+            propertyimage: [...prev.propertyimage, ...newFiles],
         }));
     };
 
     const handleRemoveImage = (index) => {
         setFormData((prev) => {
-            const updatedImages = [...prev.propertyImage];
+            const updatedImages = [...prev.propertyimage];
             const removedImage = updatedImages.splice(index, 1)[0];
             if (!(removedImage instanceof File)) {
                 setRemovedImages((prevRemoved) => [...prevRemoved, removedImage]);
             }
-            return { ...prev, propertyImage: updatedImages };
+            return { ...prev, propertyimage: updatedImages };
         });
     };
 
     const handleSubmit = async (e) => {
-        if (formData.propertyImage.length < 5) {
+        if (formData.propertyimage.length < 5) {
             setToastMessage("Please upload at least 5 images");
             setToastType("error");
             setShowToast(true);
@@ -167,19 +166,18 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         e.preventDefault();
         const data = new FormData();
         data.append("username", formData.username);
-        data.append("propertyPrice", formData.propertyprice);
-        data.append("propertyAddress", formData.propertyaddress);
-        data.append("nearbyLocation", formData.nearbylocation);
-        data.append("propertyBedType", formData.propertybedtype);
-        data.append("propertyGuestPaxNo", formData.propertyguestpaxno);
-        data.append("propertyDescription", formData.propertydescription);
+        data.append("propertyprice", formData.propertyprice);
+        data.append("propertyaddress", formData.propertyaddress);
+        data.append("nearbylocation", formData.nearbylocation);
+        data.append("propertybedtype", formData.propertybedtype);
+        data.append("propertyguestpaxno", formData.propertyguestpaxno);
+        data.append("propertydescription", formData.propertydescription);
         data.append("facilities", formData.propertyfacilities.join(","));
-        data.append("clusterName", formData.clustername); // Add clusterName to FormData
-        data.append("categoryName", formData.categoryname); // Add categoryName to FormData
+        data.append("clustername", formData.clustername);
+        data.append("categoryname", formData.categoryname);
 
-        // Only include propertyStatus when creating a new property
         if (!initialData) {
-            data.append("propertyStatus", "Pending");
+            data.append("propertystatus", "Pending");
         }
 
         formData.propertyimage.forEach((file) => {
@@ -197,7 +195,6 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             } else {
                 const response = await propertiesListing(data);
                 const { propertyid } = response;
-
                 await propertyListingRequest(propertyid);
             }
 
@@ -209,16 +206,16 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
 
             setFormData({
                 username: "",
-                propertyPrice: "",
-                propertyAddress: "",
-                nearbyLocation: "",
-                propertyBedType: "",
-                propertyGuestPaxNo: "",
-                propertyDescription: "",
-                propertyFacilities: [],
-                propertyImage: [],
-                clusterName: "", // Reset clusterName
-                categoryName: "", // Reset categoryName
+                propertyprice: "",
+                propertyaddress: "",
+                nearbylocation: "",
+                propertybedtype: "",
+                propertyguestpaxno: "",
+                propertydescription: "",
+                propertyfacilities: [],
+                propertyimage: [],
+                clustername: "",
+                categoryname: "",
             });
             setRemovedImages([]);
 
@@ -244,13 +241,13 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const handleDragEnd = (result) => {
         if (!result.destination) return;
 
-        const items = Array.from(formData.propertyImage);
+        const items = Array.from(formData.propertyimage);
         const [reorderedItem] = items.splice(result.source.index, 1);
         items.splice(result.destination.index, 0, reorderedItem);
 
         setFormData(prev => ({
             ...prev,
-            propertyImage: items
+            propertyimage: items
         }));
     };
 
@@ -273,198 +270,94 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 <h1>{initialData ? "Edit Property" : "Create a New Property"}</h1>
                 <button onClick={onClose} className="property-form-close-button">×</button>
                 <form onSubmit={handleSubmit} className="property-listing-form">
-                    <div className="property-listing-form-group">
-                        <label>Username:</label>
-                        <input
-                            type="text"
-                            name="username"
-                            value={formData.username}
-                            onChange={handleChange}
-                            readOnly
-                            required
-                        />
-                    </div>
-                    <div className="property-listing-form-group">
-                        <label>Property Name:</label>
-                        <input
-                            type="text"
-                            name="propertyAddress"
-                            value={formData.propertyaddress}
-                            onChange={handleChange}
-                            placeholder="e.g. Property"
-                            required
-                        />
-                    </div>
-                    <div className="property-listing-form-group">
-                        <label>Cluster (City):</label>
-                        <select
-                            name="clusterName"
-                            value={formData.clustername}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">Select Cluster (City)</option>
-                            {clusters.map((cluster, index) => (
-                                <option key={index} value={cluster}>
-                                    {cluster}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="property-listing-form-group">
-                        <label>Categories:</label>
-                        <select
-                            name="categoryName"
-                            value={formData.categoryname}
-                            onChange={handleChange}
-                            required
-                        >
-                            <option value="">Select Category</option>
-                            {categories.map((categoryname, index) => (
-                                <option key={index} value={categoryname}>
-                                    {categoryname}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="property-listing-form-group">
+                    <div className="form-group">
                         <label>Property Price:</label>
-                        <input
-                            type="number"
-                            name="propertyPrice"
-                            value={formData.propertyprice}
-                            onChange={handleChange}
-                            placeholder="e.g. 123.12"
-                            required
-                        />
+                        <input type="number" name="propertyprice" value={formData.propertyprice} onChange={handleChange} required />
                     </div>
-                    <div className="property-listing-form-group">
-                        <label>Guest Capacity:</label>
-                        <input
-                            type="text"
-                            name="propertyGuestPaxNo"
-                            value={formData.propertyguestpaxno}
-                            onChange={handleChange}
-                            placeholder="e.g. 2 Adults 2 Kids"
-                            required
-                        />
+                    <div className="form-group">
+                        <label>Property Address:</label>
+                        <input type="text" name="propertyaddress" value={formData.propertyaddress} onChange={handleChange} required />
                     </div>
-                    <div className="property-listing-form-group">
-                        <label>Bed Type:</label>
-                        <input
-                            type="text"
-                            name="propertyBedType"
-                            value={formData.propertybedtype}
-                            onChange={handleChange}
-                            placeholder="1 King 1 Queen"
-                            required
-                        />
+                    <div className="form-group">
+                        <label>Nearby Location:</label>
+                        <input type="text" name="nearbylocation" value={formData.nearbylocation} onChange={handleChange} />
                     </div>
-                    <div className="property-listing-form-group">
-                        <label>Property Location:</label>
-                        <input
-                            type="text"
-                            name="nearbyLocation"
-                            value={formData.nearbylocation}
-                            onChange={handleChange}
-                            placeholder="e.g. No.123, LOT 1234, Lorong 1, Jalan ABC, Kuching, Sarawak"
-                            required
-                        />
+                    <div className="form-group">
+                        <label>Property Bed Type:</label>
+                        <input type="text" name="propertybedtype" value={formData.propertybedtype} onChange={handleChange} required />
                     </div>
-                    <div className="property-listing-form-group full-width">
+                    <div className="form-group">
+                        <label>Property Guest Pax No:</label>
+                        <input type="number" name="propertyguestpaxno" value={formData.propertyguestpaxno} onChange={handleChange} required />
+                    </div>
+                    <div className="form-group">
                         <label>Property Description:</label>
-                        <textarea
-                            name="propertyDescription"
-                            value={formData.propertydescription}
-                            onChange={handleChange}
-                            placeholder="e.g. This Property Has Good View"
-                            required
-                        />
+                        <textarea name="propertydescription" value={formData.propertydescription} onChange={handleChange} required />
                     </div>
-                    <div className="property-listing-form-group full-width">
-                        <label>Facilities</label>
-                        <div className="Facilities-list">
-                            {predefinedFacilities.map((facility, index) => (
-                                <div key={index} className={`facility-item ${
-                                    formData.propertyfacilities.includes(facility.name) ? "selected" : ""
-                                }`}
-                                onClick={() => toggleFacility(facility.name)}>
-                                    {facility.icon} {facility.name}
+                    <div className="form-group">
+                        <label>Cluster:</label>
+                        <select name="clustername" value={formData.clustername} onChange={handleChange} required>
+                            <option value="">Select Cluster</option>
+                            {clusters.map((cluster) => (
+                                <option key={cluster} value={cluster}>{cluster}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="form-group">
+                        <label>Category:</label>
+                        <select name="categoryname" value={formData.categoryname} onChange={handleChange} required>
+                            <option value="">Select Category</option>
+                            {categories.map((category) => (
+                                <option key={category} value={category}>{category}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="form-group facilities-group">
+                        <label>Facilities:</label>
+                        <div className="facilities-list">
+                            {predefinedFacilities.map((facility) => (
+                                <div key={facility.name} className={`facility-item ${formData.propertyfacilities.includes(facility.name) ? 'selected' : ''}`} onClick={() => toggleFacility(facility.name)}>
+                                    {facility.icon}
+                                    <span>{facility.name}</span>
                                 </div>
                             ))}
                         </div>
                     </div>
-
-                    <div className="property-listing-form-group full-width">
-                        <label>Property Image:</label>
-                        <input
-                            type="file"
-                            name="propertyImage"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            ref={fileInputRef}
-                            multiple
-                        />
-                        {formData.propertyimage.length < 5 && (
-                            <div className="validation-warning">
-                                Minimum 5 images required ({formData.propertyimage.length}/5 uploaded)
-                            </div>
-                        )}
-                    </div>
-
-                    <DragDropContext onDragEnd={handleDragEnd}>
-                        <Droppable droppableId="images" direction="horizontal">
-                            {(provided) => (
-                                <div 
-                                    {...provided.droppableProps}
-                                    ref={provided.innerRef}
-                                    className="existing-images-container"
-                                >
-                                    {formData.propertyimage.map((image, index) => (
-                                        <Draggable 
-                                            key={image instanceof File ? image.name : `image-${index}`} 
-                                            draggableId={image instanceof File ? image.name : `image-${index}`} 
-                                            index={index}
-                                        >
-                                            {(provided, snapshot) => (
-                                                <div
-                                                    ref={provided.innerRef}
-                                                    {...provided.draggableProps}
-                                                    {...provided.dragHandleProps}
-                                                    className={`image-item ${snapshot.isDragging ? 'is-dragging' : ''}`}
-                                                >
-                                                    <div className="image-label" style={getLabelStyle(index)}>
-                                                        {getImageLabel(index)}
+                    <div className="form-group">
+                        <label>Property Images:</label>
+                        <input type="file" multiple onChange={handleFileChange} ref={fileInputRef} />
+                        <DragDropContext onDragEnd={handleDragEnd}>
+                            <Droppable droppableId="images" direction="horizontal">
+                                {(provided) => (
+                                    <div className="image-preview-container" {...provided.droppableProps} ref={provided.innerRef}>
+                                        {formData.propertyimage.map((file, index) => (
+                                            <Draggable key={file instanceof File ? file.name : file} draggableId={file instanceof File ? file.name : file} index={index}>
+                                                {(provided) => (
+                                                    <div className="image-preview" ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                                        <img
+                                                            src={file instanceof File ? URL.createObjectURL(file) : file}
+                                                            alt={`Preview ${index}`}
+                                                            className="uploaded-image"
+                                                        />
+                                                        <div className="image-label" style={getLabelStyle(index)}>
+                                                            {getImageLabel(index)}
+                                                        </div>
+                                                        <button type="button" className="remove-image" onClick={() => handleRemoveImage(index)}>×</button>
                                                     </div>
-                                                    {image instanceof File ? (
-                                                        <img src={URL.createObjectURL(image)} alt="Property" />
-                                                    ) : (
-                                                        <img src={`data:image/jpeg;base64,${image}`} alt="Property" />
-                                                    )}
-                                                    <button
-                                                        type="button"
-                                                        className="remove-image-btn"
-                                                        onClick={() => handleRemoveImage(index)}
-                                                    >
-                                                        &times;
-                                                    </button>
-                                                </div>
-                                            )}
-                                        </Draggable>
-                                    ))}
-                                    {provided.placeholder}
-                                </div>
-                            )}
-                        </Droppable>
-                    </DragDropContext>
-
-                    <button type="submit" className="property-listing-submit-button">
-                        {initialData ? "Update Property" : "Create Property"}
-                    </button>
+                                                )}
+                                            </Draggable>
+                                        ))}
+                                        {provided.placeholder}
+                                    </div>
+                                )}
+                            </Droppable>
+                        </DragDropContext>
+                    </div>
+                    <button type="submit" className="submit-button">{initialData ? "Update Property" : "Submit Property"}</button>
                 </form>
-
-                {showToast && <Toast type={toastType} message={toastMessage} />}
+                {showToast && (
+                    <Toast message={toastMessage} type={toastType} onClose={() => setShowToast(false)} />
+                )}
             </div>
         </div>
     );
