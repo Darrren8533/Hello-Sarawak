@@ -1,8 +1,8 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { FaBars, FaTimes } from "react-icons/fa";
-import { logoutUser, fetchUserData, fetchGoogleUserData } from '../../../Api/api';
+import { logoutUser, fetchUserData } from '../../../Api/api';
 import DefaultAvatar from '../../../src/public/avatar.png';
 import eventBus from '../EventBus/Eventbus';
 import { useAuth } from '../AuthContext/AuthContext';
@@ -10,7 +10,8 @@ import './navbar.css';
 
 function Navbar() {
     const navigate = useNavigate();
-    const { isLoggedIn, userAvatar, logout, userID, updateAvatar } = useAuth();
+    const { isLoggedIn, userAvatar, userID, logout, updateAvatar } = useAuth();
+    const [isCustomer, setIsCustomer] = useState(false);
 
     useEffect(() => {
         const initOffcanvas = () => {
@@ -46,6 +47,24 @@ function Navbar() {
             eventBus.off('avatarUpdated', handleAvatarUpdate);
         };
     }, [updateAvatar]);
+
+    useEffect(() => {
+        const checkUserGroup = async () => {
+            try {
+                const userData = await fetchUserData(userID);
+                // Check if the user group is exactly "Customer"
+                setIsCustomer(userData.usergroup === "Customer");
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+                setIsCustomer(false);
+            }
+        };
+
+        // Only check user group if logged in
+        if (isLoggedIn) {
+            checkUserGroup();
+        }
+    }, [isLoggedIn, userID]);
 
     const handleLogout = async () => {
         try {
@@ -126,7 +145,7 @@ function Navbar() {
                                 </li>
                                 
                                 {/* Mobile login/profile/logout options */}
-                                {isLoggedIn ? (
+                                {isLoggedIn && isCustomer ? (
                                     <>
                                         <li className="nav-item mx-4 mobile-auth-item">
                                             <Link className="nav-link mx-lg-2" to="/login/profile">
@@ -154,7 +173,7 @@ function Navbar() {
                     </div>
 
                     <div className="d-flex justify-content-end">
-                        {isLoggedIn && (
+                        {isLoggedIn && isCustomer &&(
                             <button
                                 className="user-icon-button"
                                 onClick={() => navigate('/login/profile')}
@@ -169,7 +188,7 @@ function Navbar() {
                             </button>
                         )}
 
-                        {isLoggedIn ? (
+                        {isLoggedIn && isCustomer ? (
                             <button onClick={handleLogout} className="logout-button">
                                 Logout
                             </button>
@@ -196,4 +215,4 @@ function Navbar() {
     );
 }
 
-export default Navbar;
+export default Navbar
