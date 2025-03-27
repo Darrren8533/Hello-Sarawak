@@ -195,7 +195,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             if (initialData) {
                 const propertyid = initialData.propertyid || initialData.propertyID;
                 if (!propertyid) {
-                    console.log("属性ID不存在，无法更新");
+                    console.log("property ID is:" , propertyid);
                 }
                 response = await updateProperty(data, propertyid);
             } else {
