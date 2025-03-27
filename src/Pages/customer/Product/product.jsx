@@ -289,7 +289,7 @@ const Product = () => {
                   <div className="destinations-grid">
                     {properties.slice(0, 4).map(property => (
                       <div 
-                        key={property.ID} 
+                        key={property.propertyid} 
                         className="destination-item"
                         onClick={() => handleViewDetails(property)}
                       >
@@ -407,7 +407,7 @@ const Product = () => {
         <div className="scrollable-container_for_product">
           {properties.length > 0 ? (
             properties.map((property) => (
-              <div className="tour-property-item" key={property.ID} onClick={() => handleViewDetails(property)}> 
+              <div className="tour-property-item" key={property.propertyid} onClick={() => handleViewDetails(property)}> 
                 <div className="tour-property-image-box">
                   {property.propertyimage && property.propertyimage.length > 0 ? (
                      <ImageSlider images={property.propertyimage}
