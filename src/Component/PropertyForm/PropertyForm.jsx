@@ -400,7 +400,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <label>Property Image:</label>
                         <input
                             type="file"
-                            name="propertyImage"
+                            name="propertyimage"
                             accept="image/*"
                             onChange={handleFileChange}
                             ref={fileInputRef}
