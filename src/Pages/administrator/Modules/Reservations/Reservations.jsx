@@ -96,7 +96,7 @@ const Reservations = () => {
 
     const displayLabels = {
         reservationid: "Reservation ID",
-        propertyaddress: "Property Name",
+        propertyid: "Property Name",
         checkindatetime: "Check-In Date Time",
         checkoutdatetime: "Check-Out Date Time",
         reservationblocktime: "Block Time",
@@ -113,7 +113,7 @@ const Reservations = () => {
                 (appliedFilters.status === 'All' || (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
                 (
                     (reservation.reservationid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.propertyaddress?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.propertyid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '')
                 )
@@ -129,7 +129,7 @@ const Reservations = () => {
             if (action === 'view') {
                 const essentialFields = {
                     reservationid: reservation.reservationid || 'N/A',
-                    propertyaddress: reservation.propertyaddress || 'N/A',
+                    propertyid: reservation.propertyid || 'N/A',
                     checkindatetime: reservation.checkindatetime || 'N/A',
                     checkoutdatetime: reservation.checkoutdatetime || 'N/A',
                     reservationblocktime: reservation.reservationblocktime || 'N/A',
@@ -206,8 +206,8 @@ const Reservations = () => {
         setShowMessageBox(false);
     };
 
-    const handlePropertySelect = (propertyaddress) => {
-        setSelectedProperty(propertyaddress);
+    const handlePropertySelect = (propertyid) => {
+        setSelectedProperty(propertyid);
     };
 
     const handleConfirmSuggestion = async () => {
@@ -271,7 +271,7 @@ const Reservations = () => {
     const getFilteredProperties = () => {
         if (!Array.isArray(administratorProperties)) return []; // Ensure an array
         return administratorProperties.filter(property => {
-            const matchesSearch = property.propertyaddress.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
+            const matchesSearch = property.propertyid.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
             const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
                 (!priceRange.max || property.rateamount <= Number(priceRange.max));
             return matchesSearch && matchesPrice;
@@ -287,14 +287,14 @@ const Reservations = () => {
                 reservation.propertyimage && reservation.propertyimage.length > 0 ? (
                     <img
                         src={`data:image/jpeg;base64,${reservation.propertyimage[0]}`}
-                        alt={`Property ${reservation.propertyaddress}`}
+                        alt={`Property ${reservation.propertyid}`}
                         style={{ width: 80, height: 80 }}
                     />
                 ) : (
                     <span>No Image</span>
                 ),
         },
-        { header: 'Property Name', accessor: 'propertyaddress' },
+        { header: 'Property Name', accessor: 'propertyid' },
         { header: 'Total Price', accessor: 'totalprice' },
         {
             header: 'Status',
@@ -398,25 +398,25 @@ const Reservations = () => {
                         <div className="property-list">
                             {getFilteredProperties().length > 0 ? (
                                 getFilteredProperties().map((property) => (
-                                    <div key={property.propertyaddress} className="property-card">
+                                    <div key={property.propertyid} className="property-card">
                                         <input
                                             type="radio"
-                                            id={`property-${property.propertyaddress}`}
+                                            id={`property-${property.propertyid}`}
                                             name="property"
-                                            value={property.propertyaddress}
-                                            onChange={() => handlePropertySelect(property.propertyaddress)}
+                                            value={property.propertyid}
+                                            onChange={() => handlePropertySelect(property.propertyid)}
                                             className="property-radio"
                                         />
-                                        <label htmlFor={`property-${property.propertyaddress}`} className="property-label">
+                                        <label htmlFor={`property-${property.propertyid}`} className="property-label">
                                             <div className="property-image-container">
                                                 <img
                                                     src={`data:image/jpeg;base64,${property.images[0]}`}
-                                                    alt={property.propertyaddress}
+                                                    alt={property.propertyid}
                                                     className="property-image"
                                                 />
                                             </div>
                                             <div className="property-details">
-                                                <h3 className="property-title">{property.propertyaddress}</h3>
+                                                <h3 className="property-title">{property.propertyid}</h3>
                                                 <p className="property-info-text">{property.propertyguestpaxno} Pax</p>
                                                 <p className="property-price">RM {property.rateamount}</p>
                                             </div>
