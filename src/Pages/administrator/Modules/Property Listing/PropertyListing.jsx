@@ -117,40 +117,32 @@ const PropertyListing = () => {
     
     
     const handleDeleteProperty = async () => {
-        try {
-            // Find the property to delete from the current properties list
-            const property = properties.find((prop) => prop.propertyid === propertyToDelete);
-    
-            // If property is not found, show an error and return
-            if (!property) {
-                displayToast('error', 'Property not found. Please refresh the page and try again.');
-                setIsDialogOpen(false);
-                setPropertyToDelete(null);
-                return;
+    try {
+        await deleteProperty(propertyToDelete);
+        setProperties((prevProperties) =>
+            prevProperties.filter((prop) => prop.propertyid !== propertyToDelete)
+        );
+        displayToast('success', 'Property deleted successfully');
+    } catch (error) {
+        if (error.response && error.response.data && error.response.data.message) {
+            const backendMessage = error.response.data.message;
+
+            if (backendMessage.includes('Existing reservation')) {
+                displayToast('error', 'Cannot delete property. There are existing reservations.');
+            } else if (backendMessage.includes('Property not found')) {
+                displayToast('error', 'Property not found.');
+            } else {
+                displayToast('error', backendMessage);
             }
-    
-            // Check if the property status is not "Unavailable"
-            if (property.propertystatus !== 'Unavailable') {
-                displayToast('error', 'Only unavailable properties can be deleted.');
-                setIsDialogOpen(false);
-                setPropertyToDelete(null);
-                return; // Exit the function
-            }
-    
-            // Proceed with deletion if the property is "Unavailable"
-            await deleteProperty(propertyToDelete);
-            setProperties((prevProperties) =>
-                prevProperties.filter((prop) => prop.propertyid !== propertyToDelete)
-            );
-            displayToast('success', 'Property deleted successfully');
-        } catch (error) {
-            console.error('Failed to delete property:', error);
+        } else {
             displayToast('error', 'Failed to delete property. Please try again.');
-        } finally {
-            setIsDialogOpen(false);
-            setPropertyToDelete(null);
         }
-    };
+    } finally {
+        setIsDialogOpen(false);
+        setPropertyToDelete(null);
+    }
+};
+
     
 
     const handleApplyFilters = () => {
