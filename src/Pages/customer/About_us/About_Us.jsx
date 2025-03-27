@@ -5,6 +5,7 @@ import Navbar from '../../../Component/Navbar/navbar';
 import Footer from '../../../Component/Footer/footer';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
 import TawkMessenger from '../../../Component/TawkMessenger/TawkMessenger';
+import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 
 //Import css
 import './About_Us.css';
@@ -26,6 +27,7 @@ import { MdAttachMoney } from "react-icons/md";
 const About_Us = () => {
   return (
     <div>
+      <AuthProvider>
       <Navbar />
 
       {/*Hero Section*/}
@@ -162,6 +164,7 @@ const About_Us = () => {
     <Back_To_Top_Button />
     <Footer />
     <TawkMessenger />
+    </AuthProvider>
     </div>
   );
 };
