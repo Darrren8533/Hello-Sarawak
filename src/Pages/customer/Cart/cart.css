@@ -534,10 +534,11 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(5px);
 }
 
 .modal-content {
-  background-color: white;
+  background-color: white !important;
   padding: var(--spacing-lg);
   border-radius: var(--border-radius);
   max-width: 400px;
