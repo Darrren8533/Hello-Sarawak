@@ -103,7 +103,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             setFormData({
                 username: initialData.username || "",
                 propertyPrice: initialData.propertyPrice || "",
-                propertyAddress: initialData.propertyAddress || "",
+                propertyAddress: initialData.propertyaddress || "",
                 nearbyLocation: initialData.nearbyLocation || "",
                 propertyBedType: initialData.propertyBedType || "",
                 propertyGuestPaxNo: initialData.propertyGuestPaxNo || "",
