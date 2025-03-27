@@ -125,6 +125,9 @@ export const fetchPropertiesListingTable = async () => {
 
 // Update Property
 export const updateProperty = async (propertyData, propertyid) => {
+  if (!propertyid || propertyid === 'undefined') {
+    throw new Error('property id invalid');
+  }
   try {
     const response = await fetch(`${API_URL}/propertiesListing/${propertyid}`, {
       method: 'PUT',
