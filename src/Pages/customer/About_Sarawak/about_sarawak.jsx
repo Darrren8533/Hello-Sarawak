@@ -6,6 +6,7 @@ import Footer from '../../../Component/Footer/footer';
 import Sarawak_Map from '../../../Component/Sarawak Map/Map';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
 import TawkMessenger from '../../../Component/TawkMessenger/TawkMessenger';
+import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 
 //Import css
 import './about_sarawak.css';
@@ -26,6 +27,7 @@ import Forest from '../../../public/forest.png';
 const About_Sarawak = () => {
   return (
     <div>
+      <AuthProvider>
       <Navbar />
       
       {/* Destination */}
@@ -148,6 +150,7 @@ const About_Sarawak = () => {
       <Back_To_Top_Button />
       <Footer />
       <TawkMessenger />
+      </AuthProvider>
     </div>
   );
 };

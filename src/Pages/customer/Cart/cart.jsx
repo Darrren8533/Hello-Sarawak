@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FaArrowLeft, FaArrowRight, FaShoppingCart, FaHistory, FaTrash, FaCreditCard, FaCalendarAlt, FaFilter, FaSort, FaExclamationCircle } from 'react-icons/fa';
 import { fetchCart, removeReservation, updateReservationStatus } from '../../../../Api/api';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 import Navbar from '../../../Component/Navbar/navbar';
 import Footer from '../../../Component/Footer/footer';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
@@ -379,6 +381,7 @@ const Cart = () => {
 
   return (
     <div>
+      <AuthProvider>
       <Navbar />
       <br /><br /><br />
       
@@ -411,7 +414,9 @@ const Cart = () => {
                   </div>
                   <p className="empty-cart-text">Your cart is empty</p>
                   <p className="empty-cart-subtext">Add properties to your cart to see them here</p>
-                  <button className="btn-browse">Browse Properties</button>
+                  <Link to={'/product'}>
+                    <button className="btn-browse">Browse Properties</button>
+                  </Link>
                 </div>
               )}
             </div>
@@ -603,6 +608,7 @@ const Cart = () => {
       <Back_To_Top_Button />
       <Footer />
       <TawkMessenger />
+      </AuthProvider>
     </div>
   );
 };
