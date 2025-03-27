@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchPropertiesListingTable, updatePropertyStatus, deleteProperty, propertyListingAccept, propertyListingReject } from '../../../../../Api/api';
+import { fetchPropertiesListingTable, updatePropertyStatus, deleteProperty, propertyListingAccept, propertyListingReject, fetchReservation } from '../../../../../Api/api';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
 import PropertyForm from '../../../../Component/PropertyForm/PropertyForm';
@@ -118,26 +118,35 @@ const PropertyListing = () => {
     
     const handleDeleteProperty = async () => {
         try {
-            // Find the property to delete from the current properties list
+        
             const property = properties.find((prop) => prop.propertyid === propertyToDelete);
-    
-            // If property is not found, show an error and return
+
             if (!property) {
                 displayToast('error', 'Property not found. Please refresh the page and try again.');
                 setIsDialogOpen(false);
                 setPropertyToDelete(null);
                 return;
             }
-    
-            // Check if the property status is not "Unavailable"
+
             if (property.propertystatus !== 'Unavailable') {
                 displayToast('error', 'Only unavailable properties can be deleted.');
                 setIsDialogOpen(false);
                 setPropertyToDelete(null);
-                return; // Exit the function
+                return;
             }
-    
-            // Proceed with deletion if the property is "Unavailable"
+
+        
+            const reservations = await fetchReservation();
+            const hasReservation = reservations.some(reservation => reservation.propertyid === propertyToDelete);
+
+            if (hasReservation) {
+                displayToast('error', 'This property has an existing reservation and cannot be deleted.');
+                setIsDialogOpen(false);
+                setPropertyToDelete(null);
+                return;
+            }
+
+        
             await deleteProperty(propertyToDelete);
             setProperties((prevProperties) =>
                 prevProperties.filter((prop) => prop.propertyid !== propertyToDelete)
@@ -151,6 +160,7 @@ const PropertyListing = () => {
             setPropertyToDelete(null);
         }
     };
+
     
 
     const handleApplyFilters = () => {
