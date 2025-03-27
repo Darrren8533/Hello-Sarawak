@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaArrowLeft, FaArrowRight, FaShoppingCart, FaHistory, FaTrash, FaCreditCard, FaCalendarAlt, FaFilter, FaSort, FaExclamationCircle } from 'react-icons/fa';
 import { fetchCart, removeReservation, updateReservationStatus } from '../../../../Api/api';
+import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 import Navbar from '../../../Component/Navbar/navbar';
 import Footer from '../../../Component/Footer/footer';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
@@ -379,6 +380,7 @@ const Cart = () => {
 
   return (
     <div>
+      <AuthProvider>
       <Navbar />
       <br /><br /><br />
       
@@ -603,6 +605,7 @@ const Cart = () => {
       <Back_To_Top_Button />
       <Footer />
       <TawkMessenger />
+      </AuthProvider>
     </div>
   );
 };
