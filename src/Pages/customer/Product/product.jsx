@@ -8,6 +8,7 @@ import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_To
 import Toast from '../../../Component/Toast/Toast';
 import ImageSlider from '../../../Component/ImageSlider/ImageSlider';
 import Loader from '../../../Component/Loader/Loader';
+import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 
 // Import API
 import { fetchProduct, fetchCart } from '../../../../Api/api';
@@ -394,6 +395,7 @@ const Product = () => {
 
   return (
     <div>
+      <AuthProvider>
       <Navbar />
       <br /><br /><br />
 
@@ -440,6 +442,7 @@ const Product = () => {
       <br /><br /><br /><br /><br /><br />
       <Back_To_Top_Button />
       <Footer />
+      </AuthProvider>
     </div>
   );
 };
