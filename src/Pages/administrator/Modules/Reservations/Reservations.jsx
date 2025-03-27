@@ -41,8 +41,8 @@ const Reservations = () => {
                         const expiryDateTime = new Date(reservation.expiryDateTime).getTime();
                         const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
 
-                        if (reservation.reservationStatus === 'Pending' && currentDateTime > expiryDateTime) {
-                            return { ...reservation, reservationStatus: 'expired' };
+                        if (reservation.reservationstatus === 'Pending' && currentDateTime > expiryDateTime) {
+                            return { ...reservation, reservationstatus: 'expired' };
                         }
                         return reservation;
                     });
@@ -96,13 +96,12 @@ const Reservations = () => {
 
     const displayLabels = {
         reservationid: "Reservation ID",
-        propertyid: "Property ID",
+        propertyaddress: "Property Name",
         checkindatetime: "Check-In Date Time",
         checkoutdatetime: "Check-Out Date Time",
         reservationblocktime: "Block Time",
         request: "Request",
         totalprice: "Total Price",
-        rcid: "RC ID",
         reservationstatus: "Status",
         userid: "User ID",
         images: "Images",
@@ -114,7 +113,7 @@ const Reservations = () => {
                 (appliedFilters.status === 'All' || (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
                 (
                     (reservation.reservationid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.propertyid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.propertyaddress?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '')
                 )
@@ -130,7 +129,7 @@ const Reservations = () => {
             if (action === 'view') {
                 const essentialFields = {
                     reservationid: reservation.reservationid || 'N/A',
-                    propertyid: reservation.propertyid || 'N/A',
+                    propertyaddress: reservation.propertyaddress || 'N/A',
                     checkindatetime: reservation.checkindatetime || 'N/A',
                     checkoutdatetime: reservation.checkoutdatetime || 'N/A',
                     reservationblocktime: reservation.reservationblocktime || 'N/A',
@@ -207,8 +206,8 @@ const Reservations = () => {
         setShowMessageBox(false);
     };
 
-    const handlePropertySelect = (propertyid) => {
-        setSelectedProperty(propertyid);
+    const handlePropertySelect = (propertyaddress) => {
+        setSelectedProperty(propertyaddress);
     };
 
     const handleConfirmSuggestion = async () => {
@@ -272,7 +271,7 @@ const Reservations = () => {
     const getFilteredProperties = () => {
         if (!Array.isArray(administratorProperties)) return []; // Ensure an array
         return administratorProperties.filter(property => {
-            const matchesSearch = property.propertyid.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
+            const matchesSearch = property.propertyaddress.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
             const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
                 (!priceRange.max || property.rateamount <= Number(priceRange.max));
             return matchesSearch && matchesPrice;
@@ -288,16 +287,15 @@ const Reservations = () => {
                 reservation.propertyimage && reservation.propertyimage.length > 0 ? (
                     <img
                         src={`data:image/jpeg;base64,${reservation.propertyimage[0]}`}
-                        alt={`Property ${reservation.propertyid}`}
+                        alt={`Property ${reservation.propertyaddress}`}
                         style={{ width: 80, height: 80 }}
                     />
                 ) : (
                     <span>No Image</span>
                 ),
         },
-        { header: 'Property ID', accessor: 'propertyid' },
+        { header: 'Property Name', accessor: 'propertyaddress' },
         { header: 'Total Price', accessor: 'totalprice' },
-        { header: 'RC ID', accessor: 'rcid' },
         {
             header: 'Status',
             accessor: 'reservationstatus',
@@ -400,25 +398,25 @@ const Reservations = () => {
                         <div className="property-list">
                             {getFilteredProperties().length > 0 ? (
                                 getFilteredProperties().map((property) => (
-                                    <div key={property.propertyid} className="property-card">
+                                    <div key={property.propertyaddress} className="property-card">
                                         <input
                                             type="radio"
-                                            id={`property-${property.propertyid}`}
+                                            id={`property-${property.propertyaddress}`}
                                             name="property"
-                                            value={property.propertyid}
-                                            onChange={() => handlePropertySelect(property.propertyid)}
+                                            value={property.propertyaddress}
+                                            onChange={() => handlePropertySelect(property.propertyaddress)}
                                             className="property-radio"
                                         />
-                                        <label htmlFor={`property-${property.propertyid}`} className="property-label">
+                                        <label htmlFor={`property-${property.propertyaddress}`} className="property-label">
                                             <div className="property-image-container">
                                                 <img
                                                     src={`data:image/jpeg;base64,${property.images[0]}`}
-                                                    alt={property.propertyid}
+                                                    alt={property.propertyaddress}
                                                     className="property-image"
                                                 />
                                             </div>
                                             <div className="property-details">
-                                                <h3 className="property-title">{property.propertyid}</h3>
+                                                <h3 className="property-title">{property.propertyaddress}</h3>
                                                 <p className="property-info-text">{property.propertyguestpaxno} Pax</p>
                                                 <p className="property-price">RM {property.rateamount}</p>
                                             </div>
