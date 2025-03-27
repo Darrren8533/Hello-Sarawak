@@ -585,20 +585,6 @@
   background-color: var(--primary-hover);
 }
 
-/* Toast */
-.toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  padding: 1rem;
-  border-radius: var(--border-radius);
-  background-color: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  max-width: 350px;
-  animation: slide-in 0.3s ease;
-}
-
 @keyframes slide-in {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
@@ -632,7 +618,6 @@
   }
   
   .filter-cart {
-    flex-direction: column;
     align-items: flex-start;
     padding: var(--spacing-md);
   }
@@ -653,8 +638,9 @@
 }
 
 @media screen and (max-width: 480px) {
+  
   .reservation-container {
-    margin-top: 30px;
+    margin-top: 50px;
     padding: 0 10px;
   }
   
