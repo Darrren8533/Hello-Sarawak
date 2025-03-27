@@ -350,18 +350,16 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                             name="propertyGuestPaxNo"
                             value={formData.propertyGuestPaxNo}
                             onChange={handleChange}
-                            placeholder="e.g. 2 Adults 2 Kids"
                             required
                         />
                     </div>
                     <div className="property-listing-form-group">
-                        <label>Bed Type:</label>
+                        <label>Bed:</label>
                         <input
-                            type="text"
+                            type="number"
                             name="propertyBedType"
                             value={formData.propertyBedType}
                             onChange={handleChange}
-                            placeholder="1 King 1 Queen"
                             required
                         />
                     </div>
