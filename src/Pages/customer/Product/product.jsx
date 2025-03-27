@@ -112,6 +112,13 @@ const Product = () => {
     setBookingData({ ...bookingData, [name]: value });
   };
 
+  const uniqueProperties = fetchedProperties.reduce((acc, property) => {
+    if (!acc.some((item) => item.propertyid === property.propertyid)) {
+      acc.push(property);
+    }
+    return acc;
+  }, []);
+
   const handleCheckAvailability = async (e) => {
     if (e) e.stopPropagation();
   
@@ -406,8 +413,8 @@ const Product = () => {
       ) : (
         <div className="scrollable-container_for_product">
           {properties.length > 0 ? (
-            properties.map((property) => (
-              <div className="tour-property-item" key={property.propertyid} onClick={() => handleViewDetails(property)}> 
+            uniqueProperties.map((property) => (
+              <div className="tour-property-item" key={property.propertyid} property={property} onClick={() => handleViewDetails(property)}> 
                 <div className="tour-property-image-box">
                   {property.propertyimage && property.propertyimage.length > 0 ? (
                      <ImageSlider images={property.propertyimage}
