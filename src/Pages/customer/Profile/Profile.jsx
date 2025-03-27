@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import Navbar from '../../../Component/Navbar/navbar';
 import Footer from '../../../Component/Footer/footer';
 import FrontUserProfile from '../../../Component/FrontUserProfile/FrontUserProfile';
+import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 
 const Profile = () => {
   return (
     <div>
+      <AuthProvider>
       <Navbar />
-      <br /><br /><br /><br /><br /><br />
-        <FrontUserProfile />
-        <br/>
+      <FrontUserProfile />
       <Footer />
+      </AuthProvider>
     </div>
   )
 }
