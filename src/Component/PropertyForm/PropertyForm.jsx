@@ -73,15 +73,15 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const [formData, setFormData] = useState({
         username: "",
         propertyPrice: "0.00",
-        propertyaddress: "",
-        nearbylocation: "",
-        propertybedtype: "1",
-        propertyguestpaxno: "1",
-        propertydescription: "",
-        propertyfacilities: [],
-        propertyimage: [],
-        clustername: "",
-        categoryname: "", 
+        propertyAddress: "",
+        nearbyLocation: "",
+        propertyBedType: "1",
+        propertyGuestPaxNo: "1",
+        propertyDescription: "",
+        propertyFacilities: [],
+        propertyImage: [],
+        clusterName: "",
+        categoryName: "", 
     });
 
     const [removedImages, setRemovedImages] = useState([]);
@@ -103,29 +103,29 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             setFormData({
                 username: initialData.username || "",
                 propertyPrice: initialData.propertyprice || "",
-                propertyaddress: initialData.propertyaddress || "",
-                nearbylocation: initialData.nearbylocation || "",
-                propertybedtype: initialData.propertybedtype || "",
-                propertyguestpaxno: initialData.propertyguestpaxno || "",
-                propertydescription: initialData.propertydescription || "",
-                propertyfacilities: initialData.facilities || [],
-                propertyimage: initialData.propertyimage || [],
-                clustername: initialData.clustername || "", 
-                categoryname: initialData.categoryname || "", 
+                propertyAddress: initialData.propertyaddress || "",
+                nearbyLocation: initialData.nearbylocation || "",
+                propertyBedType: initialData.propertybedtype || "",
+                propertyGuestPaxNo: initialData.propertyguestpaxno || "",
+                propertyDescription: initialData.propertydescription || "",
+                propertyFacilities: initialData.facilities || [],
+                propertyImage: initialData.propertyimage || [],
+                clusterName: initialData.clustername || "", 
+                categoryName: initialData.categoryname || "", 
             });
         }
     }, [initialData]);
 
     const toggleFacility = (facilityName) => {
         setFormData((prev) => {
-            const currentFacilities = Array.isArray(prev.propertyfacilities) ? prev.propertyfacilities : [];
+            const currentFacilities = Array.isArray(prev.propertyFacilities) ? prev.propertyFacilities : [];
             const updatedFacilities = currentFacilities.includes(facilityName)
                 ? currentFacilities.filter((name) => name !== facilityName)
                 : [...currentFacilities, facilityName];
 
             return {
                 ...prev,
-                propertyfacilities: updatedFacilities,
+                propertyFacilities: updatedFacilities,
             };
         });
     };
@@ -142,23 +142,23 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         const newFiles = Array.from(e.target.files);
         setFormData((prev) => ({
             ...prev,
-            propertyimage: [...prev.propertyimage, ...newFiles],
+            propertyImage: [...prev.propertyImage, ...newFiles],
         }));
     };
 
     const handleRemoveImage = (index) => {
         setFormData((prev) => {
-            const updatedImages = [...prev.propertyimage];
+            const updatedImages = [...prev.propertyImage];
             const removedImage = updatedImages.splice(index, 1)[0];
             if (!(removedImage instanceof File)) {
                 setRemovedImages((prevRemoved) => [...prevRemoved, removedImage]);
             }
-            return { ...prev, propertyimage: updatedImages };
+            return { ...prev, propertyImage: updatedImages };
         });
     };
 
     const handleSubmit = async (e) => {
-        if (formData.propertyimage.length < 5) {
+        if (formData.propertyImage.length < 5) {
             setToastMessage("Please upload at least 5 images");
             setToastType("error");
             setShowToast(true);
@@ -168,23 +168,23 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         const data = new FormData();
         data.append("username", formData.username);
         data.append("propertyPrice", formData.propertyPrice);
-        data.append("propertyaddress", formData.propertyaddress);
-        data.append("nearbylocation", formData.nearbylocation);
-        data.append("propertybedtype", formData.propertybedtype);
-        data.append("propertyguestpaxno", formData.propertyguestpaxno);
-        data.append("propertydescription", formData.propertydescription);
-        data.append("facilities", formData.propertyfacilities.join(","));
-        data.append("clustername", formData.clustername); 
-        data.append("categoryname", formData.categoryname); 
+        data.append("propertyAddress", formData.propertyAddress);
+        data.append("nearbyLocation", formData.nearbyLocation);
+        data.append("propertyBedType", formData.propertyBedType);
+        data.append("propertyGuestPaxNo", formData.propertyGuestPaxNo);
+        data.append("propertyDescription", formData.propertyDescription);
+        data.append("facilities", formData.propertyFacilities.join(","));
+        data.append("clusterName", formData.clusterName); 
+        data.append("categoryName", formData.categoryName); 
 
         // Only include propertyStatus when creating a new property
         if (!initialData) {
             data.append("propertyStatus", "Pending");
         }
 
-        formData.propertyimage.forEach((file) => {
+        formData.propertyImage.forEach((file) => {
             if (file instanceof File) {
-                data.append("propertyimage", file);
+                data.append("propertyImage", file);
             }
         });
 
@@ -214,15 +214,15 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             setFormData({
                 username: "",
                 propertyPrice: "",
-                propertyaddress: "",
-                nearbylocation: "",
-                propertybedtype: "",
-                propertyguestpaxno: "",
-                propertydescription: "",
-                propertyfacilities: [],
-                propertyimage: [],
-                clustername: "",
-                categoryname: "", 
+                propertyAddress: "",
+                nearbyLocation: "",
+                propertyBedType: "",
+                propertyGuestPaxNo: "",
+                propertyDescription: "",
+                propertyFacilities: [],
+                propertyImage: [],
+                clusterName: "",
+                categoryName: "", 
             });
             setRemovedImages([]);
 
@@ -248,13 +248,13 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const handleDragEnd = (result) => {
         if (!result.destination) return;
 
-        const items = Array.from(formData.propertyimage);
+        const items = Array.from(formData.propertyImage);
         const [reorderedItem] = items.splice(result.source.index, 1);
         items.splice(result.destination.index, 0, reorderedItem);
 
         setFormData(prev => ({
             ...prev,
-            propertyimage: items
+            propertyImage: items
         }));
     };
 
@@ -292,8 +292,8 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <label>Property Name:</label>
                         <input
                             type="text"
-                            name="propertyaddress"
-                            value={formData.propertyaddress}
+                            name="propertyAddress"
+                            value={formData.propertyAddress}
                             onChange={handleChange}
                             placeholder="e.g. Property"
                             required
@@ -302,8 +302,8 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                     <div className="property-listing-form-group">
                         <label>Cluster (City):</label>
                         <select
-                            name="clustername"
-                            value={formData.clustername}
+                            name="clusterName"
+                            value={formData.clusterName}
                             onChange={handleChange}
                             required
                         >
@@ -319,15 +319,15 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                     <div className="property-listing-form-group">
                         <label>Categories:</label>
                         <select
-                            name="categoryname"
-                            value={formData.categoryname}
+                            name="categoryName"
+                            value={formData.categoryName}
                             onChange={handleChange}
                             required
                         >
                             <option value="">Select Category</option>
-                            {categories.map((categoryname, index) => (
-                                <option key={index} value={categoryname}>
-                                    {categoryname}
+                            {categories.map((categoryName, index) => (
+                                <option key={index} value={categoryName}>
+                                    {categoryName}
                                 </option>
                             ))}
                         </select>
@@ -348,8 +348,8 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <label>Guest Capacity:</label>
                         <input
                             type="number"
-                            name="propertyguestpaxno"
-                            value={formData.propertyguestpaxno}
+                            name="propertyGuestPaxNo"
+                            value={formData.propertyGuestPaxNo}
                             onChange={handleChange}
                             min="1"
                             required
@@ -359,8 +359,8 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <label>Bed:</label>
                         <input
                             type="number"
-                            name="propertybedtype"
-                            value={formData.propertybedtype}
+                            name="propertyBedType"
+                            value={formData.propertyBedType}
                             onChange={handleChange}
                             min="1"
                             required
@@ -370,8 +370,8 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <label>Property Location:</label>
                         <input
                             type="text"
-                            name="nearbylocation"
-                            value={formData.nearbylocation}
+                            name="nearbyLocation"
+                            value={formData.nearbyLocation}
                             onChange={handleChange}
                             placeholder="e.g. No.123, LOT 1234, Lorong 1, Jalan ABC, Kuching, Sarawak"
                             required
@@ -380,8 +380,8 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                     <div className="property-listing-form-group full-width">
                         <label>Property Description:</label>
                         <textarea
-                            name="propertydescription"
-                            value={formData.propertydescription}
+                            name="propertyDescription"
+                            value={formData.propertyDescription}
                             onChange={handleChange}
                             placeholder="e.g. This Property Has Good View"
                             required
@@ -392,7 +392,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <div className="Facilities-list">
                             {predefinedFacilities.map((facility, index) => (
                                 <div key={index} className={`facility-item ${
-                                    formData.propertyfacilities.includes(facility.name) ? "selected" : ""
+                                    formData.propertyFacilities.includes(facility.name) ? "selected" : ""
                                 }`}
                                 onClick={() => toggleFacility(facility.name)}>
                                     {facility.icon} {facility.name}
@@ -405,15 +405,15 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <label>Property Image:</label>
                         <input
                             type="file"
-                            name="propertyimage"
+                            name="propertyImage"
                             accept="image/*"
                             onChange={handleFileChange}
                             ref={fileInputRef}
                             multiple
                         />
-                        {formData.propertyimage.length < 5 && (
+                        {formData.propertyImage.length < 5 && (
                             <div className="validation-warning">
-                                Minimum 5 images required ({formData.propertyimage.length}/5 uploaded)
+                                Minimum 5 images required ({formData.propertyImage.length}/5 uploaded)
                             </div>
                         )}
                     </div>
@@ -426,7 +426,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                                     ref={provided.innerRef}
                                     className="existing-images-container"
                                 >
-                                    {formData.propertyimage.map((image, index) => (
+                                    {formData.propertyImage.map((image, index) => (
                                         <Draggable 
                                             key={image instanceof File ? image.name : `image-${index}`} 
                                             draggableId={image instanceof File ? image.name : `image-${index}`} 
