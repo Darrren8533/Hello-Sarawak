@@ -136,14 +136,6 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             ...prev,
             [name]: value,
         }));
-
-      // Ensure property price allows typing up to two decimal places
-      if (name === "propertyPrice") {
-        const priceRegex = /^\d*(\.\d{0,2})?$/;
-        if (!priceRegex.test(value)) {
-          return prev; // Prevent invalid input
-        }
-      }
     };
 
     const handleFileChange = (e) => {
