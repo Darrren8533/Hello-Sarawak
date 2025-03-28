@@ -82,8 +82,11 @@ const PropertyDetails = () => {
     setBookingData((prev) => {
       const updatedData = { ...prev, [name]: value };
 
-      // Ensure checkout date is not before check-in date
-      if (name === "checkIn" && new Date(value) > new Date(prev.checkOut)) {
+      // Ensure check-in is not greater than or equal to check-out
+      if (
+        (name === "checkIn" && new Date(value) >= new Date(prev.checkOut)) ||
+        (name === "checkOut" && new Date(prev.checkIn) >= new Date(value))
+      ) {
         updatedData.checkOut = "";
       }
 
