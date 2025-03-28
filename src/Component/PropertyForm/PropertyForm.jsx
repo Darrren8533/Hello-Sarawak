@@ -78,10 +78,10 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         propertybedtype: "1",
         propertyguestpaxno: "1",
         propertydescription: "",
-        propertyFacilities: [],
+        propertyfacilities: [],
         propertyimage: [],
-        clustername: "", // Add clustername to formData
-        categoryname: "", // Add categoryname to formData
+        clustername: "",
+        categoryname: "", 
     });
 
     const [removedImages, setRemovedImages] = useState([]);
@@ -108,24 +108,24 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 propertybedtype: initialData.propertybedtype || "",
                 propertyguestpaxno: initialData.propertyguestpaxno || "",
                 propertydescription: initialData.propertydescription || "",
-                propertyFacilities: initialData.propertyfacilities || [],
+                propertyfacilities: initialData.facilities || [],
                 propertyimage: initialData.propertyimage || [],
-                clustername: initialData.clustername || "", // Pre-fill clustername if editing
-                categoryname: initialData.categoryname || "", // Pre-fill categoryname if editing
+                clustername: initialData.clustername || "", 
+                categoryname: initialData.categoryname || "", 
             });
         }
     }, [initialData]);
 
     const toggleFacility = (facilityName) => {
         setFormData((prev) => {
-            const currentFacilities = Array.isArray(prev.propertyFacilities) ? prev.propertyFacilities : [];
+            const currentFacilities = Array.isArray(prev.propertyfacilities) ? prev.propertyfacilities : [];
             const updatedFacilities = currentFacilities.includes(facilityName)
                 ? currentFacilities.filter((name) => name !== facilityName)
                 : [...currentFacilities, facilityName];
 
             return {
                 ...prev,
-                propertyFacilities: updatedFacilities,
+                propertyfacilities: updatedFacilities,
             };
         });
     };
@@ -173,9 +173,9 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         data.append("propertybedtype", formData.propertybedtype);
         data.append("propertyguestpaxno", formData.propertyguestpaxno);
         data.append("propertydescription", formData.propertydescription);
-        data.append("facilities", formData.propertyFacilities.join(","));
-        data.append("clustername", formData.clustername); // Add clustername to FormData
-        data.append("categoryname", formData.categoryname); // Add categoryname to FormData
+        data.append("facilities", formData.propertyfacilities.join(","));
+        data.append("clustername", formData.clustername); 
+        data.append("categoryname", formData.categoryname); 
 
         // Only include propertyStatus when creating a new property
         if (!initialData) {
@@ -219,10 +219,10 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 propertybedtype: "",
                 propertyguestpaxno: "",
                 propertydescription: "",
-                propertyFacilities: [],
+                propertyfacilities: [],
                 propertyimage: [],
-                clustername: "", // Reset clustername
-                categoryname: "", // Reset categoryname
+                clustername: "",
+                categoryname: "", 
             });
             setRemovedImages([]);
 
@@ -392,7 +392,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <div className="Facilities-list">
                             {predefinedFacilities.map((facility, index) => (
                                 <div key={index} className={`facility-item ${
-                                    formData.propertyFacilities.includes(facility.name) ? "selected" : ""
+                                    formData.propertyfacilities.includes(facility.name) ? "selected" : ""
                                 }`}
                                 onClick={() => toggleFacility(facility.name)}>
                                     {facility.icon} {facility.name}
