@@ -36,6 +36,8 @@ const Product = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
   const [activeTab, setActiveTab] = useState(null);
   const navigate = useNavigate();
+  const [checkIn, setCheckIn] = useState("");
+  const [checkOut, setCheckOut] = useState("");
 
   // Create refs for search segments
   const locationRef = useRef(null);
@@ -110,6 +112,22 @@ const Product = () => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setBookingData({ ...bookingData, [name]: value });
+  };
+
+  // Handle check-in date change
+  const handleCheckInChange = (e) => {
+    const selectedCheckIn = e.target.value;
+    setCheckIn(selectedCheckIn);
+
+    // Reset check-out date if it's before the new check-in date
+    if (checkOut && new Date(selectedCheckIn) > new Date(checkOut)) {
+      setCheckOut("");
+    }
+  };
+
+  // Handle check-out date change
+  const handleCheckOutChange = (e) => {
+    setCheckOut(e.target.value);
   };
 
   const handleCheckAvailability = async (e) => {
@@ -307,7 +325,8 @@ const Product = () => {
                     type="date" 
                     name="arrivalDate" 
                     value={bookingData.arrivalDate}
-                    onChange={handleInputChange}
+                    onChange={handleCheckInChange}
+                    min={new Date().toISOString().split("T")[0]} // Disables past dates
                     className="date-input"
                   />
                 </div>
@@ -320,7 +339,9 @@ const Product = () => {
                     type="date" 
                     name="departureDate" 
                     value={bookingData.departureDate}
-                    onChange={handleInputChange}
+                    onChange={handleCheckOutChange}
+                    min={checkIn} // Prevents selecting a check-out date before check-in
+                    disabled={!checkIn} // Disables field until check-in is selected
                     className="date-input"
                   />
                 </div>
