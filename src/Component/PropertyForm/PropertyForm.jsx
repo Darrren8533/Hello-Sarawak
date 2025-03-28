@@ -99,24 +99,23 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             }));
         }
 
-       if (initialData) {
+        if (initialData) {
             setFormData({
                 username: initialData.username || "",
-                propertyPrice: initialData.propertyprice ? Number(initialData.propertyprice) : 0.00,  
+                propertyPrice: initialData.propertyprice || "",
                 propertyAddress: initialData.propertyaddress || "",
                 nearbyLocation: initialData.nearbylocation || "",
                 propertyBedType: initialData.propertybedtype || "",
                 propertyGuestPaxNo: initialData.propertyguestpaxno || "",
                 propertyDescription: initialData.propertydescription || "",
-                propertyFacilities: Array.isArray(initialData.facilities) 
-                    ? initialData.facilities 
-                    : (typeof initialData.facilities === "string" ? initialData.facilities.split(",") : []),
+                propertyFacilities: initialData.facilities || [],
                 propertyImage: initialData.propertyimage || [],
                 clusterName: initialData.clustername || "", 
                 categoryName: initialData.categoryname || "", 
             });
         }
     }, [initialData]);
+
 
 
     const toggleFacility = (facilityName) => {
