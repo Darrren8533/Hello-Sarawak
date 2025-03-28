@@ -72,11 +72,11 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
 
     const [formData, setFormData] = useState({
         username: "",
-        propertyPrice: "",
+        propertyPrice: "0.00",
         propertyaddress: "",
         nearbylocation: "",
-        propertybedtype: "",
-        propertyguestpaxno: "",
+        propertybedtype: "1",
+        propertyguestpaxno: "1",
         propertydescription: "",
         propertyFacilities: [],
         propertyimage: [],
@@ -136,6 +136,14 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             ...prev,
             [name]: value,
         }));
+
+      // Ensure property price allows typing up to two decimal places
+      if (name === "propertyPrice") {
+        const priceRegex = /^\d*(\.\d{0,2})?$/;
+        if (!priceRegex.test(value)) {
+          return prev; // Prevent invalid input
+        }
+      }
     };
 
     const handleFileChange = (e) => {
