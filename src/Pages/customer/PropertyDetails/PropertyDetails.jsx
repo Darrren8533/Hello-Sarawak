@@ -455,7 +455,7 @@ const PropertyDetails = () => {
                           name="checkOut"
                           value={bookingData.checkOut}
                           onChange={handleInputChange}
-                          min={bookingData.checkIn} // Prevents selecting a check-out date before check-in
+                          min={{bookingData.checkIn ? new Date(new Date(bookingData.checkIn).setDate(new Date(bookingData.checkIn).getDate() + 1)).toISOString().split("T")[0] : ""} // Minimum check-out date is check-in + 1
                           disabled={!bookingData.checkIn} // Disables field until check-in is selected
                         />
                       </div>
@@ -522,7 +522,7 @@ const PropertyDetails = () => {
                             name="checkOut"
                             value={bookingData.checkOut}
                             onChange={handleInputChange}
-                            min={bookingData.checkIn} // Prevents selecting a check-out date before check-in
+                            min={bookingData.checkIn ? new Date(new Date(bookingData.checkIn).setDate(new Date(bookingData.checkIn).getDate() + 1)).toISOString().split("T")[0] : ""} // Minimum check-out date is check-in + 1
                             disabled={!bookingData.checkIn} // Disables field until check-in is selected
                           />
                         </div>
