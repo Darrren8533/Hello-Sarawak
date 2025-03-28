@@ -95,26 +95,27 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         if (storedUsername) {
             setFormData((prev) => ({
                 ...prev,
-                username: storedUsername, // pre-fill the username field from localStorage
+                username: storedUsername, 
             }));
         }
 
         if (initialData) {
             setFormData({
                 username: initialData.username || "",
-                propertyPrice: initialData.propertyprice || "",
+                propertyPrice: String(initialData.propertyprice || "0.00"), 
                 propertyAddress: initialData.propertyaddress || "",
                 nearbyLocation: initialData.nearbylocation || "",
-                propertyBedType: initialData.propertybedtype || "",
-                propertyGuestPaxNo: initialData.propertyguestpaxno || "",
+                propertyBedType: initialData.propertybedtype || "1",
+                propertyGuestPaxNo: initialData.propertyguestpaxno || "1",
                 propertyDescription: initialData.propertydescription || "",
-                propertyFacilities: initialData.facilities || [],
+                propertyFacilities: Array.isArray(initialData.facilities) ? initialData.facilities : [], 
                 propertyImage: initialData.propertyimage || [],
                 clusterName: initialData.clustername || "", 
                 categoryName: initialData.categoryname || "", 
             });
         }
     }, [initialData]);
+
 
     const toggleFacility = (facilityName) => {
         setFormData((prev) => {
