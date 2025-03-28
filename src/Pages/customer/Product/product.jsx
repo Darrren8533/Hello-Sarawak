@@ -28,16 +28,14 @@ const Product = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('');
   const [bookingData, setBookingData] = useState({
-    arrivalDate: '',
-    departureDate: '',
+    checkIn: "",
+    checkOut: "",
     adults: 1,
     children: 0,
   });
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
   const [activeTab, setActiveTab] = useState(null);
   const navigate = useNavigate();
-  const [checkIn, setCheckIn] = useState("");
-  const [checkOut, setCheckOut] = useState("");
 
   // Create refs for search segments
   const locationRef = useRef(null);
@@ -111,30 +109,23 @@ const Product = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setBookingData({ ...bookingData, [name]: value });
-  };
+    setBookingData((prev) => {
+      const updatedData = { ...prev, [name]: value };
 
-  // Handle check-in date change
-  const handleCheckInChange = (e) => {
-    const selectedCheckIn = e.target.value;
-    setCheckIn(selectedCheckIn);
+      // Ensure checkout date is not before check-in date
+      if (name === "checkIn" && new Date(value) > new Date(prev.checkOut)) {
+        updatedData.checkOut = "";
+      }
 
-    // Reset check-out date if it's before the new check-in date
-    if (checkOut && new Date(selectedCheckIn) > new Date(checkOut)) {
-      setCheckOut("");
-    }
-  };
-
-  // Handle check-out date change
-  const handleCheckOutChange = (e) => {
-    setCheckOut(e.target.value);
+      return updatedData;
+    });
   };
 
   const handleCheckAvailability = async (e) => {
     if (e) e.stopPropagation();
   
-    const arrivalDate = new Date(bookingData.arrivalDate);
-    const departureDate = new Date(bookingData.departureDate);
+    const checkIn = new Date(bookingData.checkIn);
+    const checkOut = new Date(bookingData.checkOut);
     const totalGuests = bookingData.adults + bookingData.children;
   
     try {
@@ -148,7 +139,7 @@ const Product = () => {
   
             // Fix overlapping logic
             if (
-              (arrivalDate < existingCheckout && departureDate > existingCheckin) // Strict overlap check
+              (checkIn < existingCheckout && checkOut > existingCheckin) // Strict overlap check
             ) {
               return false; // Property is reserved for that period
             }
@@ -246,7 +237,7 @@ const Product = () => {
               <div className="search-content">
                 <span className="search-label">Check in</span>
                 <span className="search-value">
-                  {bookingData.arrivalDate || 'Add dates'}
+                  {bookingData.checkIn || 'Add dates'}
                 </span>
               </div>
             </div>
@@ -262,7 +253,7 @@ const Product = () => {
               <div className="search-content">
                 <span className="search-label">Check out</span>
                 <span className="search-value">
-                  {bookingData.departureDate || 'Add dates'}
+                  {bookingData.checkOut || 'Add dates'}
                 </span>
               </div>
             </div>
@@ -322,10 +313,11 @@ const Product = () => {
                 <div>
                   <h3>Select check-in date</h3>
                   <input 
-                    type="date" 
-                    name="arrivalDate" 
-                    value={bookingData.arrivalDate}
-                    onChange={handleCheckInChange}
+                    id="check-in"
+                    type="date"
+                    name="checkIn"
+                    value={bookingData.checkIn}
+                    onChange={handleInputChange}
                     min={new Date().toISOString().split("T")[0]} // Disables past dates
                     className="date-input"
                   />
@@ -336,12 +328,13 @@ const Product = () => {
                 <div>
                   <h3>Select check-out date</h3>
                   <input 
-                    type="date" 
-                    name="departureDate" 
-                    value={bookingData.departureDate}
-                    onChange={handleCheckOutChange}
-                    min={checkIn} // Prevents selecting a check-out date before check-in
-                    disabled={!checkIn} // Disables field until check-in is selected
+                    id="check-out"
+                    type="date"
+                    name="checkOut"
+                    value={bookingData.checkOut}
+                    onChange={handleInputChange}
+                    min={bookingData.checkIn} // Prevents selecting a check-out date before check-in
+                    disabled={!bookingData.checkIn} // Disables field until check-in is selected
                     className="date-input"
                   />
                 </div>
