@@ -99,16 +99,18 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             }));
         }
 
-        if (initialData) {
+       if (initialData) {
             setFormData({
                 username: initialData.username || "",
-                propertyPrice: String(initialData.propertyprice || "0.00"), 
+                propertyPrice: initialData.propertyprice ? Number(initialData.propertyprice) : 0.00,  
                 propertyAddress: initialData.propertyaddress || "",
                 nearbyLocation: initialData.nearbylocation || "",
-                propertyBedType: initialData.propertybedtype || "1",
-                propertyGuestPaxNo: initialData.propertyguestpaxno || "1",
+                propertyBedType: initialData.propertybedtype || "",
+                propertyGuestPaxNo: initialData.propertyguestpaxno || "",
                 propertyDescription: initialData.propertydescription || "",
-                propertyFacilities: Array.isArray(initialData.facilities) ? initialData.facilities : [], 
+                propertyFacilities: Array.isArray(initialData.facilities) 
+                    ? initialData.facilities 
+                    : (typeof initialData.facilities === "string" ? initialData.facilities.split(",") : []),
                 propertyImage: initialData.propertyimage || [],
                 clusterName: initialData.clustername || "", 
                 categoryName: initialData.categoryname || "", 
