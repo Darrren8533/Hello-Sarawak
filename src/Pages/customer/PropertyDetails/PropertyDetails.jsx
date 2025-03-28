@@ -4,12 +4,10 @@ import { IoIosArrowDown, IoIosArrowUp, IoIosArrowBack, IoIosArrowForward } from 
 import { IoReturnUpBackOutline } from "react-icons/io5";
 import { FaWifi, FaParking, FaSwimmingPool, FaHotTub, FaTv, FaUtensils, FaSnowflake, FaPaw, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaLock, FaBell, FaMapMarkerAlt, FaTree, FaMountain, FaCity } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
-
 import Navbar from '../../../Component/Navbar/navbar';
 import Footer from '../../../Component/Footer/footer';
 import Reviews from "../../../Component/Reviews/Reviews";
 import './PropertyDetails.css';
-
 import { createReservation, requestBooking } from '../../../../Api/api';
 
 const facilities = [
@@ -44,14 +42,12 @@ const facilities = [
 
 const PropertyDetails = () => {
   const location = useLocation();
-  const [isGuestDropdownOpen, setIsGuestDropdownOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const { propertyid } = useParams();
   const { propertyDetails } = location.state || {};
   const [bookingData, setBookingData] = useState({
-    arrivalDate: '',
-    departureDate: '',
+    checkIn: '',
+    checkOut: '',
     adults: 1,
     children: 0,
   });
@@ -59,7 +55,6 @@ const PropertyDetails = () => {
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [isEditingDates, setIsEditingDates] = useState(false);
-  const [isEditingGuests, setIsEditingGuests] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [totalNights, setTotalNights] = useState(0);
   const [totalprice, settotalprice] = useState(0);
@@ -84,17 +79,24 @@ const PropertyDetails = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setBookingData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setBookingData((prev) => {
+      const updatedData = { ...prev, [name]: value };
 
-    if (name === 'arrivalDate' || name === 'departureDate') {
-      calculatetotalprice(
-        name === 'arrivalDate' ? value : bookingData.arrivalDate,
-        name === 'departureDate' ? value : bookingData.departureDate
-      );
-    }
+      // Ensure checkout date is not before check-in date
+      if (name === "checkIn" && new Date(value) > new Date(prev.checkOut)) {
+        updatedData.checkOut = "";
+      }
+
+      // Calculate total price if check-in or check-out changes
+      if (name === "checkIn" || name === "checkOut") {
+        calculatetotalprice(
+          name === "checkIn" ? value : prev.checkIn,
+          name === "checkOut" ? value : prev.checkOut
+        );
+      }
+
+      return updatedData;
+    });
   };
 
   const nextSlide = () => {
@@ -103,21 +105,6 @@ const PropertyDetails = () => {
   
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev === 0 ? propertyDetails?.propertyimage.length - 1 : prev - 1));
-  };
-
-  const handleGuestChange = (type, operation) => {
-    setBookingData(prev => ({
-      ...prev,
-      [type]: operation === 'add' 
-        ? prev[type] + 1 
-        : Math.max(type === 'adults' ? 1 : 0, prev[type] - 1)
-    }));
-  };
-
-  const getTotalGuests = () => {
-    const { adults, children } = bookingData;
-    let guestText = `${adults + children} pax`;
-    return guestText;
   };
 
   const handleImageClick = () => {
@@ -190,7 +177,7 @@ const PropertyDetails = () => {
       return;
     }
 
-    if (!bookingData.arrivalDate || !bookingData.departureDate) {
+    if (!bookingData.checkIn || !bookingData.checkOut) {
       alert('Please Select Check-in and Check-out Dates');
       return;
     }
@@ -204,9 +191,9 @@ const PropertyDetails = () => {
 
       const reservationData = {
         propertyid: propertyDetails.propertyid,
-        checkindatetime: bookingData.arrivalDate,
-        checkoutdatetime: bookingData.departureDate,
-        reservationblocktime: new Date(new Date(bookingData.arrivalDate) - 3 * 24 * 60 * 60 * 1000).toISOString(),
+        checkindatetime: bookingData.checkIn,
+        checkoutdatetime: bookingData.checkOut,
+        reservationblocktime: new Date(new Date(bookingData.checkIn) - 3 * 24 * 60 * 60 * 1000).toISOString(),
         request: bookingForm.additionalRequests || '',
         totalprice: totalprice,
         rcfirstname: bookingForm.firstName,
@@ -217,7 +204,6 @@ const PropertyDetails = () => {
         adults: bookingData.adults,
         children: bookingData.children,
         userid: parseInt(userid),
-        //reservationPaxNo: parseInt(bookingData.adults) + parseInt(bookingData.children),
         reservationstatus: 'Pending'
       };
 
@@ -450,19 +436,24 @@ const PropertyDetails = () => {
                       <div className="input-group">
                         <label>CHECK-IN</label>
                         <input 
-                          type="date" 
-                          name="arrivalDate"
-                          value={bookingData.arrivalDate}
+                          id="check-in"
+                          type="date"
+                          name="checkIn"
+                          value={bookingData.checkIn}
                           onChange={handleInputChange}
+                          min={new Date().toISOString().split("T")[0]} // Disables past dates
                         />
                       </div>
                       <div className="input-group">
                         <label>CHECKOUT</label>
                         <input 
-                          type="date" 
-                          name="departureDate"
-                          value={bookingData.departureDate}
+                          id="check-out"
+                          type="date"
+                          name="checkOut"
+                          value={bookingData.checkOut}
                           onChange={handleInputChange}
+                          min={bookingData.checkIn} // Prevents selecting a check-out date before check-in
+                          disabled={!bookingData.checkIn} // Disables field until check-in is selected
                         />
                       </div>
                     </div>
@@ -513,24 +504,28 @@ const PropertyDetails = () => {
                         <div className="date-input-group">
                           <label>Check-in</label>
                           <input 
-                            type="date" 
-                            value={bookingData.arrivalDate}
+                            id="check-in"
+                            type="date"
+                            name="checkIn"
+                            value={bookingData.checkIn}
                             onChange={handleInputChange}
-                            name="arrivalDate"
+                            min={new Date().toISOString().split("T")[0]} // Disables past dates
                           />
                         </div>
                         <div className="date-input-group">
                           <label>Check-out</label>
                           <input 
-                            type="date" 
-                            value={bookingData.departureDate}
+                            type="date"
+                            name="checkOut"
+                            value={bookingData.checkOut}
                             onChange={handleInputChange}
-                            name="departureDate"
+                            min={bookingData.checkIn} // Prevents selecting a check-out date before check-in
+                            disabled={!bookingData.checkIn} // Disables field until check-in is selected
                           />
                         </div>
                       </div>
                     ) : (
-                      <p>{bookingData.arrivalDate} - {bookingData.departureDate}</p>
+                      <p>{bookingData.checkIn} - {bookingData.checkOut}</p>
                     )}
                   </div>
 
