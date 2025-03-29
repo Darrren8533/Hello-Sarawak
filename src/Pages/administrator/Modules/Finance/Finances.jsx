@@ -132,8 +132,8 @@ export default function FinancialDashboard() {
               : "Monthly Reservations",
           data: financeData.monthlyData.map((item) =>
             chartType === "revenue"
-              ? item.monthly_revenue
-              : item.monthly_reservations
+              ? item.monthlyrevenue
+              : item.monthlyreservations
           ),
           fill: false,
           borderColor: "rgb(75, 192, 192)",
@@ -217,24 +217,24 @@ export default function FinancialDashboard() {
 
     return {
       revenue: {
-        current: currentMonth.monthly_revenue,
+        current: currentMonth.monthlyrevenue,
         growth: calculateGrowthRate(
-          currentMonth.monthly_revenue,
-          lastMonth.monthly_revenue
+          currentMonth.monthlyrevenue,
+          lastMonth.monthlyrevenue
         ),
       },
       reservations: {
-        current: currentMonth.monthly_reservations,
+        current: currentMonth.monthlyreservations,
         growth: calculateGrowthRate(
-          currentMonth.monthly_reservations,
-          lastMonth.monthly_reservations
+          currentMonth.monthlyreservations,
+          lastMonth.monthlyreservations
         ),
       },
       averageRevenue: {
-        current: currentMonth.monthly_revenue,
+        current: currentMonth.monthlyrevenue,
         growth: calculateGrowthRate(
-          currentMonth.monthly_revenue,
-          lastMonth.monthly_revenue
+          currentMonth.monthlyrevenue,
+          lastMonth.monthlyrevenue
         ),
       },
     };
@@ -254,7 +254,7 @@ export default function FinancialDashboard() {
             <p className="text-2xl font-bold">
               $
               {financeData?.monthlyData.reduce(
-                (sum, item) => sum + item.monthly_revenue,
+                (sum, item) => sum + item.monthlyrevenue,
                 0
               ) || 0}
             </p>
@@ -275,7 +275,7 @@ export default function FinancialDashboard() {
             </h2>
             <p className="text-2xl font-bold">
               {financeData?.monthlyData.reduce(
-                (sum, item) => sum + item.monthly_reservations,
+                (sum, item) => sum + item.monthlyreservations,
                 0
               ) || 0}
             </p>
@@ -299,7 +299,7 @@ export default function FinancialDashboard() {
               {financeData?.monthlyData.length > 0
                 ? Math.round(
                     financeData.monthlyData.reduce(
-                      (sum, item) => sum + item.monthly_revenue,
+                      (sum, item) => sum + item.monthlyrevenue,
                       0
                     ) / financeData.monthlyData.length
                   )
