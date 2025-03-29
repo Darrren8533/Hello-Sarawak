@@ -510,7 +510,7 @@
   
 .gallery-secondary img {
     width: 100%;
-    height: 150px;
+    height: 250px;
     object-fit: cover;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -525,12 +525,12 @@
     position: relative;
 }
   
-.gallery-secondary .gallery-item:nth-child(1) img {
+.gallery-secondary .gallery-item:nth-child(2) img {
     border-radius: 0 8px 0 0;
 }
   
 .gallery-secondary .gallery-item:nth-child(4) img {
-    border-radius: 0 0 0 8px;
+    border-radius: 0 0 8px 0;
 }
 
 .show-all-photos {
