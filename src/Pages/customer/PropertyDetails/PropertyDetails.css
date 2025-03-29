@@ -1561,9 +1561,16 @@
     .facilities-item {
       font-size: 14px;
       display: flex;
+      align-items: flex-start;
       align-items: center;
       gap: 12px;
       padding: 12px;
+    }
+
+    .facility-icon {
+      font-size: 28px;
+      color: #333;
+      flex-shrink: 0;
     }
   
     .form-group input,
