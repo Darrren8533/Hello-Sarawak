@@ -411,8 +411,10 @@ const PropertyDetails = () => {
                         const facility = facilities.find(f => f.name === facilityName.trim());
                         return (
                             <div key={index} className="facilities-item">
-                                {facility ? facility.icon : null}
-                                <span>{facilityName.trim()}</span>
+                                {facility.icon}
+                                <div>
+                                    <p className="property-font1">{facilityName.trim()}</p>
+                                </div>
                             </div>
                         );
                     })}
