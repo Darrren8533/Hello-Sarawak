@@ -1003,12 +1003,14 @@
 }
 
 .photo-section img {
-    width: 100%;
+    width: 500px;
+    height: 400px;
     aspect-ratio: 16/9;
     object-fit: cover;
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
+    margin-left: 100px;
 }
 
 .photo-section img:hover {
