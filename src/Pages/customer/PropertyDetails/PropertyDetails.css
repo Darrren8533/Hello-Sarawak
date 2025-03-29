@@ -994,6 +994,9 @@
 .photo-section {
     scroll-margin-top: 80px;
     margin-bottom: 48px;
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
 }
 
 .photo-section .section-title {
