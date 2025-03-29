@@ -1011,7 +1011,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     margin-top: 20px;
-    align-item: center;
+    justify-content: center;
 }
 
 .photo-section img:hover {
