@@ -1555,11 +1555,15 @@
     .facilities-details {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 16px;
     }
   
     .facilities-item {
       font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
     }
   
     .form-group input,
