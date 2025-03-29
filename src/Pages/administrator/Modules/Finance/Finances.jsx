@@ -247,28 +247,27 @@ export default function FinancialDashboard() {
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow mb-4">
-          {/* chart change button */}
-          <div className="flex space-x-4">
-            <button
-              onClick={() => setChartType("revenue")}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 border-0 focus:outline-none focus:ring-0 ${
-                chartType === "revenue"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-            >
-              Revenue Chart
-            </button>
-            <button
-              onClick={() => setChartType("reservations")}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 border-0 focus:outline-none focus:ring-0 ${
-                chartType === "reservations"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-            >
-              Reservations Chart
-            </button>
+          <div className="mb-4 flex items-center space-x-2">
+            <label htmlFor="chartSelector" className="text-sm font-medium text-gray-700">
+              Select Chart:
+            </label>
+            <div className="relative">
+              <select
+                id="chartSelector"
+                value={chartType}
+                onChange={(e) => setChartType(e.target.value)}
+                className="appearance-none bg-white border border-gray-300 rounded-xl px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 w-auto min-w-[200px] hover:border-blue-400 transition"
+              >
+                <option value="revenue">Revenue Chart</option>
+                <option value="reservations">Reservations Chart</option>
+              </select>
+              {/* Custom arrow */}
+              <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
           </div>
           <div className="h-[500px] w-full">{renderChart()}</div>
         </div>
