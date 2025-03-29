@@ -393,7 +393,7 @@ const PropertyDetails = () => {
                     <img 
                     src={propertyDetails.uimage.startsWith('http') ? propertyDetails.uimage : `data:image/jpeg;base64,${propertyDetails.uimage}`} 
                     alt="Host Avatar"
-                    className="front-avatar-image"
+                    className="product-avatar"
                     /> 
                     )}
                     Hosted by {propertyDetails?.username || "Unknown Host"}</h2>
