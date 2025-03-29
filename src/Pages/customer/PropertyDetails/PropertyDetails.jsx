@@ -385,11 +385,11 @@ const PropertyDetails = () => {
             <div className="content-section">
               <div className="left-content">
                 <div className="property-features">
-                  <h2>{propertyDetails?.nearbylocation}</h2>
+                  <h2 className="property-font">{propertyDetails?.nearbylocation}</h2>
                 </div>
                 <hr/>
                 <div className="property-features">
-                  <h2>{propertyDetails?.uimage && (
+                  <h2 className="property-font">{propertyDetails?.uimage && (
                     <img 
                     src={propertyDetails.uimage.startsWith('http') ? propertyDetails.uimage : `data:image/jpeg;base64,${propertyDetails.uimage}`} 
                     alt="Host Avatar"
@@ -400,12 +400,12 @@ const PropertyDetails = () => {
                 </div>
                 <hr/>
                 <div className="property-features">
-                  <h2>Description</h2>
-                  <p>{propertyDetails?.propertydescription}</p>
+                  <h2 className="property-font">Description</h2>
+                  <p className="property-font">{propertyDetails?.propertydescription}</p>
                 </div>
                 <hr/>
                 <div className="property-features">
-                  <h2>What this place offers</h2>
+                  <h2 className="property-font">What this place offers</h2>
                   <div className="facilities-list">
                     {(showAllFacilities ? facilitiesArray : facilitiesArray.slice(0, 10)).map((facilityName, index) => {
                         const facility = facilities.find(f => f.name === facilityName.trim());
