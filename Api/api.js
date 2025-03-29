@@ -715,6 +715,17 @@ export const fetchFinance = async () => {
   }
 };
 
+export const fetchOccupancyRate = async () => {
+  try {
+      const response = await fetch(`${API_URL}/users/occupancy_rate`);
+      const data = await response.json();
+      return data; 
+  } catch (error) {
+      console.error('API error:', error);
+      throw error;
+  }
+};
+
 // Get Properties Of Administrator For "Suggest"
 export const getOperatorProperties = async (userid) => {
   try {
