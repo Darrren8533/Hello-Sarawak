@@ -50,6 +50,7 @@ export default function FinancialDashboard() {
     const fetchOccupancyData = async () => {
       try {
         const data = await fetchOccupancyRate();
+        console.log("Occupancy Data: ", data);
         setOccupancyData(data);
       } catch (err) {
         console.error("Error fetching occupancy data:", err);
