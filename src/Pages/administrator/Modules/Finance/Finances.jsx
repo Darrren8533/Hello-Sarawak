@@ -247,28 +247,19 @@ export default function FinancialDashboard() {
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow mb-4">
-          {/* chart change button */}
-          <div className="flex space-x-4">
-            <button
-              onClick={() => setChartType("revenue")}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 border-0 focus:outline-none focus:ring-0 ${
-                chartType === "revenue"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
+          <div className="mb-4">
+            <label htmlFor="chartSelector" className="block mb-2 text-sm font-medium text-gray-700">
+              Select Chart
+            </label>
+            <select
+              id="chartSelector"
+              value={chartType}
+              onChange={(e) => setChartType(e.target.value)}
+              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
-              Revenue Chart
-            </button>
-            <button
-              onClick={() => setChartType("reservations")}
-              className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 border-0 focus:outline-none focus:ring-0 ${
-                chartType === "reservations"
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
-              }`}
-            >
-              Reservations Chart
-            </button>
+              <option value="revenue">Revenue Chart</option>
+              <option value="reservations">Reservations Chart</option>
+            </select>
           </div>
           <div className="h-[500px] w-full">{renderChart()}</div>
         </div>
