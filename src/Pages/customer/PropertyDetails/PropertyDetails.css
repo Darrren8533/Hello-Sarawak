@@ -54,6 +54,44 @@
     gap: 0.25rem;
 }
 
+.facilities-details {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.facilities-item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.facilities-icon{
+    font-size: 1.8rem;
+}
+
+.show-all-facilities {
+    margin-top: 15px;
+    padding: 10px; 
+    border: 1px solid #ccc; 
+    border-radius: 5px;
+    background: white; 
+    cursor: pointer;
+}
+
+.facilities-overlay-content {
+    width: 100%;
+    padding: 16px;
+    margin: 0;
+    border-radius: 0;
+    max-height: 90vh;
+}
+
+.full-facilities-list {
+    columns: 1;
+}
+
 .booking-section {
     background-color: white;
     border-radius: 12px;
@@ -1552,37 +1590,6 @@
       overflow-y: auto;
     }
 
-    .facilities-container {
-      margin-top: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .facilities-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-    }
-
-    .facility-icon {
-      font-size: 28px;
-      color: #333;
-      flex-shrink: 0;
-    }
-
-    .facility-title {
-      font-size: 16px;
-      font-weight: bold;
-      margin-bottom: 4px;
-    }
-  
-    .facilities-details {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-  
     .form-group input,
     .form-group select,
     .form-group textarea {
@@ -1606,18 +1613,6 @@
   
     .price-row, .price-total {
       font-size: 14px;
-    }
-  
-    .Facilities-overlay-content {
-      width: 100%;
-      padding: 16px;
-      margin: 0;
-      border-radius: 0;
-      max-height: 90vh;
-    }
-  
-    .full-Facilities-list {
-      columns: 1;
     }
 
     .right-content {
