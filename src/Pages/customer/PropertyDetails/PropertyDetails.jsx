@@ -406,7 +406,7 @@ const PropertyDetails = () => {
                 <hr/>
                 <div className="property-features">
                   <h2 className="property-font">What this place offers</h2>
-                  <div className="Facilities-list">
+                  <div className="facilities-details">
                     {(showAllFacilities ? facilitiesArray : facilitiesArray.slice(0, 10)).map((facilityName, index) => {
                         const facility = facilities.find(f => f.name === facilityName.trim());
                         return (
@@ -419,7 +419,7 @@ const PropertyDetails = () => {
                   </div>
   
                   {facilitiesArray.length > 10 && (
-                    <button className="show-all-Facilities" onClick={toggleFacilities}>
+                    <button className="show-all-facilities" onClick={toggleFacilities}>
                         {showAllFacilities ? "Show Less" : "Show All Facilities"}
                     </button>
                   )}
@@ -750,6 +750,28 @@ const PropertyDetails = () => {
           </div>
         </div>
       )}
+
+      {showAllFacilities && (
+                <div className="facilities-overlay">
+                    <div className="facilities-overlay-content">
+                        <div className="facilities-overlay-header">
+                            <h3>What this place offers</h3>
+                            <button className="close-overlay" onClick={toggleFacilities}>X</button>
+                        </div>
+                        <div className="full-facilities-list">
+                            {facilitiesArray.map((facilityName, index) => {
+                                const facility = facilities.find(f => f.name === facilityName.trim());
+                                return (
+                                    <div key={index} className="facilities-item">
+                                        {facility ? facility.icon : null}
+                                        <span>{facilityName.trim()}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            )}
     </div>
   );
 };
