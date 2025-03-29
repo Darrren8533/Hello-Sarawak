@@ -510,7 +510,7 @@
   
 .gallery-secondary img {
     width: 100%;
-    height: 250px;
+    height: 200px;
     object-fit: cover;
     cursor: pointer;
     transition: all 0.3s ease;
