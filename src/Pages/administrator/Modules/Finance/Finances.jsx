@@ -71,7 +71,7 @@ export default function FinancialDashboard() {
           datasets: [
             {
               label: "Occupancy Rate (%)",
-              data: occupancyData.monthlyData.map((item) => item.occupancyRate),
+              data: occupancyData.monthlyData.map((item) => parseFloat(item.occupancyRate)),
               fill: false,
               borderColor: "rgb(153, 102, 255)",
               tension: 0.3,
