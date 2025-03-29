@@ -64,7 +64,11 @@
 .facilities-item {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
+}
+
+.facilities-item span{
+    font-size: 18px;
 }
 
 .facilities-icon{
