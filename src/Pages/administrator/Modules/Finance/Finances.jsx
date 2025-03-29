@@ -10,7 +10,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { fetchFinance } from "../../../../../Api/api";
+import { fetchFinance, fetchOccupancyRate } from "../../../../../Api/api";
 import "./Finances.css";
 
 ChartJS.register(
@@ -28,6 +28,7 @@ export default function FinancialDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [chartType, setChartType] = useState("revenue");
+  const [occupancyData, setOccupancyData] = useState(null);
 
   useEffect(() => {
     const fetchFinanceData = async () => {
@@ -47,8 +48,77 @@ export default function FinancialDashboard() {
     fetchFinanceData();
   }, []);
 
+  const fetchOccupancyData = async () => {
+    try {
+      const data = await fetchOccupancyRate();
+      setOccupancyData(data);
+    } catch (err) {
+      console.error("Error fetching occupancy data:", err);
+    }
+  };
+  
+  fetchOccupancyData();
+
   const renderChart = () => {
     if (!financeData?.monthlyData) return null;
+
+      if (chartType === "occupancy") {
+        if (!occupancyData?.monthlyData) return <div>No occupancy data</div>;
+      
+        const occupancyChartData = {
+          labels: occupancyData.monthlyData.map((item) => item.month),
+          datasets: [
+            {
+              label: "Occupancy Rate (%)",
+              data: occupancyData.monthlyData.map((item) => item.occupancyRate),
+              fill: false,
+              borderColor: "rgb(153, 102, 255)",
+              tension: 0.3,
+              pointBackgroundColor: "rgb(153, 102, 255)",
+              pointBorderColor: "#fff",
+              pointBorderWidth: 2,
+              pointRadius: 5,
+              pointHoverRadius: 7,
+            },
+          ],
+        };
+      
+        const occupancyOptions = {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: "top",
+            },
+            title: {
+              display: true,
+              text: "Monthly Occupancy Rate Trend",
+            },
+            tooltip: {
+              callbacks: {
+                label: (context) => `Occupancy Rate: ${context.parsed.y}%`,
+              },
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              title: {
+                display: true,
+                text: "Occupancy Rate (%)",
+              },
+            },
+            x: {
+              title: {
+                display: true,
+                text: "Month",
+              },
+            },
+          },
+        };
+      
+        return <Line data={occupancyChartData} options={occupancyOptions} />;
+      }
 
     const chartData = {
       labels: financeData.monthlyData.map((item) => item.month),
@@ -260,6 +330,7 @@ export default function FinancialDashboard() {
               >
                 <option value="revenue">Revenue Chart</option>
                 <option value="reservations">Reservations Chart</option>
+                <option value="occupancy">Occupancy Rate Chart</option>
               </select>
               {/* Custom arrow */}
               <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
