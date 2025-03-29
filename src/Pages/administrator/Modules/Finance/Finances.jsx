@@ -34,6 +34,7 @@ export default function FinancialDashboard() {
     const fetchFinanceData = async () => {
       try {
         const data = await fetchFinance();
+        console.log("Data: ", data);
         if (!data || !data.monthlyData) {
           throw new Error("No finance data available");
         }
