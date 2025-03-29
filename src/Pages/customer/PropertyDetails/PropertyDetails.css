@@ -1010,7 +1010,8 @@
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
-    margin-left: 100px;
+    margin-top: 20px;
+    align-item: center;
 }
 
 .photo-section img:hover {
