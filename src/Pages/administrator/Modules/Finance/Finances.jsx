@@ -247,19 +247,27 @@ export default function FinancialDashboard() {
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow mb-4">
-          <div className="mb-4">
-            <label htmlFor="chartSelector" className="block mb-2 text-sm font-medium text-gray-700">
-              Select Chart
+          <div className="mb-4 flex items-center space-x-2">
+            <label htmlFor="chartSelector" className="text-sm font-medium text-gray-700">
+              Select Chart:
             </label>
-            <select
-              id="chartSelector"
-              value={chartType}
-              onChange={(e) => setChartType(e.target.value)}
-              className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-            >
-              <option value="revenue">Revenue Chart</option>
-              <option value="reservations">Reservations Chart</option>
-            </select>
+            <div className="relative">
+              <select
+                id="chartSelector"
+                value={chartType}
+                onChange={(e) => setChartType(e.target.value)}
+                className="appearance-none bg-white border border-gray-300 rounded-xl px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 w-auto min-w-[200px] hover:border-blue-400 transition"
+              >
+                <option value="revenue">Revenue Chart</option>
+                <option value="reservations">Reservations Chart</option>
+              </select>
+              {/* Custom arrow */}
+              <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
           </div>
           <div className="h-[500px] w-full">{renderChart()}</div>
         </div>
