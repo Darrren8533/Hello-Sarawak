@@ -54,11 +54,17 @@
     gap: 0.25rem;
 }
 
+.product-avatar {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%; 
+}
+
 .facilities-details {
     margin-top: 20px;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 20px;
 }
 
 .facilities-item {
