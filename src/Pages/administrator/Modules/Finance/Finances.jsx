@@ -10,7 +10,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { fetchFinance, fetchOccupancyRate } from "../../../../../Api/api";
+import { fetchFinance, fetchOccupancyRate, fetchRevPAR } from "../../../../../Api/api";
 import "./Finances.css";
 
 ChartJS.register(
@@ -29,6 +29,7 @@ export default function FinancialDashboard() {
   const [error, setError] = useState(null);
   const [chartType, setChartType] = useState("revenue");
   const [occupancyData, setOccupancyData] = useState(null);
+  const [revPARData, setRevPARData] = useState(null);
 
   useEffect(() => {
     const fetchFinanceData = async () => {
@@ -59,6 +60,18 @@ export default function FinancialDashboard() {
     };
     
     fetchOccupancyData();
+
+    const fetchRevPARData = async () => {
+      try {
+        const data = await fetchRevPAR();
+        console.log("RevPAR Data: ", data);
+        setRevPARData(data);
+      } catch (err) {
+        console.error("Error fetching RevPAR data:", err);
+      }
+    };
+    
+    fetchRevPARData();
   }, []);
   
   const renderChart = () => {
@@ -121,6 +134,63 @@ export default function FinancialDashboard() {
       
         return <Line data={occupancyChartData} options={occupancyOptions} />;
       }
+
+    if (chartType === "revpar") {
+      if (!revPARData?.monthlyData) return <div>No RevPAR data</div>;
+    
+      const revparChartData = {
+        labels: revPARData.monthlyData.map((_, idx) => `Month ${idx + 1}`),
+        datasets: [
+          {
+            label: "RevPAR ($)",
+            data: revPARData.monthlyData.map((item) => parseFloat(item.revpar)),
+            fill: false,
+            borderColor: "rgb(255, 159, 64)",
+            tension: 0.3,
+            pointBackgroundColor: "rgb(255, 159, 64)",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+          },
+        ],
+      };
+    
+      const revparOptions = {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "top",
+          },
+          title: {
+            display: true,
+            text: "RevPAR Trend",
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => `RevPAR: $${context.parsed.y.toFixed(2)}`,
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: "RevPAR ($)",
+            },
+          },
+          x: {
+            title: {
+              display: true,
+              text: "Month",
+            },
+          },
+        },
+      };
+    
+      return <Line data={revparChartData} options={revparOptions} />;
+    }
 
     const chartData = {
       labels: financeData.monthlyData.map((item) => item.month),
@@ -333,6 +403,7 @@ export default function FinancialDashboard() {
                 <option value="revenue">Revenue Chart</option>
                 <option value="reservations">Reservations Chart</option>
                 <option value="occupancy">Occupancy Rate Chart</option>
+                <option value="revpar">RevPAR Chart</option>
               </select>
               {/* Custom arrow */}
               <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
