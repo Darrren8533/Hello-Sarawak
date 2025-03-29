@@ -406,14 +406,14 @@ const PropertyDetails = () => {
                 <hr/>
                 <div className="property-features">
                   <h2 className="property-font">What this place offers</h2>
-                  <div className="facilities-details">
+                  <div className="facilities-container">
                     {(showAllFacilities ? facilitiesArray : facilitiesArray.slice(0, 10)).map((facilityName, index) => {
                         const facility = facilities.find(f => f.name === facilityName.trim());
                         return (
                             <div key={index} className="facilities-item">
                                 {facility.icon}
                                 <div>
-                                    <p className="property-font1">{facilityName.trim()}</p>
+                                    <p className="facilities-title">{facilityName.trim()}</p>
                                 </div>
                             </div>
                         );
