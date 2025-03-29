@@ -390,11 +390,11 @@ const PropertyDetails = () => {
                 <hr/>
                 <div className="property-features">
                   <h2 className="property-font">{propertyDetails?.uimage && (
-                    <img 
-                    src={propertyDetails.uimage.startsWith('http') ? propertyDetails.uimage : `data:image/jpeg;base64,${propertyDetails.uimage}`} 
-                    alt="Host Avatar"
-                    className="front-avatar-image"
-                    /> 
+                    <img
+                    src={userAvatar || DefaultAvatar}
+                    alt="User Avatar"
+                    style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+                    />
                     )}
                     Hosted by {propertyDetails?.username || "Unknown Host"}</h2>
                 </div>
