@@ -72,7 +72,7 @@ export default function FinancialDashboard() {
           datasets: [
             {
               label: "Occupancy Rate (%)",
-              data: occupancyData.monthlyData.map((item) => parseFloat(item.occupancyrate)),
+              data: occupancyData.monthlyData.map((item) => parseFloat(item.occupancy_rate)),
               fill: false,
               borderColor: "rgb(153, 102, 255)",
               tension: 0.3,
@@ -132,8 +132,8 @@ export default function FinancialDashboard() {
               : "Monthly Reservations",
           data: financeData.monthlyData.map((item) =>
             chartType === "revenue"
-              ? item.monthlyRevenue
-              : item.monthlyReservations
+              ? item.monthly_revenue
+              : item.monthly_reservations
           ),
           fill: false,
           borderColor: "rgb(75, 192, 192)",
@@ -217,24 +217,24 @@ export default function FinancialDashboard() {
 
     return {
       revenue: {
-        current: currentMonth.monthlyRevenue,
+        current: currentMonth.monthly_revenue,
         growth: calculateGrowthRate(
-          currentMonth.monthlyRevenue,
-          lastMonth.monthlyRevenue
+          currentMonth.monthly_revenue,
+          lastMonth.monthly_revenue
         ),
       },
       reservations: {
-        current: currentMonth.monthlyReservations,
+        current: currentMonth.monthly_reservations,
         growth: calculateGrowthRate(
-          currentMonth.monthlyReservations,
-          lastMonth.monthlyReservations
+          currentMonth.monthly_reservations,
+          lastMonth.monthly_reservations
         ),
       },
       averageRevenue: {
-        current: currentMonth.monthlyRevenue,
+        current: currentMonth.monthly_revenue,
         growth: calculateGrowthRate(
-          currentMonth.monthlyRevenue,
-          lastMonth.monthlyRevenue
+          currentMonth.monthly_revenue,
+          lastMonth.monthly_revenue
         ),
       },
     };
@@ -254,7 +254,7 @@ export default function FinancialDashboard() {
             <p className="text-2xl font-bold">
               $
               {financeData?.monthlyData.reduce(
-                (sum, item) => sum + item.monthlyRevenue,
+                (sum, item) => sum + item.monthly_revenue,
                 0
               ) || 0}
             </p>
@@ -275,7 +275,7 @@ export default function FinancialDashboard() {
             </h2>
             <p className="text-2xl font-bold">
               {financeData?.monthlyData.reduce(
-                (sum, item) => sum + item.monthlyReservations,
+                (sum, item) => sum + item.monthly_reservations,
                 0
               ) || 0}
             </p>
@@ -299,7 +299,7 @@ export default function FinancialDashboard() {
               {financeData?.monthlyData.length > 0
                 ? Math.round(
                     financeData.monthlyData.reduce(
-                      (sum, item) => sum + item.monthlyRevenue,
+                      (sum, item) => sum + item.monthly_revenue,
                       0
                     ) / financeData.monthlyData.length
                   )
