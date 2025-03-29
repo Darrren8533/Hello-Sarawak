@@ -46,19 +46,19 @@ export default function FinancialDashboard() {
     };
 
     fetchFinanceData();
+
+    const fetchOccupancyData = async () => {
+      try {
+        const data = await fetchOccupancyRate();
+        setOccupancyData(data);
+      } catch (err) {
+        console.error("Error fetching occupancy data:", err);
+      }
+    };
+    
+    fetchOccupancyData();
   }, []);
-
-  const fetchOccupancyData = async () => {
-    try {
-      const data = await fetchOccupancyRate();
-      setOccupancyData(data);
-    } catch (err) {
-      console.error("Error fetching occupancy data:", err);
-    }
-  };
   
-  fetchOccupancyData();
-
   const renderChart = () => {
     if (!financeData?.monthlyData) return null;
 
