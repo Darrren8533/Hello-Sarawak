@@ -401,7 +401,7 @@ const PropertyDetails = () => {
                 <hr/>
                 <div className="property-features">
                   <h2 className="property-font">Description</h2>
-                  <p className="property-font">{propertyDetails?.propertydescription}</p>
+                  <p className="property-font1">{propertyDetails?.propertydescription}</p>
                 </div>
                 <hr/>
                 <div className="property-features">
