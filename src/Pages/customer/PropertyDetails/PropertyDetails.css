@@ -1552,13 +1552,13 @@
       overflow-y: auto;
     }
   
-    .facilities-list {
+    .facilities-details {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
     }
   
-    .facility-item {
+    .facilities-item {
       font-size: 14px;
     }
   
