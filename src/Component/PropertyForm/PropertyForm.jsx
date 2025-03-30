@@ -78,7 +78,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         propertyBedType: "1",
         propertyGuestPaxNo: "1",
         propertyDescription: "",
-        propertyFacilities: [],
+        facilities: [],
         propertyImage: [],
         clusterName: "",
         categoryName: "", 
@@ -88,6 +88,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("");
+    const [selectedFacilities, setSelectedFacilities] = useState([]);
     const fileInputRef = useRef(null);
 
     useEffect(() => {
@@ -108,7 +109,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 propertyBedType: initialData.propertybedtype || "",
                 propertyGuestPaxNo: initialData.propertyguestpaxno || "",
                 propertyDescription: initialData.propertydescription || "",
-                propertyFacilities: initialData.facilities || [],
+                facilities: initialData.facilities || [],
                 propertyImage: initialData.propertyimage || [],
                 clusterName: initialData.clustername || "", 
                 categoryName: initialData.categoryname || "", 
@@ -116,20 +117,12 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         }
     }, [initialData]);
 
-
-
     const toggleFacility = (facilityName) => {
-        setFormData((prev) => {
-            const currentFacilities = Array.isArray(prev.propertyFacilities) ? prev.propertyFacilities : [];
-            const updatedFacilities = currentFacilities.includes(facilityName)
-                ? currentFacilities.filter((name) => name !== facilityName)
-                : [...currentFacilities, facilityName];
-
-            return {
-                ...prev,
-                propertyFacilities: updatedFacilities,
-            };
-        });
+        setSelectedFacilities((prevSelected) =>
+          prevSelected.includes(facilityName)
+            ? prevSelected.filter((name) => name !== facilityName)
+            : [...prevSelected, facilityName]
+        );
     };
 
     const handleChange = (e) => {
@@ -175,7 +168,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         data.append("propertyBedType", formData.propertyBedType);
         data.append("propertyGuestPaxNo", formData.propertyGuestPaxNo);
         data.append("propertyDescription", formData.propertyDescription);
-        data.append("facilities", formData.propertyFacilities.join(","));
+        data.append("facilities", formData.facilities.join(","));
         data.append("clusterName", formData.clusterName); 
         data.append("categoryName", formData.categoryName); 
 
@@ -221,7 +214,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 propertyBedType: "",
                 propertyGuestPaxNo: "",
                 propertyDescription: "",
-                propertyFacilities: [],
+                facilities: [],
                 propertyImage: [],
                 clusterName: "",
                 categoryName: "", 
@@ -392,16 +385,34 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                     <div className="property-listing-form-group full-width">
                         <label>Facilities</label>
                         <div className="Facilities-list">
-                            {predefinedFacilities.map((facility, index) => (
-                                <div key={index} className={`facility-item ${
-                                    formData.propertyFacilities.includes(facility.name) ? "selected" : ""
-                                }`}
-                                onClick={() => toggleFacility(facility.name)}>
-                                    {facility.icon} {facility.name}
-                                </div>
-                            ))}
+                                      {predefinedFacilities.filter(facility => !selectedFacilities.includes(facility.name)).map((facility, index) => (
+            <div
+              key={index}
+              className="facility-item"
+              onClick={() => toggleFacility(facility.name)}
+            >
+              {facility.icon} {facility.name}
+            </div>
+          ))}
                         </div>
                     </div>
+
+                    {selectedFacilities.length > 0 && (
+        <div>
+          <h3>Selected Facilities</h3>
+          <ul>
+            {selectedFacilities.map((facilityName, index) => {
+              const facility = predefinedFacilities.find(f => f.name === facilityName);
+              return (
+                <li key={index} className="selected-facility-item">
+                  {facility.icon} {facility.name} 
+                  <button onClick={() => toggleFacility(facility.name)}>X</button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
 
                     <div className="property-listing-form-group full-width">
                         <label>Property Image:</label>
