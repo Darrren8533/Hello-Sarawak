@@ -260,9 +260,9 @@ export default function FinancialDashboard() {
               : item.monthlyreservations
           ),
           fill: false,
-          borderColor: "rgb(75, 192, 192)",
+          borderColor: chartType === "revenue" ? "rgb(75, 192, 192)" : "rgb(30, 144, 255)",
           tension: 0.3,
-          pointBackgroundColor: "rgb(75, 192, 192)",
+          pointBackgroundColor: chartType === "revenue" ? "rgb(75, 192, 192)" : "rgb(30, 144, 255)",
           pointBorderColor: "#fff",
           pointBorderWidth: 2,
           pointRadius: 5,
