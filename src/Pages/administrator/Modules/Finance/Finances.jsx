@@ -10,7 +10,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { fetchFinance, fetchOccupancyRate, fetchRevPAR, fetchCancellationRate } from "../../../../../Api/api";
+import { fetchFinance, fetchOccupancyRate, fetchRevPAR, fetchCancellationRate, fetchCustomerRetentionRate } from "../../../../../Api/api";
 import "./Finances.css";
 
 ChartJS.register(
@@ -30,7 +30,8 @@ export default function FinancialDashboard() {
   const [chartType, setChartType] = useState("revenue");
   const [occupancyData, setOccupancyData] = useState(null);
   const [revPARData, setRevPARData] = useState(null);
-  const [cancellationRateData, setCancellationRateDate] = useState(null);
+  const [cancellationRateData, setCancellationRateData] = useState(null);
+  const [customerRetentionRateData, setCustomerRetentionRateData] = useState(null);
 
   useEffect(() => {
     const fetchFinanceData = async () => {
@@ -78,13 +79,25 @@ export default function FinancialDashboard() {
       try {
         const data = await fetchCancellationRate();
         
-        setCancellationRateDate(data);
+        setCancellationRateData(data);
       } catch (err) {
         console.error("Error fetching cancellation rate data:", err);
       }
     };
     
     fetchCancellationRateData();
+
+    const fetchCustomerRetentionRateDate = async () => {
+      try {
+        const data = await fetchCustomerRetentionRate();
+        
+        setCustomerRetentionRateData(data);
+      } catch (err) {
+        console.error("Error fetching customer retention rate data:", err);
+      }
+    };
+    
+    fetchCustomerRetentionRateDate();
   }, []);
   
   const renderChart = () => {
@@ -244,6 +257,64 @@ export default function FinancialDashboard() {
       };
     
       return <Line data={cancellationRateChartData} options={cancellationRateOptions} />;
+    }
+
+    if (chartType === "retention") {
+      if (!customerRetentionRateData?.monthlyData) return <div>No customer retention data</div>;
+    
+      const retentionChartData = {
+        labels: customerRetentionRateData.monthlyData.map((_, index) => `Month ${index + 1}`),
+        datasets: [
+          {
+            label: "Customer Retention Rate (%)",
+            data: customerRetentionRateData.monthlyData.map((item) => parseFloat(item.customer_retention_rate)),
+            fill: false,
+            borderColor: "rgb(54, 162, 235)",
+            tension: 0.3,
+            pointBackgroundColor: "rgb(54, 162, 235)",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+          },
+        ],
+      };
+    
+      const retentionOptions = {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "top",
+          },
+          title: {
+            display: true,
+            text: "Monthly Customer Retention Rate Trend",
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => `Retention Rate: ${context.parsed.y}%`,
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
+            title: {
+              display: true,
+              text: "Retention Rate (%)",
+            },
+          },
+          x: {
+            title: {
+              display: true,
+              text: "Month",
+            },
+          },
+        },
+      };
+    
+      return <Line data={retentionChartData} options={retentionOptions} />;
     }
 
     const chartData = {
@@ -459,6 +530,7 @@ export default function FinancialDashboard() {
                 <option value="occupancy">Occupancy Rate Chart</option>
                 <option value="revpar">RevPAR Chart</option>
                 <option value="cancellation">Cancellation Rate Chart</option>
+                <option value="retention">Customer Retention Rate Chart</option>
               </select>
               {/* Custom arrow */}
               <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
