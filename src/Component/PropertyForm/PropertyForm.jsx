@@ -118,13 +118,13 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 propertyBedType: initialData.propertybedtype || "",
                 propertyGuestPaxNo: initialData.propertyguestpaxno || "",
                 propertyDescription: initialData.propertydescription || "",
-                facilities: initialData.facilities || [],
+                facilities: Array.isArray(initialData.facilities) ? initialData.facilities : [],
                 propertyImage: initialData.propertyimage || [],
                 clusterName: initialData.clustername || "", 
                 categoryName: initialData.categoryname || "", 
             });
         }
-    }, [initialData] [initialData.facilities]);
+    }, [initialData]); 
 
     const toggleFacility = (facilityName) => {
         setFormData((prevData) => {
