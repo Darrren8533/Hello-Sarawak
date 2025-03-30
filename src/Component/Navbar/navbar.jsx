@@ -145,7 +145,7 @@ function Navbar() {
                                 </li>
                                 
                                 {/* Mobile login/profile/logout options */}
-                                {isLoggedIn ? (
+                                {isLoggedIn && isCustomer ? (
                                     <>
                                         <li className="nav-item mx-4 mobile-auth-item">
                                             <Link className="nav-link mx-lg-2" to="/login/profile">
@@ -173,7 +173,7 @@ function Navbar() {
                     </div>
 
                     <div className="d-flex justify-content-end">
-                        {isLoggedIn && (
+                        {isLoggedIn && isCustomer &&(
                             <button
                                 className="user-icon-button"
                                 onClick={() => navigate('/login/profile')}
@@ -188,7 +188,7 @@ function Navbar() {
                             </button>
                         )}
 
-                        {isLoggedIn ? (
+                        {isLoggedIn && isCustomer ? (
                             <button onClick={handleLogout} className="logout-button">
                                 Logout
                             </button>
