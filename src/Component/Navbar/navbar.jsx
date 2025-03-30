@@ -12,6 +12,7 @@ function Navbar() {
     const navigate = useNavigate();
     const { isLoggedIn, userAvatar, userID, logout, updateAvatar } = useAuth();
     const [isCustomer, setIsCustomer] = useState(false);
+    const [imageLoaded, setImageLoaded] = useState(false);
 
     useEffect(() => {
         const initOffcanvas = () => {
@@ -49,22 +50,31 @@ function Navbar() {
     }, [updateAvatar]);
 
     useEffect(() => {
-        const checkUserGroup = async () => {
+        const checkUserData = async () => {
+            if (!isLoggedIn || !userID) return;
+            
             try {
                 const userData = await fetchUserData(userID);
+                
                 // Check if the user group is exactly "Customer"
                 setIsCustomer(userData.usergroup === "Customer");
+                
+                // Update avatar if it exists in user data and is different from current
+                if (userData.avatar && userData.avatar !== userAvatar) {
+                    updateAvatar(userData.avatar);
+                }
             } catch (error) {
                 console.error('Error fetching user data:', error);
                 setIsCustomer(false);
             }
         };
 
-        // Only check user group if logged in
-        if (isLoggedIn) {
-            checkUserGroup();
-        }
-    }, [isLoggedIn, userID]);
+        // Reset image loaded state when avatar changes
+        setImageLoaded(false);
+        
+        // Fetch user data when logged in or when userID/userAvatar changes
+        checkUserData();
+    }, [isLoggedIn, userID, userAvatar, updateAvatar]);
 
     const handleLogout = async () => {
         try {
@@ -88,9 +98,19 @@ function Navbar() {
     };
 
     const handleImageError = (e) => {
-        e.target.src = DefaultAvatar;
         console.error('Avatar image load error:', e);
+        // Only set default avatar if the custom avatar fails to load
+        if (!imageLoaded) {
+            e.target.src = DefaultAvatar;
+        }
     };
+
+    const handleImageLoad = () => {
+        setImageLoaded(true);
+    };
+
+    // Determine the avatar source with proper fallback
+    const avatarSrc = userAvatar || DefaultAvatar;
 
     return (
         <div>
@@ -180,10 +200,11 @@ function Navbar() {
                                 style={{ border: 'none', background: 'transparent', cursor: 'pointer', marginRight: '20px' }}
                             >
                                 <img
-                                    src={userAvatar || DefaultAvatar}
+                                    src={avatarSrc}
                                     alt="User Avatar"
                                     style={{ width: '40px', height: '40px', borderRadius: '50%' }}
                                     onError={handleImageError}
+                                    onLoad={handleImageLoad}
                                 />
                             </button>
                         )}
@@ -215,4 +236,4 @@ function Navbar() {
     );
 }
 
-export default Navbar
+export default Navbar;
