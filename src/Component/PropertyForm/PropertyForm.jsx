@@ -101,6 +101,12 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         }
 
         if (initialData) {
+
+            const initialFacilities = 
+            typeof initialData.facilities === 'string' 
+                ? initialData.facilities.split(',') 
+                : initialData.facilities || [];
+                
             setFormData({
                 username: initialData.username || "",
                 propertyPrice: initialData.rateamount || "",
@@ -109,20 +115,29 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 propertyBedType: initialData.propertybedtype || "",
                 propertyGuestPaxNo: initialData.propertyguestpaxno || "",
                 propertyDescription: initialData.propertydescription || "",
-                facilities: initialData.facilities || [],
+                facilities: initialFacilities,
                 propertyImage: initialData.propertyimage || [],
                 clusterName: initialData.clustername || "", 
                 categoryName: initialData.categoryname || "", 
             });
+
+            setSelectedFacilities(initialFacilities);
         }
     }, [initialData]);
 
     const toggleFacility = (facilityName) => {
-        setSelectedFacilities((prevSelected) =>
-          prevSelected.includes(facilityName)
-            ? prevSelected.filter((name) => name !== facilityName)
-            : [...prevSelected, facilityName]
-        );
+        setSelectedFacilities((prevSelected) => {
+            const updatedFacilities = prevSelected.includes(facilityName)
+                ? prevSelected.filter((name) => name !== facilityName)
+                : [...prevSelected, facilityName];
+            
+            setFormData((prev) => ({
+                ...prev,
+                facilities: updatedFacilities,
+            }));
+            
+            return updatedFacilities;
+        });
     };
 
     const handleChange = (e) => {
@@ -168,7 +183,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         data.append("propertyBedType", formData.propertyBedType);
         data.append("propertyGuestPaxNo", formData.propertyGuestPaxNo);
         data.append("propertyDescription", formData.propertyDescription);
-        data.append("facilities", formData.facilities.join(","));
+        data.append("facilities", selectedFacilities.join(","));
         data.append("clusterName", formData.clusterName); 
         data.append("categoryName", formData.categoryName); 
 
