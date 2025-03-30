@@ -10,7 +10,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { fetchFinance, fetchOccupancyRate, fetchRevPAR } from "../../../../../Api/api";
+import { fetchFinance, fetchOccupancyRate, fetchRevPAR, fetchCancellationRate } from "../../../../../Api/api";
 import "./Finances.css";
 
 ChartJS.register(
@@ -30,12 +30,13 @@ export default function FinancialDashboard() {
   const [chartType, setChartType] = useState("revenue");
   const [occupancyData, setOccupancyData] = useState(null);
   const [revPARData, setRevPARData] = useState(null);
+  const [cancellationRateData, setCancellationRateDate] = useState(null);
 
   useEffect(() => {
     const fetchFinanceData = async () => {
       try {
         const data = await fetchFinance();
-        console.log("Data: ", data);
+        
         if (!data || !data.monthlyData) {
           throw new Error("No finance data available");
         }
@@ -52,7 +53,7 @@ export default function FinancialDashboard() {
     const fetchOccupancyData = async () => {
       try {
         const data = await fetchOccupancyRate();
-        console.log("Occupancy Data: ", data);
+        
         setOccupancyData(data);
       } catch (err) {
         console.error("Error fetching occupancy data:", err);
@@ -64,7 +65,7 @@ export default function FinancialDashboard() {
     const fetchRevPARData = async () => {
       try {
         const data = await fetchRevPAR();
-        console.log("RevPAR Data: ", data);
+        
         setRevPARData(data);
       } catch (err) {
         console.error("Error fetching RevPAR data:", err);
@@ -72,6 +73,18 @@ export default function FinancialDashboard() {
     };
     
     fetchRevPARData();
+
+    const fetchCancellationRateData = async () => {
+      try {
+        const data = await fetchCancellationRate();
+        
+        setCancellationRateDate(data);
+      } catch (err) {
+        console.error("Error fetching cancellation rate data:", err);
+      }
+    };
+    
+    fetchCancellationRateData();
   }, []);
   
   const renderChart = () => {
@@ -190,6 +203,53 @@ export default function FinancialDashboard() {
       };
     
       return <Line data={revparChartData} options={revparOptions} />;
+    }
+
+    if (chartType === "cancellation_rate") {
+      if (!cancellationRateData?.monthlyData) return <div>No Cancellation Rate data</div>;
+    
+      const cancellationRateChartData = {
+        labels: ["Cancellation Rate"], 
+        datasets: [
+          {
+            label: "Cancellation Rate (%)",
+            data: cancellationRateData.monthlyData.map((item) => parseFloat(item.cancellation_rate)),
+            fill: false,
+            borderColor: "rgb(255, 99, 132)",
+            tension: 0.3,
+            pointBackgroundColor: "rgb(255, 99, 132)",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+          },
+        ],
+      };
+    
+      const cancellationRateOptions = {
+        responsive: true,
+        plugins: {
+          legend: { position: "top" },
+          title: { display: true, text: "Cancellation Rate" },
+          tooltip: {
+            callbacks: {
+              label: (context) => `Cancellation Rate: ${context.parsed.y.toFixed(2)}%`,
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100, 
+            title: { display: true, text: "Cancellation Rate (%)" },
+          },
+          x: {
+            title: { display: true, text: "Metric" },
+          },
+        },
+      };
+    
+      return <Line data={cancellationRateChartData} options={cancellationRateOptions} />;
     }
 
     const chartData = {
@@ -404,6 +464,7 @@ export default function FinancialDashboard() {
                 <option value="reservations">Reservations Chart</option>
                 <option value="occupancy">Occupancy Rate Chart</option>
                 <option value="revpar">RevPAR Chart</option>
+                <option value="cancellation">Cancellation Rate Chart</option>
               </select>
               {/* Custom arrow */}
               <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
