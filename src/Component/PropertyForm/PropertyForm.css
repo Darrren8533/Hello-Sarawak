@@ -379,6 +379,8 @@
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
+  background-color: #e0f7fa;
+  border-color: #00bcd4;
   border: 1px solid #ddd;
   border-radius: 20px;
   cursor: pointer;
