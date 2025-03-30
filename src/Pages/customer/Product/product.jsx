@@ -7,6 +7,7 @@ import Footer from '../../../Component/Footer/footer';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
 import Toast from '../../../Component/Toast/Toast';
 import ImageSlider from '../../../Component/ImageSlider/ImageSlider';
+import PropertyForm from '../../../Component/PropertyForm/PropertyForm';
 import Loader from '../../../Component/Loader/Loader';
 import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 
@@ -37,34 +38,6 @@ const Product = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
   const [activeTab, setActiveTab] = useState(null);
   const navigate = useNavigate();
-
-  const clusters = [
-    "Kuching",
-    "Miri",
-    "Sibu",
-    "Bintulu",
-    "Limbang",
-    "Sarikei",
-    "Sri Aman",
-    "Kapit",
-    "Mukah",
-    "Betong",
-    "Samarahan",
-    "Serian",
-    "Lundu",
-    "Lawas",
-    "Marudi",
-    "Simunjan",
-    "Tatau",
-    "Belaga",
-    "Debak",
-    "Kabong",
-    "Pusa",
-    "Sebuyau",
-    "Saratok",
-    "Selangau",
-    "Tebedu",
-];
 
   // Create refs for search segments
   const locationRef = useRef(null);
