@@ -11,7 +11,7 @@ import Loader from '../../../Component/Loader/Loader';
 import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 
 // Import API
-import { fetchProduct, fetchCart } from '../../../../Api/api';
+import { fetchProduct } from '../../../../Api/api';
 
 // Import React Icons and CSS
 import { FaStar, FaStarHalfAlt, FaSearch } from 'react-icons/fa';
@@ -28,6 +28,7 @@ const Product = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('');
   const [bookingData, setBookingData] = useState({
+    clusterName: "",
     checkIn: "",
     checkOut: "",
     adults: 1,
@@ -36,6 +37,34 @@ const Product = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
   const [activeTab, setActiveTab] = useState(null);
   const navigate = useNavigate();
+
+  const clusters = [
+    "Kuching",
+    "Miri",
+    "Sibu",
+    "Bintulu",
+    "Limbang",
+    "Sarikei",
+    "Sri Aman",
+    "Kapit",
+    "Mukah",
+    "Betong",
+    "Samarahan",
+    "Serian",
+    "Lundu",
+    "Lawas",
+    "Marudi",
+    "Simunjan",
+    "Tatau",
+    "Belaga",
+    "Debak",
+    "Kabong",
+    "Pusa",
+    "Sebuyau",
+    "Saratok",
+    "Selangau",
+    "Tebedu",
+];
 
   // Create refs for search segments
   const locationRef = useRef(null);
@@ -132,23 +161,19 @@ const Product = () => {
     const totalGuests = bookingData.adults + bookingData.children;
   
     try {
-      const allProperties = await fetchProduct(); // Always fetch fresh data
+      const allProperties = await fetchProduct();
   
       const availableProperties = allProperties.filter((property) => {
-        if (property.propertyguestpaxno < totalGuests) return false;
-  
-            const existingCheckin = new Date(property.checkindatetime);
-            const existingCheckout = new Date(property.checkoutdatetime);
-  
-            // Fix overlapping logic
-            if (
-              (checkIn < existingCheckout && checkOut > existingCheckin) // Strict overlap check
-            ) {
-              return false; // Property is reserved for that period
-            }
+        const existingCheckin = new Date(property.checkindatetime);
+        const existingCheckout = new Date(property.checkoutdatetime);
 
+        if (property.propertyguestpaxno < totalGuests) return false;
+        
+        if (checkIn < existingCheckout && checkOut > existingCheckin) return false; 
+        
+        if (property => property.clustername === selectedCluster) return false;
   
-        return true; // Property is available
+        return true; 
       });
   
       if (availableProperties.length === 0) {
@@ -225,7 +250,9 @@ const Product = () => {
               <IoLocationSharp className='search_bar_icon'/>
               <div className="search-content">
                 <span className="search-label">Where</span>
-                <span className="search-value">Search destinations</span>
+                <span className="search-value">
+                  {bookingData.clusterName || 'Search destinations'}
+                </span>
               </div>
             </div>
             
@@ -299,15 +326,19 @@ const Product = () => {
                 <div>
                   <h3>Popular destinations</h3>
                   <div className="destinations-grid">
-                    {properties.slice(0, 4).map(property => (
-                      <div 
-                        key={property.propertyid} 
-                        className="destination-item"
-                        onClick={() => handleViewDetails(property)}
-                      >
-                        <span>{property.propertyaddress}</span>
-                      </div>
-                    ))}
+                    <select
+                            name="clusterName"
+                            value={bookingData.clusterName}
+                            onChange={handleChange}
+                            required
+                        >
+                            <option value="">Select Cluster (City)</option>
+                            {clusters.map((cluster, index) => (
+                                <option key={index} value={cluster}>
+                                    {cluster}
+                                </option>
+                            ))}
+                    </select>
                   </div>
                 </div>
               )}
