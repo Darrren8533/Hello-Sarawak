@@ -366,14 +366,6 @@
   background-color: #f5f5f5;
 }
 
-.selected-facilities-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  list-style: none;
-  padding: 0;
-}
-
 .selected-facility-item {
   display: flex;
   align-items: center;
@@ -389,16 +381,6 @@
 
 .selected-facility-item:hover {
   background-color: #f5f5f5;
-}
-
-.selected-facility-item button {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  z-index: 1001;
-  padding: 0;
-  margin-left: 20px;
-  color: #ff0000;
 }
 
 /* Drag and drop styling */
