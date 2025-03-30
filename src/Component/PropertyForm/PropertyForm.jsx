@@ -400,17 +400,17 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                     {selectedFacilities.length > 0 && (
         <div>
           <h3>Selected Facilities</h3>
-          <ul>
+          <div className="selected-facilities-grid">
             {selectedFacilities.map((facilityName, index) => {
               const facility = predefinedFacilities.find(f => f.name === facilityName);
               return (
-                <li key={index} className="facility-item">
+                <div key={index} className="selected-facility-item">
                   {facility.icon} {facility.name} 
                   <button onClick={() => toggleFacility(facility.name)}>X</button>
-                </li>
+                </div>
               );
             })}
-          </ul>
+          </div>
         </div>
       )}
 
