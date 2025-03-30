@@ -11,7 +11,7 @@ import './navbar.css';
 function Navbar() {
     const navigate = useNavigate();
     const { isLoggedIn, userAvatar, userID, logout, updateAvatar } = useAuth();
-    const [imageLoaded, setImageLoaded] = useState(false);
+    const [isCustomer, setIsCustomer] = useState(false);
 
     useEffect(() => {
         const initOffcanvas = () => {
@@ -49,25 +49,22 @@ function Navbar() {
     }, [updateAvatar]);
 
     useEffect(() => {
-        const checkUserData = async () => {
-            if (!isLoggedIn || !userID) return;
-            
+        const checkUserGroup = async () => {
             try {
                 const userData = await fetchUserData(userID);
-
-                // Update avatar if it exists in user data and is different from current
-                if (userData.avatar && userData.avatar !== userAvatar) {
-                    updateAvatar(userData.avatar);
-                }
+                // Check if the user group is exactly "Customer"
+                setIsCustomer(userData.usergroup === "Customer");
             } catch (error) {
                 console.error('Error fetching user data:', error);
+                setIsCustomer(false);
             }
         };
 
-        setImageLoaded(false);
-        
-        checkUserData();
-    }, [isLoggedIn, userID, userAvatar, updateAvatar]);
+        // Only check user group if logged in
+        if (isLoggedIn) {
+            checkUserGroup();
+        }
+    }, [isLoggedIn, userID]);
 
     const handleLogout = async () => {
         try {
@@ -91,19 +88,9 @@ function Navbar() {
     };
 
     const handleImageError = (e) => {
+        e.target.src = DefaultAvatar;
         console.error('Avatar image load error:', e);
-        // Only set default avatar if the custom avatar fails to load
-        if (!imageLoaded) {
-            e.target.src = DefaultAvatar;
-        }
     };
-
-    const handleImageLoad = () => {
-        setImageLoaded(true);
-    };
-
-    // Determine the avatar source with proper fallback
-    const avatarSrc = userAvatar || DefaultAvatar;
 
     return (
         <div>
@@ -158,7 +145,7 @@ function Navbar() {
                                 </li>
                                 
                                 {/* Mobile login/profile/logout options */}
-                                {isLoggedIn ? (
+                                {isLoggedIn && isCustomer ? (
                                     <>
                                         <li className="nav-item mx-4 mobile-auth-item">
                                             <Link className="nav-link mx-lg-2" to="/login/profile">
@@ -186,23 +173,22 @@ function Navbar() {
                     </div>
 
                     <div className="d-flex justify-content-end">
-                        {isLoggedIn &&(
+                        {isLoggedIn && isCustomer &&(
                             <button
                                 className="user-icon-button"
                                 onClick={() => navigate('/login/profile')}
                                 style={{ border: 'none', background: 'transparent', cursor: 'pointer', marginRight: '20px' }}
                             >
                                 <img
-                                    src={avatarSrc}
+                                    src={userAvatar || DefaultAvatar}
                                     alt="User Avatar"
                                     style={{ width: '40px', height: '40px', borderRadius: '50%' }}
                                     onError={handleImageError}
-                                    onLoad={handleImageLoad}
                                 />
                             </button>
                         )}
 
-                        {isLoggedIn ? (
+                        {isLoggedIn && isCustomer ? (
                             <button onClick={handleLogout} className="logout-button">
                                 Logout
                             </button>
@@ -229,4 +215,4 @@ function Navbar() {
     );
 }
 
-export default Navbar;
+export default Navbar
