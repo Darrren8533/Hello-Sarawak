@@ -143,23 +143,6 @@
   object-fit: cover;
 }
 
-.remove-image-btn {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background: rgba(255, 255, 255, 0.7);
-  border: none;
-  color: #333;
-  font-size: 12px;
-  cursor: pointer;
-  border-radius: 50%;
-  padding: 0 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
 @media (max-width: 768px) {
   .property-form-content {
     max-width: 90%;
@@ -231,12 +214,6 @@
   padding: 3px 6px;
   border-radius: 4px;
   font-size: 0.8rem;
-}
-
-.remove-image-btn {
-  position: absolute;
-  top: 5px;
-  right: 5px;
 }
 
 .image-item img {
@@ -392,7 +369,7 @@
 .selected-facilities-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  gap: 50px;
   list-style: none;
   padding: 0;
 }
