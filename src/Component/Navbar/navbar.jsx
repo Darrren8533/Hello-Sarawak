@@ -11,7 +11,6 @@ import './navbar.css';
 function Navbar() {
     const navigate = useNavigate();
     const { isLoggedIn, userAvatar, userID, logout, updateAvatar } = useAuth();
-    const [isCustomer, setIsCustomer] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
 
     useEffect(() => {
@@ -55,24 +54,18 @@ function Navbar() {
             
             try {
                 const userData = await fetchUserData(userID);
-                
-                // Check if the user group is exactly "Customer"
-                setIsCustomer(userData.usergroup === "Customer");
-                
+
                 // Update avatar if it exists in user data and is different from current
                 if (userData.avatar && userData.avatar !== userAvatar) {
                     updateAvatar(userData.avatar);
                 }
             } catch (error) {
                 console.error('Error fetching user data:', error);
-                setIsCustomer(false);
             }
         };
 
-        // Reset image loaded state when avatar changes
         setImageLoaded(false);
         
-        // Fetch user data when logged in or when userID/userAvatar changes
         checkUserData();
     }, [isLoggedIn, userID, userAvatar, updateAvatar]);
 
@@ -165,7 +158,7 @@ function Navbar() {
                                 </li>
                                 
                                 {/* Mobile login/profile/logout options */}
-                                {isLoggedIn && isCustomer ? (
+                                {isLoggedIn ? (
                                     <>
                                         <li className="nav-item mx-4 mobile-auth-item">
                                             <Link className="nav-link mx-lg-2" to="/login/profile">
@@ -193,7 +186,7 @@ function Navbar() {
                     </div>
 
                     <div className="d-flex justify-content-end">
-                        {isLoggedIn && isCustomer &&(
+                        {isLoggedIn &&(
                             <button
                                 className="user-icon-button"
                                 onClick={() => navigate('/login/profile')}
@@ -209,7 +202,7 @@ function Navbar() {
                             </button>
                         )}
 
-                        {isLoggedIn && isCustomer ? (
+                        {isLoggedIn ? (
                             <button onClick={handleLogout} className="logout-button">
                                 Logout
                             </button>
