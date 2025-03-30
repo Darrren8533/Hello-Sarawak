@@ -100,15 +100,6 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             }));
         }
 
-        if (Array.isArray(initialData.facilities)) {
-            setFormData((prevData) => ({
-              ...prevData,
-              facilities: initialData.facilities.filter(facility =>
-                predefinedFacilities.some(predefined => predefined.name === facility)
-              )
-            }));
-        }
-
         if (initialData) {
             setFormData({
                 username: initialData.username || "",
@@ -118,22 +109,21 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 propertyBedType: initialData.propertybedtype || "",
                 propertyGuestPaxNo: initialData.propertyguestpaxno || "",
                 propertyDescription: initialData.propertydescription || "",
-                facilities: Array.isArray(initialData.facilities) ? initialData.facilities : [],
+                facilities: initialData.facilities || [],
                 propertyImage: initialData.propertyimage || [],
                 clusterName: initialData.clustername || "", 
                 categoryName: initialData.categoryname || "", 
             });
         }
-    }, [initialData]); 
+    }, [initialData]);
 
     const toggleFacility = (facilityName) => {
-        setFormData((prevData) => {
-          const updatedFacilities = prevData.facilities.includes(facilityName)
-            ? prevData.facilities.filter((name) => name !== facilityName)
-            : [...prevData.facilities, facilityName];
-          return { ...prevData, facilities: updatedFacilities };
-        });
-      };
+        setSelectedFacilities((prevSelected) =>
+          prevSelected.includes(facilityName)
+            ? prevSelected.filter((name) => name !== facilityName)
+            : [...prevSelected, facilityName]
+        );
+    };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -395,7 +385,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                     <div className="property-listing-form-group full-width">
                         <label>Facilities</label>
                         <div className="Facilities-list">
-                            {predefinedFacilities.filter(facility => !formData.facilities.includes(facility.name)).map((facility, index) => (
+                            {predefinedFacilities.filter(facility => !selectedFacilities.includes(facility.name)).map((facility, index) => (
                                 <div key={index} className="facility-item" onClick={() => toggleFacility(facility.name)}>
                                     {facility.icon} {facility.name}
                                 </div>
@@ -403,15 +393,15 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                        </div>
                     </div>
 
-                    {!formData.facilities.length > 0 && (
+                    {selectedFacilities.length > 0 && (
                         <div className="property-listing-form-group full-width">
                             <label>Selected Facilities</label>
                             <div className="Facilities-list">
-                                {!formData.facilities.map((facilityName, index) => {
+                                {selectedFacilities.map((facilityName, index) => {
                                     const facility = predefinedFacilities.find(f => f.name === facilityName);
                                     return (
                                         <div key={index} className="selected-facility-item" onClick={() => toggleFacility(facility.name)}>
-                                            {facility?.icon} {facility?.name} 
+                                            {facility.icon} {facility.name} 
                                         </div>
                                     );
                                 })}
