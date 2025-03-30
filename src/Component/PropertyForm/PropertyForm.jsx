@@ -5,7 +5,7 @@ import { propertiesListing, updateProperty, propertyListingRequest } from "../..
 import Toast from "../Toast/Toast";
 import "./PropertyForm.css";
 
-const PropertyForm = ({ initialData, onSubmit, onClose, existingFacilities = [] }) => {
+const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const predefinedFacilities = [
         { name: "Wi-Fi", icon: <FaWifi /> },
         { name: "Parking", icon: <FaParking /> },
@@ -93,7 +93,6 @@ const PropertyForm = ({ initialData, onSubmit, onClose, existingFacilities = [] 
 
     useEffect(() => {
         const storedUsername = localStorage.getItem("username");
-        setSelectedFacilities(existingFacilities);
         if (storedUsername) {
             setFormData((prev) => ({
                 ...prev,
@@ -116,7 +115,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose, existingFacilities = [] 
                 categoryName: initialData.categoryname || "", 
             });
         }
-    }, [initialData] [existingFacilities]);
+    }, [initialData]);
 
     const toggleFacility = (facilityName) => {
         setSelectedFacilities((prevSelected) =>
