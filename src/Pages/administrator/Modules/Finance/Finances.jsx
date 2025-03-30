@@ -260,16 +260,16 @@ export default function FinancialDashboard() {
     }
 
     if (chartType === "retention") {
-      if (!customerRetentionRateData?.monthlyData) return <div>No customer retention data</div>;
+      if (!customerRetentionRateData?.monthlyData) return <div>No Retention Rate data</div>;
     
-      const retentionChartData = {
-        labels: customerRetentionRateData.monthlyData.map((_, index) => `Month ${index + 1}`),
+      const retentionRateChartData = {
+        labels: ["Retention Rate"], 
         datasets: [
           {
-            label: "Customer Retention Rate (%)",
+            label: "Retention Rate (%)",
             data: customerRetentionRateData.monthlyData.map((item) => parseFloat(item.customer_retention_rate)),
             fill: false,
-            borderColor: "rgb(54, 162, 235)",
+            borderColor: "rgb(54, 162, 235)", 
             tension: 0.3,
             pointBackgroundColor: "rgb(54, 162, 235)",
             pointBorderColor: "#fff",
@@ -280,19 +280,14 @@ export default function FinancialDashboard() {
         ],
       };
     
-      const retentionOptions = {
+      const retentionRateOptions = {
         responsive: true,
         plugins: {
-          legend: {
-            position: "top",
-          },
-          title: {
-            display: true,
-            text: "Monthly Customer Retention Rate Trend",
-          },
+          legend: { position: "top" },
+          title: { display: true, text: "Retention Rate" },
           tooltip: {
             callbacks: {
-              label: (context) => `Retention Rate: ${context.parsed.y}%`,
+              label: (context) => `Retention Rate: ${context.parsed.y.toFixed(2)}%`,
             },
           },
         },
@@ -300,21 +295,15 @@ export default function FinancialDashboard() {
           y: {
             beginAtZero: true,
             max: 100,
-            title: {
-              display: true,
-              text: "Retention Rate (%)",
-            },
+            title: { display: true, text: "Retention Rate (%)" },
           },
           x: {
-            title: {
-              display: true,
-              text: "Month",
-            },
+            title: { display: true, text: "Metric" },
           },
         },
       };
     
-      return <Line data={retentionChartData} options={retentionOptions} />;
+      return <Line data={retentionRateChartData} options={retentionRateOptions} />;
     }
 
     const chartData = {
