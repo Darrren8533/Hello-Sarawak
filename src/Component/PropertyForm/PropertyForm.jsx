@@ -394,17 +394,18 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                     </div>
 
                     {selectedFacilities.length > 0 && (
-                        <div><h3>Selected Facilities</h3>
-                          <div className="selected-facilities-grid">
-                            {selectedFacilities.map((facilityName, index) => {
-                                const facility = predefinedFacilities.find(f => f.name === facilityName);
-                                return (
-                                    <div key={index} className="selected-facility-item" onClick={() => toggleFacility(facility.name)}>
-                                        {facility.icon} {facility.name} 
-                                    </div>
-                                );
-                            })}
-                          </div>
+                        <div className="property-listing-form-group full-width">
+                            <label>Selected Facilities</label>
+                            <div className="selected-facilities-grid">
+                                {selectedFacilities.map((facilityName, index) => {
+                                    const facility = predefinedFacilities.find(f => f.name === facilityName);
+                                    return (
+                                        <div key={index} className="selected-facility-item" onClick={() => toggleFacility(facility.name)}>
+                                            {facility.icon} {facility.name} 
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
                     )}
 
