@@ -100,15 +100,6 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             }));
         }
 
-        if (Array.isArray(initialData.facilities)) {
-            setFormData((prevData) => ({
-              ...prevData,
-              facilities: initialData.facilities.filter(facility =>
-                predefinedFacilities.some(predefined => predefined.name === facility)
-              )
-            }));
-        }
-
         if (initialData) {
             setFormData({
                 username: initialData.username || "",
