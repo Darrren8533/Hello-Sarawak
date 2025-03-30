@@ -88,7 +88,6 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("");
-    const [selectedFacilities, setSelectedFacilities] = useState([]);
     const fileInputRef = useRef(null);
 
     useEffect(() => {
@@ -114,19 +113,16 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 clusterName: initialData.clustername || "", 
                 categoryName: initialData.categoryname || "", 
             });
-
-            setSelectedFacilities({  
-                facilities: initialData.facilities || [],
-            });
         }
     }, [initialData]);
 
     const toggleFacility = (facilityName) => {
-        setSelectedFacilities((prevSelected) =>
-          prevSelected.includes(facilityName)
-            ? prevSelected.filter((name) => name !== facilityName)
-            : [...prevSelected, facilityName]
-        );
+        setFormData((prevData) => {
+          const updatedFacilities = prevData.facilities.includes(facilityName)
+            ? prevData.facilities.filter((name) => name !== facilityName)
+            : [...prevData.facilities, facilityName];
+          return { ...prevData, facilities: updatedFacilities };
+        });
     };
 
     const handleChange = (e) => {
@@ -389,7 +385,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                     <div className="property-listing-form-group full-width">
                         <label>Facilities</label>
                         <div className="Facilities-list">
-                            {predefinedFacilities.filter(facility => !selectedFacilities.includes(facility.name)).map((facility, index) => (
+                            {predefinedFacilities.filter(facility => !formData.facilities.includes(facility.name)).map((facility, index) => (
                                 <div key={index} className="facility-item" onClick={() => toggleFacility(facility.name)}>
                                     {facility.icon} {facility.name}
                                 </div>
@@ -397,11 +393,11 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                        </div>
                     </div>
 
-                    {selectedFacilities.length > 0 && (
+                    {formData.facilities.length > 0 && (
                         <div className="property-listing-form-group full-width">
                             <label>Selected Facilities</label>
                             <div className="Facilities-list">
-                                {selectedFacilities.map((facilityName, index) => {
+                                {formData.facilities.map((facilityName, index) => {
                                     const facility = predefinedFacilities.find(f => f.name === facilityName);
                                     return (
                                         <div key={index} className="selected-facility-item" onClick={() => toggleFacility(facility.name)}>
