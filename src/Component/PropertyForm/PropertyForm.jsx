@@ -72,7 +72,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
 
     const [formData, setFormData] = useState({
         username: "",
-        propertyPrice: "0.00",
+        propertyPrice: "",
         propertyAddress: "",
         nearbyLocation: "",
         propertyBedType: "1",
@@ -102,7 +102,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         if (initialData) {
             setFormData({
                 username: initialData.username || "",
-                propertyPrice: initialData.propertyprice || "",
+                propertyPrice: initialData.rateamount || "",
                 propertyAddress: initialData.propertyaddress || "",
                 nearbyLocation: initialData.nearbylocation || "",
                 propertyBedType: initialData.propertybedtype || "",
