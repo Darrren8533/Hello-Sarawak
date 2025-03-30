@@ -27,6 +27,7 @@ const Product = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('');
+  const [selectedCluster, setSelectedCluster] = useState("");
   const [bookingData, setBookingData] = useState({
     clusterName: "",
     checkIn: "",
@@ -134,14 +135,6 @@ const Product = () => {
     navigate(`/product/${property.propertyid}`, { 
       state: { propertyDetails: property }
     });
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setBookingData((prev) => ({
-        ...prev,
-        [name]: value,
-    }));
   };
 
   const handleInputChange = (e) => {
@@ -336,10 +329,9 @@ const Product = () => {
                   <div className="destinations-grid">
                     <select
                             name="clusterName"
-                            value={bookingData.clusterName}
-                            onChange={handleChange}
-                            required
-                        >
+                            value={selectedCluster}
+                            onChange={(e) => setSelectedCluster(e.target.value)}
+                    >
                             <option value="">Select Cluster (City)</option>
                             {clusters.map((cluster, index) => (
                                 <option key={index} value={cluster}>
