@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { fetchUserData } from '../Api/api'; // Make sure this path is correct
+import { fetchUserData } from '../../../Api/api';
 
 const AuthContext = createContext({
   isLoggedIn: false,
@@ -12,17 +12,19 @@ const AuthContext = createContext({
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    // Check both localStorage and sessionStorage
+
     return localStorage.getItem('isLoggedIn') === 'true' || 
            sessionStorage.getItem('persistentLogin') === 'true';
   });
   const [userID, setUserID] = useState(() => localStorage.getItem('userid'));
   const [userAvatar, setUserAvatar] = useState(() => localStorage.getItem('userAvatar'));
+  const [isLoadingAvatar, setIsLoadingAvatar] = useState(false);
 
   // This effect fetches the user data including avatar when component mounts or userID changes
   useEffect(() => {
     const fetchAvatar = async () => {
-      if (isLoggedIn && userID) {
+      if (isLoggedIn && userID && !isLoadingAvatar) {
+        setIsLoadingAvatar(true);
         try {
           const userData = await fetchUserData(userID);
           if (userData && userData.avatar) {
@@ -30,6 +32,8 @@ export const AuthProvider = ({ children }) => {
           }
         } catch (error) {
           console.error('Error fetching user avatar:', error);
+        } finally {
+          setIsLoadingAvatar(false);
         }
       }
     };
@@ -39,36 +43,37 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (isLoggedIn && userID) {
-      // Use both localStorage and sessionStorage for redundancy
       localStorage.setItem('isLoggedIn', 'true');
       sessionStorage.setItem('persistentLogin', 'true');
       localStorage.setItem('userid', userID);
     }
   }, [isLoggedIn, userID]);
 
-  const login = async (id, avatar) => {
+  const login = async (id, avatar = null) => {
     setIsLoggedIn(true);
     setUserID(id);
     
-    // Persist login across different pages and browser tabs
     localStorage.setItem('userid', id);
     localStorage.setItem('isLoggedIn', 'true');
     sessionStorage.setItem('persistentLogin', 'true');
     
-    // If avatar is provided directly, use it
-    if (avatar) {
-      setUserAvatar(avatar);
-      localStorage.setItem('userAvatar', avatar);
-    } else {
-      // Otherwise fetch the user data to get the avatar
-      try {
-        const userData = await fetchUserData(id);
-        if (userData && userData.avatar) {
-          updateAvatar(userData.avatar);
-        }
-      } catch (error) {
-        console.error('Error fetching user avatar during login:', error);
+    setIsLoadingAvatar(true);
+    try {
+      const userData = await fetchUserData(id);
+      if (userData && userData.avatar) {
+        updateAvatar(userData.avatar);
+      } 
+      
+      else if (avatar) {
+        updateAvatar(avatar);
       }
+    } catch (error) {
+      console.error('Error fetching user avatar during login:', error);
+      if (avatar) {
+        updateAvatar(avatar);
+      }
+    } finally {
+      setIsLoadingAvatar(false);
     }
   };
 
@@ -105,7 +110,8 @@ export const AuthProvider = ({ children }) => {
         userAvatar, 
         login, 
         logout, 
-        updateAvatar 
+        updateAvatar,
+        isLoadingAvatar
       }}
     >
       {children}
