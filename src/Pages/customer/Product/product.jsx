@@ -29,7 +29,6 @@ const Product = () => {
   const [toastType, setToastType] = useState('');
   const [selectedCluster, setSelectedCluster] = useState("");
   const [bookingData, setBookingData] = useState({
-    clusterName: "",
     checkIn: "",
     checkOut: "",
     adults: 1,
@@ -252,7 +251,7 @@ const Product = () => {
               <div className="search-content">
                 <span className="search-label">Where</span>
                 <span className="search-value">
-                  {bookingData.clusterName || 'Search destinations'}
+                  {selectedCluster || 'Search destinations'}
                 </span>
               </div>
             </div>
