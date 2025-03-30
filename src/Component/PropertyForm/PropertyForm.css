@@ -369,7 +369,7 @@
 .selected-facilities-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 50px;
+  gap: 20px;
   list-style: none;
   padding: 0;
 }
@@ -390,8 +390,16 @@
 }
 
 .selected-facility-item button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  z-index: 1001;
+  padding: 0;
   margin-left: 20px;
-  color: red;
+  color: #ff0000;
 }
 
 /* Drag and drop styling */
