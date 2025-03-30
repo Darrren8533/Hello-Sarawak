@@ -413,9 +413,8 @@
 }
 
 .selected-facility-item button {
-  margin-left: 10px;
-  background: red;
-  color: white;
+  margin-left: 20px;
+  color: red;
   border: none;
   cursor: pointer;
 }
