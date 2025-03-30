@@ -205,7 +205,7 @@ export default function FinancialDashboard() {
       return <Line data={revparChartData} options={revparOptions} />;
     }
 
-    if (chartType === "cancellation_rate") {
+    if (chartType === "cancellation") {
       if (!cancellationRateData?.monthlyData) return <div>No Cancellation Rate data</div>;
     
       const cancellationRateChartData = {
