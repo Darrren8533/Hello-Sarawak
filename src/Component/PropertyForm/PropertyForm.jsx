@@ -386,7 +386,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         <label>Facilities</label>
                         <div className="Facilities-list">
                             {predefinedFacilities.filter(facility => !formData.facilities.includes(facility.name)).map((facility, index) => (
-                                <div key={index} className="facility-item" onClick={() => toggleFacility(facilityName)}>
+                                <div key={index} className="facility-item" onClick={() => toggleFacility(facility.name)}>
                                     {facility.icon} {facility.name}
                                 </div>
                             ))}
@@ -401,7 +401,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                                     const facility = predefinedFacilities.find(f => f.name === facilityName);
                                     return (
                                         <div key={index} className="selected-facility-item" onClick={() => toggleFacility(facilityName)}>
-                                            {facility.icon} {facility.name} 
+                                            {facility.icon} {facilityName} 
                                         </div>
                                     );
                                 })}
