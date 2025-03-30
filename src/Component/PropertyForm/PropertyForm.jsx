@@ -385,34 +385,28 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                     <div className="property-listing-form-group full-width">
                         <label>Facilities</label>
                         <div className="Facilities-list">
-                                      {predefinedFacilities.filter(facility => !selectedFacilities.includes(facility.name)).map((facility, index) => (
-            <div
-              key={index}
-              className="facility-item"
-              onClick={() => toggleFacility(facility.name)}
-            >
-              {facility.icon} {facility.name}
-            </div>
-          ))}
-                        </div>
+                            {predefinedFacilities.filter(facility => !selectedFacilities.includes(facility.name)).map((facility, index) => (
+                                <div key={index} className="facility-item" onClick={() => toggleFacility(facility.name)}>
+                                    {facility.icon} {facility.name}
+                                </div>
+                            ))}
+                       </div>
                     </div>
 
                     {selectedFacilities.length > 0 && (
-        <div>
-          <h3>Selected Facilities</h3>
-          <div className="selected-facilities-grid">
-            {selectedFacilities.map((facilityName, index) => {
-              const facility = predefinedFacilities.find(f => f.name === facilityName);
-              return (
-                <div key={index} className="selected-facility-item">
-                  {facility.icon} {facility.name} 
-                  <button onClick={() => toggleFacility(facility.name)}>x</button>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+                        <div><h3>Selected Facilities</h3>
+                          <div className="selected-facilities-grid">
+                            {selectedFacilities.map((facilityName, index) => {
+                                const facility = predefinedFacilities.find(f => f.name === facilityName);
+                                return (
+                                    <div key={index} className="selected-facility-item" onClick={() => toggleFacility(facility.name)}>
+                                        {facility.icon} {facility.name} 
+                                    </div>
+                                );
+                            })}
+                          </div>
+                        </div>
+                    )}
 
                     <div className="property-listing-form-group full-width">
                         <label>Property Image:</label>
