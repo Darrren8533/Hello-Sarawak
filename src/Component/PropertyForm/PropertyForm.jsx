@@ -406,7 +406,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
               return (
                 <div key={index} className="selected-facility-item">
                   {facility.icon} {facility.name} 
-                  <button onClick={() => toggleFacility(facility.name)}>X</button>
+                  <button onClick={() => toggleFacility(facility.name)}>x</button>
                 </div>
               );
             })}
