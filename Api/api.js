@@ -748,6 +748,17 @@ export const fetchCancellationRate = async () => {
   }
 };
 
+export const fetchCustomerRetentionRate = async () => {
+  try {
+      const response = await fetch(`${API_URL}/users/customer_retention_rate`);
+      const data = await response.json();
+      return data; 
+  } catch (error) {
+      console.error('API error:', error);
+      throw error;
+  }
+};
+
 // Get Properties Of Administrator For "Suggest"
 export const getOperatorProperties = async (userid) => {
   try {
