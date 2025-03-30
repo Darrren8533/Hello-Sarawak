@@ -4,7 +4,7 @@ import { FaWifi, FaParking, FaSwimmingPool, FaHotTub, FaTv, FaUtensils, FaSnowfl
 import { propertiesListing, updateProperty, propertyListingRequest } from "../../../Api/api"; // Import API function for categories
 import Toast from "../Toast/Toast";
 import "./PropertyForm.css";
-
+//abc
 const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const predefinedFacilities = [
         { name: "Wi-Fi", icon: <FaWifi /> },
