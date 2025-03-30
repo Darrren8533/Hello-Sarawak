@@ -138,7 +138,7 @@ const Product = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setBookingData((prev) => ({
         ...prev,
         [name]: value,
     }));
