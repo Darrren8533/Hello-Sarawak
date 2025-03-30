@@ -396,7 +396,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                     {selectedFacilities.length > 0 && (
                         <div className="property-listing-form-group full-width">
                             <label>Selected Facilities</label>
-                            <div className="selected-Facilities-list">
+                            <div className="Facilities-list">
                                 {selectedFacilities.map((facilityName, index) => {
                                     const facility = predefinedFacilities.find(f => f.name === facilityName);
                                     return (
