@@ -1,5 +1,4 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
-import { fetchUserData } from '../../../Api/api';
 
 const AuthContext = createContext({
   isLoggedIn: false,
@@ -12,68 +11,34 @@ const AuthContext = createContext({
 
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(() => {
-
+    // Check both localStorage and sessionStorage
     return localStorage.getItem('isLoggedIn') === 'true' || 
            sessionStorage.getItem('persistentLogin') === 'true';
   });
   const [userID, setUserID] = useState(() => localStorage.getItem('userid'));
   const [userAvatar, setUserAvatar] = useState(() => localStorage.getItem('userAvatar'));
-  const [isLoadingAvatar, setIsLoadingAvatar] = useState(false);
-
-  // This effect fetches the user data including avatar when component mounts or userID changes
-  useEffect(() => {
-    const fetchAvatar = async () => {
-      if (isLoggedIn && userID && !isLoadingAvatar) {
-        setIsLoadingAvatar(true);
-        try {
-          const userData = await fetchUserData(userID);
-          if (userData && userData.avatar) {
-            updateAvatar(userData.avatar);
-          }
-        } catch (error) {
-          console.error('Error fetching user avatar:', error);
-        } finally {
-          setIsLoadingAvatar(false);
-        }
-      }
-    };
-    
-    fetchAvatar();
-  }, [isLoggedIn, userID]);
 
   useEffect(() => {
     if (isLoggedIn && userID) {
+      // Use both localStorage and sessionStorage for redundancy
       localStorage.setItem('isLoggedIn', 'true');
       sessionStorage.setItem('persistentLogin', 'true');
       localStorage.setItem('userid', userID);
     }
   }, [isLoggedIn, userID]);
 
-  const login = async (id, avatar = null) => {
+  const login = (id, avatar) => {
     setIsLoggedIn(true);
     setUserID(id);
-    
+    setUserAvatar(avatar);
+
+    // Persist login across different pages and browser tabs
     localStorage.setItem('userid', id);
     localStorage.setItem('isLoggedIn', 'true');
     sessionStorage.setItem('persistentLogin', 'true');
     
-    setIsLoadingAvatar(true);
-    try {
-      const userData = await fetchUserData(id);
-      if (userData && userData.avatar) {
-        updateAvatar(userData.avatar);
-      } 
-      
-      else if (avatar) {
-        updateAvatar(avatar);
-      }
-    } catch (error) {
-      console.error('Error fetching user avatar during login:', error);
-      if (avatar) {
-        updateAvatar(avatar);
-      }
-    } finally {
-      setIsLoadingAvatar(false);
+    if (avatar) {
+      localStorage.setItem('userAvatar', avatar);
     }
   };
 
@@ -93,11 +58,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateAvatar = (newAvatar) => {
+    setUserAvatar(newAvatar);
     if (newAvatar) {
-      setUserAvatar(newAvatar);
       localStorage.setItem('userAvatar', newAvatar);
     } else {
-      setUserAvatar(null);
       localStorage.removeItem('userAvatar');
     }
   };
@@ -110,8 +74,7 @@ export const AuthProvider = ({ children }) => {
         userAvatar, 
         login, 
         logout, 
-        updateAvatar,
-        isLoadingAvatar
+        updateAvatar 
       }}
     >
       {children}
