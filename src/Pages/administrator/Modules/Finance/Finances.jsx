@@ -149,14 +149,19 @@ export default function FinancialDashboard() {
       }
 
     if (chartType === "revpar") {
-      if (!revPARData?.monthlyData) return <div>No RevPAR data</div>;
+      if (!revPARData?.monthlyData || revPARData.monthlyData.length === 0) {
+        return <div>No RevPAR data</div>;
+      }
+    
+      // Get the latest RevPAR value
+      const latestRevPAR = parseFloat(revPARData.monthlyData[revPARData.monthlyData.length - 1].revpar);
     
       const revparChartData = {
-        labels: revPARData.monthlyData.map((_, idx) => `Month ${idx + 1}`),
+        labels: ["RevPAR"], // Single data point label
         datasets: [
           {
             label: "RevPAR ($)",
-            data: revPARData.monthlyData.map((item) => parseFloat(item.revpar)),
+            data: [latestRevPAR],
             fill: false,
             borderColor: "rgb(255, 159, 64)",
             tension: 0.3,
@@ -172,13 +177,8 @@ export default function FinancialDashboard() {
       const revparOptions = {
         responsive: true,
         plugins: {
-          legend: {
-            position: "top",
-          },
-          title: {
-            display: true,
-            text: "RevPAR Trend",
-          },
+          legend: { position: "top" },
+          title: { display: true, text: "RevPAR Data" },
           tooltip: {
             callbacks: {
               label: (context) => `RevPAR: $${context.parsed.y.toFixed(2)}`,
@@ -188,16 +188,10 @@ export default function FinancialDashboard() {
         scales: {
           y: {
             beginAtZero: true,
-            title: {
-              display: true,
-              text: "RevPAR ($)",
-            },
+            title: { display: true, text: "RevPAR ($)" },
           },
           x: {
-            title: {
-              display: true,
-              text: "Month",
-            },
+            title: { display: true, text: "Metric" },
           },
         },
       };
