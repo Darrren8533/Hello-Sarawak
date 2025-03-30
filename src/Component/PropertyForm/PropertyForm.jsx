@@ -93,6 +93,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
 
     useEffect(() => {
         const storedUsername = localStorage.getItem("username");
+        setSelectedFacilities(existingFacilities);
         if (storedUsername) {
             setFormData((prev) => ({
                 ...prev,
@@ -115,7 +116,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 categoryName: initialData.categoryname || "", 
             });
         }
-    }, [initialData]);
+    }, [initialData] [existingFacilities]);
 
     const toggleFacility = (facilityName) => {
         setSelectedFacilities((prevSelected) =>
