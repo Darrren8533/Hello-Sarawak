@@ -171,7 +171,7 @@ const Product = () => {
         
         if (checkIn < existingCheckout && checkOut > existingCheckin) return false; 
         
-        if (property => property.clustername === selectedCluster) return false;
+        if (property.clustername !== selectedCluster) return false;
   
         return true; 
       });
