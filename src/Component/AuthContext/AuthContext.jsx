@@ -10,33 +10,29 @@ const AuthContext = createContext({
 });
 
 export const AuthProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(() => {
-    // Check both localStorage and sessionStorage
-    return localStorage.getItem('isLoggedIn') === 'true' || 
-           sessionStorage.getItem('persistentLogin') === 'true';
-  });
-  const [userID, setUserID] = useState(() => localStorage.getItem('userid'));
-  const [userAvatar, setUserAvatar] = useState(() => localStorage.getItem('userAvatar'));
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userID, setUserID] = useState(null);
+  const [userAvatar, setUserAvatar] = useState(null);
 
   useEffect(() => {
-    if (isLoggedIn && userID) {
-      // Use both localStorage and sessionStorage for redundancy
-      localStorage.setItem('isLoggedIn', 'true');
-      sessionStorage.setItem('persistentLogin', 'true');
-      localStorage.setItem('userid', userID);
+    const storedUserID = localStorage.getItem('userid');
+    const storedLoginStatus = localStorage.getItem('isLoggedIn') === 'true';
+    const storedUserAvatar = localStorage.getItem('userAvatar');
+
+    if (storedUserID && storedLoginStatus) {
+      setIsLoggedIn(true);
+      setUserID(storedUserID);
+      setUserAvatar(storedUserAvatar || null);
     }
-  }, [isLoggedIn, userID]);
+  }, []);
 
   const login = (id, avatar) => {
     setIsLoggedIn(true);
     setUserID(id);
     setUserAvatar(avatar);
-
-    // Persist login across different pages and browser tabs
+    
     localStorage.setItem('userid', id);
     localStorage.setItem('isLoggedIn', 'true');
-    sessionStorage.setItem('persistentLogin', 'true');
-    
     if (avatar) {
       localStorage.setItem('userAvatar', avatar);
     }
@@ -46,15 +42,11 @@ export const AuthProvider = ({ children }) => {
     setIsLoggedIn(false);
     setUserID(null);
     setUserAvatar(null);
-
-    // Remove all login-related storage
+    
     localStorage.removeItem('userid');
     localStorage.removeItem('isLoggedIn');
     localStorage.removeItem('userAvatar');
     localStorage.removeItem('googleAccessToken');
-    
-    // Remove session storage item
-    sessionStorage.removeItem('persistentLogin');
   };
 
   const updateAvatar = (newAvatar) => {
