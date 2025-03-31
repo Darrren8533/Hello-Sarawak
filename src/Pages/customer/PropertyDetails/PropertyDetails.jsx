@@ -74,7 +74,7 @@ const PropertyDetails = () => {
 
 
   const toggleFacilities = () => {
-    setShowAllFacilities(!showAllFacilities);
+    setShowAllFacilities(true);
   };
 
   const handleInputChange = (e) => {
