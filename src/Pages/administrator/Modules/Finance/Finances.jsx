@@ -10,7 +10,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { fetchFinance, fetchOccupancyRate, fetchRevPAR, fetchCancellationRate, fetchCustomerRetentionRate } from "../../../../../Api/api";
+import { fetchFinance, fetchOccupancyRate, fetchRevPAR, fetchCancellationRate, fetchCustomerRetentionRate, fetchGuestSatisfactionScore } from "../../../../../Api/api";
 import "./Finances.css";
 
 ChartJS.register(
@@ -32,6 +32,7 @@ export default function FinancialDashboard() {
   const [revPARData, setRevPARData] = useState(null);
   const [cancellationRateData, setCancellationRateData] = useState(null);
   const [customerRetentionRateData, setCustomerRetentionRateData] = useState(null);
+  const [guestSatisfactionScoreData, setGuestSatisfactionScoreData] = useState(null);
 
   useEffect(() => {
     const fetchFinanceData = async () => {
@@ -87,7 +88,7 @@ export default function FinancialDashboard() {
     
     fetchCancellationRateData();
 
-    const fetchCustomerRetentionRateDate = async () => {
+    const fetchCustomerRetentionRateData = async () => {
       try {
         const data = await fetchCustomerRetentionRate();
         
@@ -97,7 +98,19 @@ export default function FinancialDashboard() {
       }
     };
     
-    fetchCustomerRetentionRateDate();
+    fetchCustomerRetentionRateData();
+
+    const fetchGuestSatisfactionScoreData = async () => {
+      try {
+        const data = await fetchGuestSatisfactionScore();
+        
+        setGuestSatisfactionScoreData(data);
+      } catch (err) {
+        console.error("Error fetching guest satisfaction score data:", err);
+      }
+    };
+    
+    fetchGuestSatisfactionScoreData();
   }, []);
   
   const renderChart = () => {
@@ -304,6 +317,53 @@ export default function FinancialDashboard() {
       };
     
       return <Line data={retentionRateChartData} options={retentionRateOptions} />;
+    }
+
+    if (chartType === "satisfaction") {
+      if (!guestSatisfactionData?.monthlyData) return <div>No Guest Satisfaction Score data</div>;
+    
+      const guestSatisfactionChartData = {
+        labels: guestSatisfactionData.monthlyData.map((_, index) => `Property ${index + 1}`),
+        datasets: [
+          {
+            label: "Guest Satisfaction Score",
+            data: guestSatisfactionData.monthlyData.map((item) => parseFloat(item.guest_satisfaction_score)),
+            fill: false,
+            borderColor: "rgb(255, 99, 132)",
+            tension: 0.3,
+            pointBackgroundColor: "rgb(255, 99, 132)",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+          },
+        ],
+      };
+    
+      const guestSatisfactionOptions = {
+        responsive: true,
+        plugins: {
+          legend: { position: "top" },
+          title: { display: true, text: "Guest Satisfaction Score" },
+          tooltip: {
+            callbacks: {
+              label: (context) => `Score: ${context.parsed.y.toFixed(2)}`,
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 5,
+            title: { display: true, text: "Average Score" },
+          },
+          x: {
+            title: { display: true, text: "Properties" },
+          },
+        },
+      };
+    
+      return <Line data={guestSatisfactionChartData} options={guestSatisfactionOptions} />;
     }
 
     const chartData = {
@@ -520,6 +580,7 @@ export default function FinancialDashboard() {
                 <option value="revpar">RevPAR Chart</option>
                 <option value="cancellation">Cancellation Rate Chart</option>
                 <option value="retention">Customer Retention Rate Chart</option>
+                <option value="satisfaction">Guest Satisfaction Score Chart</option>
               </select>
               {/* Custom arrow */}
               <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
