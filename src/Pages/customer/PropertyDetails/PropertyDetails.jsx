@@ -420,7 +420,7 @@ const PropertyDetails = () => {
   
                   {facilitiesArray.length > 10 && (
                     <button className="show-all-facilities" onClick={toggleFacilities}>
-                        {showAllFacilities ? "Show Less" : "Show All Facilities"}
+                        Show All Facilities
                     </button>
                   )}
                 </div>
