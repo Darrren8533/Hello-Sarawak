@@ -423,6 +423,28 @@ const PropertyDetails = () => {
                         Show All Facilities
                     </button>
                   )}
+
+                {showAllFacilities && (
+                  <div className="facilities-overlay">
+                    <div className="facilities-overlay-content">
+                      <div className="facilities-overlay-header">
+                          <h3>What this place offers</h3>
+                          <button className="close-overlay" onClick={() => setShowAllFacilities(false)}>X</button>
+                      </div>
+                      <div className="full-facilities-list">
+                          {facilitiesArray.map((facilityName, index) => {
+                            const facility = facilities.find(f => f.name === facilityName.trim());
+                            return (
+                              <div key={index} className="facilities-item">
+                                {facility ? facility.icon : null}
+                                <span>{facilityName.trim()}</span>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  </div>
+                 )}
                 </div>
               </div>
 
@@ -750,28 +772,6 @@ const PropertyDetails = () => {
           </div>
         </div>
       )}
-
-      {showAllFacilities && (
-                <div className="facilities-overlay">
-                    <div className="facilities-overlay-content">
-                        <div className="facilities-overlay-header">
-                            <h3>What this place offers</h3>
-                            <button className="close-overlay" onClick={toggleFacilities}>X</button>
-                        </div>
-                        <div className="full-facilities-list">
-                            {facilitiesArray.map((facilityName, index) => {
-                                const facility = facilities.find(f => f.name === facilityName.trim());
-                                return (
-                                    <div key={index} className="facilities-item">
-                                        {facility ? facility.icon : null}
-                                        <span>{facilityName.trim()}</span>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-            )}
     </div>
   );
 };
