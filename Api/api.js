@@ -759,6 +759,17 @@ export const fetchCustomerRetentionRate = async () => {
   }
 };
 
+export const fetchGuestSatisfactionScore = async () => {
+  try {
+      const response = await fetch(`${API_URL}/users/guest_satisfaction_score`);
+      const data = await response.json();
+      return data; 
+  } catch (error) {
+      console.error('API error:', error);
+      throw error;
+  }
+};
+
 // Get Properties Of Administrator For "Suggest"
 export const getOperatorProperties = async (userid) => {
   try {
