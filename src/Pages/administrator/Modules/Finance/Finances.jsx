@@ -320,14 +320,14 @@ export default function FinancialDashboard() {
     }
 
     if (chartType === "satisfaction") {
-      if (!guestSatisfactionData?.monthlyData) return <div>No Guest Satisfaction Score data</div>;
+      if (!guestSatisfactionScoreData?.monthlyData) return <div>No Guest Satisfaction Score data</div>;
     
       const guestSatisfactionChartData = {
-        labels: guestSatisfactionData.monthlyData.map((_, index) => `Property ${index + 1}`),
+        labels: guestSatisfactionScoreData.monthlyData.map((_, index) => `Property ${index + 1}`),
         datasets: [
           {
             label: "Guest Satisfaction Score",
-            data: guestSatisfactionData.monthlyData.map((item) => parseFloat(item.guest_satisfaction_score)),
+            data: guestSatisfactionScoreData.monthlyData.map((item) => parseFloat(item.guest_satisfaction_score)),
             fill: false,
             borderColor: "rgb(255, 99, 132)",
             tension: 0.3,
