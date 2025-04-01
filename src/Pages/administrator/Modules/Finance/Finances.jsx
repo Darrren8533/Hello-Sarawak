@@ -497,10 +497,12 @@ export default function FinancialDashboard() {
             <h2 className="text-sm font-medium text-gray-500">Total Revenue</h2>
             <p className="text-2xl font-bold">
               $
-              {financeData?.monthlyData.reduce(
-                (sum, item) => sum + item.monthlyrevenue,
-                0
-              ) || 0}
+              {(
+                financeData?.monthlyData.reduce(
+                  (sum, item) => sum + item.monthlyrevenue,
+                  0
+                ) || 0
+              ).toFixed(2)}
             </p>
             <p
               className={`text-sm ${
