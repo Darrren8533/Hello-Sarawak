@@ -10,7 +10,7 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { fetchFinance, fetchOccupancyRate, fetchRevPAR, fetchCancellationRate, fetchCustomerRetentionRate, fetchGuestSatisfactionScore } from "../../../../../Api/api";
+import { fetchFinance, fetchOccupancyRate, fetchRevPAR, fetchCancellationRate, fetchCustomerRetentionRate, fetchGuestSatisfactionScore, fetchALOS } from "../../../../../Api/api";
 import "./Finances.css";
 
 ChartJS.register(
@@ -33,6 +33,7 @@ export default function FinancialDashboard() {
   const [cancellationRateData, setCancellationRateData] = useState(null);
   const [customerRetentionRateData, setCustomerRetentionRateData] = useState(null);
   const [guestSatisfactionScoreData, setGuestSatisfactionScoreData] = useState(null);
+  const [alosData, setALOSData] = useState(null);
 
   useEffect(() => {
     const fetchFinanceData = async () => {
@@ -111,6 +112,18 @@ export default function FinancialDashboard() {
     };
     
     fetchGuestSatisfactionScoreData();
+
+    const fetchALOSData = async () => {
+      try {
+        const data = await fetchALOS();
+        
+        setALOSData(data);
+      } catch (err) {
+        console.error("Error fetching average length of stay data:", err);
+      }
+    };
+    
+    fetchALOSData();
   }, []);
   
   const renderChart = () => {
@@ -366,6 +379,52 @@ export default function FinancialDashboard() {
       return <Line data={guestSatisfactionChartData} options={guestSatisfactionOptions} />;
     }
 
+    if (chartType === "alos") {
+      if (!alosData?.monthlyData) return <div>No Average Length of Stay data</div>;
+    
+      const alosChartData = {
+        labels: alosData.monthlyData.map((item) => `Property ${item.propertyid}`),
+        datasets: [
+          {
+            label: "Average Length of Stay (Days)",
+            data: alosData.monthlyData.map((item) => parseFloat(item.average_length_of_stay)),
+            fill: false,
+            borderColor: "rgb(54, 162, 235)",
+            tension: 0.3,
+            pointBackgroundColor: "rgb(54, 162, 235)",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+          },
+        ],
+      };
+    
+      const alosChartOptions = {
+        responsive: true,
+        plugins: {
+          legend: { position: "top" },
+          title: { display: true, text: "Average Length of Stay per Property" },
+          tooltip: {
+            callbacks: {
+              label: (context) => `ALOS: ${context.parsed.y.toFixed(2)} days`,
+            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: "Days" },
+          },
+          x: {
+            title: { display: true, text: "Properties" },
+          },
+        },
+      };
+    
+      return <Line data={alosChartData} options={alosChartOptions} />;
+    }
+
     const chartData = {
       labels: financeData.monthlyData.map((item) => item.month),
       datasets: [
@@ -583,6 +642,7 @@ export default function FinancialDashboard() {
                 <option value="cancellation">Cancellation Rate Chart</option>
                 <option value="retention">Customer Retention Rate Chart</option>
                 <option value="satisfaction">Guest Satisfaction Score Chart</option>
+                <option value="alos">Average Length of Stay Chart</option>
               </select>
               {/* Custom arrow */}
               <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
