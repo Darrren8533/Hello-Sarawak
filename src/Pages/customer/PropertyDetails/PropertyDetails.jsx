@@ -68,7 +68,7 @@ const PropertyDetails = () => {
   });
   const navigate = useNavigate();
 
-  const facilities = propertyDetails?.facilities
+  const facilitiesArray = propertyDetails?.facilities
   ? propertyDetails.facilities.split(",") 
   : [];
 
@@ -260,7 +260,7 @@ const PropertyDetails = () => {
 
   return (
     <div className="property-details-page">
-      {!showAllPhotos && !isFullscreen && !showBookingForm ? (
+      {!showAllPhotos && !isFullscreen && !showBookingForm && !showAllFacilities ? (
         <>
           <Navbar />
           <div className="property-details-container">
@@ -333,7 +333,7 @@ const PropertyDetails = () => {
               </div>
             </div>
   
-            {!showAllPhotos && !isFullscreen && !showBookingForm && (
+            {!showAllPhotos && !isFullscreen && !showBookingForm && !showAllFacilities && (
               <div className="mobile-booking-bar">
                 <div className="mobile-booking-bar-content">
                   <div className="mobile-price-info">
@@ -403,7 +403,7 @@ const PropertyDetails = () => {
                 <div className="property-features">
                   <h2 className="property-font">What this place offers</h2>
                   <div className="facilities-details">
-                    {(showAllFacilities ? facilities : facilities.slice(0, 10)).map((facilityName, index) => {
+                    {(showAllFacilities ? facilitiesArray : facilitiesArray.slice(0, 10)).map((facilityName, index) => {
                         const facility = facilities.find(f => f.name === facilityName.trim());
                         return (
                             <div key={index} className="facilities-item">
@@ -414,7 +414,7 @@ const PropertyDetails = () => {
                     })}
                   </div>
   
-                  {facilities.length > 10 && (
+                  {facilitiesArray.length > 10 && (
                     <button className="show-all-facilities" onClick={() =>setShowAllFacilities(true)}>
                         Show All Facilities
                     </button>
@@ -428,7 +428,7 @@ const PropertyDetails = () => {
                           <button className="close-overlay" onClick={() => setShowAllFacilities(false)}>X</button>
                         </div>
                         <div className="full-facilities-list">
-                          {facilities.map((facilityName, index) => {
+                          {facilitiesArray.map((facilityName, index) => {
                             const facility = facilities.find(f => f.name === facilityName.trim());
                             return (
                               <div key={index} className="facilities-item">
