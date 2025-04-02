@@ -1,145 +1,59 @@
-import Home from './Pages/customer/Home/Home'
-import Login from './Pages/customer/Login/Login'
-import Register from './Pages/customer/Register/Register'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+
+import Home from './Pages/customer/Home/Home';
+import Login from './Pages/customer/Login/Login';
+import Register from './Pages/customer/Register/Register';
 import ModeratorDashboard from './Pages/moderator/ModeratorDashboard';
 import AdminDashboard from './Pages/administrator/AdminDashboard';
 import OwnerDashboard from './Pages/cams_owner/OwnerDashboard';
-import About_Sarawak from './Pages/customer/About_Sarawak/about_sarawak';
+import AboutSarawak from './Pages/customer/About_Sarawak/about_sarawak';
 import Product from './Pages/customer/Product/product';
 import PropertyDetails from './Pages/customer/PropertyDetails/PropertyDetails';
 import Cart from './Pages/customer/Cart/cart';
-import About_Us from './Pages/customer/About_us/About_Us';
+import AboutUs from './Pages/customer/About_us/About_Us';
 import NoAccess from './Component/NoAccess/NoAccess';
 import Error from './Component/Error_404/Error';
 import Profile from './Pages/customer/Profile/Profile';
 
-//Import React router dom
-
-import{
-  createBrowserRouter,
-  RouterProvider
-}from 'react-router-dom'
+const queryClient = new QueryClient();
 
 const router = createBrowserRouter([
-   {
-     path: '/',
-     element: <div><Home/></div>
-   },
+  { path: '/', element: <Home /> },
+  { path: '/register', element: <Register /> },
+  { path: '/login', element: <Login /> },
 
-   {
-     path: '/register',
-     element: <div><Register/></div>
-   },
+  // Customer routes
+  { path: '/home', element: <Home /> },
+  { path: '/about_sarawak', element: <AboutSarawak /> },
+  { path: '/product', element: <Product /> },
+  { path: '/product/:propertyid', element: <PropertyDetails /> },
+  { path: '/cart', element: <Cart /> },
+  { path: '/about_us', element: <AboutUs /> },
+  { path: '/profile', element: <Profile /> },
 
-   {
-     path: '/login',
-     element: <div><Login/></div>
-   },
+  // Administrator
+  { path: '/administrator_dashboard/*', element: <AdminDashboard /> },
 
-   //Customer
-   {
-    path: '/home',  
-    element: <Home/>
-   },
+  // Moderator
+  { path: '/moderator_dashboard/*', element: <ModeratorDashboard /> },
 
-   {
-    path: '/about_sarawak', 
-    element: <About_Sarawak/>
-   },
+  // Owner
+  { path: '/owner_dashboard/*', element: <OwnerDashboard /> },
 
-   {
-    path: '/product', 
-    element: <Product/>
-   },
+  // No Access
+  { path: '/no-access', element: <NoAccess /> },
 
-   {
-    path: '/product/:propertyid', 
-    element: <div><PropertyDetails/></div>
-   },
-
-   {
-    path: '/cart', 
-    element: <Cart/>
-   },
-   
-   {
-    path: '/about_us', 
-    element: <About_Us/>
-   },
-
-   {
-     path: '/login/home',
-     element: <div><Home/></div>
-   },
-
-   {
-     path: '/login/about_sarawak',
-     element: <div><About_Sarawak/></div>
-   },
-
-   {
-     path: '/login/product',
-     element: <div><Product/></div>
-   },
-
-   {
-    path: '/login/product/:propertyid', 
-    element: <div><PropertyDetails/></div>
-   },
-
-   {
-    path: '/login/cart',
-    element: <div><Cart/></div>
-   },
-
-   {
-    path: '/login/about_us',
-    element: <div><About_Us/></div>
-   },
-
-   {
-    path: '/login/profile',
-    element: <div><Profile/></div>
-   },
-
-    //Administrator
-    {
-      path: '/login/administrator_dashboard/*',
-      element: <div><AdminDashboard/></div>
-    },
-
-     //Moderator
-     {
-      path: '/login/moderator_dashboard/*',
-      element: <div><ModeratorDashboard/></div>
-    },
-
-   //Owner
-    {
-     path: '/login/owner_dashboard/*',
-     element: <div><OwnerDashboard/></div>
-   },
-
-   // No Access
-   {
-    path: '/no-access',
-    element: <div><NoAccess/></div>
-   },
-
-   // Error 404
-  {
-    path: '*', 
-    element: <div><Error /></div>
-  }
-])
+  // Error 404
+  { path: '*', element: <Error /> },
+]);
 
 function App() {
-
   return (
-  <div>
-    <RouterProvider router={router}/>
-  </div>
-  )
+    <QueryClientProvider client={queryClient}>
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  );
 }
 
-export default App
+export default App;
