@@ -104,11 +104,15 @@
   }
 
 .facilities-overlay-content {
-    width: 100%;
-    padding: 16px;
-    margin: 0;
-    border-radius: 0;
-    max-height: 90vh;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    width: 50%;
+}
+  
+.close-modal-btn {
+    background-color: red;
 }
 
 .full-facilities-list {
