@@ -68,14 +68,10 @@ const PropertyDetails = () => {
   });
   const navigate = useNavigate();
 
-  const facilitiesArray = propertyDetails?.facilities
+  const facilities = propertyDetails?.facilities
   ? propertyDetails.facilities.split(",") 
   : [];
 
-
-  const toggleFacilities = () => {
-    setShowAllFacilities(true);
-  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -407,7 +403,7 @@ const PropertyDetails = () => {
                 <div className="property-features">
                   <h2 className="property-font">What this place offers</h2>
                   <div className="facilities-details">
-                    {(showAllFacilities ? facilitiesArray : facilitiesArray.slice(0, 10)).map((facilityName, index) => {
+                    {(showAllFacilities ? facilities : facilities.slice(0, 10)).map((facilityName, index) => {
                         const facility = facilities.find(f => f.name === facilityName.trim());
                         return (
                             <div key={index} className="facilities-item">
@@ -418,21 +414,21 @@ const PropertyDetails = () => {
                     })}
                   </div>
   
-                  {facilitiesArray.length > 10 && (
-                    <button className="show-all-facilities" onClick={toggleFacilities}>
+                  {facilities.length > 10 && (
+                    <button className="show-all-facilities" onClick={() =>setShowAllFacilities(true)}>
                         Show All Facilities
                     </button>
                   )}
 
-                {showAllFacilities && (
-                  <div className="facilities-overlay">
-                    <div className="facilities-overlay-content">
-                      <div className="facilities-overlay-header">
+                  {showAllFacilities && (
+                    <div className="facilities-overlay">
+                      <div className="facilities-overlay-content">
+                        <div className="facilities-overlay-header">
                           <h3>What this place offers</h3>
                           <button className="close-overlay" onClick={() => setShowAllFacilities(false)}>X</button>
-                      </div>
-                      <div className="full-facilities-list">
-                          {facilitiesArray.map((facilityName, index) => {
+                        </div>
+                        <div className="full-facilities-list">
+                          {facilities.map((facilityName, index) => {
                             const facility = facilities.find(f => f.name === facilityName.trim());
                             return (
                               <div key={index} className="facilities-item">
@@ -441,10 +437,10 @@ const PropertyDetails = () => {
                               </div>
                             );
                           })}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                 )}
+                   )}
                 </div>
               </div>
 
