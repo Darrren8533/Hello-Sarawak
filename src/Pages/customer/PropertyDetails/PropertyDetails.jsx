@@ -221,6 +221,7 @@ const PropertyDetails = () => {
 
       await requestBooking(createdReservation.reservationid);
       console.log('Booking request sent');
+    console.log('Reservation added to the cart');
 
       displayToast('success', 'Reservation added to the cart');
         setShowBookingForm(false);
