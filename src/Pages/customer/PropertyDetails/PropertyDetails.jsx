@@ -280,7 +280,6 @@ const PropertyDetails = () => {
       {!showAllPhotos && !isFullscreen && !showBookingForm && !showAllFacilities ? (
         <>
           // <Navbar />
-        {showToast && <Toast type={toastType} message={toastMessage} />}
             
           <div className="property-details-container">
             <h1 className="property-title">{propertyDetails?.propertyaddress}</h1>
@@ -790,7 +789,7 @@ const PropertyDetails = () => {
         
       )}
 
-      
+      {showToast && <Toast type={toastType} message={toastMessage} />}
 
     </div>
   );
