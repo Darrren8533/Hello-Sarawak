@@ -315,12 +315,19 @@ const handleAvatarUpload = async () => {
 
                                 <div className="back-profile-form-group">
                                     <label>Title</label>
-                                    <input type="text" name="uTitle" value={userData.uTitle || ''} onChange={handleInputChange} />
+                                    <select name="utitle" value={userData.utitle || ''} onChange={handleInputChange}>
+                                        <option value="">Select Title</option>
+                                        <option value="Mr.">Mr.</option>
+                                        <option value="Mrs.">Mrs.</option>
+                                        <option value="Ms.">Ms.</option>
+                                        <option value="Miss">Miss</option>
+                                        <option value="Madam">Madam</option>
+                                    </select>
                                 </div>
 
                                 <div className="back-profile-form-group">
                                     <label>Gender</label>
-                                    <select name="uGender" value={userData.uGender || ''} onChange={handleInputChange}>
+                                    <select name="ugender" value={userData.ugender || ''} onChange={handleInputChange}>
                                         <option value="">Select Gender</option>
                                         <option value="Male">Male</option>
                                         <option value="Female">Female</option>
