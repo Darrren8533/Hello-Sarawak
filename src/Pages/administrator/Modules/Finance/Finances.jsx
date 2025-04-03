@@ -274,7 +274,7 @@ export default function FinancialDashboard() {
       if (!guestSatisfactionScoreData?.monthlyData) return <div>No Guest Satisfaction Score data</div>;
     
       const guestSatisfactionChartData = {
-        labels: guestSatisfactionScoreData.monthlyData.map((_, index) => `Property ${index + 1}`),
+        labels: guestSatisfactionScoreData.monthlyData.map((item) => `Property ${item.propertyid}`),
         datasets: [
           {
             label: "Guest Satisfaction Score",
