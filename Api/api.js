@@ -1,4 +1,4 @@
-const API_URL = "https://cams-backend.vercel.app";
+const API_URL = import.meta.env.VITE_API_URL;
 
 //Register
 export const signupUser = async (userData) => {
