@@ -223,8 +223,12 @@ const PropertyDetails = () => {
       console.log('Booking request sent');
 
       displayToast('success', 'Reservation added to the cart');
-      setShowBookingForm(false);
-      navigate('/cart');
+        
+      setTimeout(() => {
+            setShowBookingForm(false);
+            navigate('/cart');
+        }, 2000); 
+        
     } catch (error) {
       console.error('Reservation error:', error);
       displayToast('error', 'Failed to add to cart');
