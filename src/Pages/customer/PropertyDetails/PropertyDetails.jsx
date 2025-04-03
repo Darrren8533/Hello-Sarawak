@@ -5,6 +5,7 @@ import { IoReturnUpBackOutline } from "react-icons/io5";
 import { FaWifi, FaParking, FaSwimmingPool, FaHotTub, FaTv, FaUtensils, FaSnowflake, FaPaw, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaLock, FaBell, FaMapMarkerAlt, FaTree, FaMountain, FaCity } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import Navbar from '../../../Component/Navbar/navbar';
+import Toast from '../../../Component/Toast/Toast';
 import Footer from '../../../Component/Footer/footer';
 import Reviews from "../../../Component/Reviews/Reviews";
 import './PropertyDetails.css';
@@ -44,7 +45,10 @@ const PropertyDetails = () => {
   const location = useLocation();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const { propertyDetails } = location.state || {};
+  const [toastMessage, setToastMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [toastType, setToastType] = useState('');
+  const {propertyDetails} = location.state || {};
   const [bookingData, setBookingData] = useState({
     checkIn: '',
     checkOut: '',
@@ -167,18 +171,20 @@ const PropertyDetails = () => {
     const userid = localStorage.getItem('userid');
     
     if (!userid) {
-      alert('Please Login First');
-      return;
+        displayToast('error', 'Please login first');
+        return;
     }
 
     if (!bookingForm.firstName || !bookingForm.lastName || !bookingForm.email || !bookingForm.phoneNumber) {
-      alert('Please Fill All Required Fields');
-      return;
+        displayToast('error', 'Please fill all required fields');
+        return;
+
     }
 
     if (!bookingData.checkIn || !bookingData.checkOut) {
-      alert('Please Select Check-in and Check-out Dates');
-      return;
+        displayToast('error', 'Please select Check-in and Check-out dates');
+        return;
+  
     }
 
     try {
@@ -216,12 +222,12 @@ const PropertyDetails = () => {
       await requestBooking(createdReservation.reservationid);
       console.log('Booking request sent');
 
-      alert('Reservation added to cart');
+      displayToast('success', 'Reservation added to the cart');
       setShowBookingForm(false);
       navigate('/cart');
     } catch (error) {
       console.error('Reservation error:', error);
-      alert(`Failed to add to cart: ${error.message}`);
+      displayToast('error', 'Failed to add to cart');
     }
   };
 
@@ -250,6 +256,13 @@ const PropertyDetails = () => {
     } catch (error) {
       console.error('Failed to get user information:', error);
     }
+  };
+
+  const displayToast = (type, message) => {
+    setToastType(type);
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 5000);
   };
 
   useEffect(() => {
@@ -767,7 +780,12 @@ const PropertyDetails = () => {
             </button>
           </div>
         </div>
+
+        
       )}
+
+      {showToast && <Toast type={toastType} message={toastMessage} />}
+
     </div>
   );
 };
