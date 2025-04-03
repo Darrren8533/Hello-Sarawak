@@ -1,30 +1,34 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FaArrowLeft, FaArrowRight, FaShoppingCart, FaHistory, FaTrash, FaCreditCard, FaCalendarAlt, FaFilter, FaSort, FaExclamationCircle } from 'react-icons/fa';
-import { fetchCart, removeReservation, updateReservationStatus } from '../../../../Api/api';
-import { Link, useNavigate } from 'react-router-dom';
+import { removeReservation, updateReservationStatus } from '../../../../Api/api';
+import { Link } from 'react-router-dom';
 import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 import Navbar from '../../../Component/Navbar/navbar';
 import Footer from '../../../Component/Footer/footer';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
 import TawkMessenger from '../../../Component/TawkMessenger/TawkMessenger';
 import Toast from '../../../Component/Toast/Toast';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { fetchCart } from '../../../../Api/api';
 import './cart.css';
 
 const Cart = () => {
-  const [reservations, setReservations] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [sortOrder, setSortOrder] = useState('Latest');
   const [filterStatus, setFilterStatus] = useState('All status');
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [actionToConfirm, setActionToConfirm] = useState(null);
   const [selectedReservationId, setSelectedReservationId] = useState(null);
+  const usergroup = localStorage.getItem('usergroup');
   const taxRate = 0.10;
 
   // Toast state
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('');
+
+  // Initialize QueryClient
+  const queryClient = useQueryClient();
 
   // Display toast message
   const displayToast = (type, message) => {
@@ -38,22 +42,49 @@ const Cart = () => {
     }, 3000);
   };
 
-  useEffect(() => {
-    const loadReservations = async () => {
-      try {
-        setLoading(true);
-        const fetchedReservations = await fetchCart();
-        setReservations(fetchedReservations);
-      } catch (error) {
-        console.error('Error fetching reservations:', error);
-        displayToast('error', 'Failed to load your reservations. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // React Query hook for fetching cart data
+  const { data: reservations = [], isLoading: loading } = useQuery({
+    queryKey: ['cart'],
+    queryFn: fetchCart,
+    enabled: usergroup === 'Customer',
+    onError: (error) => {
+      console.error('Error fetching reservations:', error);
+      displayToast('error', 'Failed to load your reservations. Please try again.');
+    }
+  });
 
-    loadReservations();
-  }, []);
+  // Mutation for updating reservation status
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ reservationId, status }) => updateReservationStatus(reservationId, status),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
+      
+      const statusMessages = {
+        'Paid': 'Your reservation has been paid.',
+        'Canceled': 'Your reservation has been canceled.',
+        'Pending': 'Your reservations have been checked out. Please wait for the response of the operators.'
+      };
+      
+      displayToast('success', statusMessages[variables.status] || 'Status updated successfully.');
+    },
+    onError: (error, variables) => {
+      console.error(`Error updating reservation to ${variables.status}:`, error);
+      displayToast('error', `Failed to update reservation. Please try again.`);
+    }
+  });
+
+  // Mutation for removing reservation
+  const removeReservationMutation = useMutation({
+    mutationFn: (reservationId) => removeReservation(reservationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
+      displayToast('success', 'Reservation removed from your list.');
+    },
+    onError: (error) => {
+      console.error('Error removing reservation:', error);
+      displayToast('error', 'Failed to remove reservation. Please try again.');
+    }
+  });
 
   const handleSortChange = (event) => {
     setSortOrder(event.target.value);
@@ -73,21 +104,21 @@ const Cart = () => {
 
   // Execute the confirmed action
   const executeAction = async () => {
-    if (!actionToConfirm || !selectedReservationId) return;
+    if (!actionToConfirm || (!selectedReservationId && actionToConfirm !== 'checkout')) return;
     
     try {
       switch(actionToConfirm) {
         case 'pay':
-          await handlePaid(selectedReservationId);
+          updateStatusMutation.mutate({ reservationId: selectedReservationId, status: 'Paid' });
           break;
         case 'cancel':
-          await handleCancel(selectedReservationId);
+          updateStatusMutation.mutate({ reservationId: selectedReservationId, status: 'Canceled' });
           break;
         case 'remove':
-          await handleRemove(selectedReservationId);
+          removeReservationMutation.mutate(selectedReservationId);
           break;
         case 'checkout':
-          await handleCheckout();
+          handleCheckout();
           break;
         default:
           break;
@@ -98,60 +129,6 @@ const Cart = () => {
       setShowConfirmModal(false);
       setActionToConfirm(null);
       setSelectedReservationId(null);
-    }
-  };
-
-  // Handle pay for reservation
-  const handlePaid = async (reservationID) => {
-    try {
-      await updateReservationStatus(reservationID, 'Paid');
-      
-      setReservations(prevReservations =>
-        prevReservations.map(reservation =>
-          reservation.reservationid === reservationID
-            ? { ...reservation, reservationstatus: 'Paid' }
-            : reservation
-        )
-      );
-
-      displayToast('success', 'Your reservation has been paid.');
-    } catch (error) {
-      console.error('Error paying for reservation:', error);
-      displayToast('error', 'Failed to process payment. Please try again.');
-    }
-  };
-
-  // Handle cancel reservation
-  const handleCancel = async (reservationID) => {
-    try {
-      await updateReservationStatus(reservationID, 'Canceled');
-      
-      setReservations(prevReservations =>
-        prevReservations.map(reservation =>
-          reservation.reservationid === reservationID
-            ? { ...reservation, reservationstatus: 'Canceled' }
-            : reservation
-        )
-      );
-
-      displayToast('success', 'Your reservation has been canceled.');
-    } catch (error) {
-      console.error('Error canceling reservation:', error);
-      displayToast('error', 'Failed to cancel reservation. Please try again.');
-    }
-  };
-
-  // Handle remove reservation
-  const handleRemove = async (reservationID) => {
-    try {
-      await removeReservation(reservationID);
-      setReservations(prevReservations =>
-        prevReservations.filter(reservation => reservation.reservationid !== reservationID)
-      );
-      displayToast('success', 'Reservation removed from your list.');
-    } catch (error) {
-      console.error('Error removing reservation:', error);
-      displayToast('error', 'Failed to remove reservation. Please try again.');
     }
   };
 
@@ -166,23 +143,16 @@ const Cart = () => {
         return;
       }
   
-      // Update each reservation status to 'Pending' via API
+      // Update each reservation status to 'Pending' via API - using Promise.all for parallel execution
       await Promise.all(
         bookingReservations.map(async (reservation) => {
-          await updateReservationStatus(reservation.reservationid, 'Pending');
+          updateStatusMutation.mutate({ 
+            reservationId: reservation.reservationid, 
+            status: 'Pending' 
+          });
         })
       );
   
-      // Update local state to reflect the 'Pending' status for these reservations
-      setReservations(prevReservations =>
-        prevReservations.map(reservation =>
-          reservation.reservationstatus === 'Booking'
-            ? { ...reservation, reservationstatus: 'Pending' }
-            : reservation
-        )
-      );
-  
-      displayToast('success', 'Your reservations have been checked out. Please wait for the response of the operators.');
     } catch (error) {
       console.error('Error during checkout:', error);
       displayToast('error', 'Checkout process failed. Please try again.');
@@ -331,8 +301,9 @@ const Cart = () => {
             <button 
               className="modal-button modal-confirm" 
               onClick={executeAction}
+              disabled={updateStatusMutation.isPending || removeReservationMutation.isPending}
             >
-              Confirm
+              {updateStatusMutation.isPending || removeReservationMutation.isPending ? 'Processing...' : 'Confirm'}
             </button>
           </div>
         </div>
@@ -371,6 +342,7 @@ const Cart = () => {
           <button
             className="btn-action btn-cancel"
             onClick={() => confirmAction('cancel', reservation.reservationid)}
+            disabled={updateStatusMutation.isPending}
           >
             Cancel Booking
           </button>
@@ -405,7 +377,7 @@ const Cart = () => {
                 Array(2).fill().map((_, index) => <CartItemSkeleton key={index} />)
               ) : acceptedReservations.length > 0 ? (
                 acceptedReservations.map((reservation) => (
-                  <CartItem reservation={reservation} />
+                  <CartItem key={reservation.reservationid} reservation={reservation} />
                 ))
               ) : (
                 <div className="empty-cart">
@@ -446,10 +418,10 @@ const Cart = () => {
                 </div>
                 <button 
                   className={`checkout-btn ${acceptedReservations.length === 0 ? 'disabled' : ''}`}
-                  disabled={acceptedReservations.length === 0}
+                  disabled={acceptedReservations.length === 0 || updateStatusMutation.isPending}
                   onClick={() => confirmAction('checkout')}
                 >
-                  Proceed to Checkout
+                  {updateStatusMutation.isPending ? 'Processing...' : 'Proceed to Checkout'}
                 </button>
               </div>
             </div>

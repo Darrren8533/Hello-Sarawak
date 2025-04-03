@@ -18,21 +18,35 @@ import { FaHotel, FaUserTie } from 'react-icons/fa';
 import { RiAdminLine } from 'react-icons/ri';
 import '../../Component/MainContent/MainContent.css';
 
-const OwnerDashboard = () => {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [isAuthorized, setIsAuthorized] = useState(false);
-  const navigate = useNavigate();
+  const OwnerDashboard = () => {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [usergroup, setusergroup] = useState('');
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const navigate = useNavigate();
 
-  useEffect(() => {
+    useEffect(() => {
+    // Initial check
+    checkAndRedirect();
+  
+    const checkInterval = setInterval(() => {
+      checkAndRedirect();
+    }, 3000); // Check every 3 seconds
+  
+    // Define the check function
+    function checkAndRedirect() {
     const loggedInStatus = localStorage.getItem('isLoggedIn');
-    const usergroup = localStorage.getItem('usergroup');
-
-    if (loggedInStatus === 'true' && usergroup === 'Owner') {
-      setIsAuthorized(true);
-    } else {
-      setIsAuthorized(false);
+    const usergroupStatus = localStorage.getItem('usergroup');
+    
+    setIsLoggedIn(loggedInStatus === 'true');
+    setusergroup(usergroupStatus);
+    
+    if (loggedInStatus !== 'true' || usergroupStatus !== 'Owner') {
       navigate('/no-access');
     }
+  }
+  
+    // Clean up interval on unmount
+    return () => clearInterval(checkInterval);
   }, [navigate]);
 
   if (!isAuthorized) {
@@ -40,17 +54,17 @@ const OwnerDashboard = () => {
   }
 
   const links = [
-    { path: '/login/owner_dashboard/dashboard', label: 'Dashboard', icon: <FiHome /> },
-    { path: '/login/owner_dashboard/customers', label: 'Customers', icon: <FiUsers /> },
-    { path: '/login/owner_dashboard/operators', label: 'Admin/Moderator', icon: <FaUserTie /> },
-    { path: '/login/owner_dashboard/owners', label: 'Owners', icon: <RiAdminLine /> },
-    { path: '/login/owner_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel /> },
-    { path: '/login/owner_dashboard/reservations', label: 'Reservations', icon: <FiCalendar /> },
-    { path: '/login/owner_dashboard/finances', label: 'Finances', icon: <FiCreditCard /> },
-    { path: '/login/owner_dashboard/analytics', label: 'Analytics', icon: <FiBarChart /> },
-    { path: '/login/owner_dashboard/communication-hub', label: 'Communication Hub', icon: <FiMessageSquare /> },
-    { path: '/login/owner_dashboard/audit-trails', label: 'Audit Trails', icon: <FiFileText /> },
-    { path: '/login/owner_dashboard/profile', label: 'Profile', icon: <FiUsers /> },
+    { path: '/owner_dashboard/dashboard', label: 'Dashboard', icon: <FiHome /> },
+    { path: '/owner_dashboard/customers', label: 'Customers', icon: <FiUsers /> },
+    { path: '/owner_dashboard/operators', label: 'Admin/Moderator', icon: <FaUserTie /> },
+    { path: '/owner_dashboard/owners', label: 'Owners', icon: <RiAdminLine /> },
+    { path: '/owner_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel /> },
+    { path: '/owner_dashboard/reservations', label: 'Reservations', icon: <FiCalendar /> },
+    { path: '/owner_dashboard/finances', label: 'Finances', icon: <FiCreditCard /> },
+    { path: '/owner_dashboard/analytics', label: 'Analytics', icon: <FiBarChart /> },
+    { path: '/owner_dashboard/communication-hub', label: 'Communication Hub', icon: <FiMessageSquare /> },
+    { path: '/owner_dashboard/audit-trails', label: 'Audit Trails', icon: <FiFileText /> },
+    { path: '/owner_dashboard/profile', label: 'Profile', icon: <FiUsers /> },
   ];
 
   const handleLogout = () => {

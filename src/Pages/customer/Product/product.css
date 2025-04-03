@@ -231,15 +231,6 @@
   background-color: #493829;
 }
 
-.loader-box {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 200px;
-  margin-top: 70px;
-}
-
 /*------------Property list styles------------*/
 .property-container_for_product {
   padding: 20px;

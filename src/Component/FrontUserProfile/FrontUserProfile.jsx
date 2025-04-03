@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { fetchUserData, fetchGoogleUserData, uploadAvatar, updateProfile } from '../../../Api/api';
 import Toast from '../Toast/Toast';
-import { FaUser, FaLock, FaCamera } from 'react-icons/fa';
+import { FaUser, FaLock, FaCamera, FaEye, FaEyeSlash } from 'react-icons/fa';
 import './FrontUserProfile.css';
 import eventBus from '../EventBus/Eventbus';
+import Loader from '../../Component/Loader/Loader';
 import { CountryDropdown } from 'react-country-region-selector';
 
 const FrontUserProfile = () => {
@@ -20,6 +21,7 @@ const FrontUserProfile = () => {
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [avatarKey, setAvatarKey] = useState(0);
     const [originalUserData, setOriginalUserData] = useState({});
+    const [loading, setLoading] = useState(false);
 
     const userid = localStorage.getItem('userid');
     const usergroup = localStorage.getItem('usergroup');
@@ -29,6 +31,7 @@ const FrontUserProfile = () => {
     const fetchUserData_Customer = async () => {
         if (usergroup === 'Customer') {
             try {
+                setLoading(true);
                 const data = await fetchUserData(userid);
                 setUserData(data);
                 setOriginalUserData(data);
@@ -45,12 +48,19 @@ const FrontUserProfile = () => {
 
                 setPreviewAvatar(imageSrc);
                 localStorage.setItem("uimage", imageSrc);
-            } catch (error) {
+            } 
+            
+            catch (error) {
                 displayToast('error', 'Error fetching user data');
+            }
+            
+            finally{
+                setLoading(false);
             }
         } 
         
         else{
+            setLoading(false);
             displayToast('error', 'User Not Logged In');
             return;
         }
@@ -218,193 +228,200 @@ const FrontUserProfile = () => {
     return (
         <div className="front-profile-container">
             {showToast && <Toast type={toastType} message={toastMessage} />}
-            <div className="front-profile-layout">
-            <div className="front-sidebar-card">
-                    <div className={`front-tab ${activeTab === 'personal' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('personal')}>
-                        <FaUser className="front-tab-icon" /> Personal details
+    
+            {loading ? (
+                <div className="loader-box">
+                    <Loader />
+                </div>
+            ) : (
+                <div className="front-profile-layout">
+                <div className="front-sidebar-card">
+                        <div className={`front-tab ${activeTab === 'personal' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('personal')}>
+                            <FaUser className="front-tab-icon" /> Personal details
+                        </div>
+                        <div className={`front-tab ${activeTab === 'security' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('security')}>
+                            <FaLock className="front-tab-icon" /> Security settings
+                        </div>
                     </div>
-                    <div className={`front-tab ${activeTab === 'security' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('security')}>
-                        <FaLock className="front-tab-icon" /> Security settings
+    
+                    <div className="front-content-card">
+                        {activeTab === 'personal' && (
+                            <>
+                                <h2>Personal details</h2>
+                                <div className="front-profile-field">
+                                    <span className="front-field-label">Avatar</span>
+                                    <div className="front-field-value">
+                                        <img src={previewAvatar} alt="User Avatar" className="front-avatar-image" />
+                                    </div>
+                                    <span className="front-edit-link"
+                                        onClick={() => document.getElementById('avatar-upload').click()}>
+                                        Edit
+                                    </span>
+                                    <input id="avatar-upload" type="file" accept="image/*"
+                                        onChange={handleAvatarChange} style={{ display: 'none' }} />
+                                </div>
+    
+                                {/* Name Field */}
+                                <div className="front-profile-field">
+                                    <span className="front-field-label">Name</span>
+                                    <span className="front-field-value">{userData.ufirstname} {userData.ulastname}</span>
+                                    <span className="front-edit-link"
+                                        onClick={() => editingField === 'name' ? cancelEditing() : setEditingField('name')}>
+                                        {editingField === 'name' ? 'Cancel' : 'Edit'}
+                                    </span>
+                                </div>
+                                {editingField === 'name' && (
+                                    <div className="front-edit-section">
+                                        <input type="text" name="ufirstname" placeholder="First Name"
+                                            value={userData.ufirstname || ''} onChange={handleInputChange} />
+                                        <input type="text" name="ulastname" placeholder="Last Name"
+                                            value={userData.ulastname || ''} onChange={handleInputChange} />
+                                        <button onClick={handleUpdate}>Save</button>
+                                    </div>
+                                )}
+    
+                                {/* Email Field */}
+                                <div className="front-profile-field">
+                                    <span className="front-field-label">Email Address</span>
+                                    <span className="front-field-value">{userData.uemail || 'Not provided'}</span>
+                                    <span className="front-edit-link"
+                                        onClick={() => editingField === 'email' ? cancelEditing() : setEditingField('email')}>
+                                        {editingField === 'email' ? 'Cancel' : 'Edit'}
+                                    </span>
+                                </div>
+                                {editingField === 'email' && (
+                                    <div className="front-edit-section">
+                                        <input type="email" name="uemail" placeholder="Email Address"
+                                            value={userData.uemail || ''} onChange={handleInputChange} />
+                                        <button onClick={handleUpdate}>Save</button>
+                                    </div>
+                                )}
+    
+                                {/* Phone Field */}
+                                <div className="front-profile-field">
+                                    <span className="front-field-label">Phone Number</span>
+                                    <span className="front-field-value">{userData.uphoneno || 'Not provided'}</span>
+                                    <span className="front-edit-link"
+                                        onClick={() => editingField === 'phone' ? cancelEditing() : setEditingField('phone')}>
+                                        {editingField === 'phone' ? 'Cancel' : 'Edit'}
+                                    </span>
+                                </div>
+                                {editingField === 'phone' && (
+                                    <div className="front-edit-section">
+                                        <input type="text" name="uphoneno" placeholder="Phone Number"
+                                            value={userData.uphoneno || ''} onChange={handleInputChange} />
+                                        <button onClick={handleUpdate}>Save</button>
+                                    </div>
+                                )}
+    
+                                {/* Date of Birth Field */}
+                                <div className="front-profile-field">
+                                    <span className="front-field-label">Date of Birth</span>
+                                    <span className="front-field-value">{userData.udob || 'Not provided'}</span>
+                                    <span className="front-edit-link"
+                                        onClick={() => editingField === 'dob' ? cancelEditing() : setEditingField('dob')}>
+                                        {editingField === 'dob' ? 'Cancel' : 'Edit'}
+                                    </span>
+                                </div>
+                                {editingField === 'dob' && (
+                                    <div className="front-edit-section">
+                                        <input type="date" name="udob"
+                                            value={userData.udob || ''} onChange={handleInputChange} />
+                                        <button onClick={handleUpdate}>Save</button>
+                                    </div>
+                                )}
+    
+                                {/* Country Field */}
+                                <div className="front-profile-field">
+                                    <span className="front-field-label">Country</span>
+                                    <span className="front-field-value">{userData.ucountry || 'Not provided'}</span>
+                                    <span
+                                        className="front-edit-link"
+                                        onClick={() => editingField === 'country'? cancelEditing() : setEditingField('country')}
+                                    >
+                                        {editingField === 'country'? 'Cancel' : 'Edit'}
+                                    </span>
+                                </div>
+                                {editingField === 'country' && (
+                                    <div className="front-edit-section">
+                                        <CountryDropdown className='country-dropdown'
+                                            value={userData.ucountry || ''}                  
+                                            onChange={handleCountryChange}
+                                        />
+                                        <button onClick={handleUpdate}>Save</button>
+                                    </div>
+                                )}
+                            </>
+                        )}
+    
+                        {activeTab === 'security' && (
+                            <>
+                                <h2>Security settings</h2>
+    
+                                {/* Username Field */}
+                                <div className="front-profile-field">
+                                    <span className="front-field-label">Username</span>
+                                    <span className="front-field-value">{userData.username || 'Not provided'}</span>
+                                    <span className="front-edit-link"
+                                        onClick={() => editingField === 'username' ? cancelEditing() : setEditingField('username')}>
+                                        {editingField === 'username' ? 'Cancel' : 'Edit'}
+                                    </span>
+                                </div>
+                                {editingField === 'username' && (
+                                    <div className="front-edit-section">
+                                        <input type="text" name="username" placeholder="Username"
+                                            value={userData.username || ''} onChange={handleInputChange} />
+                                        <button className="front-save-button" onClick={handleUpdate}>Save</button>
+                                    </div>
+                                )}
+    
+                                {/* Password Field */}
+                                <div className="front-profile-field">
+                                    <span className="front-field-label">Password</span>
+                                    <span className="front-field-value">
+                                        {editingField!== 'password' ? '********' : 'Enter new password'}
+                                    </span>
+                                    <span className="front-edit-link"
+                                        onClick={() => editingField === 'password' ? cancelEditing() : setEditingField('password')}>
+                                        {editingField === 'password' ? 'Cancel' : 'Edit'}
+                                    </span>
+                                </div>
+                                {editingField === 'password' && (
+                                    <div className="front-edit-section">
+                                        <div className="front-password-field">
+                                            <input type={showPassword ? 'text' : 'password'}
+                                                placeholder="New Password"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)} />
+                                            {showPassword ? (
+                                                <FaEye className="front-eye-icon" onClick={() => setShowPassword(false)} />
+                                            ) : (
+                                                <FaEyeSlash className="front-eye-icon" onClick={() => setShowPassword(true)} />
+                                            )}
+                                        </div>
+                                        <div className="front-password-field">
+                                            <input type={showConfirmPassword ? 'text' : 'password'}
+                                                placeholder="Confirm Password"
+                                                value={confirmPassword}
+                                                onChange={(e) => setConfirmPassword(e.target.value)} />
+                                            {showConfirmPassword ? (
+                                                <FaEye className="front-eye-icon" onClick={() => setShowConfirmPassword(false)} />
+                                            ) : (
+                                                <FaEyeSlash className="front-eye-icon" onClick={() => setShowConfirmPassword(true)} />
+                                            )}
+                                        </div>
+                                        <button onClick={handleUpdate}>Save</button>
+                                    </div>
+                                )}
+                            </>
+                        )}
                     </div>
                 </div>
-
-                <div className="front-content-card">
-                    {activeTab === 'personal' && (
-                        <>
-                            <h2>Personal details</h2>
-                            <div className="front-profile-field">
-                                <span className="front-field-label">Avatar</span>
-                                <div className="front-field-value">
-                                    <img src={previewAvatar} alt="User Avatar" className="front-avatar-image" />
-                                </div>
-                                <span className="front-edit-link"
-                                    onClick={() => document.getElementById('avatar-upload').click()}>
-                                    Edit
-                                </span>
-                                <input id="avatar-upload" type="file" accept="image/*"
-                                    onChange={handleAvatarChange} style={{ display: 'none' }} />
-                            </div>
-
-                            {/* Name Field */}
-                            <div className="front-profile-field">
-                                <span className="front-field-label">Name</span>
-                                <span className="front-field-value">{userData.ufirstname} {userData.ulastname}</span>
-                                <span className="front-edit-link"
-                                    onClick={() => editingField === 'name' ? cancelEditing() : setEditingField('name')}>
-                                    {editingField === 'name' ? 'Cancel' : 'Edit'}
-                                </span>
-                            </div>
-                            {editingField === 'name' && (
-                                <div className="front-edit-section">
-                                    <input type="text" name="ufirstname" placeholder="First Name"
-                                        value={userData.ufirstname || ''} onChange={handleInputChange} />
-                                    <input type="text" name="ulastname" placeholder="Last Name"
-                                        value={userData.ulastname || ''} onChange={handleInputChange} />
-                                    <button onClick={handleUpdate}>Save</button>
-                                </div>
-                            )}
-
-                            {/* Email Field */}
-                            <div className="front-profile-field">
-                                <span className="front-field-label">Email Address</span>
-                                <span className="front-field-value">{userData.uemail || 'Not provided'}</span>
-                                <span className="front-edit-link"
-                                    onClick={() => editingField === 'email' ? cancelEditing() : setEditingField('email')}>
-                                    {editingField === 'email' ? 'Cancel' : 'Edit'}
-                                </span>
-                            </div>
-                            {editingField === 'email' && (
-                                <div className="front-edit-section">
-                                    <input type="email" name="uemail" placeholder="Email Address"
-                                        value={userData.uemail || ''} onChange={handleInputChange} />
-                                    <button onClick={handleUpdate}>Save</button>
-                                </div>
-                            )}
-
-                            {/* Phone Field */}
-                            <div className="front-profile-field">
-                                <span className="front-field-label">Phone Number</span>
-                                <span className="front-field-value">{userData.uphoneno || 'Not provided'}</span>
-                                <span className="front-edit-link"
-                                    onClick={() => editingField === 'phone' ? cancelEditing() : setEditingField('phone')}>
-                                    {editingField === 'phone' ? 'Cancel' : 'Edit'}
-                                </span>
-                            </div>
-                            {editingField === 'phone' && (
-                                <div className="front-edit-section">
-                                    <input type="text" name="uphoneno" placeholder="Phone Number"
-                                        value={userData.uphoneno || ''} onChange={handleInputChange} />
-                                    <button onClick={handleUpdate}>Save</button>
-                                </div>
-                            )}
-
-                            {/* Date of Birth Field */}
-                            <div className="front-profile-field">
-                                <span className="front-field-label">Date of Birth</span>
-                                <span className="front-field-value">{userData.udob || 'Not provided'}</span>
-                                <span className="front-edit-link"
-                                    onClick={() => editingField === 'dob' ? cancelEditing() : setEditingField('dob')}>
-                                    {editingField === 'dob' ? 'Cancel' : 'Edit'}
-                                </span>
-                            </div>
-                            {editingField === 'dob' && (
-                                <div className="front-edit-section">
-                                    <input type="date" name="udob"
-                                        value={userData.udob || ''} onChange={handleInputChange} />
-                                    <button onClick={handleUpdate}>Save</button>
-                                </div>
-                            )}
-
-                            {/* Country Field */}
-                            <div className="front-profile-field">
-                                <span className="front-field-label">Country</span>
-                                <span className="front-field-value">{userData.ucountry || 'Not provided'}</span>
-                                <span
-                                    className="front-edit-link"
-                                    onClick={() => editingField === 'country'? cancelEditing() : setEditingField('country')}
-                                >
-                                    {editingField === 'country'? 'Cancel' : 'Edit'}
-                                </span>
-                            </div>
-                            {editingField === 'country' && (
-                                <div className="front-edit-section">
-                                    <CountryDropdown className='country-dropdown'
-                                        value={userData.ucountry || ''}                  
-                                        onChange={handleCountryChange}
-                                    />
-                                    <button onClick={handleUpdate}>Save</button>
-                                </div>
-                            )}
-                        </>
-                    )}
-
-                    {activeTab === 'security' && (
-                        <>
-                            <h2>Security settings</h2>
-
-                            {/* Username Field */}
-                            <div className="front-profile-field">
-                                <span className="front-field-label">Username</span>
-                                <span className="front-field-value">{userData.username || 'Not provided'}</span>
-                                <span className="front-edit-link"
-                                    onClick={() => editingField === 'username' ? cancelEditing() : setEditingField('username')}>
-                                    {editingField === 'username' ? 'Cancel' : 'Edit'}
-                                </span>
-                            </div>
-                            {editingField === 'username' && (
-                                <div className="front-edit-section">
-                                    <input type="text" name="username" placeholder="Username"
-                                        value={userData.username || ''} onChange={handleInputChange} />
-                                    <button className="front-save-button" onClick={handleUpdate}>Save</button>
-                                </div>
-                            )}
-
-                            {/* Password Field */}
-                            <div className="front-profile-field">
-                                <span className="front-field-label">Password</span>
-                                <span className="front-field-value">
-                                    {editingField!== 'password' ? '********' : 'Enter new password'}
-                                </span>
-                                <span className="front-edit-link"
-                                    onClick={() => editingField === 'password' ? cancelEditing() : setEditingField('password')}>
-                                    {editingField === 'password' ? 'Cancel' : 'Edit'}
-                                </span>
-                            </div>
-                            {editingField === 'password' && (
-                                <div className="front-edit-section">
-                                    <div className="front-password-field">
-                                        <input type={showPassword ? 'text' : 'password'}
-                                            placeholder="New Password"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)} />
-                                        {showPassword ? (
-                                            <FaEye className="front-eye-icon" onClick={() => setShowPassword(false)} />
-                                        ) : (
-                                            <FaEyeSlash className="front-eye-icon" onClick={() => setShowPassword(true)} />
-                                        )}
-                                    </div>
-                                    <div className="front-password-field">
-                                        <input type={showConfirmPassword ? 'text' : 'password'}
-                                            placeholder="Confirm Password"
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)} />
-                                        {showConfirmPassword ? (
-                                            <FaEye className="front-eye-icon" onClick={() => setShowConfirmPassword(false)} />
-                                        ) : (
-                                            <FaEyeSlash className="front-eye-icon" onClick={() => setShowConfirmPassword(true)} />
-                                        )}
-                                    </div>
-                                    <button onClick={handleUpdate}>Save</button>
-                                </div>
-                            )}
-                        </>
-                    )}
-                </div>
-            </div>
+            )}
         </div>
-    );
+    );    
 };
 
 export default FrontUserProfile;

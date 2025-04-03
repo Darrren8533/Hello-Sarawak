@@ -11,23 +11,35 @@ import { CgProfile } from "react-icons/cg";
 import { FaHotel } from 'react-icons/fa';
 import '../../Component/MainContent/MainContent.css';
 
-const ModeratorDashboard = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [usergroup, setusergroup] = useState('');
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const navigate = useNavigate();
+  const ModeratorDashboard = () => {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [usergroup, setusergroup] = useState('');
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const navigate = useNavigate();
 
-  useEffect(() => {
+    useEffect(() => {
+    // Initial check
+    checkAndRedirect();
+  
+    const checkInterval = setInterval(() => {
+      checkAndRedirect();
+    }, 3000); // Check every 3 seconds
+  
+    // Define the check function
+    function checkAndRedirect() {
     const loggedInStatus = localStorage.getItem('isLoggedIn');
     const usergroupStatus = localStorage.getItem('usergroup');
-
+    
     setIsLoggedIn(loggedInStatus === 'true');
     setusergroup(usergroupStatus);
-
-    // Redirect to NoAccess page if not logged in or usergroup is not 'Moderator'
+    
     if (loggedInStatus !== 'true' || usergroupStatus !== 'Moderator') {
       navigate('/no-access');
     }
+  }
+
+      // Clean up interval on unmount
+      return () => clearInterval(checkInterval);
   }, [navigate]);
 
   // Display a loading state until authentication is confirmed
