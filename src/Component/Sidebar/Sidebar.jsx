@@ -8,13 +8,14 @@ const Sidebar = ({ title, links, isCollapsed, toggleSidebar }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
+
   useEffect(() => {
     const checkLoginStatus = async () => {
       const userid = localStorage.getItem('userid');
 
       if (userid) {
         try {
-          const response = await fetch(`https://cams-backend.vercel.app/checkStatus?userid=${userid}`);
+          const response = await fetch(`${API_URL}/checkStatus?userid=${userid}`);
           const data = await response.json();
 
           if (data.ustatus === 'login') {
