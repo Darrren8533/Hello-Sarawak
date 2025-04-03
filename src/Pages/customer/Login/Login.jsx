@@ -35,6 +35,7 @@ const Login = () => {
 
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [email, setEmail] = useState('');
+  const API_URL = import.meta.env.API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -100,7 +101,7 @@ const Login = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch('https://cams-backend.vercel.app/forgot-password', {
+      const response = await fetch(`${API_URL}/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -146,7 +147,7 @@ const Login = () => {
       localStorage.setItem("googleAccessToken", tokenResponse.access_token);
   
       try {
-        const response = await fetch("https://cams-backend.vercel.app/google-login", {
+        const response = await fetch(`${API_URL}/google-login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ token: tokenResponse.access_token }),
