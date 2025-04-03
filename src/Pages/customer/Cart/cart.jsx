@@ -354,7 +354,7 @@ const Cart = () => {
   return (
     <div>
       <AuthProvider>
-      <Navbar />
+
       <br /><br /><br />
       
       {/* Toast notification */}
