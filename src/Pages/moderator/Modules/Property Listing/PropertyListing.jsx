@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchPropertiesListingTable, deleteProperty } from '../../../../../Api/api';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
@@ -10,10 +11,10 @@ import Toast from '../../../../Component/Toast/Toast';
 import Alert from '../../../../Component/Alert/Alert';
 import { FaEye, FaEdit, FaTrash } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
+import Loader from '../../../../Component/Loader/Loader'; 
 import '../Property Listing/PropertyListing.css';
 
 const PropertyListing = () => {
-    const [properties, setProperties] = useState([]);
     const [searchKey, setSearchKey] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('All');
     const [appliedFilters, setAppliedFilters] = useState({ status: 'All' });
@@ -27,28 +28,46 @@ const PropertyListing = () => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [propertyToDelete, setPropertyToDelete] = useState(null);
 
-    useEffect(() => {
-        fetchProperties();
-    }, []);
+    // Initialize QueryClient
+    const queryClient = useQueryClient();
+
+    // Use React Query for fetching properties
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['properties'],
+        queryFn: async () => {
+            const propertyData = await fetchPropertiesListingTable();
+            return (propertyData?.properties || []).filter(
+                (property) => property.propertyid !== undefined
+            );
+        },
+        onError: () => {
+            displayToast('error', 'Failed to load properties. Please try again.');
+        }
+    });
+
+    // Use React Query for delete mutation
+    const deleteMutation = useMutation({
+        mutationFn: (propertyId) => deleteProperty(propertyId),
+        onSuccess: () => {
+            // Invalidate and refetch properties after successful deletion
+            queryClient.invalidateQueries({ queryKey: ['properties'] });
+            displayToast('success', 'Property deleted successfully');
+        },
+        onError: (error) => {
+            console.error('Failed to delete property:', error);
+            displayToast('error', 'Failed to delete property. Please try again.');
+        },
+        onSettled: () => {
+            setIsDialogOpen(false);
+            setPropertyToDelete(null);
+        }
+    });
 
     const displayToast = (type, message) => {
         setToastType(type);
         setToastMessage(message);
         setShowToast(true);
         setTimeout(() => setShowToast(false), 5000);
-    };
-
-    const fetchProperties = async () => {
-        try {
-            const propertyData = await fetchPropertiesListingTable();
-            const validProperties = (propertyData?.properties || []).filter(
-                (property) => property.propertyid !== undefined
-            );
-            setProperties(validProperties);
-        } catch (error) {
-            console.error('Failed to fetch property details', error);
-            displayToast('error', 'Failed to load properties. Please try again.');
-        }
     };
 
     const handleApplyFilters = () => {
@@ -84,6 +103,8 @@ const PropertyListing = () => {
         username: "Operator Name"
     };
 
+    const properties = data || [];
+    
     const filteredProperties = properties.filter(
         (property) =>
             (appliedFilters.status === 'All' ||
@@ -123,19 +144,7 @@ const PropertyListing = () => {
     };
 
     const handleDeleteProperty = async () => {
-        try {
-            await deleteProperty(propertyToDelete);
-            setProperties((prevProperties) =>
-                prevProperties.filter((property) => property.propertyid !== propertyToDelete)
-            );
-            displayToast('success', 'Property deleted successfully');
-        } catch (error) {
-            console.error('Failed to delete property:', error);
-            displayToast('error', 'Failed to delete property. Please try again.');
-        } finally {
-            setIsDialogOpen(false);
-            setPropertyToDelete(null);
-        }
+        deleteMutation.mutate(propertyToDelete);
     };
 
     const propertyDropdownItems = (propertystatus) => {
@@ -202,6 +211,22 @@ const PropertyListing = () => {
         setIsPropertyFormOpen(true);
     };
 
+    const handleFormSubmit = () => {
+        setIsPropertyFormOpen(false);
+        // Invalidate and refetch properties after form submission
+        queryClient.invalidateQueries({ queryKey: ['properties'] });
+        displayToast(
+            'success',
+            editProperty
+                ? 'Property updated successfully'
+                : 'Property created successfully'
+        );
+    };
+
+    if (error) {
+        displayToast('error', 'An error occurred while fetching properties.');
+    }
+
     return (
         <div>
             <div className="header-container">
@@ -221,11 +246,17 @@ const PropertyListing = () => {
                 Create New Property
             </button>
 
-            <PaginatedTable
-                data={filteredProperties}
-                columns={columns}
-                rowKey="propertyid"
-            />
+            {isLoading ? (
+            <div className="loader-box">
+               <Loader />
+            </div>
+            ) : (
+                <PaginatedTable
+                    data={filteredProperties}
+                    columns={columns}
+                    rowKey="propertyid"
+                />
+            )}
 
             <Modal
                 isOpen={!!selectedProperty}
@@ -238,16 +269,7 @@ const PropertyListing = () => {
             {isPropertyFormOpen && (
                 <PropertyForm
                     initialData={editProperty}
-                    onSubmit={() => {
-                        setIsPropertyFormOpen(false);
-                        fetchProperties();
-                        displayToast(
-                            'success',
-                            editProperty
-                                ? 'Property updated successfully'
-                                : 'Property created successfully'
-                        );
-                    }}
+                    onSubmit={handleFormSubmit}
                     onClose={() => setIsPropertyFormOpen(false)}
                 />
             )}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchModerators, suspendUser, activateUser, removeUser } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
@@ -8,6 +9,7 @@ import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable'
 import ModeratorForm from '../../../../Component/ModeratorForm/ModeratorForm';
 import Toast from '../../../../Component/Toast/Toast';
 import Alert from '../../../../Component/Alert/Alert';
+import Loader from '../../../../Component/Loader/Loader';
 import { FaEye, FaBan, FaUser, FaEdit, FaTrash } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -17,7 +19,6 @@ import '../../../../Component/SearchBar/SearchBar.css';
 import '../Moderators/Moderators.css';
 
 const Moderators = () => {
-  const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [searchKey, setSearchKey] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('All');
@@ -31,9 +32,66 @@ const Moderators = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [userToDelete, setUserToDelete] = useState(null);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  // Initialize QueryClient
+  const queryClient = useQueryClient();
+
+  // Fetch moderators query
+  const { data: users = [], isLoading } = useQuery({
+    queryKey: ['moderators'],
+    queryFn: fetchModerators,
+    staleTime: 30 * 60 * 1000,
+    refetchInterval: 1000,
+  });
+
+  // Define mutations
+  const suspendMutation = useMutation({
+    mutationFn: (userId) => suspendUser(userId),
+    onSuccess: (_, userId) => {
+      queryClient.setQueryData(['moderators'], (oldData) =>
+        oldData.map(u => u.userid === userId ? { ...u, uactivation: 'Inactive' } : u)
+      );
+      const user = users.find(u => u.userid === userId);
+      displayToast('success', `User ${user.ufirstname} ${user.ulastname} has been suspended.`);
+    },
+    onError: (error) => {
+      console.error('Failed to suspend user:', error);
+      displayToast('error', 'Error suspending user');
+    }
+  });
+
+  const activateMutation = useMutation({
+    mutationFn: (userId) => activateUser(userId),
+    onSuccess: (_, userId) => {
+      queryClient.setQueryData(['moderators'], (oldData) =>
+        oldData.map(u => u.userid === userId ? { ...u, uactivation: 'Active' } : u)
+      );
+      const user = users.find(u => u.userid === userId);
+      displayToast('success', `User ${user.ufirstname} ${user.ulastname} has been activated.`);
+    },
+    onError: (error) => {
+      console.error('Failed to activate user:', error);
+      displayToast('error', 'Error activating user');
+    }
+  });
+
+  const removeMutation = useMutation({
+    mutationFn: (userId) => removeUser(userId),
+    onSuccess: (_, userId) => {
+      queryClient.setQueryData(['moderators'], (oldData) =>
+        oldData.filter(u => u.userid !== userId)
+      );
+      const user = users.find(u => u.userid === userId);
+      displayToast('success', `User ${user.ufirstname} ${user.ulastname} removed successfully.`);
+      setIsDialogOpen(false);
+      setUserToDelete(null);
+    },
+    onError: (error) => {
+      console.error('Error removing user:', error);
+      displayToast('error', 'Failed to remove user.');
+      setIsDialogOpen(false);
+      setUserToDelete(null);
+    }
+  });
 
   useEffect(() => {
     applyFilters();
@@ -44,16 +102,6 @@ const Moderators = () => {
     setToastMessage(message);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 5000);
-  };
-
-  const fetchUsers = async () => {
-    try {
-      const userData = await fetchModerators();
-      setUsers(userData);
-    } catch (error) {
-      console.error('Failed to fetch moderator details', error);
-      displayToast('error', 'Failed to load moderators. Please try again.');
-    }
   };
 
   const applyFilters = () => {
@@ -120,66 +168,23 @@ const Moderators = () => {
       setEditUser(user);
       setIsModeratorFormOpen(true);
     } else if (action === 'suspend') {
-      await handleSuspendUser(user);
+      suspendMutation.mutate(user.userid);
     } else if (action === 'activate') {
-      await handleActivateUser(user);
+      activateMutation.mutate(user.userid);
     } else if (action === 'remove') {
       setUserToDelete(user);
       setIsDialogOpen(true);
     }
   };
 
-  const handleSuspendUser = async (user) => {
-    try {
-      await suspendUser(user.userid);
-      setUsers((prevUsers) =>
-        prevUsers.map((u) => (u.userid === user.userid ? { ...u, uactivation: 'Inactive' } : u))
-      );
-      displayToast('success', `User ${user.ufirstname} ${user.ulastname} has been suspended.`);
-    } catch (error) {
-      console.error('Failed to suspend user:', error);
-      displayToast('error', 'Error suspending user');
+  const handleRemoveUser = () => {
+    if (userToDelete) {
+      removeMutation.mutate(userToDelete.userid);
     }
   };
-
-  const handleActivateUser = async (user) => {
-    try {
-      await activateUser(user.userid);
-      setUsers((prevUsers) =>
-        prevUsers.map((u) => (u.userid === user.userid ? { ...u, uactivation: 'Active' } : u))
-      );
-      displayToast('success', `User ${user.ufirstname} ${user.ulastname} has been activated.`);
-    } catch (error) {
-      console.error('Failed to activate user:', error);
-      displayToast('error', 'Error activating user');
-    }
-  };
-
-  const handleRemoveUser = async () => {
-    try {
-        await removeUser(userToDelete.userid);
-        setUsers((prevUsers) => {
-            // Remove the user from the list
-            const updatedUsers = prevUsers.filter((u) => u.userid !== userToDelete.userid);
-            setFilteredUsers(updatedUsers);
-            return updatedUsers;
-        });
-        displayToast('success', `User ${userToDelete.ufirstname} ${userToDelete.ulastname} removed successfully.`);
-    } catch (error) {
-        console.error('Error removing user:', error);
-        displayToast('error', 'Failed to remove user.');
-    } finally {
-        setIsDialogOpen(false);
-        setUserToDelete(null);
-    }
-};
-
-
-
 
   const userDropdownItems = (userStatus) => {
     if (userStatus === 'Inactive') {
-
       return [
         { label: 'View Moderator', icon: <FaEye />, action: 'view' },
         { label: 'Edit', icon: <FaEdit />, action: 'edit' },
@@ -187,7 +192,6 @@ const Moderators = () => {
         { label: 'Remove', icon: <FaTrash />, action: 'remove' },
       ];
     } else if (userStatus === 'Active') {
-      
       return [
         { label: 'View Moderator', icon: <FaEye />, action: 'view' },
         { label: 'Edit', icon: <FaEdit />, action: 'edit' },
@@ -197,7 +201,6 @@ const Moderators = () => {
 
     return [{ label: 'View Moderator', icon: <FaEye />, action: 'view' }];
   };
-  
 
   const columns = [
     { header: 'ID', accessor: 'userid' },
@@ -225,7 +228,6 @@ const Moderators = () => {
       ),
     },
   ];
-  
 
   return (
     <div>
@@ -237,12 +239,18 @@ const Moderators = () => {
       <Filter filters={filters} onApplyFilters={handleApplyFilters} />
       <button className="create-moderator-button" onClick={handleCreateModerator}>Create Moderator</button>
 
-      <PaginatedTable
-        data={filteredUsers}
-        columns={columns}
-        rowKey="userid"
-        enableCheckbox={false}
-      />
+      {isLoading ? (
+        <div className="loader-box">
+          <Loader />
+        </div>
+      ) : (
+        <PaginatedTable
+          data={filteredUsers}
+          columns={columns}
+          rowKey="userid"
+          enableCheckbox={false}
+        />
+      )}
 
       <Modal
         isOpen={!!selectedUser}
@@ -257,7 +265,7 @@ const Moderators = () => {
           initialData={editUser}
           onSubmit={() => {
             setIsModeratorFormOpen(false);
-            fetchUsers();
+            queryClient.invalidateQueries(['moderators']);
             displayToast('success', editUser ? 'Moderator updated successfully!' : 'Moderator created successfully!');
           }}
           onClose={() => setIsModeratorFormOpen(false)}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { fetchUserData, updateProfile, uploadAvatar, fetchGoogleUserData } from '../../../Api/api';
+import { fetchUserData, fetchGoogleUserData, uploadAvatar, updateProfile } from '../../../Api/api';
 import Toast from '../Toast/Toast';
-import { FaCamera, FaUser, FaLock, FaUsers, FaCog, FaCreditCard, FaShieldAlt, FaEye, FaEyeSlash } from'react-icons/fa';
+import { FaUser, FaLock, FaCamera } from 'react-icons/fa';
 import './FrontUserProfile.css';
 import eventBus from '../EventBus/Eventbus';
 import { CountryDropdown } from 'react-country-region-selector';
@@ -22,10 +22,12 @@ const FrontUserProfile = () => {
     const [originalUserData, setOriginalUserData] = useState({});
 
     const userid = localStorage.getItem('userid');
+    const usergroup = localStorage.getItem('usergroup');
     const googleAccessToken = localStorage.getItem('googleAccessToken');
 
-    useEffect(() => {
-        const loadUserDetails = async () => {
+    // Function to check user group and fetch user data only if the user is a Customer
+    const fetchUserData_Customer = async () => {
+        if (usergroup === 'Customer') {
             try {
                 const data = await fetchUserData(userid);
                 setUserData(data);
@@ -40,15 +42,23 @@ const FrontUserProfile = () => {
                 } else {
                     imageSrc = '/avatar.png';
                 }
+
                 setPreviewAvatar(imageSrc);
                 localStorage.setItem("uimage", imageSrc);
             } catch (error) {
                 displayToast('error', 'Error fetching user data');
             }
-        };
+        } 
+        
+        else{
+            displayToast('error', 'User Not Logged In');
+            return;
+        }
+    };
 
-        loadUserDetails();
-    }, [userid, googleAccessToken]);
+    useEffect(() => {
+        fetchUserData_Customer();  // Only fetch if usergroup is Customer
+    }, [userid, usergroup, googleAccessToken]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -153,7 +163,7 @@ const FrontUserProfile = () => {
                     throw new Error('Password must be 6-20 characters with at least 1 letter and 1 number');
                 }
                 // Update password in userData
-                setUserData((prev) => ({ ...prev, password }));
+                setUserData((prev) => ({ ...prev, password })); // Update password directly
             }
 
             if (editingField === 'email') {
@@ -169,33 +179,22 @@ const FrontUserProfile = () => {
                 if (!userData.ucountry?.trim()) throw new Error('Country cannot be empty');
             }
 
-           
-        const dataToUpdate = { ...userData };
-        if (editingField === 'password') {
-            dataToUpdate.password = password; 
-        }
+            const dataToUpdate = { ...userData };
+            if (editingField === 'password') {
+                dataToUpdate.password = password;
+            }
 
-        // API call
-        const response = await updateProfile(dataToUpdate);
-        if (!response.success) throw new Error('Failed to update profile');
+            const response = await updateProfile(dataToUpdate);
+            if (!response.success) throw new Error('Failed to update profile');
 
-        // Success handling
-        displayToast('success', 'Profile updated successfully');
-        setEditingField(null);
-        setPassword('');
-        setConfirmPassword('');
+            displayToast('success', 'Profile updated successfully');
+            setEditingField(null);
+            setPassword('');
+            setConfirmPassword('');
 
-            const handleCountryChange = (val) => {
-        setUserData((prevUserData) => ({
-            ...prevUserData,
-            ucountry: val
-        }));
-    };
-
-        // Refresh data
-        const updatedData = await fetchUserData(userid);
-        setUserData(updatedData);
-        setOriginalUserData(updatedData);
+            const updatedData = await fetchUserData(userid);
+            setUserData(updatedData);
+            setOriginalUserData(updatedData);
 
         } catch (error) {
             displayToast('error', error.message);
@@ -216,19 +215,11 @@ const FrontUserProfile = () => {
         setTimeout(() => setShowToast(false), 5000);
     };
 
-    const handleCountryChange = (val) => {
-        setUserData((prevUserData) => ({
-            ...prevUserData,
-            ucountry: val
-        }));
-    };
-
     return (
         <div className="front-profile-container">
             {showToast && <Toast type={toastType} message={toastMessage} />}
-
             <div className="front-profile-layout">
-                <div className="front-sidebar-card">
+            <div className="front-sidebar-card">
                     <div className={`front-tab ${activeTab === 'personal' ? 'active' : ''}`}
                         onClick={() => setActiveTab('personal')}>
                         <FaUser className="front-tab-icon" /> Personal details

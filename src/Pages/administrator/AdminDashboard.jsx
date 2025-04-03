@@ -19,23 +19,35 @@ import { VscGraphLine } from "react-icons/vsc";
 import { CgProfile } from "react-icons/cg";
 import '../../Component/MainContent/MainContent.css';
 
-const AdminDashboard = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [usergroup, setusergroup] = useState('');
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const navigate = useNavigate();
+  const AdminDashboard = () => {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [usergroup, setusergroup] = useState('');
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+    const navigate = useNavigate();
 
-  useEffect(() => {
+    useEffect(() => {
+    // Initial check
+    checkAndRedirect();
+  
+    const checkInterval = setInterval(() => {
+      checkAndRedirect();
+    }, 3000); // Check every 3 seconds
+  
+    // Define the check function
+    function checkAndRedirect() {
     const loggedInStatus = localStorage.getItem('isLoggedIn');
     const usergroupStatus = localStorage.getItem('usergroup');
-
+    
     setIsLoggedIn(loggedInStatus === 'true');
     setusergroup(usergroupStatus);
-
-    // Redirect to NoAccess page if not logged in or usergroup is not 'Administrator'
+    
     if (loggedInStatus !== 'true' || usergroupStatus !== 'Administrator') {
       navigate('/no-access');
     }
+  }
+  
+    // Clean up interval on unmount
+    return () => clearInterval(checkInterval);
   }, [navigate]);
 
   // Display a loading state until authentication is confirmed
@@ -44,15 +56,15 @@ const AdminDashboard = () => {
   }
 
   const links = [
-    { path: '/login/administrator_dashboard/dashboard', label: 'Dashboard', icon: <FiHome /> },
-    { path: '/login/administrator_dashboard/customers', label: 'Customer', icon: <FiUsers /> },
-    { path: '/login/administrator_dashboard/moderators', label: 'Moderator', icon: <FaBuildingUser  /> },
-    { path: '/login/administrator_dashboard/administrators', label: 'Administrator', icon: <FaUserTie /> },
-    { path: '/login/administrator_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel />},
-    { path: '/login/administrator_dashboard/reservations', label: 'Reservation', icon: <FiCalendar /> },
-    { path: '/login/administrator_dashboard/booknpay-log', label: 'BooknPayLog', icon: <GoLog /> },
-    { path: '/login/administrator_dashboard/finance', label: 'Finance', icon: <VscGraphLine /> },
-    { path: '/login/administrator_dashboard/profile', label: 'Profile', icon: <CgProfile /> },
+    { path: '/administrator_dashboard/dashboard', label: 'Dashboard', icon: <FiHome /> },
+    { path: '/administrator_dashboard/customers', label: 'Customer', icon: <FiUsers /> },
+    { path: '/administrator_dashboard/moderators', label: 'Moderator', icon: <FaBuildingUser  /> },
+    { path: '/administrator_dashboard/administrators', label: 'Administrator', icon: <FaUserTie /> },
+    { path: '/administrator_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel />},
+    { path: '/administrator_dashboard/reservations', label: 'Reservation', icon: <FiCalendar /> },
+    { path: '/administrator_dashboard/booknpay-log', label: 'BooknPayLog', icon: <GoLog /> },
+    { path: '/administrator_dashboard/finance', label: 'Finance', icon: <VscGraphLine /> },
+    { path: '/administrator_dashboard/profile', label: 'Profile', icon: <CgProfile /> },
   ];
 
   const handleLogout = () => {

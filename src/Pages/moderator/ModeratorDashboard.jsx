@@ -36,10 +36,10 @@ const ModeratorDashboard = () => {
   }
 
   const links = [
-    { path: '/login/moderator_dashboard/dashboard', label: 'Dashboard', icon: <FiHome /> },
-    { path: '/login/moderator_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel /> },
-    { path: '/login/moderator_dashboard/reservations', label: 'Reservations', icon: <FiCalendar /> },
-    { path: '/login/moderator_dashboard/profile', label: 'Profile', icon: <CgProfile /> },
+    { path: '/moderator_dashboard/dashboard', label: 'Dashboard', icon: <FiHome /> },
+    { path: '/moderator_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel /> },
+    { path: '/moderator_dashboard/reservations', label: 'Reservations', icon: <FiCalendar /> },
+    { path: '/moderator_dashboard/profile', label: 'Profile', icon: <CgProfile /> },
   ];
 
   const handleLogout = () => {

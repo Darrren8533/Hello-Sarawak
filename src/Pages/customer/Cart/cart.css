@@ -348,9 +348,9 @@
 }
 
 .status-rejected {
-  color: #494F55;
-  background-color: #F2F3F4;
-  border: 1px solid #DADEE2;
+  color: #AC1A2F;
+  background-color: #FEE7E9;
+  border: 1px solid #FBC0C6;
 }
 
 .status-paid {

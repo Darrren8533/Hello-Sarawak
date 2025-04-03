@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchGoogleUserData, fetchUserData, updateProfile, uploadAvatar } from '../../../Api/api';
 import Toast from '../Toast/Toast';
+import Loader from '../../Component/Loader/Loader';
 import './BackUserProfile.css';
 import { FaUser, FaLock, FaCamera, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { CountryDropdown } from 'react-country-region-selector';
@@ -14,6 +15,7 @@ const BackUserProfile = () => {
     const [toastType, setToastType] = useState('');
     const [activeTab, setActiveTab] = useState('account');
     const [showPassword, setShowPassword] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     const userid = localStorage.getItem('userid');
     const googleAccessToken = localStorage.getItem('googleAccessToken');
@@ -22,8 +24,10 @@ const BackUserProfile = () => {
 
     useEffect(() => {
         const loadUserDetails = async () => {
+            setIsLoading(true);
             if (!userid || isNaN(userid)) {
                 displayToast('error', 'Invalid or missing user ID');
+                setIsLoading(false);
                 return;
             }
 
@@ -55,6 +59,7 @@ const BackUserProfile = () => {
             } catch (error) {
                 displayToast('error', 'Error fetching user data');
             }
+            setIsLoading(false);
         };
 
         if (googleAccessToken) {
@@ -98,21 +103,47 @@ const BackUserProfile = () => {
     };
 
     const handleAvatarChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-        setAvatar(file);
-
+        const file = e.target.files[0];
+        if (!file) return;
+    
+        setAvatar(file); 
+    
         const reader = new FileReader();
-        reader.onloadend = () => {
-            let base64String = reader.result.split(',')[1]; 
-            setPreviewAvatar(reader.result);
-            setUserData((prevData) => ({ ...prevData, uimage: base64String }));
-        };
         reader.readAsDataURL(file);
-    }
-};
-
-
+        reader.onloadend = () => {
+            const img = new Image();
+            img.src = reader.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+    
+                const maxSize = 200; 
+                let width = img.width;
+                let height = img.height;
+    
+                if (width > height) {
+                    if (width > maxSize) {
+                        height *= maxSize / width;
+                        width = maxSize;
+                    }
+                } else {
+                    if (height > maxSize) {
+                        width *= maxSize / height;
+                        height = maxSize;
+                    }
+                }
+    
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
+    
+                const resizedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                setPreviewAvatar(resizedBase64);
+                setUserData((prevData) => ({ ...prevData, uimage: resizedBase64.split(',')[1] }));
+            };
+        };
+    };
+    
 const handleAvatarUpload = async () => {
   if (!avatar) {
     return displayToast('error', 'Please select an avatar to upload');
@@ -218,6 +249,12 @@ const handleAvatarUpload = async () => {
     return (
         <div className="back-profile-container">
             {showToast && <Toast type={toastType} message={toastMessage} />}
+
+            {isLoading ? (
+            <div className="loader-box">
+                <Loader />
+            </div>
+        ) : (
 
             <div className="back-profile-grid">
                 <div className="back-profile-left-column">
@@ -357,6 +394,7 @@ const handleAvatarUpload = async () => {
                     </div>
                 </div>
             </div>
+        )}
         </div>
     );
 };

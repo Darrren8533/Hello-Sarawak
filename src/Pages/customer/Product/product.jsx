@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Import Components
 import Navbar from '../../../Component/Navbar/navbar';
@@ -20,10 +21,19 @@ import { CiCalendarDate } from "react-icons/ci";
 import { IoLocationSharp } from "react-icons/io5";
 import './product.css';
 
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 const Product = () => {
   const [properties, setProperties] = useState([]);
   const [rating] = useState(4.5);
-  const [isLoading, setIsLoading] = useState(true);
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('');
@@ -37,6 +47,26 @@ const Product = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
   const [activeTab, setActiveTab] = useState(null);
   const navigate = useNavigate();
+
+  // Use React Query to fetch properties
+  const { data: fetchedProperties, isLoading, error } = useQuery({
+    queryKey: ['properties'],
+    queryFn: fetchProduct,
+  });
+
+  // Set properties when data is fetched
+  useEffect(() => {
+    if (fetchedProperties) {
+      setProperties(fetchedProperties);
+    }
+  }, [fetchedProperties]);
+
+  // Show error toast if fetching fails
+  useEffect(() => {
+    if (error) {
+      displayToast('error', 'Failed to load properties');
+    }
+  }, [error]);
 
   const clusters = [
     "Kuching",
@@ -109,27 +139,6 @@ const Product = () => {
     setTimeout(() => setShowToast(false), 5000);
   };
 
-  useEffect(() => {
-    const loadProperties = async () => {
-      setIsLoading(true);
-      try {
-        const fetchedProperties = await fetchProduct();
-        setProperties(fetchedProperties);
-      } 
-      
-      catch (error) {
-        console.error('Error fetching properties:', error);
-        displayToast('error', 'Failed to load properties');
-      }
-      
-      finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadProperties();
-  }, []);
-
   const handleViewDetails = (property) => {
     navigate(`/product/${property.propertyid}`, { 
       state: { propertyDetails: property }
@@ -161,7 +170,11 @@ const Product = () => {
     const totalGuests = bookingData.adults + bookingData.children;
   
     try {
-      const allProperties = await fetchProduct();
+      // Use the cached data from React Query when possible
+      const allProperties = fetchedProperties || await queryClient.fetchQuery({
+        queryKey: ['properties'],
+        queryFn: fetchProduct
+      });
   
       const availableProperties = allProperties.filter((property) => {
         const existingCheckin = new Date(property.checkindatetime);
@@ -184,8 +197,8 @@ const Product = () => {
   
       setProperties(availableProperties); // Update the displayed properties
     } catch (error) {
-      console.error('Error fetching properties:', error);
-      displayToast('error', 'Failed to load properties');
+      console.error('Error filtering properties:', error);
+      displayToast('error', 'Failed to filter properties');
     }
   };  
   

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
@@ -6,6 +7,7 @@ import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Toast from '../../../../Component/Toast/Toast';
+import Loader from '../../../../Component/Loader/Loader';
 import { FaEye, FaCheck, FaTimes } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -14,7 +16,6 @@ import '../../../../Component/Filter/Filter.css';
 import './Reservations.css';
 
 const Reservations = () => {
-    const [reservations, setReservations] = useState([]);
     const [searchKey, setSearchKey] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('All');
     const [appliedFilters, setAppliedFilters] = useState({ status: 'All' });
@@ -24,20 +25,22 @@ const Reservations = () => {
     const [showToast, setShowToast] = useState(false);
     const [showMessageBox, setShowMessageBox] = useState(false);
     const [messageBoxMode, setMessageBoxMode] = useState(null);
-    const [administratorProperties, setAdministratorProperties] = useState([]);
     const [selectedProperty, setSelectedProperty] = useState(null);
-    const [operators, setOperators] = useState([]);
     const [selectedOperators, setSelectedOperators] = useState([]);
     const [rejectedReservationID, setRejectedReservationID] = useState(null);
     const [suggestSearchKey, setSuggestSearchKey] = useState('');
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+    
+    const queryClient = useQueryClient();
 
-    useEffect(() => {
-        const fetchReservationsData = async () => {
+    // Fetch reservations with React Query
+    const { data: reservationsData, isLoading: reservationsLoading } = useQuery({
+        queryKey: ['reservations'],
+        queryFn: async () => {
             try {
                 const reservationData = await fetchReservation();
                 if (Array.isArray(reservationData)) {
-                    const updatedReservations = reservationData.map(reservation => {
+                    return reservationData.map(reservation => {
                         const expiryDateTime = new Date(reservation.expiryDateTime).getTime();
                         const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
 
@@ -46,31 +49,61 @@ const Reservations = () => {
                         }
                         return reservation;
                     });
-                    setReservations(updatedReservations);
                 } else {
                     console.error("Invalid data format received:", reservationData);
-                    setReservations([]);
+                    return [];
                 }
             } catch (error) {
                 console.error('Failed to fetch reservation details:', error);
-                setReservations([]);
+                throw error;
             }
-        };
-        fetchReservationsData();
-    }, []);
+        },
+        staleTime: 30 * 60 * 1000,
+        refetchInterval: 1000,
+    });
 
+    // Fetch operators with React Query
+    const { data: operators = [] } = useQuery({
+        queryKey: ['operators'],
+        queryFn: fetchOperators,
+    });
 
-    useEffect(() => {
-        const fetchOperatorsData = async () => {
-            try {
-                const operatorsData = await fetchOperators();
-                setOperators(operatorsData);
-            } catch (error) {
-                console.error('Failed to fetch operators', error);
-            }
-        };
-        fetchOperatorsData();
-    }, []);
+    // Fetch administrator properties when needed
+    const { data: administratorProperties = [], refetch: refetchProperties } = useQuery({
+        queryKey: ['administratorProperties'],
+        queryFn: async () => {
+            const userid = localStorage.getItem('userid');
+            const response = await getOperatorProperties(userid);
+            return response.data;
+        },
+        enabled: false, // Don't run this query automatically
+    });
+
+    // Update reservation status mutation
+    const updateStatusMutation = useMutation({
+        mutationFn: ({ reservationId, newStatus }) => 
+            updateReservationStatus(reservationId, newStatus),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['reservations'] });
+        },
+    });
+
+    // Accept booking mutation
+    const acceptBookingMutation = useMutation({
+        mutationFn: (reservationId) => acceptBooking(reservationId),
+    });
+
+    // Suggest new room mutation
+    const suggestRoomMutation = useMutation({
+        mutationFn: ({ propertyAddress, reservationId }) => 
+            suggestNewRoom(propertyAddress, reservationId),
+    });
+
+    // Send notification mutation
+    const sendNotificationMutation = useMutation({
+        mutationFn: ({ reservationId, operators }) => 
+            sendSuggestNotification(reservationId, operators),
+    });
 
     const handleApplyFilters = () => {
         setAppliedFilters({ status: selectedStatus });
@@ -107,8 +140,8 @@ const Reservations = () => {
         images: "Images",
     };
 
-    const filteredReservations = Array.isArray(reservations)
-        ? reservations.filter(
+    const filteredReservations = Array.isArray(reservationsData)
+        ? reservationsData.filter(
             (reservation) =>
                 (appliedFilters.status === 'All' || (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
                 (
@@ -120,86 +153,74 @@ const Reservations = () => {
         )
         : [];
 
-        const handleAction = async (action, reservation) => {
-            if (reservation.reservationstatus === 'expired') {
-                displayToast('error', 'Action cannot be performed. This reservation has expired.');
-                return;
-            }
-        
-            if (action === 'view') {
-                const essentialFields = {
-                    reservationid: reservation.reservationid || 'N/A',
-                    propertyaddress: reservation.propertyaddress || 'N/A',
-                    checkindatetime: reservation.checkindatetime || 'N/A',
-                    checkoutdatetime: reservation.checkoutdatetime || 'N/A',
-                    reservationblocktime: reservation.reservationblocktime || 'N/A',
-                    request: reservation.request || 'N/A',
-                    totalprice: reservation.totalprice || 'N/A',
-                    rcid: reservation.rcid || 'N/A',
-                    reservationstatus: reservation.reservationstatus || 'N/A',
-                    userid: reservation.userid || 'N/A',
-                    images: reservation.propertyimage || [],
-                };
-                setSelectedReservation(essentialFields);
-            } else if (action === 'accept') {
+    const handleAction = async (action, reservation) => {
+        if (reservation.reservationstatus === 'expired') {
+            displayToast('error', 'Action cannot be performed. This reservation has expired.');
+            return;
+        }
+    
+        if (action === 'view') {
+            const essentialFields = {
+                reservationid: reservation.reservationid || 'N/A',
+                propertyaddress: reservation.propertyaddress || 'N/A',
+                checkindatetime: reservation.checkindatetime || 'N/A',
+                checkoutdatetime: reservation.checkoutdatetime || 'N/A',
+                reservationblocktime: reservation.reservationblocktime || 'N/A',
+                request: reservation.request || 'N/A',
+                totalprice: reservation.totalprice || 'N/A',
+                rcid: reservation.rcid || 'N/A',
+                reservationstatus: reservation.reservationstatus || 'N/A',
+                userid: reservation.userid || 'N/A',
+                images: reservation.propertyimage || [],
+            };
+            setSelectedReservation(essentialFields);
+        } else if (action === 'accept') {
+            try {
+                // Using optimistic updates with React Query
                 const newStatus = 'Accepted';
+                
+                // Update the status first
+                await updateStatusMutation.mutateAsync({ 
+                    reservationId: reservation.reservationid, 
+                    newStatus 
+                });
+                
+                // Then send the acceptance email
+                await acceptBookingMutation.mutateAsync(reservation.reservationid);
         
-                try {
-                    await updateReservationStatus(reservation.reservationid, newStatus);
-                    await acceptBooking(reservation.reservationid);
-        
-                    setReservations((prevReservations) =>
-                        prevReservations.map((res) =>
-                            res.reservationid === reservation.reservationid
-                               ? { ...res, reservationstatus: newStatus }
-                                : res
-                        )
-                    );
-        
-                    displayToast('success', 'Reservation Accepted Successfully');
-                } catch (error) {
-                    console.error('Failed to accept reservation or send email', error);
-                }
-            } else if (action ==='reject') {
-                const rejectedID = {
-                    reservationid: reservation.reservationid || 'N/A',
-                };
-        
-                setRejectedReservationID(rejectedID);
-        
-                const newStatus = 'Rejected';
-        
-                try {
-                    await updateReservationStatus(reservation.reservationid, newStatus);
-        
-                    setReservations((prevReservations) =>
-                        prevReservations.map((res) =>
-                            res.reservationid === reservation.reservationid
-                               ? { ...res, reservationstatus: newStatus }
-                                : res
-                        )
-                    );
-        
-                    setShowMessageBox(true);
-        
-                    displayToast('success', 'Reservation Rejected Successfully');
-                } catch (error) {
-                    console.error('Failed to update reservation status', error);
-                }
+                displayToast('success', 'Reservation Accepted Successfully');
+            } catch (error) {
+                console.error('Failed to accept reservation or send email', error);
+                displayToast('error', 'Failed to accept reservation');
             }
-        };
-
+        } else if (action === 'reject') {
+            const rejectedID = {
+                reservationid: reservation.reservationid || 'N/A',
+            };
+    
+            setRejectedReservationID(rejectedID);
+    
+            try {
+                const newStatus = 'Rejected';
+                
+                await updateStatusMutation.mutateAsync({ 
+                    reservationId: reservation.reservationid, 
+                    newStatus 
+                });
+    
+                setShowMessageBox(true);
+                displayToast('success', 'Reservation Rejected Successfully');
+            } catch (error) {
+                console.error('Failed to update reservation status', error);
+                displayToast('error', 'Failed to reject reservation');
+            }
+        }
+    };
 
     const handleMessageBoxSelect = async (mode) => {
         if (mode === 'suggest') {
-            try {
-                const userid = localStorage.getItem('userid');
-                const response = await getOperatorProperties(userid);
-
-                setAdministratorProperties(response.data);
-            } catch (error) {
-                console.error('Error fetching properties: ', error);
-            }
+            // Trigger the properties query
+            refetchProperties();
         }
 
         setMessageBoxMode(mode);
@@ -213,10 +234,12 @@ const Reservations = () => {
     const handleConfirmSuggestion = async () => {
         if (selectedProperty && rejectedReservationID.reservationid) {
             try {
-                await suggestNewRoom(selectedProperty, rejectedReservationID.reservationid);
+                await suggestRoomMutation.mutateAsync({
+                    propertyAddress: selectedProperty,
+                    reservationId: rejectedReservationID.reservationid
+                });
 
                 displayToast('success', 'New Room Suggestion Email Sent Successfully');
-
                 setMessageBoxMode(null);
             } catch (error) {
                 displayToast('error', 'Error Sending New Room Suggestion Email');
@@ -237,10 +260,12 @@ const Reservations = () => {
     const handleConfirmNotification = async () => {
         if (selectedOperators.length > 0 && rejectedReservationID.reservationid) {
             try {
-                await sendSuggestNotification(rejectedReservationID.reservationid, selectedOperators);
+                await sendNotificationMutation.mutateAsync({
+                    reservationId: rejectedReservationID.reservationid,
+                    operators: selectedOperators
+                });
 
                 displayToast('success', 'Suggest Notification Sent Successfully');
-
                 setMessageBoxMode(null);
             } catch (error) {
                 displayToast('error', 'Error Sending Suggest Notification');
@@ -327,12 +352,18 @@ const Reservations = () => {
 
             <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-            <PaginatedTable
-                data={filteredReservations}
-                columns={columns}
-                rowKey="reservationid"
-                enableCheckbox={false}
-            />
+            {reservationsLoading ? (
+                <div className="loader-box">
+                    <Loader />
+                </div>
+            ) : (
+                <PaginatedTable
+                    data={filteredReservations}
+                    columns={columns}
+                    rowKey="reservationid"
+                    enableCheckbox={false}
+                />
+            )}
 
             <Modal
                 isOpen={!!selectedReservation}
@@ -444,6 +475,7 @@ const Reservations = () => {
                                 <input
                                     type="checkbox"
                                     id="select-all-operators"
+                                    checked={selectedOperators.length === operators.length && operators.length > 0}
                                     onChange={(e) => {
                                         const checked = e.target.checked;
                                         setSelectedOperators(checked ? operators.map(operator => operator.userid) : []);

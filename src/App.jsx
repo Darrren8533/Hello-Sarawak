@@ -1,6 +1,5 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-
 import Home from './Pages/customer/Home/Home';
 import Login from './Pages/customer/Login/Login';
 import Register from './Pages/customer/Register/Register';

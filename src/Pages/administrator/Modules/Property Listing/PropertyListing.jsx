@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchPropertiesListingTable, updatePropertyStatus, deleteProperty, propertyListingAccept, propertyListingReject, fetchReservation } from '../../../../../Api/api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
 import PropertyForm from '../../../../Component/PropertyForm/PropertyForm';
@@ -8,12 +9,12 @@ import Filter from '../../../../Component/Filter/Filter';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Toast from '../../../../Component/Toast/Toast';
 import Alert from '../../../../Component/Alert/Alert';
+import Loader from '../../../../Component/Loader/Loader';
 import { FaEye, FaEdit, FaTrash, FaCheck, FaTimes } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../Property Listing/PropertyListing.css';
 
 const PropertyListing = () => {
-    const [properties, setProperties] = useState([]);
     const [searchKey, setSearchKey] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('All');
     const [appliedFilters, setAppliedFilters] = useState({ status: 'All' });
@@ -25,10 +26,26 @@ const PropertyListing = () => {
     const [toastType, setToastType] = useState('');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [propertyToDelete, setPropertyToDelete] = useState(null);
-
-    useEffect(() => {
-        fetchProperties();
-    }, []);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    
+    const queryClient = useQueryClient();
+    
+    // Use React Query to fetch properties
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['properties', page, pageSize, appliedFilters],
+        queryFn: () => fetchPropertiesListingTable(page, pageSize, appliedFilters.status !== 'All' ? appliedFilters.status : undefined),
+        select: (data) => ({
+            properties: (data?.properties || []).filter(property => property.propertyid !== undefined),
+            totalCount: data?.totalCount || 0
+        }),
+        staleTime: 30 * 60 * 1000,
+        refetchInterval: 1000,  
+    });
+    
+    // Extract properties from query result
+    const properties = data?.properties || [];
+    const totalCount = data?.totalCount || 0;
 
     const displayToast = (type, message) => {
         setToastType(type);
@@ -37,18 +54,56 @@ const PropertyListing = () => {
         setTimeout(() => setShowToast(false), 5000);
     };
 
-    const fetchProperties = async () => {
-        try {
-            const propertyData = await fetchPropertiesListingTable();
-            const validProperties = (propertyData?.properties || []).filter(
-                (property) => property.propertyid !== undefined
-            );
-            setProperties(validProperties);
-        } catch (error) {
-            console.error('Failed to fetch property details', error);
-            displayToast('error', 'Failed to load properties. Please try again.');
+    // React Query mutation for accepting property
+    const acceptMutation = useMutation({
+        mutationFn: async (propertyId) => {
+            await propertyListingAccept(propertyId);
+            return updatePropertyStatus(propertyId, 'Available');
+        },
+        onSuccess: (_, propertyId) => {
+            displayToast('success', 'Property Listing Request Accepted Successfully');
+            queryClient.invalidateQueries({ queryKey: ['properties'] });
+        },
+        onError: (error) => {
+            console.error('Failed to accept property', error);
+            displayToast('error', 'Failed to accept property listing request');
         }
-    };
+    });
+
+    // React Query mutation for rejecting property
+    const rejectMutation = useMutation({
+        mutationFn: async (propertyId) => {
+            await propertyListingReject(propertyId);
+            return updatePropertyStatus(propertyId, 'Unavailable');
+        },
+        onSuccess: (_, propertyId) => {
+            displayToast('success', 'Property Listing Request Rejected Successfully');
+            queryClient.invalidateQueries({ queryKey: ['properties'] });
+        },
+        onError: (error) => {
+            console.error('Failed to reject property', error);
+            displayToast('error', 'Failed to reject property listing request');
+        }
+    });
+
+    // React Query mutation for deleting property
+    const deleteMutation = useMutation({
+        mutationFn: async (propertyId) => {
+            return deleteProperty(propertyId);
+        },
+        onSuccess: () => {
+            displayToast('success', 'Property deleted successfully');
+            queryClient.invalidateQueries({ queryKey: ['properties'] });
+        },
+        onError: (error) => {
+            console.error('Failed to delete property', error);
+            displayToast('error', 'Failed to delete property. Please try again.');
+        },
+        onSettled: () => {
+            setIsDialogOpen(false);
+            setPropertyToDelete(null);
+        }
+    });
 
     const handleAction = async (action, property) => {
        if (action === 'view') {
@@ -66,45 +121,12 @@ const PropertyListing = () => {
             username: property.username || 'N/A',
         });
     } else if (action === 'edit') {
-        
         setEditProperty({ ...property });
         setIsPropertyFormOpen(true);
     } else if (action === 'accept') {
-        const newStatus = 'Available';
-        await propertyListingAccept(property.propertyid);
-        updatePropertyStatus(property.propertyid, newStatus)
-            .then(() => {
-                setProperties((prevProperties) =>
-                    prevProperties.map((res) =>
-                        res.propertyid === property.propertyid
-                            ? { ...res, propertystatus: newStatus }
-                            : res
-                    )
-                );
-                displayToast('success', 'Property Listing Request Accepted Successfully');
-            })
-            .catch((error) => {
-                console.error('Failed to update property status', error);
-                displayToast('error', 'Failed to accept property listing request');
-            });
+        acceptMutation.mutate(property.propertyid);
     } else if (action === 'reject') {
-        const newStatus = 'Unavailable';
-        await propertyListingReject(property.propertyid);
-        updatePropertyStatus(property.propertyid, newStatus)
-            .then(() => {
-                setProperties((prevProperties) =>
-                    prevProperties.map((res) =>
-                        res.propertyid === property.propertyid
-                            ? { ...res, propertystatus: newStatus }
-                            : res
-                    )
-                );
-                displayToast('success', 'Property Listing Request Rejected Successfully');
-            })
-            .catch((error) => {
-                console.error('Failed to update property status', error);
-                displayToast('error', 'Failed to reject property listing request');
-            });
+        rejectMutation.mutate(property.propertyid);
     } else if (action === 'delete') {
         if (property.propertystatus === 'Unavailable' && property.username === username) {
             setPropertyToDelete(property.propertyid);
@@ -115,10 +137,8 @@ const PropertyListing = () => {
     }
 };
     
-    
     const handleDeleteProperty = async () => {
         try {
-        
             const property = properties.find((prop) => prop.propertyid === propertyToDelete);
 
             if (!property) {
@@ -135,9 +155,13 @@ const PropertyListing = () => {
                 return;
             }
 
-        
-            const reservations = await fetchReservation();
-            const hasReservation = reservations.some(reservation => reservation.propertyid === propertyToDelete);
+            // Use React Query to fetch reservations
+            const reservationsQuery = await queryClient.fetchQuery({
+                queryKey: ['reservations', propertyToDelete],
+                queryFn: fetchReservation
+            });
+            
+            const hasReservation = reservationsQuery.some(reservation => reservation.propertyid === propertyToDelete);
 
             if (hasReservation) {
                 displayToast('error', 'This property has an existing reservation and cannot be deleted.');
@@ -146,22 +170,14 @@ const PropertyListing = () => {
                 return;
             }
 
-        
-            await deleteProperty(propertyToDelete);
-            setProperties((prevProperties) =>
-                prevProperties.filter((prop) => prop.propertyid !== propertyToDelete)
-            );
-            displayToast('success', 'Property deleted successfully');
+            deleteMutation.mutate(propertyToDelete);
         } catch (error) {
             console.error('Failed to delete property:', error);
             displayToast('error', 'Failed to delete property. Please try again.');
-        } finally {
             setIsDialogOpen(false);
             setPropertyToDelete(null);
         }
     };
-
-    
 
     const handleApplyFilters = () => {
         setAppliedFilters({ status: selectedStatus });
@@ -197,17 +213,14 @@ const PropertyListing = () => {
     };
 
     const filteredProperties = properties.filter(
-        (property) =>
-            (appliedFilters.status === 'All' || (property.propertystatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
-            (
-                (property.propertyid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.propertyaddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.nearbylocation?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.rateamount?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.propertystatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
-            )
+        (property) => (
+            (property.propertyid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+            (property.propertyaddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+            (property.nearbylocation?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+            (property.rateamount?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+            (property.propertystatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
+        )
     );
-
 
     const propertyDropdownItems = (property, username, usergroup) => {
     const isOwner = property.username === username; 
@@ -325,6 +338,16 @@ const columns = [
     },
 ];
 
+    // Handle page change
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+    };
+
+    // Handle page size change
+    const handlePageSizeChange = (newPageSize) => {
+        setPageSize(newPageSize);
+        setPage(1); // Reset to first page when changing page size
+    };
 
     return (
         <div>
@@ -345,11 +368,26 @@ const columns = [
                 Create New Property
             </button>
 
+            {isLoading ? (
+            <div className="loader-box">
+                <Loader />
+            </div>
+        ) : error ? (
+            <div className="error-message">
+                Error loading properties. Please try again.
+            </div>
+        ) : (
             <PaginatedTable
                 data={filteredProperties}
                 columns={columns}
                 rowKey="propertyid"
+                currentPage={page}
+                pageSize={pageSize}
+                totalCount={totalCount}
+                onPageChange={handlePageChange}
+                onPageSizeChange={handlePageSizeChange}
             />
+        )}
 
             <Modal
                 isOpen={!!selectedProperty}
@@ -364,7 +402,7 @@ const columns = [
                     initialData={editProperty}
                     onSubmit={() => {
                     setIsPropertyFormOpen(false);
-                    fetchProperties();
+                    queryClient.invalidateQueries({ queryKey: ['properties'] });
                     displayToast('success', editProperty? 'Property updated successfully' : 'Property created successfully');
                 }}
                     onClose={() => setIsPropertyFormOpen(false)}

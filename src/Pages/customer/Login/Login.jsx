@@ -65,22 +65,22 @@ const Login = () => {
         
         else if (data.usergroup === 'Customer') {
           displayToast('success', 'Login successful! Redirecting...');
-          setTimeout(() => navigate('/login/home'), 2000); 
+          setTimeout(() => navigate('/home'), 2000); 
         } 
         
         else if (data.usergroup === 'Owner') {
           displayToast('success', 'Login successful! Redirecting...');
-          setTimeout(() => navigate('/login/owner_dashboard'), 2000); 
+          setTimeout(() => navigate('/owner_dashboard'), 2000); 
         } 
         
         else if (data.usergroup === 'Moderator') {
           displayToast('success', 'Login successful! Redirecting...');
-          setTimeout(() => navigate('/login/moderator_dashboard'), 2000); 
+          setTimeout(() => navigate('/moderator_dashboard'), 2000); 
         } 
         
         else if (data.usergroup === 'Administrator') {
           displayToast('success', 'Login successful! Redirecting...');
-          setTimeout(() => navigate('/login/administrator_dashboard'), 2000); 
+          setTimeout(() => navigate('/administrator_dashboard'), 2000); 
         } 
         
         else {
@@ -166,13 +166,13 @@ const Login = () => {
           if (data.uactivation === 'Inactive') {
             displayToast('error', 'Your account is inactive.');
           } else if (data.usergroup === 'Customer') {
-            setTimeout(() => navigate('/login/home'), 2000);
+            setTimeout(() => navigate('/home'), 2000);
           } else if (data.usergroup === 'Owner') {
-            setTimeout(() => navigate('/login/owner_dashboard'), 2000);
+            setTimeout(() => navigate('/owner_dashboard'), 2000);
           } else if (data.usergroup === 'Moderator') {
-            setTimeout(() => navigate('/login/moderator_dashboard'), 2000);
+            setTimeout(() => navigate('/moderator_dashboard'), 2000);
           } else if (data.usergroup === 'Administrator') {
-            setTimeout(() => navigate('/login/administrator_dashboard'), 2000);
+            setTimeout(() => navigate('/administrator_dashboard'), 2000);
           } else {
             displayToast('error', 'Invalid User Group.');
           }

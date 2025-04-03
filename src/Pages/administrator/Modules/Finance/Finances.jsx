@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,7 +10,9 @@ import {
   Legend,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import Loader from '../../../../Component/Loader/Loader';
 import { fetchFinance, fetchOccupancyRate, fetchRevPAR, fetchCancellationRate, fetchCustomerRetentionRate, fetchGuestSatisfactionScore, fetchALOS } from "../../../../../Api/api";
+import { useQuery } from "@tanstack/react-query";
 import "./Finances.css";
 
 ChartJS.register(
@@ -24,168 +26,104 @@ ChartJS.register(
 );
 
 export default function FinancialDashboard() {
-  const [financeData, setFinanceData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [chartType, setChartType] = useState("revenue");
-  const [occupancyData, setOccupancyData] = useState(null);
-  const [revPARData, setRevPARData] = useState(null);
-  const [cancellationRateData, setCancellationRateData] = useState(null);
-  const [customerRetentionRateData, setCustomerRetentionRateData] = useState(null);
-  const [guestSatisfactionScoreData, setGuestSatisfactionScoreData] = useState(null);
-  const [alosData, setALOSData] = useState(null);
 
-  useEffect(() => {
-    const fetchFinanceData = async () => {
-      try {
-        const data = await fetchFinance();
-        
-        if (!data || !data.monthlyData) {
-          throw new Error("No finance data available");
-        }
-        setFinanceData(data);
-      } catch (err) {
-        setError(`Error: ${err.message}`);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // React Query hooks for data fetching
+  const { data: financeData, isLoading: financeLoading, error: financeError } = useQuery({
+    queryKey: ['finance'],
+    queryFn: fetchFinance
+  });
 
-    fetchFinanceData();
+  const { data: occupancyData } = useQuery({
+    queryKey: ['occupancy'],
+    queryFn: fetchOccupancyRate
+  });
 
-    const fetchOccupancyData = async () => {
-      try {
-        const data = await fetchOccupancyRate();
-        
-        setOccupancyData(data);
-      } catch (err) {
-        console.error("Error fetching occupancy data:", err);
-      }
-    };
-    
-    fetchOccupancyData();
+  const { data: revPARData } = useQuery({
+    queryKey: ['revPAR'],
+    queryFn: fetchRevPAR
+  });
 
-    const fetchRevPARData = async () => {
-      try {
-        const data = await fetchRevPAR();
-        
-        setRevPARData(data);
-      } catch (err) {
-        console.error("Error fetching RevPAR data:", err);
-      }
-    };
-    
-    fetchRevPARData();
+  const { data: cancellationRateData } = useQuery({
+    queryKey: ['cancellationRate'],
+    queryFn: fetchCancellationRate
+  });
 
-    const fetchCancellationRateData = async () => {
-      try {
-        const data = await fetchCancellationRate();
-        
-        setCancellationRateData(data);
-      } catch (err) {
-        console.error("Error fetching cancellation rate data:", err);
-      }
-    };
-    
-    fetchCancellationRateData();
+  const { data: customerRetentionRateData } = useQuery({
+    queryKey: ['customerRetentionRate'],
+    queryFn: fetchCustomerRetentionRate
+  });
 
-    const fetchCustomerRetentionRateData = async () => {
-      try {
-        const data = await fetchCustomerRetentionRate();
-        
-        setCustomerRetentionRateData(data);
-      } catch (err) {
-        console.error("Error fetching customer retention rate data:", err);
-      }
-    };
-    
-    fetchCustomerRetentionRateData();
+  const { data: guestSatisfactionScoreData } = useQuery({
+    queryKey: ['guestSatisfactionScore'],
+    queryFn: fetchGuestSatisfactionScore
+  });
 
-    const fetchGuestSatisfactionScoreData = async () => {
-      try {
-        const data = await fetchGuestSatisfactionScore();
-        
-        setGuestSatisfactionScoreData(data);
-      } catch (err) {
-        console.error("Error fetching guest satisfaction score data:", err);
-      }
-    };
-    
-    fetchGuestSatisfactionScoreData();
+  const { data: alosData } = useQuery({
+    queryKey: ['alos'],
+    queryFn: fetchALOS
+  });
 
-    const fetchALOSData = async () => {
-      try {
-        const data = await fetchALOS();
-        
-        setALOSData(data);
-      } catch (err) {
-        console.error("Error fetching average length of stay data:", err);
-      }
-    };
-    
-    fetchALOSData();
-  }, []);
-  
   const renderChart = () => {
     if (!financeData?.monthlyData) return null;
 
-      if (chartType === "occupancy") {
-        if (!occupancyData?.monthlyData) return <div>No occupancy data</div>;
-      
-        const occupancyChartData = {
-          labels: occupancyData.monthlyData.map((item) => item.month),
-          datasets: [
-            {
-              label: "Occupancy Rate (%)",
-              data: occupancyData.monthlyData.map((item) => parseFloat(item.occupancy_rate)),
-              fill: false,
-              borderColor: "rgb(153, 102, 255)",
-              tension: 0.3,
-              pointBackgroundColor: "rgb(153, 102, 255)",
-              pointBorderColor: "#fff",
-              pointBorderWidth: 2,
-              pointRadius: 5,
-              pointHoverRadius: 7,
+    if (chartType === "occupancy") {
+      if (!occupancyData?.monthlyData) return <div>No occupancy data</div>;
+    
+      const occupancyChartData = {
+        labels: occupancyData.monthlyData.map((item) => item.month),
+        datasets: [
+          {
+            label: "Occupancy Rate (%)",
+            data: occupancyData.monthlyData.map((item) => parseFloat(item.occupancy_rate)),
+            fill: false,
+            borderColor: "rgb(153, 102, 255)",
+            tension: 0.3,
+            pointBackgroundColor: "rgb(153, 102, 255)",
+            pointBorderColor: "#fff",
+            pointBorderWidth: 2,
+            pointRadius: 5,
+            pointHoverRadius: 7,
+          },
+        ],
+      };
+    
+      const occupancyOptions = {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "top",
+          },
+          title: {
+            display: true,
+            text: "Monthly Occupancy Rate Trend",
+          },
+          tooltip: {
+            callbacks: {
+              label: (context) => `Occupancy Rate: ${context.parsed.y}%`,
             },
-          ],
-        };
-      
-        const occupancyOptions = {
-          responsive: true,
-          plugins: {
-            legend: {
-              position: "top",
-            },
+          },
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100,
             title: {
               display: true,
-              text: "Monthly Occupancy Rate Trend",
-            },
-            tooltip: {
-              callbacks: {
-                label: (context) => `Occupancy Rate: ${context.parsed.y}%`,
-              },
+              text: "Occupancy Rate (%)",
             },
           },
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 100,
-              title: {
-                display: true,
-                text: "Occupancy Rate (%)",
-              },
-            },
-            x: {
-              title: {
-                display: true,
-                text: "Month",
-              },
+          x: {
+            title: {
+              display: true,
+              text: "Month",
             },
           },
-        };
-      
-        return <Line data={occupancyChartData} options={occupancyOptions} />;
-      }
+        },
+      };
+    
+      return <Line data={occupancyChartData} options={occupancyOptions} />;
+    }
 
     if (chartType === "revpar") {
       if (!revPARData?.monthlyData || revPARData.monthlyData.length === 0) {
@@ -543,8 +481,8 @@ export default function FinancialDashboard() {
     };
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
+  if (financeLoading) return <div className="loader-box"><Loader /></div>;
+  if (financeError) return <div>Error: {financeError.message}</div>;
 
   return (
     <div className="container mx-auto p-4">

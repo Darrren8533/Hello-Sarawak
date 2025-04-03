@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchCustomers, suspendUser, activateUser } from '../../../../../Api/api';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
@@ -6,6 +7,7 @@ import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import Filter from '../../../../Component/Filter/Filter';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Toast from '../../../../Component/Toast/Toast';
+import Loader from '../../../../Component/Loader/Loader';
 import { FaEye, FaBan, FaUser } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -15,7 +17,7 @@ import '../../../../Component/SearchBar/SearchBar.css';
 import './Customers.css';
 
 const Customers = () => {
-    const [customers, setCustomers] = useState([]);
+    const [filteredCustomers, setFilteredCustomers] = useState([]);
     const [searchKey, setSearchKey] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('All');
     const [appliedFilters, setAppliedFilters] = useState({ status: 'All' }); 
@@ -24,24 +26,74 @@ const Customers = () => {
     const [showToast, setShowToast] = useState(false);
     const [toastType, setToastType] = useState('');
 
+    // Initialize QueryClient
+    const queryClient = useQueryClient();
+
+    // Fetch customers query
+    const { data: customers = [], isLoading } = useQuery({
+        queryKey: ['customers'],
+        queryFn: fetchCustomers,
+        onError: (error) => {
+            console.error('Failed to fetch customer details', error);
+            displayToast('error', 'Failed to load customers. Please try again.');
+        }
+    });
+
+    // Define mutations
+    const suspendMutation = useMutation({
+        mutationFn: (userId) => suspendUser(userId),
+        onSuccess: (_, userId) => {
+            queryClient.setQueryData(['customers'], (oldData) =>
+                oldData.map(c => c.userid === userId ? { ...c, uactivation: 'Inactive' } : c)
+            );
+            const customer = customers.find(c => c.userid === userId);
+            displayToast('success', `User ${customer.ufirstname} ${customer.ulastname} has been suspended.`);
+        },
+        onError: (error) => {
+            console.error('Failed to suspend user:', error);
+            displayToast('error', 'Error suspending user');
+        }
+    });
+
+    const activateMutation = useMutation({
+        mutationFn: (userId) => activateUser(userId),
+        onSuccess: (_, userId) => {
+            queryClient.setQueryData(['customers'], (oldData) =>
+                oldData.map(c => c.userid === userId ? { ...c, uactivation: 'Active' } : c)
+            );
+            const customer = customers.find(c => c.userid === userId);
+            displayToast('success', `User ${customer.ufirstname} ${customer.ulastname} has been activated.`);
+        },
+        onError: (error) => {
+            console.error('Failed to activate user:', error);
+            displayToast('error', 'Error activating user');
+        }
+    });
+
     useEffect(() => {
-        const fetchCustomerData = async () => {
-            try {
-                const customerData = await fetchCustomers();
-                setCustomers(customerData);
-            } catch (error) {
-                console.error('Failed to fetch customer details', error);
-                displayToast('error', 'Failed to load customers. Please try again.');
-            }
-        };
-        fetchCustomerData();
-    }, []);
+        if (customers) {
+            applyFilters();
+        }
+    }, [customers, searchKey, appliedFilters]);
 
     const displayToast = (type, message) => {
         setToastType(type);
         setToastMessage(message);
         setShowToast(true);
         setTimeout(() => setShowToast(false), 5000);
+    };
+
+    const applyFilters = () => {
+        const filtered = customers.filter(
+            (customer) =>
+                (appliedFilters.status === 'All' || customer.uactivation === appliedFilters.status) &&
+                (
+                    `${customer.ufirstname} ${customer.ulastname} ${customer.uemail} ${customer.uphoneno} ${customer.uactivation}`
+                        .toLowerCase()
+                        .includes(searchKey.toLowerCase())
+                )
+        );
+        setFilteredCustomers(filtered);
     };
 
     const filters = [
@@ -58,18 +110,16 @@ const Customers = () => {
         },
     ];
 
-    // 修改displayLabels对象
     const displayLabels = {
         firstname: 'First Name',
         lastname: 'Last Name',
         email: 'Email',
         phoneno: 'Phone Number',
-        uactivation: 'Status',  // 修改为小写
+        uactivation: 'Status', 
         gender: 'Gender',
         country: 'Country',
     };
 
-    // 修改处理函数中的字段引用
     const handleAction = async (action, customer) => {
         if (action === 'view') {
             const essentialFields = {
@@ -82,37 +132,14 @@ const Customers = () => {
             };
             setSelectedCustomer(essentialFields);
         } else if (action === 'suspend') {
-            await handleSuspendUser(customer);
+            suspendMutation.mutate(customer.userid);
         } else if (action === 'activate') {
-            await handleActivateUser(customer);
+            activateMutation.mutate(customer.userid);
         }
     };
 
-    // 修改suspend和activate函数
-    const handleSuspendUser = async (customer) => {
-        try {
-            await suspendUser(customer.userid);
-            setCustomers((prevUsers) =>
-                prevUsers.map((c) => (c.userid === customer.userid ? { ...c, uactivation: 'Inactive' } : c))
-            );
-            displayToast('success', `User ${customer.ufirstname} ${customer.ulastname} has been suspended.`);
-        } catch (error) {
-            console.error('Failed to suspend user:', error);
-            displayToast('error', 'Error suspending user');
-        }
-    };
-
-    const handleActivateUser = async (customer) => {
-        try {
-            await activateUser(customer.userid);
-            setCustomers((prevCustomers) =>
-                prevCustomers.map((c) => (c.userid === customer.userid ? { ...c, uactivation: 'Active' } : c))
-            );
-            displayToast('success', `User ${customer.ufirstname} ${customer.ulastname} has been activated.`);
-        } catch (error) {
-            console.error('Failed to activate user:', error);
-            displayToast('error', 'Error activating user');
-        }
+    const handleApplyFilters = () => {
+        setAppliedFilters({ status: selectedStatus });
     };
 
     const customerDropdownItems = (customerStatus) => {
@@ -131,23 +158,6 @@ const Customers = () => {
         return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
     };
 
-
-    // 修改字段引用，从驼峰式改为全小写
-    const filteredCustomers = customers.filter(
-        (customer) =>
-            (appliedFilters.status === 'All' || customer.uactivation === appliedFilters.status) &&
-            (
-                `${customer.ufirstname} ${customer.ulastname} ${customer.uemail} ${customer.uphoneno} ${customer.uactivation}`
-                    .toLowerCase()
-                    .includes(searchKey.toLowerCase())
-            )
-    );
-
-    const handleApplyFilters = () => {
-        setAppliedFilters({ status: selectedStatus });
-    };
-
-    // 修改列定义
     const columns = [
         { header: 'First Name', accessor: 'ufirstname' },
         { header: 'Last Name', accessor: 'ulastname' },
@@ -183,12 +193,18 @@ const Customers = () => {
 
             <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-            <PaginatedTable
-                data={filteredCustomers}
-                columns={columns}
-                rowKey="userID"
-                enableCheckbox={false}
-            />
+            {isLoading ? (
+                <div className="loader-box">
+                    <Loader />
+                </div>
+            ) : (
+                <PaginatedTable
+                    data={filteredCustomers}
+                    columns={columns}
+                    rowKey="userID"
+                    enableCheckbox={false}
+                />
+            )}
 
             <Modal
                 isOpen={!!selectedCustomer}

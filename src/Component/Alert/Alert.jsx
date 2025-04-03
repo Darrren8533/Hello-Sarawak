@@ -1,35 +1,76 @@
-// src/components/ConfirmDialog.js
-import React from 'react';
-import './Alert.css';
+import React, { useEffect, useRef } from 'react';
 import { FaExclamationCircle } from 'react-icons/fa';
+import './Alert.css';
 
-const Alert = ({ isOpen, title, message, onConfirm, onCancel }) => {
+const ConfirmDialog = ({ 
+  isOpen, 
+  title = 'Are you sure?', 
+  message = 'Are you sure you want to proceed with this action?',
+  confirmText = 'Yes',
+  cancelText = 'Cancel',
+  confirmVariant = 'danger',
+  icon = <FaExclamationCircle />,
+  onConfirm, 
+  onCancel 
+}) => {
+  const dialogRef = useRef(null);
+  const confirmButtonRef = useRef(null);
+
+  // Close on escape key
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onCancel();
+      }
+    };
+    
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen, onCancel]);
+
+  // Focus trap and auto-focus on cancel button
+  useEffect(() => {
+    if (isOpen && dialogRef.current) {
+      confirmButtonRef.current.focus();
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="alert-overlay">
-      <div className="alert-dialog">
-        <div className="alert-icon">
-          <FaExclamationCircle />
+    <div 
+      className="confirm-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onCancel();
+      }}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="dialog-title"
+      aria-describedby="dialog-message"
+    >
+      <div className="confirm-dialog" ref={dialogRef}>
+        <div className={`confirm-icon ${confirmVariant}`}>
+          {icon}
         </div>
-        <h2 className="alert-title">
-          {title || 'Are you sure?'}
+        <h2 className="confirm-title" id="dialog-title">
+          {title}
         </h2>
-        <p className="alert-message">
-          {message || 'Are you sure you want to proceed with this action?'}
+        <p className="confirm-message" id="dialog-message">
+          {message}
         </p>
-        <div className="alert-buttons">
+        <div className="confirm-buttons">
           <button
-            className="alert-button confirm"
+            className={`confirm-button ${confirmVariant}`}
             onClick={onConfirm}
+            ref={confirmButtonRef}
           >
-            Yes
+            {confirmText}
           </button>
           <button
-            className="alert-button cancel"
+            className="confirm-button cancel"
             onClick={onCancel}
           >
-            Cancel
+            {cancelText}
           </button>
         </div>
       </div>
@@ -37,4 +78,4 @@ const Alert = ({ isOpen, title, message, onConfirm, onCancel }) => {
   );
 };
 
-export default Alert;
+export default ConfirmDialog;
