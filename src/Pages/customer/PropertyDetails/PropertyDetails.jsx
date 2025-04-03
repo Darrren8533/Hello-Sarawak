@@ -279,7 +279,7 @@ const PropertyDetails = () => {
     <div className="property-details-page">
       {!showAllPhotos && !isFullscreen && !showBookingForm && !showAllFacilities ? (
         <>
-          <Navbar />
+          // <Navbar />
           <div className="property-details-container">
             <h1 className="property-title">{propertyDetails?.propertyaddress}</h1>
             <div className="gallery-section">
