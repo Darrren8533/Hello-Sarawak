@@ -223,12 +223,9 @@ const PropertyDetails = () => {
       console.log('Booking request sent');
 
       displayToast('success', 'Reservation added to the cart');
-        
-      setTimeout(() => {
-            setShowBookingForm(false);
-            navigate('/cart');
-        }, 2000); 
-        
+        setShowBookingForm(false);
+        navigate('/cart');
+
     } catch (error) {
       console.error('Reservation error:', error);
       displayToast('error', 'Failed to add to cart');
@@ -279,7 +276,7 @@ const PropertyDetails = () => {
     <div className="property-details-page">
       {!showAllPhotos && !isFullscreen && !showBookingForm && !showAllFacilities ? (
         <>
-          // <Navbar />
+            <Navbar />
             
           <div className="property-details-container">
             <h1 className="property-title">{propertyDetails?.propertyaddress}</h1>
