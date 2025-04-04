@@ -106,7 +106,7 @@ const BackUserProfile = () => {
         const { name, value } = e.target;
         setUserData((prevUserData) => ({
             ...prevUserData,
-            [name]: value,
+            [name]: value
         }));
     };
 
@@ -122,7 +122,7 @@ const BackUserProfile = () => {
 
     const handleBlur = (e) => {
         const { name, value } = e.target;
-        if (value.trim() === '') {
+        if (!value.trim()) {
             setUserData((prevUserData) => ({
                 ...prevUserData,
                 [name]: 'Not Provided'
@@ -284,7 +284,7 @@ const BackUserProfile = () => {
                                 </label>
                             </div>
                             <div className="back-user-name">
-                                <h2>{userData.ufirstname || 'Not Provided'} {userData.ulastname || 'Not Provided'}</h2>
+                                <h2>{userData.ufirstname === 'Not Provided' ? '' : userData.ufirstname} {userData.ulastname === 'Not Provided' ? '' : userData.ulastname}</h2>
                             </div>
                             <button type="button" className="back-profile-save-avatar-button" onClick={handleAvatarUpload}>
                                 Save Avatar
@@ -310,7 +310,7 @@ const BackUserProfile = () => {
                                         <input 
                                             type="text" 
                                             name="ufirstname" 
-                                            value={userData.ufirstname || 'Not Provided'} 
+                                            value={userData.ufirstname || ''} 
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
@@ -321,7 +321,7 @@ const BackUserProfile = () => {
                                         <input 
                                             type="text" 
                                             name="ulastname" 
-                                            value={userData.ulastname || 'Not Provided'} 
+                                            value={userData.ulastname || ''} 
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
@@ -368,7 +368,7 @@ const BackUserProfile = () => {
                                         <input 
                                             type="email" 
                                             name="uemail" 
-                                            value={userData.uemail || 'Not Provided'} 
+                                            value={userData.uemail || ''} 
                                             readOnly 
                                         />
                                     </div>
@@ -377,7 +377,7 @@ const BackUserProfile = () => {
                                         <input 
                                             type="text" 
                                             name="uphoneno" 
-                                            value={userData.uphoneno || 'Not Provided'} 
+                                            value={userData.uphoneno || ''} 
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
@@ -395,7 +395,7 @@ const BackUserProfile = () => {
                                         <input 
                                             type="text" 
                                             name="uzipcode" 
-                                            value={userData.uzipcode || 'Not Provided'} 
+                                            value={userData.uzipcode || ''} 
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
@@ -414,7 +414,7 @@ const BackUserProfile = () => {
                                         <input 
                                             type="text" 
                                             name="username" 
-                                            value={userData.username || 'Not Provided'} 
+                                            value={userData.username || ''} 
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
