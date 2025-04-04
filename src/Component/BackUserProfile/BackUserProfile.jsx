@@ -209,7 +209,9 @@ const BackUserProfile = () => {
 
     try {
         let updateMessage = 'Profile updated successfully';
+        let shouldLogout = false; 
 
+        // Validation for profile fields
         if (activeTab === 'account') {
             if (userData.ufirstname === 'Not Provided' || userData.ulastname === 'Not Provided') {
                 throw new Error('First and last name cannot be empty');
@@ -239,23 +241,26 @@ const BackUserProfile = () => {
             throw new Error(response.message || 'Failed to update profile');
         }
 
-        // Determine the update message based on the updated fields
         if (userData.username !== 'Not Provided' || userData.password !== 'Not Provided') {
             updateMessage = 'Profile updated successfully. You need to log in again to reflect your changes';
-            
-            setTimeout(() => {    
-                localStorage.clear();
-                navigate('/login');
+            shouldLogout = true;  
+        }
+        
+        displayToast('success', updateMessage);
+
+        if (shouldLogout) {
+            setTimeout(() => {
+                localStorage.clear(); 
+                navigate('/login');  
             }, 5000);
         }
-
-        displayToast('success', updateMessage);
 
     } catch (error) {
         console.error('Update Error:', error);
         displayToast('error', error.message);
     }
 };
+
 
 
     const displayToast = (type, message) => {
