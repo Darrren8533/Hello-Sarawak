@@ -200,7 +200,7 @@ const BackUserProfile = () => {
         reader.readAsDataURL(avatar);
     };
 
-    const handleUpdate = async () => {
+   const handleUpdate = async () => {
     const nameRegex = /^[A-Za-z\s]*$/;
     const usernameRegex = /^[a-zA-Z0-9_]{6,15}$/;
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
@@ -226,10 +226,11 @@ const BackUserProfile = () => {
                 throw new Error('Please enter a valid email address');
             }
         } else if (activeTab === 'security') {
-            if (userData.username === 'Not Provided' || !usernameRegex.test(userData.username)) {
+            // Username and Password validation
+            if (userData.username !== 'Not Provided' && !usernameRegex.test(userData.username)) {
                 throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
             }
-            if (userData.password && userData.password !== 'Not Provided' && !passwordRegex.test(userData.password)) {
+            if (userData.password !== 'Not Provided' && !passwordRegex.test(userData.password)) {
                 throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
             }
         }
@@ -241,18 +242,21 @@ const BackUserProfile = () => {
             throw new Error(response.message || 'Failed to update profile');
         }
 
+
         if (userData.username !== 'Not Provided' || userData.password !== 'Not Provided') {
             updateMessage = 'Profile updated successfully. You need to log in again to reflect your changes';
             shouldLogout = true;  
         }
-        
+
+
         displayToast('success', updateMessage);
+
 
         if (shouldLogout) {
             setTimeout(() => {
-                localStorage.clear(); 
-                navigate('/login');  
-            }, 5000);
+                localStorage.clear();  
+                navigate('/login');    
+            }, 5000); 
         }
 
     } catch (error) {
@@ -260,6 +264,7 @@ const BackUserProfile = () => {
         displayToast('error', error.message);
     }
 };
+
 
 
 
