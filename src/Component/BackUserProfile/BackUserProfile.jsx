@@ -250,11 +250,12 @@ const BackUserProfile = () => {
 
             if (updatedFields.length > 0) {
                 displayToast('info', 'You need to log in again to reflect your changes');
-            
-
+    
+                setTimeout(() => {
                 localStorage.clear();
-
                 navigate('/login');
+            }, 5000); 
+                
             } else {
                 displayToast('success', 'Profile updated successfully');
             }
