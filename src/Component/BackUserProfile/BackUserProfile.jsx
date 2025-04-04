@@ -208,8 +208,9 @@ const BackUserProfile = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     try {
-        let updateMessage = 'Profile updated successfully';
-        let shouldLogout = false; 
+        // Store original values to compare changes
+        const originalUsername = userData.username;
+        const originalPassword = userData.password || '';
 
         // Validation for profile fields
         if (activeTab === 'account') {
@@ -226,11 +227,10 @@ const BackUserProfile = () => {
                 throw new Error('Please enter a valid email address');
             }
         } else if (activeTab === 'security') {
-            // Username and Password validation
-            if (userData.username !== 'Not Provided' && !usernameRegex.test(userData.username)) {
+            if (userData.username === 'Not Provided' || !usernameRegex.test(userData.username)) {
                 throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
             }
-            if (userData.password !== 'Not Provided' && !passwordRegex.test(userData.password)) {
+            if (userData.password && !passwordRegex.test(userData.password)) {
                 throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
             }
         }
@@ -242,21 +242,25 @@ const BackUserProfile = () => {
             throw new Error(response.message || 'Failed to update profile');
         }
 
+ 
+        const usernameChanged = userData.username !== originalUsername && userData.username !== 'Not Provided';
+        const passwordChanged = userData.password !== originalPassword && userData.password !== '';
 
-        if (userData.username !== 'Not Provided' || userData.password !== 'Not Provided') {
-            updateMessage = 'Profile updated successfully. You need to log in again to reflect your changes';
-            shouldLogout = true;  
+        let updateMessage = 'Profile updated successfully';
+        let shouldLogout = false;
+
+        if (usernameChanged || passwordChanged) {
+            updateMessage = 'Profile updated successfully. You must login again to reflect your changes';
+            shouldLogout = true;
         }
 
-
         displayToast('success', updateMessage);
-
 
         if (shouldLogout) {
             setTimeout(() => {
                 localStorage.clear();  
-                navigate('/login');    
-            }, 5000); 
+                navigate('/login');   
+            }, 5000);
         }
 
     } catch (error) {
@@ -264,8 +268,6 @@ const BackUserProfile = () => {
         displayToast('error', error.message);
     }
 };
-
-
 
 
     const displayToast = (type, message) => {
