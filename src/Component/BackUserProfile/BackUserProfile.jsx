@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { fetchGoogleUserData, fetchUserData, updateProfile, uploadAvatar } from '../../../Api/api';
 import Toast from '../Toast/Toast';
 import Loader from '../../Component/Loader/Loader';
@@ -199,47 +200,72 @@ const BackUserProfile = () => {
     };
 
     const handleUpdate = async () => {
-        const nameRegex = /^[A-Za-z\s]*$/;
-        const usernameRegex = /^[a-zA-Z0-9_]{6,15}$/;
-        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-        const phoneRegex = /^[0-9]{10,15}$/;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const nameRegex = /^[A-Za-z\s]*$/;
+    const usernameRegex = /^[a-zA-Z0-9_]{6,15}$/;
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    const phoneRegex = /^[0-9]{10,15}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        try {
-            if (activeTab === 'account') {
-                if (userData.ufirstname === 'Not Provided' || userData.ulastname === 'Not Provided') {
-                    throw new Error('First and last name cannot be empty');
-                }
-                if (!nameRegex.test(userData.ufirstname) || !nameRegex.test(userData.ulastname)) {
-                    throw new Error('Name should only contain letters and spaces');
-                }
-                if (userData.uphoneno && userData.uphoneno !== 'Not Provided' && !phoneRegex.test(userData.uphoneno)) {
-                    throw new Error('Phone number should contain 10-15 digits');
-                }
-                if (userData.uemail === 'Not Provided' || !emailRegex.test(userData.uemail)) {
-                    throw new Error('Please enter a valid email address');
-                }
-            } else if (activeTab === 'security') {
-                if (userData.username === 'Not Provided' || !usernameRegex.test(userData.username)) {
-                    throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
-                }
-                if (userData.password && userData.password !== 'Not Provided' && !passwordRegex.test(userData.password)) {
-                    throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
-                }
+    try {
+        let updatedFields = [];
+
+        if (activeTab === 'account') {
+            if (userData.ufirstname === 'Not Provided' || userData.ulastname === 'Not Provided') {
+                throw new Error('First and last name cannot be empty');
             }
-
-            const payload = { ...userData, userid };
-            const response = await updateProfile(payload);
-            if (!response.success) {
-                throw new Error(response.message || 'Failed to update profile');
+            if (!nameRegex.test(userData.ufirstname) || !nameRegex.test(userData.ulastname)) {
+                throw new Error('Name should only contain letters and spaces');
             }
-
-            displayToast('success', 'Profile updated successfully');
-        } catch (error) {
-            console.error('Update Error:', error);
-            displayToast('error', error.message);
+            if (userData.uphoneno && userData.uphoneno !== 'Not Provided' && !phoneRegex.test(userData.uphoneno)) {
+                throw new Error('Phone number should contain 10-15 digits');
+            }
+            if (userData.uemail === 'Not Provided' || !emailRegex.test(userData.uemail)) {
+                throw new Error('Please enter a valid email address');
+            }
+        } else if (activeTab === 'security') {
+            if (userData.username === 'Not Provided' || !usernameRegex.test(userData.username)) {
+                throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
+            }
+            if (userData.password && userData.password !== 'Not Provided' && !passwordRegex.test(userData.password)) {
+                throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
+            }
+            // Check if username or password has been changed
+            if (userData.username !== 'Not Provided') {
+                updatedFields.push('username');
+            }
+            if (userData.password && userData.password !== 'Not Provided') {
+                updatedFields.push('password');
+            }
         }
-    };
+
+        const payload = { ...userData, userid };
+        const response = await updateProfile(payload);
+
+        if (!response.success) {
+            throw new Error(response.message || 'Failed to update profile');
+        }
+
+        // Display toast for successful update
+        displayToast('success', `${updatedFields.join(' and ')} updated successfully`);
+
+        // If username or password is updated, notify user and force logout
+        if (updatedFields.length > 0) {
+            displayToast('info', 'You need to log in again to reflect your changes');
+            
+            // Clear local storage to log out the user
+            localStorage.clear();
+            // Redirect to login page
+            window.location.href = '/login';
+        } else {
+            displayToast('success', 'Profile updated successfully');
+        }
+
+    } catch (error) {
+        console.error('Update Error:', error);
+        displayToast('error', error.message);
+    }
+};
+
 
     const displayToast = (type, message) => {
         setToastType(type);
