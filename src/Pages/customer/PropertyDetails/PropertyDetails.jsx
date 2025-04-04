@@ -223,8 +223,8 @@ const PropertyDetails = () => {
       console.log('Booking request sent');
 
       displayToast('success', 'Reservation added to the cart');
-        setShowBookingForm(false);
         setTimeout(() => {
+        setShowBookingForm(false);
         navigate('/cart');
       }, 5000);
 
