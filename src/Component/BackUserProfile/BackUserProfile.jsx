@@ -132,46 +132,48 @@ const BackUserProfile = () => {
         }
     };
 
-    const handleAvatarChange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-        setAvatar(file);
+    setAvatar(file);
 
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => {
-            const img = new Image();
-            img.src = reader.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const maxSize = 200;
-                let width = img.width;
-                let height = img.height;
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
 
-                if (width > height) {
-                    if (width > maxSize) {
-                        height *= maxSize / width;
-                        width = maxSize;
-                    }
-                } else {
-                    if (height > maxSize) {
-                        width *= maxSize / height;
-                        height = maxSize;
-                    }
-                }
+    img.onload = async () => {
+        URL.revokeObjectURL(objectUrl);
 
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(img, 0, 0, width, height);
+        const maxWidth = 300;
+        const maxHeight = 300;
+        let width = img.width;
+        let height = img.height;
 
-                const resizedBase64 = canvas.toDataURL('image/jpeg', 0.8);
-                setPreviewAvatar(resizedBase64);
-                setUserData((prevData) => ({ ...prevData, uimage: resizedBase64.split(',')[1] }));
-            };
-        };
+        if (width > maxWidth || height > maxHeight) {
+            if (width > height) {
+                height = Math.round(height * (maxWidth / width));
+                width = maxWidth;
+            } else {
+                width = Math.round(width * (maxHeight / height));
+                height = maxHeight;
+            }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const resizedImage = canvas.toDataURL('image/jpeg', 0.7);
+        const base64String = resizedImage.split(',')[1];
+
+        setPreviewAvatar(resizedImage);
+        setUserData((prevData) => ({ ...prevData, uimage: base64String }));
     };
+
+    img.src = objectUrl;
+};
 
     const handleAvatarUpload = async () => {
         if (!avatar) {
