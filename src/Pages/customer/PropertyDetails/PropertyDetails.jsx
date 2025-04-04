@@ -224,8 +224,9 @@ const PropertyDetails = () => {
 
       displayToast('success', 'Reservation added to the cart');
         setShowBookingForm(false);
-        navigate('/cart', { state: { showToast: true } });
-
+        setTimeout(() => {
+        navigate('/cart');
+      }, 500);
 
     } catch (error) {
       console.error('Reservation error:', error);
