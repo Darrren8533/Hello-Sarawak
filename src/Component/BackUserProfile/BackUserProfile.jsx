@@ -391,7 +391,7 @@ const BackUserProfile = () => {
                                             value={userData.ugender || 'Not Provided'} 
                                             onChange={handleInputChange}
                                         >
-                                            <option value="Select Gender">Select Gender</option>
+                                            <option value="">Select Gender</option>
                                             <option value="Male">Male</option>
                                             <option value="Female">Female</option>
                                             <option value="Other">Other</option>
