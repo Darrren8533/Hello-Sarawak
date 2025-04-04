@@ -226,7 +226,7 @@ const PropertyDetails = () => {
         setShowBookingForm(false);
         setTimeout(() => {
         navigate('/cart');
-      }, 500);
+      }, 1000);
 
     } catch (error) {
       console.error('Reservation error:', error);
