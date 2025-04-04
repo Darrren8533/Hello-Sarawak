@@ -8,6 +8,7 @@ import { FaUser, FaLock, FaCamera, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { CountryDropdown } from 'react-country-region-selector';
 
 const BackUserProfile = () => {
+    const navigate = useNavigate();
     const [userData, setUserData] = useState({});
     const [avatar, setAvatar] = useState(null);
     const [previewAvatar, setPreviewAvatar] = useState('');
