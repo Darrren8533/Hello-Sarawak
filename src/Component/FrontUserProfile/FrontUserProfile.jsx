@@ -266,7 +266,12 @@ const FrontUserProfile = () => {
                                 {/* Name Field */}
                                 <div className="front-profile-field">
                                     <span className="front-field-label">Name</span>
-                                    <span className="front-field-value">{userData.ufirstname} {userData.ulastname}</span>
+                                    <span className="front-field-value">
+                                      {(userData.ufirstname || userData.ulastname)
+                                        ? `${userData.ufirstname || ''} ${userData.ulastname || ''}`.trim()
+                                          : 'Not provided'}
+                                    </span>
+
                                     <span className="front-edit-link"
                                         onClick={() => editingField === 'name' ? cancelEditing() : setEditingField('name')}>
                                         {editingField === 'name' ? 'Cancel' : 'Edit'}
