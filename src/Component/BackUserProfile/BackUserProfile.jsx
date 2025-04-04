@@ -34,7 +34,6 @@ const BackUserProfile = () => {
             try {
                 const data = await fetchUserData(userid);
 
-                // Assign a username if missing
                 if (!data.username) {
                     const randomNumber = generateRandomNumber();
                     data.username = data.ufirstname ? `${data.ufirstname}_${randomNumber}` : `user_${randomNumber}`;
@@ -98,16 +97,16 @@ const BackUserProfile = () => {
         const { name, value } = e.target;
         setUserData((prevUserData) => ({
             ...prevUserData,
-            [name]: value,
+            [name]: value.trim() === '' ? 'Not Provided' : value,
         }));
     };
 
     const handleAvatarChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
-    
+
         setAvatar(file); 
-    
+
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onloadend = () => {
@@ -116,11 +115,11 @@ const BackUserProfile = () => {
             img.onload = () => {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
-    
+
                 const maxSize = 200; 
                 let width = img.width;
                 let height = img.height;
-    
+
                 if (width > height) {
                     if (width > maxSize) {
                         height *= maxSize / width;
@@ -132,105 +131,87 @@ const BackUserProfile = () => {
                         height = maxSize;
                     }
                 }
-    
+
                 canvas.width = width;
                 canvas.height = height;
                 ctx.drawImage(img, 0, 0, width, height);
-    
+
                 const resizedBase64 = canvas.toDataURL('image/jpeg', 0.8);
                 setPreviewAvatar(resizedBase64);
                 setUserData((prevData) => ({ ...prevData, uimage: resizedBase64.split(',')[1] }));
             };
         };
     };
-    
-const handleAvatarUpload = async () => {
-  if (!avatar) {
-    return displayToast('error', 'Please select an avatar to upload');
-  }
 
-  const reader = new FileReader();
-  reader.onloadend = async () => {
-    let base64String = reader.result.split(',')[1]; 
+    const handleAvatarUpload = async () => {
+        if (!avatar) {
+            return displayToast('error', 'Please select an avatar to upload');
+        }
 
-    try {
-      const response = await uploadAvatar(userData.userid, base64String); 
-      if (response.success) {
-        displayToast('success', response.message);
-        setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`); 
-        setUserData((prevData) => ({
-          ...prevData,
-          uimage: response.data.uimage, 
-        }));
-      }
-    } catch (error) {
-      console.error('Avatar Upload Error:', error);
-      displayToast('error', error.message || 'Failed to upload avatar');
-    }
-  };
-  reader.readAsDataURL(avatar);
-};
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            let base64String = reader.result.split(',')[1]; 
 
-
+            try {
+                const response = await uploadAvatar(userData.userid, base64String); 
+                if (response.success) {
+                    displayToast('success', response.message);
+                    setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`); 
+                    setUserData((prevData) => ({
+                        ...prevData,
+                        uimage: response.data.uimage, 
+                    }));
+                }
+            } catch (error) {
+                console.error('Avatar Upload Error:', error);
+                displayToast('error', error.message || 'Failed to upload avatar');
+            }
+        };
+        reader.readAsDataURL(avatar);
+    };
 
     const handleUpdate = async () => {
-    const nameRegex = /^[A-Za-z\s]*$/;
-    const usernameRegex = /^[a-zA-Z0-9_]{6,15}$/;
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; 
-    const phoneRegex = /^[0-9]{10,15}$/; 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+        const nameRegex = /^[A-Za-z\s]*$/;
+        const usernameRegex = /^[a-zA-Z0-9_]{6,15}$/;
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/; 
+        const phoneRegex = /^[0-9]{10,15}$/; 
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
 
-    try {
-        // Validate fields based on active tab
-        if (activeTab === 'account') {
-            // Name validation
-            if (!userData.ufirstname?.trim() || !userData.ulastname?.trim()) {
-                throw new Error('First and last name cannot be empty');
-            }
-            if (!nameRegex.test(userData.ufirstname) || !nameRegex.test(userData.ulastname)) {
-                throw new Error('Name should only contain letters and spaces');
-            }
-
-            // Phone validation
-            if (userData.uphoneno && !phoneRegex.test(userData.uphoneno)) {
-                throw new Error('Phone number should contain 10-15 digits');
-            }
-
-            // Email validation
-            if (!emailRegex.test(userData.uemail)) {
-                throw new Error('Please enter a valid email address');
-            }
-        } else if (activeTab === 'security') {
-            // Username validation
-            if (!usernameRegex.test(userData.username)) {
-                throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
+        try {
+            if (activeTab === 'account') {
+                if (!userData.ufirstname?.trim() || !userData.ulastname?.trim()) {
+                    throw new Error('First and last name cannot be empty');
+                }
+                if (!nameRegex.test(userData.ufirstname) || !nameRegex.test(userData.ulastname)) {
+                    throw new Error('Name should only contain letters and spaces');
+                }
+                if (userData.uphoneno && !phoneRegex.test(userData.uphoneno)) {
+                    throw new Error('Phone number should contain 10-15 digits');
+                }
+                if (!emailRegex.test(userData.uemail)) {
+                    throw new Error('Please enter a valid email address');
+                }
+            } else if (activeTab === 'security') {
+                if (!usernameRegex.test(userData.username)) {
+                    throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
+                }
+                if (userData.password && !passwordRegex.test(userData.password)) {
+                    throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
+                }
             }
 
-            // Password validation
-            if (userData.password && !passwordRegex.test(userData.password)) {
-                throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
+            const payload = { ...userData, userid };
+            const response = await updateProfile(payload);
+            if (!response.success) {
+                throw new Error(response.message || 'Failed to update profile');
             }
+
+            displayToast('success', 'Profile updated successfully');
+        } catch (error) {
+            console.error('Update Error:', error);
+            displayToast('error', error.message);
         }
-
-        // Add userid to the payload
-        const payload = { ...userData, userid };
-
-
-        console.log('Update Payload:', payload);
-
-
-        const response = await updateProfile(payload);
-        if (!response.success) {
-            throw new Error(response.message || 'Failed to update profile');
-        }
-
-
-        displayToast('success', 'Profile updated successfully');
-    } catch (error) {
-        console.error('Update Error:', error);
-        displayToast('error', error.message);
-    }
-};
+    };
 
     const displayToast = (type, message) => {
         setToastType(type);
@@ -249,159 +230,136 @@ const handleAvatarUpload = async () => {
     return (
         <div className="back-profile-container">
             {showToast && <Toast type={toastType} message={toastMessage} />}
-
             {isLoading ? (
-            <div className="loader-box">
-                <Loader />
-            </div>
-        ) : (
-
-            <div className="back-profile-grid">
-                <div className="back-profile-left-column">
-                    <div className="back-profile-avatar-section">
-                        <div className="back-profile-avatar-wrapper">
-                            <img
-                                src={previewAvatar || '/avatar.png'}
-                                alt="User Avatar"
-                                className="back-profile-avatar-image"
-                            />
-                            <label htmlFor="avatar-upload" className="back-profile-camera-icon">
-                                <FaCamera />
-                                <input
-                                    id="avatar-upload"
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={handleAvatarChange}
-                                    style={{ display: 'none' }}
+                <div className="loader-box">
+                    <Loader />
+                </div>
+            ) : (
+                <div className="back-profile-grid">
+                    <div className="back-profile-left-column">
+                        <div className="back-profile-avatar-section">
+                            <div className="back-profile-avatar-wrapper">
+                                <img
+                                    src={previewAvatar || '/avatar.png'}
+                                    alt="User Avatar"
+                                    className="back-profile-avatar-image"
                                 />
-                            </label>
-                        </div>
-                        <div className="back-user-name">
-                            <h2>{userData.ufirstname || ''} {userData.ulastname || ''}</h2>
-                        </div>
-                        <button type="button" className="back-profile-save-avatar-button" onClick={handleAvatarUpload}>
-                            Save Avatar
-                        </button>
-                    </div>
-                </div>
-
-                <div className="back-profile-right-column">
-                    <div className="back-profile-tabs">
-                        <button className={`back-profile-tab-button ${activeTab === 'account' ? 'active' : ''}`} onClick={() => setActiveTab('account')}>
-                            <FaUser /> Account Settings
-                        </button>
-                        <button className={`back-profile-tab-button ${activeTab === 'security' ? 'active' : ''}`} onClick={() => setActiveTab('security')}>
-                            <FaLock /> Security
-                        </button>
-                    </div>
-
-                    <div className="back-profile-tab-content">
-                        {activeTab === 'account' && (
-                            <form className="back-profile-form">
-                                <div className="back-profile-form-group">
-                                    <label>First Name</label>
-                                    <input type="text" name="ufirstname" value={userData.ufirstname || ''} onChange={handleInputChange} />
-                                </div>
-
-                                <div className="back-profile-form-group">
-                                    <label>Last Name</label>
-                                    <input type="text" name="ulastname" value={userData.ulastname || ''} onChange={handleInputChange} />
-                                </div>
-
-                                <div className="back-profile-form-group">
-                                    <label>Date of Birth</label>
-                                    <input type="date" name="udob" value={userData.udob || ''} onChange={handleInputChange} />
-                                </div>
-
-                                <div className="back-profile-form-group">
-                                    <label>Title</label>
-                                    <select name="utitle" value={userData.utitle || ''} onChange={handleInputChange}>
-                                        <option value="">Select Title</option>
-                                        <option value="Mr.">Mr.</option>
-                                        <option value="Mrs.">Mrs.</option>
-                                        <option value="Ms.">Ms.</option>
-                                        <option value="Miss">Miss</option>
-                                        <option value="Madam">Madam</option>
-                                    </select>
-                                </div>
-
-                                <div className="back-profile-form-group">
-                                    <label>Gender</label>
-                                    <select name="ugender" value={userData.ugender || ''} onChange={handleInputChange}>
-                                        <option value="">Select Gender</option>
-                                        <option value="Male">Male</option>
-                                        <option value="Female">Female</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                </div>
-
-                                <div className="back-profile-form-group">
-                                    <label>Email</label>
+                                <label htmlFor="avatar-upload" className="back-profile-camera-icon">
+                                    <FaCamera />
                                     <input
-                                        type="email"
-                                        name="uemail"
-                                        value={userData.uemail || ''}
-                                        onChange={handleInputChange}
-                                        readOnly
+                                        id="avatar-upload"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleAvatarChange}
+                                        style={{ display: 'none' }}
                                     />
-                                </div>
+                                </label>
+                            </div>
+                            <div className="back-user-name">
+                                <h2>{userData.ufirstname || ''} {userData.ulastname || ''}</h2>
+                            </div>
+                            <button type="button" className="back-profile-save-avatar-button" onClick={handleAvatarUpload}>
+                                Save Avatar
+                            </button>
+                        </div>
+                    </div>
 
-                                <div className="back-profile-form-group">
-                                    <label>Phone Number</label>
-                                    <input type="text" name="uphoneno" value={userData.uphoneno || ''} onChange={handleInputChange} />
-                                </div>
+                    <div className="back-profile-right-column">
+                        <div className="back-profile-tabs">
+                            <button className={`back-profile-tab-button ${activeTab === 'account' ? 'active' : ''}`} onClick={() => setActiveTab('account')}>
+                                <FaUser /> Account Settings
+                            </button>
+                            <button className={`back-profile-tab-button ${activeTab === 'security' ? 'active' : ''}`} onClick={() => setActiveTab('security')}>
+                                <FaLock /> Security
+                            </button>
+                        </div>
 
-                                <div className="back-profile-form-group">
-                                    <label>Country</label>
-                                    <CountryDropdown
-                                        value={userData.ucountry || ''}
-                                        onChange={handleCountryChange}
-                                    />
-                                </div>
-
-                                <div className="back-profile-form-group">
-                                    <label>Zip Code</label>
-                                    <input type="text" name="uzipcode" value={userData.uzipcode || ''} onChange={handleInputChange} />
-                                </div>
-
-                                <button type="button" className="back-profile-update-button" onClick={handleUpdate}>
-                                    Update Profile
-                                </button>
-                            </form>
-                        )}
-
-                        {activeTab === 'security' && (
-                            <form className="back-profile-form">
-                                <div className="back-profile-form-group">
-                                    <label>Username</label>
-                                    <input type="text" name="username" value={userData.username || ''} onChange={handleInputChange} />
-                                </div>
-
-                                <div className="back-profile-form-group">
-                                    <label>Password</label>
-                                    <div className="back-password-input-wrapper">
-                                        <input
-                                            type={showPassword ? 'text' : 'password'}
-                                            name="password"
-                                            value={userData.password || ''}
-                                            onChange={handleInputChange}
-                                            className="back-password-input"
-                                        />
-                                        <span className="back-password-toggle-icon" onClick={() => setShowPassword(!showPassword)}>
-                                            {showPassword ? <FaEye /> : <FaEyeSlash />}
-                                        </span>
+                        <div className="back-profile-tab-content">
+                            {activeTab === 'account' && (
+                                <form className="back-profile-form">
+                                    <div className="back-profile-form-group">
+                                        <label>First Name</label>
+                                        <input type="text" name="ufirstname" value={userData.ufirstname || 'Not Provided'} onChange={handleInputChange} onFocus={(e) => e.target.value === 'Not Provided' && (e.target.value = '')} />
                                     </div>
-                                </div>
+                                    <div className="back-profile-form-group">
+                                        <label>Last Name</label>
+                                        <input type="text" name="ulastname" value={userData.ulastname || 'Not Provided'} onChange={handleInputChange} onFocus={(e) => e.target.value === 'Not Provided' && (e.target.value = '')} />
+                                    </div>
+                                    <div className="back-profile-form-group">
+                                        <label>Date of Birth</label>
+                                        <input type="date" name="udob" value={userData.udob || ''} onChange={handleInputChange} />
+                                    </div>
+                                    <div className="back-profile-form-group">
+                                        <label>Title</label>
+                                        <select name="utitle" value={userData.utitle} onChange={handleInputChange}>
+                                            <option value="Mr.">Not Provided</option>
+                                            <option value="Mrs.">Mrs.</option>
+                                            <option value="Ms.">Ms.</option>
+                                            <option value="Miss">Miss</option>
+                                            <option value="Madam">Madam</option>
+                                        </select>
+                                    </div>
+                                    <div className="back-profile-form-group">
+                                        <label>Gender</label>
+                                        <select name="ugender" value={userData.ugender || 'Not Provided'} onChange={handleInputChange}>
+                                            <option value="Not Provided">Not Provided</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div className="back-profile-form-group">
+                                        <label>Email</label>
+                                        <input type="email" name="uemail" value={userData.uemail || 'Not Provided'} readOnly />
+                                    </div>
+                                    <div className="back-profile-form-group">
+                                        <label>Phone Number</label>
+                                        <input type="text" name="uphoneno" value={userData.uphoneno || 'Not Provided'} onChange={handleInputChange} onFocus={(e) => e.target.value === 'Not Provided' && (e.target.value = '')} />
+                                    </div>
+                                    <div className="back-profile-form-group">
+                                        <label>Country</label>
+                                        <CountryDropdown value={userData.ucountry || ''} onChange={handleCountryChange} />
+                                    </div>
+                                    <div className="back-profile-form-group">
+                                        <label>Zip Code</label>
+                                        <input type="text" name="uzipcode" value={userData.uzipcode || 'Not Provided'} onChange={handleInputChange} onFocus={(e) => e.target.value === 'Not Provided' && (e.target.value = '')} />
+                                    </div>
+                                    <button type="button" className="back-profile-update-button" onClick={handleUpdate}>
+                                        Update Profile
+                                    </button>
+                                </form>
+                            )}
 
-                                <button type="button" className="back-profile-update-button" onClick={handleUpdate}>
-                                    Update Profile
-                                </button>
-                            </form>
-                        )}
+                            {activeTab === 'security' && (
+                                <form className="back-profile-form">
+                                    <div className="back-profile-form-group">
+                                        <label>Username</label>
+                                        <input type="text" name="username" value={userData.username || 'Not Provided'} onChange={handleInputChange} onFocus={(e) => e.target.value === 'Not Provided' && (e.target.value = '')} />
+                                    </div>
+                                    <div className="back-profile-form-group">
+                                        <label>Password</label>
+                                        <div className="back-password-input-wrapper">
+                                            <input
+                                                type={showPassword ? 'text' : 'password'}
+                                                name="password"
+                                                value={userData.password || ''}
+                                                onChange={handleInputChange}
+                                                className="back-password-input"
+                                            />
+                                            <span className="back-password-toggle-icon" onClick={() => setShowPassword(!showPassword)}>
+                                                {showPassword ? <FaEye /> : <FaEyeSlash />}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <button type="button" className="back-profile-update-button" onClick={handleUpdate}>
+                                        Update Profile
+                                    </button>
+                                </form>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
-        )}
+            )}
         </div>
     );
 };
