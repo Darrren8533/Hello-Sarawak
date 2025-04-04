@@ -7,6 +7,7 @@ import '../../Component/Sidebar/Sidebar.css';
 const Sidebar = ({ title, links, isCollapsed, toggleSidebar }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const API_URL = import.meta.env.VITE_API_URL;
 
 
   useEffect(() => {
