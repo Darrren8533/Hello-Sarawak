@@ -200,7 +200,7 @@ const BackUserProfile = () => {
         reader.readAsDataURL(avatar);
     };
 
-   const handleUpdate = async () => {
+  const handleUpdate = async () => {
     const nameRegex = /^[A-Za-z\s]*$/;
     const usernameRegex = /^[a-zA-Z0-9_]{6,15}$/;
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
@@ -208,9 +208,10 @@ const BackUserProfile = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     try {
-        // Store original values to compare changes
-        const originalUsername = userData.username;
-        const originalPassword = userData.password || '';
+        // Fetch the original user data to compare against
+        const originalData = await fetchUserData(userid); 
+        const originalUsername = originalData.username || 'Not Provided';
+        const originalPassword = originalData.password || ''; 
 
         // Validation for profile fields
         if (activeTab === 'account') {
@@ -242,9 +243,14 @@ const BackUserProfile = () => {
             throw new Error(response.message || 'Failed to update profile');
         }
 
- 
-        const usernameChanged = userData.username !== originalUsername && userData.username !== 'Not Provided';
-        const passwordChanged = userData.password !== originalPassword && userData.password !== '';
+        const usernameChanged = userData.username !== originalUsername && 
+                               userData.username !== 'Not Provided' && 
+                               activeTab === 'security';
+        
+        const passwordChanged = userData.password && 
+                               userData.password !== originalPassword && 
+                               userData.password !== '' && 
+                               activeTab === 'security';
 
         let updateMessage = 'Profile updated successfully';
         let shouldLogout = false;
@@ -259,8 +265,8 @@ const BackUserProfile = () => {
         if (shouldLogout) {
             setTimeout(() => {
                 localStorage.clear();  
-                navigate('/login');   
-            }, 5000);
+                navigate('/login');    
+            }, 5000); 
         }
 
     } catch (error) {
@@ -268,7 +274,6 @@ const BackUserProfile = () => {
         displayToast('error', error.message);
     }
 };
-
 
     const displayToast = (type, message) => {
         setToastType(type);
