@@ -133,72 +133,73 @@ const BackUserProfile = () => {
     };
 
     const handleAvatarChange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    const file = e.target.files[0];
+    if (!file) return;
 
-        setAvatar(file);
+    setAvatar(file);
 
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => {
-            const img = new Image();
-            img.src = reader.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const maxSize = 200;
-                let width = img.width;
-                let height = img.height;
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+        const img = new Image();
+        img.src = reader.result;
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const maxSize = 100; 
+            let width = img.width;
+            let height = img.height;
 
-                if (width > height) {
-                    if (width > maxSize) {
-                        height *= maxSize / width;
-                        width = maxSize;
-                    }
-                } else {
-                    if (height > maxSize) {
-                        width *= maxSize / height;
-                        height = maxSize;
-                    }
+
+            if (width > height) {
+                if (width > maxSize) {
+                    height = Math.round((height * maxSize) / width);
+                    width = maxSize;
                 }
+            } else {
+                if (height > maxSize) {
+                    width = Math.round((width * maxSize) / height);
+                    height = maxSize;
+                }
+            }
 
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(img, 0, 0, width, height);
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(img, 0, 0, width, height);
 
-                const resizedBase64 = canvas.toDataURL('image/jpeg', 0.8);
-                setPreviewAvatar(resizedBase64);
-                setUserData((prevData) => ({ ...prevData, uimage: resizedBase64.split(',')[1] }));
-            };
+            const resizedBase64 = canvas.toDataURL('image/jpeg', 0.5);
+            setPreviewAvatar(resizedBase64);
+            setUserData((prevData) => ({ ...prevData, uimage: resizedBase64.split(',')[1] }));
         };
     };
+};
 
-    const handleAvatarUpload = async () => {
-        if (!avatar) {
-            return displayToast('error', 'Please select an avatar to upload');
+   const handleAvatarUpload = async () => {
+    if (!avatar) {
+        return displayToast('error', 'Please select an avatar to upload');
+    }
+
+    try {
+        
+        const base64String = userData.uimage; 
+        if (!base64String) {
+            return displayToast('error', 'No avatar data available to upload');
         }
 
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            let base64String = reader.result.split(',')[1];
-
-            try {
-                const response = await uploadAvatar(userData.userid, base64String);
-                if (response.success) {
-                    displayToast('success', response.message);
-                    setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`);
-                    setUserData((prevData) => ({
-                        ...prevData,
-                        uimage: response.data.uimage,
-                    }));
-                }
-            } catch (error) {
-                console.error('Avatar Upload Error:', error);
-                displayToast('error', error.message || 'Failed to upload avatar');
-            }
-        };
-        reader.readAsDataURL(avatar);
-    };
+        const response = await uploadAvatar(userData.userid, base64String);
+        if (response.success) {
+            displayToast('success', response.message);
+            setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`);
+            setUserData((prevData) => ({
+                ...prevData,
+                uimage: response.data.uimage,
+            }));
+        }
+    } catch (error) {
+        console.error('Avatar Upload Error:', error);
+        displayToast('error', error.message || 'Failed to upload avatar');
+    }
+};
 
   const handleUpdate = async () => {
     const nameRegex = /^[A-Za-z\s]*$/;
