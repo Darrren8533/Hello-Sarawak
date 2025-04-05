@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
@@ -16,7 +16,6 @@ import '../../../../Component/Filter/Filter.css';
 import './Reservations.css';
 
 const Reservations = () => {
-    const [reservations, setReservations] = useState([]);
     const [searchKey, setSearchKey] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('All');
     const [appliedFilters, setAppliedFilters] = useState({ status: 'All' });
@@ -26,14 +25,12 @@ const Reservations = () => {
     const [showToast, setShowToast] = useState(false);
     const [showMessageBox, setShowMessageBox] = useState(false);
     const [messageBoxMode, setMessageBoxMode] = useState(null);
-    const [administratorProperties, setAdministratorProperties] = useState([]);
     const [selectedProperty, setSelectedProperty] = useState(null);
-    const [operators, setOperators] = useState([]);
     const [selectedOperators, setSelectedOperators] = useState([]);
     const [rejectedReservationID, setRejectedReservationID] = useState(null);
     const [suggestSearchKey, setSuggestSearchKey] = useState('');
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
-
+    
     const queryClient = useQueryClient();
 
     // Fetch reservations with React Query
@@ -71,6 +68,17 @@ const Reservations = () => {
         queryFn: fetchOperators,
     });
 
+    // Fetch administrator properties when needed
+    const { data: administratorProperties = [], refetch: refetchProperties } = useQuery({
+        queryKey: ['administratorProperties'],
+        queryFn: async () => {
+            const userid = localStorage.getItem('userid');
+            const response = await getOperatorProperties(userid);
+            return response.data;
+        },
+        enabled: false, // Don't run this query automatically
+    });
+
     // Update reservation status mutation
     const updateStatusMutation = useMutation({
         mutationFn: ({ reservationId, newStatus }) => 
@@ -97,7 +105,6 @@ const Reservations = () => {
             sendSuggestNotification(reservationId, operators),
     });
 
-
     const handleApplyFilters = () => {
         setAppliedFilters({ status: selectedStatus });
     };
@@ -123,130 +130,116 @@ const Reservations = () => {
     const displayLabels = {
         reservationid: "Reservation ID",
         propertyaddress: "Property Name",
-        totalprice: "Total Price",
-        reservationpaxno: "Reservation Pax No",
-        reservationstatus: "Reservation Status",
         checkindatetime: "Check-In Date Time",
         checkoutdatetime: "Check-Out Date Time",
+        reservationblocktime: "Block Time",
         request: "Request",
+        totalprice: "Total Price",
+        reservationstatus: "Status",
+        userid: "User ID",
         images: "Images",
-
-
-
     };
 
-    const filteredReservations = Array.isArray(reservations)
-        ? reservations.filter(
+    const filteredReservations = Array.isArray(reservationsData)
+        ? reservationsData.filter(
             (reservation) =>
                 (appliedFilters.status === 'All' || (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
                 (
                     (reservation.reservationid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.propertyaddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.propertyaddress?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.reservationpaxno?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '')
                 )
         )
         : [];
 
-        const handleAction = async (action, reservation) => {
-            if (reservation.reservationstatus === 'expired') {
-                displayToast('error', 'Action cannot be performed. This reservation has expired.');
-                return;
-            }
-        
-            if (action === 'view') {
-                const essentialFields = {
-                    reservationid: reservation.reservationid || 'N/A',
-                    propertyaddress: reservation.propertyaddress || 'N/A',
-                    totalprice: reservation.totalprice || 'N/A',
-                    reservationpaxno: reservation.reservationpaxno || 'N/A',
-                    reservationstatus: reservation.reservationstatus || 'N/A',
-                    checkindatetime: reservation.checkindatetime || 'N/A',
-                    checkoutdatetime: reservation.checkoutdatetime || 'N/A',
-                    request: reservation.request || 'N/A',
-                    images: reservation.propertyimage || [],
-
-
-                };
-                setSelectedReservation(essentialFields);
-            } else if (action === 'accept') {
+    const handleAction = async (action, reservation) => {
+        if (reservation.reservationstatus === 'expired') {
+            displayToast('error', 'Action cannot be performed. This reservation has expired.');
+            return;
+        }
+    
+        if (action === 'view') {
+            const essentialFields = {
+                reservationid: reservation.reservationid || 'N/A',
+                propertyaddress: reservation.propertyaddress || 'N/A',
+                checkindatetime: reservation.checkindatetime || 'N/A',
+                checkoutdatetime: reservation.checkoutdatetime || 'N/A',
+                reservationblocktime: reservation.reservationblocktime || 'N/A',
+                request: reservation.request || 'N/A',
+                totalprice: reservation.totalprice || 'N/A',
+                rcid: reservation.rcid || 'N/A',
+                reservationstatus: reservation.reservationstatus || 'N/A',
+                userid: reservation.userid || 'N/A',
+                images: reservation.propertyimage || [],
+            };
+            setSelectedReservation(essentialFields);
+        } else if (action === 'accept') {
+            try {
+                // Using optimistic updates with React Query
                 const newStatus = 'Accepted';
+                
+                // Update the status first
+                await updateStatusMutation.mutateAsync({ 
+                    reservationId: reservation.reservationid, 
+                    newStatus 
+                });
+                
+                // Then send the acceptance email
+                await acceptBookingMutation.mutateAsync(reservation.reservationid);
         
-                try {
-                    await updateReservationStatus(reservation.reservationid, newStatus);
-                    await acceptBooking(reservation.reservationid);
-        
-                    setReservations((prevReservations) =>
-                        prevReservations.map((res) =>
-                            res.reservationid === reservation.reservationid
-                               ? { ...res, reservationstatus: newStatus }
-                                : res
-                        )
-                    );
-        
-                    displayToast('success', 'Reservation Accepted Successfully');
-                } catch (error) {
-                    console.error('Failed to accept reservation or send email', error);
-                }
-            } else if (action ==='reject') {
-                const rejectedID = {
-                    reservationid: reservation.reservationid || 'N/A',
-                };
-        
-                setRejectedReservationID(rejectedID);
-        
-                const newStatus = 'Rejected';
-        
-                try {
-                    await updateReservationStatus(reservation.reservationid, newStatus);
-        
-                    setReservations((prevReservations) =>
-                        prevReservations.map((res) =>
-                            res.reservationid === reservation.reservationid
-                               ? { ...res, reservationstatus: newStatus }
-                                : res
-                        )
-                    );
-        
-                    setShowMessageBox(true);
-        
-                    displayToast('success', 'Reservation Rejected Successfully');
-                } catch (error) {
-                    console.error('Failed to update reservation status', error);
-                }
+                displayToast('success', 'Reservation Accepted Successfully');
+            } catch (error) {
+                console.error('Failed to accept reservation or send email', error);
+                displayToast('error', 'Failed to accept reservation');
             }
-        };
-
+        } else if (action === 'reject') {
+            const rejectedID = {
+                reservationid: reservation.reservationid || 'N/A',
+            };
+    
+            setRejectedReservationID(rejectedID);
+    
+            try {
+                const newStatus = 'Rejected';
+                
+                await updateStatusMutation.mutateAsync({ 
+                    reservationId: reservation.reservationid, 
+                    newStatus 
+                });
+    
+                setShowMessageBox(true);
+                displayToast('success', 'Reservation Rejected Successfully');
+            } catch (error) {
+                console.error('Failed to update reservation status', error);
+                displayToast('error', 'Failed to reject reservation');
+            }
+        }
+    };
 
     const handleMessageBoxSelect = async (mode) => {
         if (mode === 'suggest') {
-            try {
-                const userID = localStorage.getItem('userID');
-                const response = await getOperatorProperties(userID);
-
-                setAdministratorProperties(response.data);
-            } catch (error) {
-                console.error('Error fetching properties: ', error);
-            }
+            // Trigger the properties query
+            refetchProperties();
         }
 
         setMessageBoxMode(mode);
         setShowMessageBox(false);
     };
 
-    const handlePropertySelect = (propertyID) => {
-        setSelectedProperty(propertyID);
+    const handlePropertySelect = (propertyaddress) => {
+        setSelectedProperty(propertyaddress);
     };
 
     const handleConfirmSuggestion = async () => {
         if (selectedProperty && rejectedReservationID.reservationid) {
             try {
-                await suggestNewRoom(selectedProperty, rejectedReservationID.reservationid);
+                await suggestRoomMutation.mutateAsync({
+                    propertyAddress: selectedProperty,
+                    reservationId: rejectedReservationID.reservationid
+                });
 
                 displayToast('success', 'New Room Suggestion Email Sent Successfully');
-
                 setMessageBoxMode(null);
             } catch (error) {
                 displayToast('error', 'Error Sending New Room Suggestion Email');
@@ -256,21 +249,23 @@ const Reservations = () => {
         }
     };
 
-    const handleOperatorSelect = (userID) => {
+    const handleOperatorSelect = (userid) => {
         setSelectedOperators((prevSelectedOperators) =>
-            prevSelectedOperators.includes(userID)
-                ? prevSelectedOperators.filter((id) => id !== userID)
-                : [...prevSelectedOperators, userID]
+            prevSelectedOperators.includes(userid)
+                ? prevSelectedOperators.filter((id) => id !== userid)
+                : [...prevSelectedOperators, userid]
         );
     };
 
     const handleConfirmNotification = async () => {
         if (selectedOperators.length > 0 && rejectedReservationID.reservationid) {
             try {
-                await sendSuggestNotification(rejectedReservationID.reservationid, selectedOperators);
+                await sendNotificationMutation.mutateAsync({
+                    reservationId: rejectedReservationID.reservationid,
+                    operators: selectedOperators
+                });
 
                 displayToast('success', 'Suggest Notification Sent Successfully');
-
                 setMessageBoxMode(null);
             } catch (error) {
                 displayToast('error', 'Error Sending Suggest Notification');
@@ -280,8 +275,8 @@ const Reservations = () => {
         }
     };
 
-    const reservationDropdownItems = (reservationstatus) => {
-        if (reservationstatus === 'Pending') {
+    const reservationDropdownItems = (reservationStatus) => {
+        if (reservationStatus === 'Pending') {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Accept', icon: <FaCheck />, action: 'accept' },
@@ -299,8 +294,9 @@ const Reservations = () => {
     };
 
     const getFilteredProperties = () => {
+        if (!Array.isArray(administratorProperties)) return []; // Ensure an array
         return administratorProperties.filter(property => {
-            const matchesSearch = property.propertyaddress.toLowerCase().includes(suggestSearchKey.toLowerCase());
+            const matchesSearch = property.propertyaddress.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
             const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
                 (!priceRange.max || property.rateamount <= Number(priceRange.max));
             return matchesSearch && matchesPrice;
@@ -316,7 +312,7 @@ const Reservations = () => {
                 reservation.propertyimage && reservation.propertyimage.length > 0 ? (
                     <img
                         src={`data:image/jpeg;base64,${reservation.propertyimage[0]}`}
-                        alt={reservation.propertyaddress}
+                        alt={`Property ${reservation.propertyaddress}`}
                         style={{ width: 80, height: 80 }}
                     />
                 ) : (
@@ -325,7 +321,6 @@ const Reservations = () => {
         },
         { header: 'Property Name', accessor: 'propertyaddress' },
         { header: 'Total Price', accessor: 'totalprice' },
-        { header: 'Pax', accessor: 'reservationpaxno' },
         {
             header: 'Status',
             accessor: 'reservationstatus',
@@ -362,13 +357,13 @@ const Reservations = () => {
                     <Loader />
                 </div>
             ) : (
-
-            <PaginatedTable
-                data={filteredReservations}
-                columns={columns}
-                rowKey="reservationid"
-                enableCheckbox={false}
-            />
+                <PaginatedTable
+                    data={filteredReservations}
+                    columns={columns}
+                    rowKey="reservationid"
+                    enableCheckbox={false}
+                />
+            )}
 
             <Modal
                 isOpen={!!selectedReservation}
@@ -434,16 +429,16 @@ const Reservations = () => {
                         <div className="property-list">
                             {getFilteredProperties().length > 0 ? (
                                 getFilteredProperties().map((property) => (
-                                    <div key={property.propertyID} className="property-card">
+                                    <div key={property.propertyaddress} className="property-card">
                                         <input
                                             type="radio"
-                                            id={`property-${property.propertyID}`}
+                                            id={`property-${property.propertyaddress}`}
                                             name="property"
-                                            value={property.propertyID}
-                                            onChange={() => handlePropertySelect(property.propertyID)}
+                                            value={property.propertyaddress}
+                                            onChange={() => handlePropertySelect(property.propertyaddress)}
                                             className="property-radio"
                                         />
-                                        <label htmlFor={`property-${property.propertyID}`} className="property-label">
+                                        <label htmlFor={`property-${property.propertyaddress}`} className="property-label">
                                             <div className="property-image-container">
                                                 <img
                                                     src={`data:image/jpeg;base64,${property.images[0]}`}
@@ -453,7 +448,7 @@ const Reservations = () => {
                                             </div>
                                             <div className="property-details">
                                                 <h3 className="property-title">{property.propertyaddress}</h3>
-                                                <p className="property-info-text">{property.propertyGuestPaxNo} Pax</p>
+                                                <p className="property-info-text">{property.propertyguestpaxno} Pax</p>
                                                 <p className="property-price">RM {property.rateamount}</p>
                                             </div>
                                         </label>
@@ -480,9 +475,10 @@ const Reservations = () => {
                                 <input
                                     type="checkbox"
                                     id="select-all-operators"
+                                    checked={selectedOperators.length === operators.length && operators.length > 0}
                                     onChange={(e) => {
                                         const checked = e.target.checked;
-                                        setSelectedOperators(checked ? operators.map(operator => operator.userID) : []);
+                                        setSelectedOperators(checked ? operators.map(operator => operator.userid) : []);
                                     }}
                                 />
                                 <label htmlFor="select-all-operators">Select All</label>
@@ -490,16 +486,16 @@ const Reservations = () => {
 
                             {operators.length > 0 ? (
                                 operators.map((operator) => (
-                                    <div key={operator.userID} className="operator-option">
+                                    <div key={operator.userid} className="operator-option">
                                         <input
                                             type="checkbox"
-                                            id={`operator-${operator.userID}`}
-                                            value={operator.userID}
-                                            checked={selectedOperators.includes(operator.userID)}
-                                            onChange={() => handleOperatorSelect(operator.userID)}
+                                            id={`operator-${operator.userid}`}
+                                            value={operator.userid}
+                                            checked={selectedOperators.includes(operator.userid)}
+                                            onChange={() => handleOperatorSelect(operator.userid)}
                                         />
-                                        <label htmlFor={`operator-${operator.userID}`}>
-                                            {operator.uFirstName} {operator.uLastName} ({operator.username}) - {operator.userGroup}
+                                        <label htmlFor={`operator-${operator.userid}`}>
+                                            {operator.ufirstname} {operator.ulastname} ({operator.username}) - {operator.usergroup}
                                         </label>
                                     </div>
                                 ))
