@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
@@ -7,7 +6,6 @@ import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Toast from '../../../../Component/Toast/Toast';
-import Loader from '../../../../Component/Loader/Loader';
 import { FaEye, FaCheck, FaTimes } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -34,69 +32,45 @@ const Reservations = () => {
     const [suggestSearchKey, setSuggestSearchKey] = useState('');
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
 
-    const queryClient = useQueryClient();
-
-    // Fetch reservations with React Query
-    const { data: reservationsData, isLoading: reservationsLoading } = useQuery({
-        queryKey: ['reservations'],
-        queryFn: async () => {
+    useEffect(() => {
+        const fetchReservationsData = async () => {
             try {
                 const reservationData = await fetchReservation();
                 if (Array.isArray(reservationData)) {
-                    return reservationData.map(reservation => {
-                        const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
+                    const updatedReservations = reservationData.map(reservation => {
+                        const expiryDateTime = new Date(reservation.expiryDateTime).getTime();
                         const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
 
-                        if (reservation.reservationstatus === 'Pending' && currentDateTime > reservationblocktime) {
-                            return { ...reservation, reservationstatus: 'expired' };
+                        if (reservation.reservationStatus === 'Pending' && currentDateTime > expiryDateTime) {
+                            return { ...reservation, reservationStatus: 'expired' };
                         }
                         return reservation;
                     });
+                    setReservations(updatedReservations);
                 } else {
                     console.error("Invalid data format received:", reservationData);
-                    return [];
+                    setReservations([]);
                 }
             } catch (error) {
                 console.error('Failed to fetch reservation details:', error);
-                throw error;
+                setReservations([]);
             }
-        },
-        staleTime: 30 * 60 * 1000,
-        refetchInterval: 1000,
-    });
+        };
+        fetchReservationsData();
+    }, []);
 
-    // Fetch operators with React Query
-    const { data: operators = [] } = useQuery({
-        queryKey: ['operators'],
-        queryFn: fetchOperators,
-    });
 
-    // Update reservation status mutation
-    const updateStatusMutation = useMutation({
-        mutationFn: ({ reservationId, newStatus }) => 
-            updateReservationStatus(reservationId, newStatus),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['reservations'] });
-        },
-    });
-
-    // Accept booking mutation
-    const acceptBookingMutation = useMutation({
-        mutationFn: (reservationId) => acceptBooking(reservationId),
-    });
-
-    // Suggest new room mutation
-    const suggestRoomMutation = useMutation({
-        mutationFn: ({ propertyAddress, reservationId }) => 
-            suggestNewRoom(propertyAddress, reservationId),
-    });
-
-    // Send notification mutation
-    const sendNotificationMutation = useMutation({
-        mutationFn: ({ reservationId, operators }) => 
-            sendSuggestNotification(reservationId, operators),
-    });
-
+    useEffect(() => {
+        const fetchOperatorsData = async () => {
+            try {
+                const operatorsData = await fetchOperators();
+                setOperators(operatorsData);
+            } catch (error) {
+                console.error('Failed to fetch operators', error);
+            }
+        };
+        fetchOperatorsData();
+    }, []);
 
     const handleApplyFilters = () => {
         setAppliedFilters({ status: selectedStatus });
@@ -121,13 +95,13 @@ const Reservations = () => {
     ];
 
     const displayLabels = {
-        reservationid: "Reservation ID",
-        propertyaddress: "Property Name",
-        totalprice: "Total Price",
-        reservationpaxno: "Reservation Pax No",
-        reservationstatus: "Reservation Status",
-        checkindatetime: "Check-In Date Time",
-        checkoutdatetime: "Check-Out Date Time",
+        reservationID: "Reservation ID",
+        propertyName: "Property Name",
+        totalPrice: "Total Price",
+        reservationPaxNo: "Reservation Pax No",
+        reservationStatus: "Reservation Status",
+        checkInDateTime: "Check-In Date Time",
+        checkOutDateTime: "Check-Out Date Time",
         request: "Request",
         images: "Images",
 
@@ -138,35 +112,35 @@ const Reservations = () => {
     const filteredReservations = Array.isArray(reservations)
         ? reservations.filter(
             (reservation) =>
-                (appliedFilters.status === 'All' || (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
+                (appliedFilters.status === 'All' || (reservation.reservationStatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
                 (
-                    (reservation.reservationid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.propertyaddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.reservationpaxno?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.reservationID?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.propertyName?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.totalPrice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.reservationPaxNo?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.reservationStatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '')
                 )
         )
         : [];
 
         const handleAction = async (action, reservation) => {
-            if (reservation.reservationstatus === 'expired') {
+            if (reservation.reservationStatus === 'expired') {
                 displayToast('error', 'Action cannot be performed. This reservation has expired.');
                 return;
             }
         
             if (action === 'view') {
                 const essentialFields = {
-                    reservationid: reservation.reservationid || 'N/A',
-                    propertyaddress: reservation.propertyaddress || 'N/A',
-                    totalprice: reservation.totalprice || 'N/A',
-                    reservationpaxno: reservation.reservationpaxno || 'N/A',
-                    reservationstatus: reservation.reservationstatus || 'N/A',
-                    checkindatetime: reservation.checkindatetime || 'N/A',
-                    checkoutdatetime: reservation.checkoutdatetime || 'N/A',
+                    reservationID: reservation.reservationID || 'N/A',
+                    propertyName: reservation.propertyName || 'N/A',
+                    totalPrice: reservation.totalPrice || 'N/A',
+                    reservationPaxNo: reservation.reservationPaxNo || 'N/A',
+                    reservationStatus: reservation.reservationStatus || 'N/A',
+                    checkInDateTime: reservation.checkInDateTime || 'N/A',
+                    checkOutDateTime: reservation.checkOutDateTime || 'N/A',
                     request: reservation.request || 'N/A',
-                    images: reservation.propertyimage || [],
+                    images: reservation.propertyImage || [],
 
 
                 };
@@ -175,13 +149,13 @@ const Reservations = () => {
                 const newStatus = 'Accepted';
         
                 try {
-                    await updateReservationStatus(reservation.reservationid, newStatus);
-                    await acceptBooking(reservation.reservationid);
+                    await updateReservationStatus(reservation.reservationID, newStatus);
+                    await acceptBooking(reservation.reservationID);
         
                     setReservations((prevReservations) =>
                         prevReservations.map((res) =>
-                            res.reservationid === reservation.reservationid
-                               ? { ...res, reservationstatus: newStatus }
+                            res.reservationID === reservation.reservationID
+                               ? { ...res, reservationStatus: newStatus }
                                 : res
                         )
                     );
@@ -192,7 +166,7 @@ const Reservations = () => {
                 }
             } else if (action ==='reject') {
                 const rejectedID = {
-                    reservationid: reservation.reservationid || 'N/A',
+                    reservationID: reservation.reservationID || 'N/A',
                 };
         
                 setRejectedReservationID(rejectedID);
@@ -200,12 +174,12 @@ const Reservations = () => {
                 const newStatus = 'Rejected';
         
                 try {
-                    await updateReservationStatus(reservation.reservationid, newStatus);
+                    await updateReservationStatus(reservation.reservationID, newStatus);
         
                     setReservations((prevReservations) =>
                         prevReservations.map((res) =>
-                            res.reservationid === reservation.reservationid
-                               ? { ...res, reservationstatus: newStatus }
+                            res.reservationID === reservation.reservationID
+                               ? { ...res, reservationStatus: newStatus }
                                 : res
                         )
                     );
@@ -241,9 +215,9 @@ const Reservations = () => {
     };
 
     const handleConfirmSuggestion = async () => {
-        if (selectedProperty && rejectedReservationID.reservationid) {
+        if (selectedProperty && rejectedReservationID.reservationID) {
             try {
-                await suggestNewRoom(selectedProperty, rejectedReservationID.reservationid);
+                await suggestNewRoom(selectedProperty, rejectedReservationID.reservationID);
 
                 displayToast('success', 'New Room Suggestion Email Sent Successfully');
 
@@ -265,9 +239,9 @@ const Reservations = () => {
     };
 
     const handleConfirmNotification = async () => {
-        if (selectedOperators.length > 0 && rejectedReservationID.reservationid) {
+        if (selectedOperators.length > 0 && rejectedReservationID.reservationID) {
             try {
-                await sendSuggestNotification(rejectedReservationID.reservationid, selectedOperators);
+                await sendSuggestNotification(rejectedReservationID.reservationID, selectedOperators);
 
                 displayToast('success', 'Suggest Notification Sent Successfully');
 
@@ -280,8 +254,8 @@ const Reservations = () => {
         }
     };
 
-    const reservationDropdownItems = (reservationstatus) => {
-        if (reservationstatus === 'Pending') {
+    const reservationDropdownItems = (reservationStatus) => {
+        if (reservationStatus === 'Pending') {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Accept', icon: <FaCheck />, action: 'accept' },
@@ -300,38 +274,38 @@ const Reservations = () => {
 
     const getFilteredProperties = () => {
         return administratorProperties.filter(property => {
-            const matchesSearch = property.propertyaddress.toLowerCase().includes(suggestSearchKey.toLowerCase());
-            const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
-                (!priceRange.max || property.rateamount <= Number(priceRange.max));
+            const matchesSearch = property.propertyName.toLowerCase().includes(suggestSearchKey.toLowerCase());
+            const matchesPrice = (!priceRange.min || property.propertyPrice >= Number(priceRange.min)) &&
+                (!priceRange.max || property.propertyPrice <= Number(priceRange.max));
             return matchesSearch && matchesPrice;
         });
     };
 
     const columns = [
-        { header: 'ID', accessor: 'reservationid' },
+        { header: 'ID', accessor: 'reservationID' },
         {
             header: 'Image',
-            accessor: 'propertyimage',
+            accessor: 'propertyImage',
             render: (reservation) =>
-                reservation.propertyimage && reservation.propertyimage.length > 0 ? (
+                reservation.propertyImage && reservation.propertyImage.length > 0 ? (
                     <img
-                        src={`data:image/jpeg;base64,${reservation.propertyimage[0]}`}
-                        alt={reservation.propertyaddress}
+                        src={`data:image/jpeg;base64,${reservation.propertyImage[0]}`}
+                        alt={reservation.propertyName}
                         style={{ width: 80, height: 80 }}
                     />
                 ) : (
                     <span>No Image</span>
                 ),
         },
-        { header: 'Property Name', accessor: 'propertyaddress' },
-        { header: 'Total Price', accessor: 'totalprice' },
-        { header: 'Pax', accessor: 'reservationpaxno' },
+        { header: 'Property Name', accessor: 'propertyName' },
+        { header: 'Total Price', accessor: 'totalPrice' },
+        { header: 'Pax', accessor: 'reservationPaxNo' },
         {
             header: 'Status',
-            accessor: 'reservationstatus',
+            accessor: 'reservationStatus',
             render: (reservation) => (
-                <span className={`reservation-status ${reservation.reservationstatus?.toLowerCase()}`}>
-                    {reservation.reservationstatus}
+                <span className={`reservation-status ${reservation.reservationStatus?.toLowerCase()}`}>
+                    {reservation.reservationStatus}
                 </span>
             ),
         },
@@ -340,7 +314,7 @@ const Reservations = () => {
             accessor: 'actions',
             render: (reservation) => (
                 <ActionDropdown
-                    items={reservationDropdownItems(reservation.reservationstatus)}
+                    items={reservationDropdownItems(reservation.reservationStatus)}
                     onAction={(action) => handleAction(action, reservation)}
                 />
             ),
@@ -360,13 +334,13 @@ const Reservations = () => {
             <PaginatedTable
                 data={filteredReservations}
                 columns={columns}
-                rowKey="reservationid"
+                rowKey="reservationID"
                 enableCheckbox={false}
             />
 
             <Modal
                 isOpen={!!selectedReservation}
-                title={`Reservation ID: ${selectedReservation?.reservationid}`}
+                title={`Reservation ID: ${selectedReservation?.reservationID}`}
                 data={selectedReservation || {}}
                 labels={displayLabels}
                 onClose={() => setSelectedReservation(null)}
@@ -441,14 +415,14 @@ const Reservations = () => {
                                             <div className="property-image-container">
                                                 <img
                                                     src={`data:image/jpeg;base64,${property.images[0]}`}
-                                                    alt={property.propertyaddress}
+                                                    alt={property.propertyName}
                                                     className="property-image"
                                                 />
                                             </div>
                                             <div className="property-details">
-                                                <h3 className="property-title">{property.propertyaddress}</h3>
+                                                <h3 className="property-title">{property.propertyName}</h3>
                                                 <p className="property-info-text">{property.propertyGuestPaxNo} Pax</p>
-                                                <p className="property-price">RM {property.rateamount}</p>
+                                                <p className="property-price">RM {property.propertyPrice}</p>
                                             </div>
                                         </label>
                                     </div>
