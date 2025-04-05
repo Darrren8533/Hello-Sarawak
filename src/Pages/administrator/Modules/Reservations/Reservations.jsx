@@ -41,10 +41,10 @@ const Reservations = () => {
                 const reservationData = await fetchReservation();
                 if (Array.isArray(reservationData)) {
                     return reservationData.map(reservation => {
-                        const expiryDateTime = new Date(reservation.expiryDateTime).getTime();
+                        const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
                         const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
 
-                        if (reservation.reservationstatus === 'Pending' && currentDateTime > expiryDateTime) {
+                        if (reservation.reservationstatus === 'Pending' && currentDateTime > reservationblocktime) {
                             return { ...reservation, reservationstatus: 'expired' };
                         }
                         return reservation;
