@@ -132,44 +132,74 @@ const BackUserProfile = () => {
         }
     };
 
-   const handleAvatarChange = (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+    const handleAvatarChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
+        setAvatar(file);
 
-  if (!file.type.startsWith('image/')) {
-    displayToast('error', 'Only image files are allowed');
-    return;
-  }
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onloadend = () => {
+            const img = new Image();
+            img.src = reader.result;
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const maxSize = 200;
+                let width = img.width;
+                let height = img.height;
 
-  setAvatar(file);
-  setPreviewAvatar(URL.createObjectURL(file)); 
-};
+                if (width > height) {
+                    if (width > maxSize) {
+                        height *= maxSize / width;
+                        width = maxSize;
+                    }
+                } else {
+                    if (height > maxSize) {
+                        width *= maxSize / height;
+                        height = maxSize;
+                    }
+                }
 
+                canvas.width = width;
+                canvas.height = height;
+                ctx.drawImage(img, 0, 0, width, height);
 
-const handleAvatarUpload = async () => {
-  if (!avatar) {
-    return displayToast('error', 'Please select an avatar first');
-  }
+                const resizedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                setPreviewAvatar(resizedBase64);
+                setUserData((prevData) => ({ ...prevData, uimage: resizedBase64.split(',')[1] }));
+            };
+        };
+    };
 
-  try {
-    setIsLoading(true);
-    const response = await uploadAvatar(userData.userid, avatar);
+    const handleAvatarUpload = async () => {
+        if (!avatar) {
+            return displayToast('error', 'Please select an avatar to upload');
+        }
 
-    if (response.success) {
-      displayToast('success', 'Avatar updated successfully');
-      if (response.data.imageUrl) {
-        setPreviewAvatar(response.data.imageUrl);
-      }
-    }
-  } catch (error) {
-    displayToast('error', error.message || 'Upload failed');
-  } finally {
-    setIsLoading(false);
-  }
-};
+        const reader = new FileReader();
+        reader.onloadend = async () => {
+            let base64String = reader.result.split(',')[1];
 
-    
+            try {
+                const response = await uploadAvatar(userData.userid, base64String);
+                if (response.success) {
+                    displayToast('success', response.message);
+                    setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`);
+                    setUserData((prevData) => ({
+                        ...prevData,
+                        uimage: response.data.uimage,
+                    }));
+                }
+            } catch (error) {
+                console.error('Avatar Upload Error:', error);
+                displayToast('error', error.message || 'Failed to upload avatar');
+            }
+        };
+        reader.readAsDataURL(avatar);
+    };
+
   const handleUpdate = async () => {
     const nameRegex = /^[A-Za-z\s]*$/;
     const usernameRegex = /^[a-zA-Z0-9_]{6,15}$/;
