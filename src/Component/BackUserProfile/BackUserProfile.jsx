@@ -133,62 +133,42 @@ const BackUserProfile = () => {
     };
 
     const handleAvatarChange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+  const file = e.target.files[0];
+  if (!file) return;
 
-        setAvatar(file);
+  setAvatar(file);
 
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => {
-            const img = new Image();
-            img.src = reader.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const maxSize = 200;
-                let width = img.width;
-                let height = img.height;
-
-                if (width > height) {
-                    if (width > maxSize) {
-                        height *= maxSize / width;
-                        width = maxSize;
-                    }
-                } else {
-                    if (height > maxSize) {
-                        width *= maxSize / height;
-                        height = maxSize;
-                    }
-                }
-
-                canvas.width = width;
-                canvas.height = height;
-                ctx.drawImage(img, 0, 0, width, height);
-
-                const resizedBase64 = canvas.toDataURL('image/jpeg', 0.8);
-                setPreviewAvatar(resizedBase64);
-                setUserData((prevData) => ({ ...prevData, uimage: resizedBase64.split(',')[1] }));
-            };
-        };
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      const base64String = reader.result;
+      setPreviewAvatar(base64String);
+      setUserData((prev) => ({ ...prev, uimage: base64String.split(',')[1] }));
+      resolve(base64String); 
     };
+  });
+};
 
-    const handleAvatarUpload = async () => {
-        if (!avatar) {
-            return displayToast('error', 'Please select an avatar to upload');
-        }
 
-        try {
-            const response = await uploadAvatar(userData.userid, avatar); 
-            if (response.success) {
-              displayToast('success', response.message);
-              setPreviewAvatar(URL.createObjectURL(avatar)); 
-              setUserData(prev => ({ ...prev, uimage: response.data.uimage }));
-            }
-          } catch (error) {
-        displayToast('error', error.message || 'Failed to upload avatar');
-      }
-    };
+const handleAvatarUpload = async () => {
+  if (!avatar) {
+    return displayToast('error', 'Please select an avatar to upload');
+  }
+
+  try {
+
+    const base64String = await handleAvatarChange({ target: { files: [avatar] } });
+
+    const response = await uploadAvatar(userData.userid, base64String);
+    if (response.success) {
+      displayToast('success', response.message);
+      setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`);
+    }
+  } catch (error) {
+    displayToast('error', error.message || 'Failed to upload avatar');
+  }
+};
 
     
   const handleUpdate = async () => {
