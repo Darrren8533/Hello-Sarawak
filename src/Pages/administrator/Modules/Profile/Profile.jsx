@@ -1,5 +1,7 @@
 import React from 'react'
+import '../../../../Component/MainContent/MainContent.css';
 import BackUserProfile from '../../../../Component/BackUserProfile/BackUserProfile'
+
 
 const Profile = () => {
   return (
