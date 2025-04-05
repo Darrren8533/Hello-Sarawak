@@ -874,16 +874,18 @@ export const uploadAvatar = async (userid, base64String) => {
   try {
     if (!userid) throw new Error('User ID is missing');
 
-    if (!base64String || !base64String.startsWith('data:image/')) {
-      throw new Error('Invalid image data');
+    if (typeof base64String !== 'string' || !base64String.trim()) {
+      throw new Error('Invalid image data: Expected a Base64 string');
     }
 
-    const pureBase64 = base64String.split(',')[1];
+    const pureBase64 = base64String.includes(',') 
+      ? base64String.split(',')[1] 
+      : base64String;
 
     const response = await fetch(`${API_URL}/users/uploadAvatar/${userid}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ uimage: pureBase64 }), 
+      body: JSON.stringify({ uimage: pureBase64 }),
     });
 
     if (!response.ok) {
