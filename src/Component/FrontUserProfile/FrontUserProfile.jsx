@@ -48,18 +48,18 @@ const FrontUserProfile = () => {
 
                 setPreviewAvatar(imageSrc);
                 localStorage.setItem("uimage", imageSrc);
-            } 
-            
+            }
+
             catch (error) {
                 displayToast('error', 'Error fetching user data');
             }
-            
-            finally{
+
+            finally {
                 setLoading(false);
             }
-        } 
-        
-        else{
+        }
+
+        else {
             setLoading(false);
             displayToast('error', 'User Not Logged In');
             return;
@@ -228,14 +228,14 @@ const FrontUserProfile = () => {
     return (
         <div className="front-profile-container">
             {showToast && <Toast type={toastType} message={toastMessage} />}
-    
+
             {loading ? (
                 <div className="loader-box">
                     <Loader />
                 </div>
             ) : (
                 <div className="front-profile-layout">
-                <div className="front-sidebar-card">
+                    <div className="front-sidebar-card">
                         <div className={`front-tab ${activeTab === 'personal' ? 'active' : ''}`}
                             onClick={() => setActiveTab('personal')}>
                             <FaUser className="front-tab-icon" /> Personal details
@@ -245,7 +245,7 @@ const FrontUserProfile = () => {
                             <FaLock className="front-tab-icon" /> Security settings
                         </div>
                     </div>
-    
+
                     <div className="front-content-card">
                         {activeTab === 'personal' && (
                             <>
@@ -262,14 +262,14 @@ const FrontUserProfile = () => {
                                     <input id="avatar-upload" type="file" accept="image/*"
                                         onChange={handleAvatarChange} style={{ display: 'none' }} />
                                 </div>
-    
+
                                 {/* Name Field */}
                                 <div className="front-profile-field">
                                     <span className="front-field-label">Name</span>
                                     <span className="front-field-value">
-                                      {(userData.ufirstname || userData.ulastname)
-                                        ? `${userData.ufirstname || ''} ${userData.ulastname || ''}`.trim()
-                                          : 'Not provided'}
+                                        {(userData.ufirstname || userData.ulastname)
+                                            ? `${userData.ufirstname || ''} ${userData.ulastname || ''}`.trim()
+                                            : 'Not provided'}
                                     </span>
 
                                     <span className="front-edit-link"
@@ -286,7 +286,7 @@ const FrontUserProfile = () => {
                                         <button onClick={handleUpdate}>Save</button>
                                     </div>
                                 )}
-    
+
                                 {/* Email Field */}
                                 <div className="front-profile-field">
                                     <span className="front-field-label">Email Address</span>
@@ -303,7 +303,70 @@ const FrontUserProfile = () => {
                                         <button onClick={handleUpdate}>Save</button>
                                     </div>
                                 )}
-    
+
+                                {/* Title Field */}
+                                <div className="front-profile-field">
+                                    <span className="front-field-label">Title</span>
+                                    <span className="front-field-value">
+                                        {userData.utitle || 'Not provided'}
+                                    </span>
+                                    <span
+                                        className="front-edit-link"
+                                        onClick={() => editingField === 'title' ? cancelEditing() : setEditingField('title')}
+                                    >
+                                        {editingField === 'title' ? 'Cancel' : 'Edit'}
+                                    </span>
+                                </div>
+                                {editingField === 'title' && (
+                                    <div className="front-edit-section">
+                                        <select
+                                            name="utitle"
+                                            value={userData.utitle || ''}
+                                            onChange={handleInputChange}
+                                            className="front-select-dropdown"
+                                        >
+                                            <option value="">Select Title</option>
+                                            <option value="Mr.">Mr.</option>
+                                            <option value="Mrs.">Mrs.</option>
+                                            <option value="Ms.">Ms.</option>
+                                            <option value="Miss">Miss</option>
+                                            <option value="Madam">Madam</option>
+                                        </select>
+                                        <button onClick={handleUpdate}>Save</button>
+                                    </div>
+                                )}
+
+                                {/* Gender Field */}
+                                <div className="front-profile-field">
+                                    <span className="front-field-label">Gender</span>
+                                    <span className="front-field-value">
+                                        {userData.ugender || 'Not provided'}
+                                    </span>
+                                    <span
+                                        className="front-edit-link"
+                                        onClick={() => editingField === 'gender' ? cancelEditing() : setEditingField('gender')}
+                                    >
+                                        {editingField === 'gender' ? 'Cancel' : 'Edit'}
+                                    </span>
+                                </div>
+                                {editingField === 'gender' && (
+                                    <div className="front-edit-section">
+                                        <select
+                                            name="ugender"
+                                            value={userData.ugender || ''}
+                                            onChange={handleInputChange}
+                                            className="front-select-dropdown"
+                                        >
+                                            <option value="">Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <button onClick={handleUpdate}>Save</button>
+                                    </div>
+                                )}
+
+
                                 {/* Phone Field */}
                                 <div className="front-profile-field">
                                     <span className="front-field-label">Phone Number</span>
@@ -320,7 +383,7 @@ const FrontUserProfile = () => {
                                         <button onClick={handleUpdate}>Save</button>
                                     </div>
                                 )}
-    
+
                                 {/* Date of Birth Field */}
                                 <div className="front-profile-field">
                                     <span className="front-field-label">Date of Birth</span>
@@ -337,22 +400,22 @@ const FrontUserProfile = () => {
                                         <button onClick={handleUpdate}>Save</button>
                                     </div>
                                 )}
-    
+
                                 {/* Country Field */}
                                 <div className="front-profile-field">
                                     <span className="front-field-label">Country</span>
                                     <span className="front-field-value">{userData.ucountry || 'Not provided'}</span>
                                     <span
                                         className="front-edit-link"
-                                        onClick={() => editingField === 'country'? cancelEditing() : setEditingField('country')}
+                                        onClick={() => editingField === 'country' ? cancelEditing() : setEditingField('country')}
                                     >
-                                        {editingField === 'country'? 'Cancel' : 'Edit'}
+                                        {editingField === 'country' ? 'Cancel' : 'Edit'}
                                     </span>
                                 </div>
                                 {editingField === 'country' && (
                                     <div className="front-edit-section">
                                         <CountryDropdown className='country-dropdown'
-                                            value={userData.ucountry || ''}                  
+                                            value={userData.ucountry || ''}
                                             onChange={handleCountryChange}
                                         />
                                         <button onClick={handleUpdate}>Save</button>
@@ -360,11 +423,11 @@ const FrontUserProfile = () => {
                                 )}
                             </>
                         )}
-    
+
                         {activeTab === 'security' && (
                             <>
                                 <h2>Security settings</h2>
-    
+
                                 {/* Username Field */}
                                 <div className="front-profile-field">
                                     <span className="front-field-label">Username</span>
@@ -381,12 +444,12 @@ const FrontUserProfile = () => {
                                         <button className="front-save-button" onClick={handleUpdate}>Save</button>
                                     </div>
                                 )}
-    
+
                                 {/* Password Field */}
                                 <div className="front-profile-field">
                                     <span className="front-field-label">Password</span>
                                     <span className="front-field-value">
-                                        {editingField!== 'password' ? '********' : 'Enter new password'}
+                                        {editingField !== 'password' ? '********' : 'Enter new password'}
                                     </span>
                                     <span className="front-edit-link"
                                         onClick={() => editingField === 'password' ? cancelEditing() : setEditingField('password')}>
@@ -426,7 +489,7 @@ const FrontUserProfile = () => {
                 </div>
             )}
         </div>
-    );    
+    );
 };
 
 export default FrontUserProfile;
