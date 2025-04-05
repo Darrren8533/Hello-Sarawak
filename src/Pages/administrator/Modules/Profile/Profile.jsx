@@ -4,6 +4,9 @@ import BackUserProfile from '../../../../Component/BackUserProfile/BackUserProfi
 const Profile = () => {
   return (
     <div>
+      <div className="header-container">
+        <h1 className="dashboard-page-title">User Profile</h1>
+      </div>
       <BackUserProfile />
     </div>
   )
