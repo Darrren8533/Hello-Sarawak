@@ -870,35 +870,31 @@ export const updateProfile = async (userData) => {
 };
 
 //Upload Avatar
-export const uploadAvatar = async (userid, base64String) => {
+export const uploadAvatar = async (userid, file) => {
   try {
-    if (!userid) throw new Error('User ID is missing');
-
-    if (typeof base64String !== 'string' || !base64String.trim()) {
-      throw new Error('Invalid image data: Expected a Base64 string');
+    if (!userid || !file) {
+      throw new Error('Missing user ID or file');
     }
 
-    const pureBase64 = base64String.includes(',') 
-      ? base64String.split(',')[1] 
-      : base64String;
+    const formData = new FormData();
+    formData.append('avatar', file); 
+    formData.append('userid', userid);
 
     const response = await fetch(`${API_URL}/users/uploadAvatar/${userid}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ uimage: pureBase64 }),
+      body: formData,  
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to upload avatar');
+      throw new Error(errorData.message || 'Upload failed');
     }
 
     return await response.json();
   } catch (error) {
-    console.error('API error:', error);
+    console.error('Upload error:', error);
     throw error;
   }
 };
-
 
 
