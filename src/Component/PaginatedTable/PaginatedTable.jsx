@@ -4,8 +4,8 @@ import './PaginatedTable.css';
 
 const PaginatedTable = ({ data = [], columns, rowsPerPage = 5, rowKey, enableCheckbox = false }) => {
   const [currentPage, setCurrentPage] = useState(1);
-  // Set the initial sort configuration to sort by 'createdAt' in descending order
-  const [sortConfig, setSortConfig] = useState({ key: 'createdAt', direction: 'desc' });
+  // Set the initial sort configuration to sort by 'id' in descending order
+  const [sortConfig, setSortConfig] = useState({ key: 'id', direction: 'desc' });
   const [selectedRows, setSelectedRows] = useState([]);
 
   const totalPages = Math.ceil(data.length / rowsPerPage);
@@ -36,11 +36,9 @@ const PaginatedTable = ({ data = [], columns, rowsPerPage = 5, rowKey, enableChe
 
   const sortedData = [...data].sort((a, b) => {
     if (!sortConfig.key) return 0;
-
-    const aValue = new Date(a[sortConfig.key]).getTime();
-    const bValue = new Date(b[sortConfig.key]).getTime();
-
-    return (aValue - bValue) * (sortConfig.direction === 'asc' ? 1 : -1);
+    const aValue = a[sortConfig.key];
+    const bValue = b[sortConfig.key];
+    return (aValue < bValue ? -1 : 1) * (sortConfig.direction === 'asc' ? 1 : -1);
   });
 
   const paginatedData = sortedData.slice(
@@ -73,8 +71,10 @@ const PaginatedTable = ({ data = [], columns, rowsPerPage = 5, rowKey, enableChe
     );
   };
 
+  // ✅ Add this effect to auto-refresh sorting when data changes
   useEffect(() => {
     setCurrentPage(1);
+    setSortConfig({ key: 'id', direction: 'desc' });
   }, [data]);
 
   return (
