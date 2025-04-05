@@ -132,41 +132,40 @@ const BackUserProfile = () => {
         }
     };
 
-    const handleAvatarChange = (e) => {
+   const handleAvatarChange = (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  setAvatar(file);
 
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = () => {
-      const base64String = reader.result;
-      setPreviewAvatar(base64String);
-      setUserData((prev) => ({ ...prev, uimage: base64String.split(',')[1] }));
-      resolve(base64String); 
-    };
-  });
+  if (!file.type.startsWith('image/')) {
+    displayToast('error', 'Only image files are allowed');
+    return;
+  }
+
+  setAvatar(file);
+  setPreviewAvatar(URL.createObjectURL(file)); 
 };
 
 
 const handleAvatarUpload = async () => {
   if (!avatar) {
-    return displayToast('error', 'Please select an avatar to upload');
+    return displayToast('error', 'Please select an avatar first');
   }
 
   try {
+    setIsLoading(true);
+    const response = await uploadAvatar(userData.userid, avatar);
 
-    const base64String = await handleAvatarChange({ target: { files: [avatar] } });
-
-    const response = await uploadAvatar(userData.userid, base64String);
     if (response.success) {
-      displayToast('success', response.message);
-      setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`);
+      displayToast('success', 'Avatar updated successfully');
+      if (response.data.imageUrl) {
+        setPreviewAvatar(response.data.imageUrl);
+      }
     }
   } catch (error) {
-    displayToast('error', error.message || 'Failed to upload avatar');
+    displayToast('error', error.message || 'Upload failed');
+  } finally {
+    setIsLoading(false);
   }
 };
 
