@@ -27,6 +27,14 @@ const FrontUserProfile = () => {
     const usergroup = localStorage.getItem('usergroup');
     const googleAccessToken = localStorage.getItem('googleAccessToken');
 
+    const handleCountryChange = (val) => {
+        setUserData(prev => ({
+            ...prev,
+            ucountry: val
+        }));
+    };
+
+
     // Function to check user group and fetch user data only if the user is a Customer
     const fetchUserData_Customer = async () => {
         if (usergroup === 'Customer') {
@@ -217,6 +225,8 @@ const FrontUserProfile = () => {
         setConfirmPassword('');
         setUserData(originalUserData);
     };
+
+    
 
     const displayToast = (type, message) => {
         setToastType(type);
