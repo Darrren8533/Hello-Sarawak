@@ -137,6 +137,20 @@
     color: #333;
 }
 
+.front-select-dropdown {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.front-select-dropdown:focus {
+    outline: none;
+    border-color: #007BFF;
+}
+
 .front-edit-section .country-dropdown:focus {
     border-color: #007BFF;
     outline: none;
