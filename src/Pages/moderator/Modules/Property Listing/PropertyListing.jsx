@@ -113,7 +113,7 @@ const PropertyListing = () => {
             (
                 (property.propertyid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                 (property.propertyaddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.nearbylocation?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.clustername?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                 (property.rateamount?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                 (property.propertystatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
             )
@@ -180,7 +180,7 @@ const PropertyListing = () => {
         },
         { header: 'Name', accessor: 'propertyaddress' },
         { header: 'Price', accessor: 'rateamount' },
-        { header: 'Location', accessor: 'nearbylocation' },
+        { header: 'Cluster', accessor: 'clustername' },
         {
             header: 'Status',
             accessor: 'propertystatus',
