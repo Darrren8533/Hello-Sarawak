@@ -127,23 +127,23 @@
 }
 
 .front-edit-section .country-dropdown {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 15px;
+    width: calc(100% - 20px);
+    padding: 12px;
+    margin-bottom: 25px;
     border: 1px solid #ccc;
-    border-radius: 3px;
+    border-radius: 4px;
     background-color: white;
-    font-size: 14px;
+    font-size: 1em;
     color: #333;
 }
 
 .front-select-dropdown {
-    width: 100%;
-    padding: 8px;
+    width: calc(100% - 20px);
+    padding: 12px;
     border: 1px solid #ccc;
     border-radius: 4px;
-    font-size: 14px;
-    margin-bottom: 10px;
+    font-size: 1em;
+    margin-bottom: 25px;
 }
 
 .front-select-dropdown:focus {
