@@ -58,6 +58,7 @@ const Cart = () => {
     mutationFn: ({ reservationId, status }) => updateReservationStatus(reservationId, status),
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
+      queryClient.invalidateQueries({ queryKey: ['reservations'] });
       
       const statusMessages = {
         'Paid': 'Your reservation has been paid.',
