@@ -71,11 +71,14 @@ const PaginatedTable = ({ data = [], columns, rowsPerPage = 5, rowKey, enableChe
     );
   };
 
-  // ✅ Add this effect to auto-refresh sorting when data changes
   useEffect(() => {
-    setCurrentPage(1);
-    setSortConfig({ key: 'id', direction: 'desc' });
-  }, [data]);
+  setSortConfig((prev) => ({
+    key: prev.key || 'id',
+    direction: 'desc',
+  }));
+  setCurrentPage(1);
+}, [data]);
+
 
   return (
     <div className="paginated-table">
