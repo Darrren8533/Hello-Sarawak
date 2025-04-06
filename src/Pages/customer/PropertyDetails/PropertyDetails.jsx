@@ -418,8 +418,8 @@ const PropertyDetails = () => {
                   <h2 className="property-font">Description</h2>
                   <div className="property-description">
                     <p>
-                      {description.length > 20 ? `${description.slice(0, 20)}...` : description}
-                      {description.length > 20 && (
+                      {description.length > 40 ? `${description.slice(0, 40)}...` : description}
+                      {description.length > 40 && (
                         <button className="show-more-btn" onClick={() => setShowDescriptionOverlay(true)}>
                           Show more
                         </button>
