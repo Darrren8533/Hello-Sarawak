@@ -507,10 +507,9 @@ export default function FinancialDashboard() {
             <p className="text-2xl font-bold">
               $
               {(
-                financeData?.monthlyData.reduce(
-                  (sum, item) => sum + item.monthlyrevenue,
-                  0
-                ) || 0
+                Array.isArray(financeData?.monthlyData)
+                  ? financeData.monthlyData.reduce((sum, item) => sum + item.monthlyrevenue, 0)
+                  : 0
               ).toFixed(2)}
             </p>
             <p
@@ -529,10 +528,9 @@ export default function FinancialDashboard() {
               Total Reservations
             </h2>
             <p className="text-2xl font-bold">
-              {financeData?.monthlyData.reduce(
-                (sum, item) => sum + item.monthlyreservations,
-                0
-              ) || 0}
+              {Array.isArray(financeData?.monthlyData)
+                ? financeData.monthlyData.reduce((sum, item) => sum + item.monthlyreservations, 0)
+                : 0}
             </p>
             <p
               className={`text-sm ${
@@ -551,12 +549,10 @@ export default function FinancialDashboard() {
             </h2>
             <p className="text-2xl font-bold">
               $
-              {financeData?.monthlyData.length > 0
+              {Array.isArray(financeData?.monthlyData) && financeData.monthlyData.length > 0
                 ? Math.round(
-                    financeData.monthlyData.reduce(
-                      (sum, item) => sum + item.monthlyrevenue,
-                      0
-                    ) / financeData.monthlyData.length
+                    financeData.monthlyData.reduce((sum, item) => sum + item.monthlyrevenue, 0) /
+                    financeData.monthlyData.length
                   )
                 : 0}
             </p>
