@@ -47,19 +47,18 @@ const BackUserProfile = () => {
 
                 let imageSrc = '../../public/avatar.png';
                 if (data.uimage) {
-                    imageSrc = data.uimage.startsWith('http') 
-                        ? data.uimage 
+                    imageSrc = data.uimage.startsWith('http')
+                        ? data.uimage
                         : `data:image/jpeg;base64,${data.uimage}`;
                 }
 
-
                 const defaultData = {
-                    ufirstname: data.ufirstname || 'Not Provided',
-                    ulastname: data.ulastname || 'Not Provided',
-                    uemail: data.uemail || 'Not Provided',
+                    ufirstname: data.ufirstname || '',
+                    ulastname: data.ulastname || '',
+                    uemail: data.uemail || '',
                     uphoneno: data.uphoneno || 'Not Provided',
                     uzipcode: data.uzipcode || 'Not Provided',
-                    username: data.username || 'Not Provided',
+                    username: data.username || '',
                     ugender: data.ugender || 'Not Provided',
                     ...data
                 };
@@ -79,12 +78,12 @@ const BackUserProfile = () => {
                         const randomNumber = generateRandomNumber();
                         const updatedUserData = {
                             ...prevUserData,
-                            ufirstname: profile.given_name || 'Not Provided',
-                            ulastname: profile.family_name || 'Not Provided',
-                            uemail: profile.email || 'Not Provided',
+                            ufirstname: profile.given_name || '',
+                            ulastname: profile.family_name || '',
+                            uemail: profile.email || '',
                         };
 
-                        if (!prevUserData.username || prevUserData.username === 'Not Provided') {
+                        if (!prevUserData.username || prevUserData.username === '') {
                             updatedUserData.username = profile.given_name
                                 ? `${profile.given_name}_${randomNumber}`
                                 : `user_${randomNumber}`;
@@ -124,10 +123,20 @@ const BackUserProfile = () => {
 
     const handleBlur = (e) => {
         const { name, value } = e.target;
-        if (!value.trim()) {
+
+
+        const requiredFields = ['ufirstname', 'ulastname', 'uemail', 'username'];
+
+        if (!value.trim() && !requiredFields.includes(name)) {
             setUserData((prevUserData) => ({
                 ...prevUserData,
                 [name]: 'Not Provided'
+            }));
+        } else if (!value.trim() && requiredFields.includes(name)) {
+            // For required fields, keep them empty if blank
+            setUserData((prevUserData) => ({
+                ...prevUserData,
+                [name]: ''
             }));
         }
     };
@@ -200,88 +209,96 @@ const BackUserProfile = () => {
         reader.readAsDataURL(avatar);
     };
 
-  const handleUpdate = async () => {
-    const nameRegex = /^[A-Za-z\s]*$/;
-    const usernameRegex = /^[a-zA-Z0-9_]{6,15}$/;
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    const phoneRegex = /^[0-9]{10,15}$/;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const handleUpdate = async () => {
+        const nameRegex = /^[A-Za-z\s]*$/;
+        const usernameRegex = /^[a-zA-Z0-9_]{6,15}$/;
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        const phoneRegex = /^[0-9]{10,15}$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    try {
-        // Fetch the original user data to compare against
-        const originalData = await fetchUserData(userid); 
-        const originalUsername = originalData.username || 'Not Provided';
-        const originalPassword = originalData.password || ''; 
-
-        // Validation for profile fields
-        if (activeTab === 'account') {
-            const firstName = userData.ufirstname === 'Not Provided'? '' : userData.ufirstname;
-            const lastName = userData.ulastname === 'Not Provided'? '' : userData.ulastname;
-            const phone = userData.uphoneno === 'Not Provided'? '' : userData.uphoneno;
-            const email = userData.uemail === 'Not Provided'? '' : userData.uemail;
-
-            if (firstName === '' || lastName === '') {
-                throw new Error('First and last name cannot be empty');
-            }
-            if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
-                throw new Error('Name should only contain letters and spaces');
-            }
-            if (phone &&!phoneRegex.test(phone)) {
-                throw new Error('Phone number should contain 10-15 digits');
-            }
-            if (email === '' ||!emailRegex.test(email)) {
-                throw new Error('Please enter a valid email address');
-            }
-        } else if (activeTab === 'security') {
-            const username = userData.username === 'Not Provided'? '' : userData.username;
-            const password = userData.password === 'Not Provided'? '' : userData.password;
-
-            if (username === '' ||!usernameRegex.test(username)) {
-                throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
-            }
-            if (password &&!passwordRegex.test(password)) {
-                throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
-            }
-        }
-
-        const payload = { ...userData, userid };
-        const response = await updateProfile(payload);
-
-        if (!response.success) {
-            throw new Error(response.message || 'Failed to update profile');
-        }
-
-        const usernameChanged = userData.username!== originalUsername && 
-                               userData.username!== 'Not Provided' && 
-                               activeTab === 'security';
+        try {
         
-        const passwordChanged = userData.password && 
-                               userData.password!== originalPassword && 
-                               userData.password!== '' && 
-                               activeTab === 'security';
+            const submissionData = { ...userData };
+            Object.keys(submissionData).forEach(key => {
+                if (submissionData[key] === 'Not Provided') {
+                    submissionData[key] = '';
+                }
+            });
 
-        let updateMessage = 'Profile updated successfully';
-        let shouldLogout = false;
+            // Validation for profile fields
+            if (activeTab === 'account') {
+                const firstName = submissionData.ufirstname || '';
+                const lastName = submissionData.ulastname || '';
+                const phone = submissionData.uphoneno || '';
+                const email = submissionData.uemail || '';
 
-        if (usernameChanged || passwordChanged) {
-            updateMessage = 'Profile updated successfully. You must login again to reflect your changes';
-            shouldLogout = true;
+                if (!firstName.trim() || !lastName.trim()) {
+                    throw new Error('First and last name cannot be empty');
+                }
+                if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
+                    throw new Error('Name should only contain letters and spaces');
+                }
+                if (phone && !phoneRegex.test(phone)) {
+                    throw new Error('Phone number should contain 10-15 digits');
+                }
+                if (!email || !emailRegex.test(email)) {
+                    throw new Error('Please enter a valid email address');
+                }
+            } else if (activeTab === 'security') {
+                const username = submissionData.username || '';
+                const password = submissionData.password || '';
+
+                if (!username || !usernameRegex.test(username)) {
+                    throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
+                }
+                if (password && !passwordRegex.test(password)) {
+                    throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
+                }
+            }
+
+            const payload = { ...submissionData, userid };
+            const response = await updateProfile(payload);
+
+            if (!response.success) {
+                throw new Error(response.message || 'Failed to update profile');
+            }
+
+            // Fetch the original user data to compare against
+            const originalData = await fetchUserData(userid);
+            const originalUsername = originalData.username || '';
+            const originalPassword = originalData.password || '';
+
+            const usernameChanged = submissionData.username !== originalUsername &&
+                submissionData.username !== '' &&
+                activeTab === 'security';
+
+            const passwordChanged = submissionData.password &&
+                submissionData.password !== originalPassword &&
+                submissionData.password !== '' &&
+                activeTab === 'security';
+
+            let updateMessage = 'Profile updated successfully';
+            let shouldLogout = false;
+
+            if (usernameChanged || passwordChanged) {
+                updateMessage = 'Profile updated successfully. You must login again to reflect your changes';
+                shouldLogout = true;
+            }
+
+            displayToast('success', updateMessage);
+
+            if (shouldLogout) {
+                setTimeout(() => {
+                    localStorage.clear();
+                    navigate('/login');
+                }, 5000);
+            }
+
+        } catch (error) {
+            console.error('Update Error:', error);
+            displayToast('error', error.message);
         }
-
-        displayToast('success', updateMessage);
-
-        if (shouldLogout) {
-            setTimeout(() => {
-                localStorage.clear();  
-                navigate('/login');    
-            }, 5000); 
-        }
-
-    } catch (error) {
-        console.error('Update Error:', error);
-        displayToast('error', error.message);
-    }
-};
+    };
 
     const displayToast = (type, message) => {
         setToastType(type);
@@ -326,7 +343,7 @@ const BackUserProfile = () => {
                                 </label>
                             </div>
                             <div className="back-user-name">
-                                <h2>{userData.ufirstname === 'Not Provided' ? '' : userData.ufirstname} {userData.ulastname === 'Not Provided' ? '' : userData.ulastname}</h2>
+                                <h2>{userData.ufirstname} {userData.ulastname}</h2>
                             </div>
                             <button type="button" className="back-profile-save-avatar-button" onClick={handleAvatarUpload}>
                                 Save Avatar
@@ -349,10 +366,10 @@ const BackUserProfile = () => {
                                 <form className="back-profile-form">
                                     <div className="back-profile-form-group">
                                         <label>First Name</label>
-                                        <input 
-                                            type="text" 
-                                            name="ufirstname" 
-                                            value={userData.ufirstname} 
+                                        <input
+                                            type="text"
+                                            name="ufirstname"
+                                            value={userData.ufirstname}
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
@@ -360,10 +377,10 @@ const BackUserProfile = () => {
                                     </div>
                                     <div className="back-profile-form-group">
                                         <label>Last Name</label>
-                                        <input 
-                                            type="text" 
-                                            name="ulastname" 
-                                            value={userData.ulastname} 
+                                        <input
+                                            type="text"
+                                            name="ulastname"
+                                            value={userData.ulastname}
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
@@ -371,18 +388,18 @@ const BackUserProfile = () => {
                                     </div>
                                     <div className="back-profile-form-group">
                                         <label>Date of Birth</label>
-                                        <input 
-                                            type="date" 
-                                            name="udob" 
-                                            value={userData.udob} 
+                                        <input
+                                            type="date"
+                                            name="udob"
+                                            value={userData.udob}
                                             onChange={handleInputChange}
                                         />
                                     </div>
                                     <div className="back-profile-form-group">
                                         <label>Title</label>
-                                        <select 
-                                            name="utitle" 
-                                            value={userData.utitle} 
+                                        <select
+                                            name="utitle"
+                                            value={userData.utitle}
                                             onChange={handleInputChange}
                                         >
                                             <option value="Mr.">Mr.</option>
@@ -394,9 +411,9 @@ const BackUserProfile = () => {
                                     </div>
                                     <div className="back-profile-form-group">
                                         <label>Gender</label>
-                                        <select 
-                                            name="ugender" 
-                                            value={userData.ugender} 
+                                        <select
+                                            name="ugender"
+                                            value={userData.ugender === 'Not Provided' ? '' : userData.ugender}
                                             onChange={handleInputChange}
                                         >
                                             <option value="">Select Gender</option>
@@ -407,19 +424,19 @@ const BackUserProfile = () => {
                                     </div>
                                     <div className="back-profile-form-group">
                                         <label>Email</label>
-                                        <input 
-                                            type="email" 
-                                            name="uemail" 
-                                            value={userData.uemail} 
-                                            readOnly 
+                                        <input
+                                            type="email"
+                                            name="uemail"
+                                            value={userData.uemail}
+                                            readOnly
                                         />
                                     </div>
                                     <div className="back-profile-form-group">
                                         <label>Phone Number</label>
-                                        <input 
-                                            type="text" 
-                                            name="uphoneno" 
-                                            value={userData.uphoneno} 
+                                        <input
+                                            type="text"
+                                            name="uphoneno"
+                                            value={userData.uphoneno === 'Not Provided' ? '' : userData.uphoneno}
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
@@ -427,17 +444,17 @@ const BackUserProfile = () => {
                                     </div>
                                     <div className="back-profile-form-group">
                                         <label>Country</label>
-                                        <CountryDropdown 
-                                            value={userData.ucountry} 
-                                            onChange={handleCountryChange} 
+                                        <CountryDropdown
+                                            value={userData.ucountry}
+                                            onChange={handleCountryChange}
                                         />
                                     </div>
                                     <div className="back-profile-form-group">
                                         <label>Zip Code</label>
-                                        <input 
-                                            type="text" 
-                                            name="uzipcode" 
-                                            value={userData.uzipcode} 
+                                        <input
+                                            type="text"
+                                            name="uzipcode"
+                                            value={userData.uzipcode === 'Not Provided' ? '' : userData.uzipcode}
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
@@ -453,10 +470,10 @@ const BackUserProfile = () => {
                                 <form className="back-profile-form">
                                     <div className="back-profile-form-group">
                                         <label>Username</label>
-                                        <input 
-                                            type="text" 
-                                            name="username" 
-                                            value={userData.username} 
+                                        <input
+                                            type="text"
+                                            name="username"
+                                            value={userData.username}
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
@@ -468,7 +485,7 @@ const BackUserProfile = () => {
                                             <input
                                                 type={showPassword ? 'text' : 'password'}
                                                 name="password"
-                                                value={userData.password}
+                                                value={userData.password || ''}
                                                 onChange={handleInputChange}
                                                 className="back-password-input"
                                             />
