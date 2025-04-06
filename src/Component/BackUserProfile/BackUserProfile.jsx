@@ -52,7 +52,7 @@ const BackUserProfile = () => {
                         : `data:image/jpeg;base64,${data.uimage}`;
                 }
 
-                // Set default "Not Provided" for empty fields
+                // Set default "Not Provided" for all empty fields
                 const defaultData = {
                     ufirstname: data.ufirstname || 'Not Provided',
                     ulastname: data.ulastname || 'Not Provided',
@@ -61,6 +61,10 @@ const BackUserProfile = () => {
                     uzipcode: data.uzipcode || 'Not Provided',
                     username: data.username || 'Not Provided',
                     ugender: data.ugender || 'Not Provided',
+                    udob: data.udob || 'Not Provided',
+                    utitle: data.utitle || 'Not Provided',
+                    ucountry: data.ucountry || 'Not Provided',
+                    password: data.password || '',
                     ...data
                 };
 
@@ -108,7 +112,7 @@ const BackUserProfile = () => {
         const { name, value } = e.target;
         setUserData((prevUserData) => ({
             ...prevUserData,
-            [name]: value
+            [name]: value === 'Not Provided' ? '' : value
         }));
     };
 
@@ -200,80 +204,80 @@ const BackUserProfile = () => {
         reader.readAsDataURL(avatar);
     };
 
-  const handleUpdate = async () => {
-    const nameRegex = /^[A-Za-z\s]*$/;
-    const usernameRegex = /^[a-zA-Z0-9_]{6,15}$/;
-    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
-    const phoneRegex = /^[0-9]{10,15}$/;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const handleUpdate = async () => {
+        const nameRegex = /^[A-Za-z\s]*$/;
+        const usernameRegex = /^[a-zA-Z0-9_]{6,15}$/;
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        const phoneRegex = /^[0-9]{10,15}$/;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    try {
-        // Fetch the original user data to compare against
-        const originalData = await fetchUserData(userid); 
-        const originalUsername = originalData.username || 'Not Provided';
-        const originalPassword = originalData.password || ''; 
+        try {
 
-        // Validation for profile fields
-        if (activeTab === 'account') {
-            if (userData.ufirstname === 'Not Provided' || userData.ulastname === 'Not Provided') {
-                throw new Error('First and last name cannot be empty');
+            const payload = Object.keys(userData).reduce((acc, key) => {
+                acc[key] = userData[key] === 'Not Provided' ? '' : userData[key];
+                return acc;
+            }, {});
+            
+            payload.userid = userid;
+
+            // Validation for profile fields
+            if (activeTab === 'account') {
+                if (payload.ufirstname && !nameRegex.test(payload.ufirstname)) {
+                    throw new Error('First name should only contain letters and spaces');
+                }
+                if (payload.ulastname && !nameRegex.test(payload.ulastname)) {
+                    throw new Error('Last name should only contain letters and spaces');
+                }
+                if (payload.uphoneno && !phoneRegex.test(payload.uphoneno)) {
+                    throw new Error('Phone number should contain 10-15 digits');
+                }
+                if (payload.uemail && !emailRegex.test(payload.uemail)) {
+                    throw new Error('Please enter a valid email address');
+                }
+            } else if (activeTab === 'security') {
+                if (payload.username && !usernameRegex.test(payload.username)) {
+                    throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
+                }
+                if (payload.password && !passwordRegex.test(payload.password)) {
+                    throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
+                }
             }
-            if (!nameRegex.test(userData.ufirstname) || !nameRegex.test(userData.ulastname)) {
-                throw new Error('Name should only contain letters and spaces');
+
+            const response = await updateProfile(payload);
+
+            if (!response.success) {
+                throw new Error(response.message || 'Failed to update profile');
             }
-            if (userData.uphoneno && userData.uphoneno !== 'Not Provided' && !phoneRegex.test(userData.uphoneno)) {
-                throw new Error('Phone number should contain 10-15 digits');
+
+            const originalData = await fetchUserData(userid); 
+            const originalUsername = originalData.username || 'Not Provided';
+            const originalPassword = originalData.password || ''; 
+
+            const usernameChanged = payload.username && payload.username !== originalUsername && activeTab === 'security';
+            const passwordChanged = payload.password && payload.password !== originalPassword && activeTab === 'security';
+
+            let updateMessage = 'Profile updated successfully';
+            let shouldLogout = false;
+
+            if (usernameChanged || passwordChanged) {
+                updateMessage = 'Profile updated successfully. You must login again to reflect your changes';
+                shouldLogout = true;
             }
-            if (userData.uemail === 'Not Provided' || !emailRegex.test(userData.uemail)) {
-                throw new Error('Please enter a valid email address');
+
+            displayToast('success', updateMessage);
+
+            if (shouldLogout) {
+                setTimeout(() => {
+                    localStorage.clear();  
+                    navigate('/login');    
+                }, 5000); 
             }
-        } else if (activeTab === 'security') {
-            if (userData.username === 'Not Provided' || !usernameRegex.test(userData.username)) {
-                throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
-            }
-            if (userData.password && !passwordRegex.test(userData.password)) {
-                throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
-            }
+
+        } catch (error) {
+            console.error('Update Error:', error);
+            displayToast('error', error.message);
         }
-
-        const payload = { ...userData, userid };
-        const response = await updateProfile(payload);
-
-        if (!response.success) {
-            throw new Error(response.message || 'Failed to update profile');
-        }
-
-        const usernameChanged = userData.username !== originalUsername && 
-                               userData.username !== 'Not Provided' && 
-                               activeTab === 'security';
-        
-        const passwordChanged = userData.password && 
-                               userData.password !== originalPassword && 
-                               userData.password !== '' && 
-                               activeTab === 'security';
-
-        let updateMessage = 'Profile updated successfully';
-        let shouldLogout = false;
-
-        if (usernameChanged || passwordChanged) {
-            updateMessage = 'Profile updated successfully. You must login again to reflect your changes';
-            shouldLogout = true;
-        }
-
-        displayToast('success', updateMessage);
-
-        if (shouldLogout) {
-            setTimeout(() => {
-                localStorage.clear();  
-                navigate('/login');    
-            }, 5000); 
-        }
-
-    } catch (error) {
-        console.error('Update Error:', error);
-        displayToast('error', error.message);
-    }
-};
+    };
 
     const displayToast = (type, message) => {
         setToastType(type);
@@ -285,7 +289,7 @@ const BackUserProfile = () => {
     const handleCountryChange = (val) => {
         setUserData((prevUserData) => ({
             ...prevUserData,
-            ucountry: val,
+            ucountry: val === 'Not Provided' ? '' : val,
         }));
     };
 
@@ -344,10 +348,11 @@ const BackUserProfile = () => {
                                         <input 
                                             type="text" 
                                             name="ufirstname" 
-                                            value={userData.ufirstname || ''} 
+                                            value={userData.ufirstname === 'Not Provided' ? '' : userData.ufirstname} 
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
+                                            placeholder="Not Provided"
                                         />
                                     </div>
                                     <div className="back-profile-form-group">
@@ -355,10 +360,11 @@ const BackUserProfile = () => {
                                         <input 
                                             type="text" 
                                             name="ulastname" 
-                                            value={userData.ulastname || ''} 
+                                            value={userData.ulastname === 'Not Provided' ? '' : userData.ulastname} 
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
+                                            placeholder="Not Provided"
                                         />
                                     </div>
                                     <div className="back-profile-form-group">
@@ -366,17 +372,20 @@ const BackUserProfile = () => {
                                         <input 
                                             type="date" 
                                             name="udob" 
-                                            value={userData.udob || ''} 
+                                            value={userData.udob === 'Not Provided' ? '' : userData.udob} 
                                             onChange={handleInputChange}
+                                            onFocus={handleFocus}
+                                            onBlur={handleBlur}
                                         />
                                     </div>
                                     <div className="back-profile-form-group">
                                         <label>Title</label>
                                         <select 
                                             name="utitle" 
-                                            value={userData.utitle} 
+                                            value={userData.utitle === 'Not Provided' ? '' : userData.utitle} 
                                             onChange={handleInputChange}
                                         >
+                                            <option value="">Not Provided</option>
                                             <option value="Mr.">Mr.</option>
                                             <option value="Mrs.">Mrs.</option>
                                             <option value="Ms.">Ms.</option>
@@ -388,10 +397,10 @@ const BackUserProfile = () => {
                                         <label>Gender</label>
                                         <select 
                                             name="ugender" 
-                                            value={userData.ugender || 'Not Provided'} 
+                                            value={userData.ugender === 'Not Provided' ? '' : userData.ugender} 
                                             onChange={handleInputChange}
                                         >
-                                            <option value="">Select Gender</option>
+                                            <option value="">Not Provided</option>
                                             <option value="Male">Male</option>
                                             <option value="Female">Female</option>
                                             <option value="Other">Other</option>
@@ -402,8 +411,9 @@ const BackUserProfile = () => {
                                         <input 
                                             type="email" 
                                             name="uemail" 
-                                            value={userData.uemail || ''} 
+                                            value={userData.uemail === 'Not Provided' ? '' : userData.uemail} 
                                             readOnly 
+                                            placeholder="Not Provided"
                                         />
                                     </div>
                                     <div className="back-profile-form-group">
@@ -411,17 +421,20 @@ const BackUserProfile = () => {
                                         <input 
                                             type="text" 
                                             name="uphoneno" 
-                                            value={userData.uphoneno || ''} 
+                                            value={userData.uphoneno === 'Not Provided' ? '' : userData.uphoneno} 
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
+                                            placeholder="Not Provided"
                                         />
                                     </div>
                                     <div className="back-profile-form-group">
                                         <label>Country</label>
                                         <CountryDropdown 
-                                            value={userData.ucountry || ''} 
+                                            value={userData.ucountry === 'Not Provided' ? '' : userData.ucountry} 
                                             onChange={handleCountryChange} 
+                                            classes="country-dropdown"
+                                            valueType="short"
                                         />
                                     </div>
                                     <div className="back-profile-form-group">
@@ -429,10 +442,11 @@ const BackUserProfile = () => {
                                         <input 
                                             type="text" 
                                             name="uzipcode" 
-                                            value={userData.uzipcode || ''} 
+                                            value={userData.uzipcode === 'Not Provided' ? '' : userData.uzipcode} 
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
+                                            placeholder="Not Provided"
                                         />
                                     </div>
                                     <button type="button" className="back-profile-update-button" onClick={handleUpdate}>
@@ -448,10 +462,11 @@ const BackUserProfile = () => {
                                         <input 
                                             type="text" 
                                             name="username" 
-                                            value={userData.username || ''} 
+                                            value={userData.username === 'Not Provided' ? '' : userData.username} 
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
+                                            placeholder="Not Provided"
                                         />
                                     </div>
                                     <div className="back-profile-form-group">
@@ -463,6 +478,7 @@ const BackUserProfile = () => {
                                                 value={userData.password || ''}
                                                 onChange={handleInputChange}
                                                 className="back-password-input"
+                                                placeholder={userData.password ? '' : 'Not Provided'}
                                             />
                                             <span className="back-password-toggle-icon" onClick={() => setShowPassword(!showPassword)}>
                                                 {showPassword ? <FaEye /> : <FaEyeSlash />}
