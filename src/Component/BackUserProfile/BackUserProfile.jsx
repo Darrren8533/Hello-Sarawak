@@ -52,7 +52,7 @@ const BackUserProfile = () => {
                         : `data:image/jpeg;base64,${data.uimage}`;
                 }
 
-                // Set default "Not Provided" for empty fields
+
                 const defaultData = {
                     ufirstname: data.ufirstname || 'Not Provided',
                     ulastname: data.ulastname || 'Not Provided',
@@ -215,23 +215,31 @@ const BackUserProfile = () => {
 
         // Validation for profile fields
         if (activeTab === 'account') {
-            if (userData.ufirstname === 'Not Provided' || userData.ulastname === 'Not Provided') {
+            const firstName = userData.ufirstname === 'Not Provided'? '' : userData.ufirstname;
+            const lastName = userData.ulastname === 'Not Provided'? '' : userData.ulastname;
+            const phone = userData.uphoneno === 'Not Provided'? '' : userData.uphoneno;
+            const email = userData.uemail === 'Not Provided'? '' : userData.uemail;
+
+            if (firstName === '' || lastName === '') {
                 throw new Error('First and last name cannot be empty');
             }
-            if (!nameRegex.test(userData.ufirstname) || !nameRegex.test(userData.ulastname)) {
+            if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
                 throw new Error('Name should only contain letters and spaces');
             }
-            if (userData.uphoneno && userData.uphoneno !== 'Not Provided' && !phoneRegex.test(userData.uphoneno)) {
+            if (phone &&!phoneRegex.test(phone)) {
                 throw new Error('Phone number should contain 10-15 digits');
             }
-            if (userData.uemail === 'Not Provided' || !emailRegex.test(userData.uemail)) {
+            if (email === '' ||!emailRegex.test(email)) {
                 throw new Error('Please enter a valid email address');
             }
         } else if (activeTab === 'security') {
-            if (userData.username === 'Not Provided' || !usernameRegex.test(userData.username)) {
+            const username = userData.username === 'Not Provided'? '' : userData.username;
+            const password = userData.password === 'Not Provided'? '' : userData.password;
+
+            if (username === '' ||!usernameRegex.test(username)) {
                 throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
             }
-            if (userData.password && !passwordRegex.test(userData.password)) {
+            if (password &&!passwordRegex.test(password)) {
                 throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
             }
         }
@@ -243,13 +251,13 @@ const BackUserProfile = () => {
             throw new Error(response.message || 'Failed to update profile');
         }
 
-        const usernameChanged = userData.username !== originalUsername && 
-                               userData.username !== 'Not Provided' && 
+        const usernameChanged = userData.username!== originalUsername && 
+                               userData.username!== 'Not Provided' && 
                                activeTab === 'security';
         
         const passwordChanged = userData.password && 
-                               userData.password !== originalPassword && 
-                               userData.password !== '' && 
+                               userData.password!== originalPassword && 
+                               userData.password!== '' && 
                                activeTab === 'security';
 
         let updateMessage = 'Profile updated successfully';
