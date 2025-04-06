@@ -64,6 +64,9 @@ export default function FinancialDashboard() {
     queryFn: fetchALOS
   });
 
+  if (financeLoading) return <div className="loader-box"><Loader /></div>;
+  if (financeError) return <div>Error: {financeError.message}</div>;
+
   const renderChart = () => {
     if (!financeData?.monthlyData || financeData.monthlyData.length === 0) {
       return <h1>No reservations made yet.</h1>;
@@ -492,9 +495,6 @@ export default function FinancialDashboard() {
       },
     };
   };
-
-  if (financeLoading) return <div className="loader-box"><Loader /></div>;
-  if (financeError) return <div>Error: {financeError.message}</div>;
 
   return (
     <div className="container mx-auto p-4">
