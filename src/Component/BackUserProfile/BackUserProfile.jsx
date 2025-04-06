@@ -344,7 +344,7 @@ const BackUserProfile = () => {
                                         <input 
                                             type="text" 
                                             name="ufirstname" 
-                                            value={userData.ufirstname || ''} 
+                                            value={userData.ufirstname} 
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
@@ -355,7 +355,7 @@ const BackUserProfile = () => {
                                         <input 
                                             type="text" 
                                             name="ulastname" 
-                                            value={userData.ulastname || ''} 
+                                            value={userData.ulastname} 
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
@@ -366,7 +366,7 @@ const BackUserProfile = () => {
                                         <input 
                                             type="date" 
                                             name="udob" 
-                                            value={userData.udob || ''} 
+                                            value={userData.udob} 
                                             onChange={handleInputChange}
                                         />
                                     </div>
@@ -388,7 +388,7 @@ const BackUserProfile = () => {
                                         <label>Gender</label>
                                         <select 
                                             name="ugender" 
-                                            value={userData.ugender || 'Not Provided'} 
+                                            value={userData.ugender} 
                                             onChange={handleInputChange}
                                         >
                                             <option value="">Select Gender</option>
@@ -402,7 +402,7 @@ const BackUserProfile = () => {
                                         <input 
                                             type="email" 
                                             name="uemail" 
-                                            value={userData.uemail || ''} 
+                                            value={userData.uemail} 
                                             readOnly 
                                         />
                                     </div>
@@ -411,7 +411,7 @@ const BackUserProfile = () => {
                                         <input 
                                             type="text" 
                                             name="uphoneno" 
-                                            value={userData.uphoneno || ''} 
+                                            value={userData.uphoneno} 
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
@@ -420,7 +420,7 @@ const BackUserProfile = () => {
                                     <div className="back-profile-form-group">
                                         <label>Country</label>
                                         <CountryDropdown 
-                                            value={userData.ucountry || ''} 
+                                            value={userData.ucountry} 
                                             onChange={handleCountryChange} 
                                         />
                                     </div>
@@ -429,7 +429,7 @@ const BackUserProfile = () => {
                                         <input 
                                             type="text" 
                                             name="uzipcode" 
-                                            value={userData.uzipcode || ''} 
+                                            value={userData.uzipcode} 
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
@@ -448,7 +448,7 @@ const BackUserProfile = () => {
                                         <input 
                                             type="text" 
                                             name="username" 
-                                            value={userData.username || ''} 
+                                            value={userData.username} 
                                             onChange={handleInputChange}
                                             onFocus={handleFocus}
                                             onBlur={handleBlur}
@@ -460,7 +460,7 @@ const BackUserProfile = () => {
                                             <input
                                                 type={showPassword ? 'text' : 'password'}
                                                 name="password"
-                                                value={userData.password || ''}
+                                                value={userData.password}
                                                 onChange={handleInputChange}
                                                 className="back-password-input"
                                             />
