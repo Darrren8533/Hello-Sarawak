@@ -65,10 +65,14 @@ export default function FinancialDashboard() {
   });
 
   const renderChart = () => {
-    if (!financeData?.monthlyData) return <h1>No Reservation Made!</h1>;
+    if (!financeData?.monthlyData || financeData.monthlyData.length === 0) {
+      return <h1>No reservations made yet.</h1>;
+    }
 
     if (chartType === "occupancy") {
-      if (!occupancyData?.monthlyData) return <div>No occupancy data</div>;
+      if (!occupancyData?.monthlyData || occupancyData.monthlyData.length === 0) {
+        return <div>No occupancy data available</div>;
+      }
     
       const occupancyChartData = {
         labels: occupancyData.monthlyData.map((item) => item.month),
@@ -177,7 +181,9 @@ export default function FinancialDashboard() {
     }
 
     if (chartType === "cancellation") {
-      if (!cancellationRateData?.monthlyData) return <div>No Cancellation Rate data</div>;
+      if (!cancellationRateData?.monthlyData || cancellationRateData.monthlyData.length === 0) {
+        return <div>No cancellation data available</div>;
+      }
     
       const cancellationRateChartData = {
         labels: ["Cancellation Rate"], 
@@ -224,7 +230,9 @@ export default function FinancialDashboard() {
     }
 
     if (chartType === "retention") {
-      if (!customerRetentionRateData?.monthlyData) return <div>No Retention Rate data</div>;
+      if (!customerRetentionRateData?.monthlyData || customerRetentionRateData.monthlyData.length === 0) {
+        return <div>No Retention Rate data</div>;
+      }
     
       const retentionRateChartData = {
         labels: ["Retention Rate"], 
@@ -271,7 +279,9 @@ export default function FinancialDashboard() {
     }
 
     if (chartType === "satisfaction") {
-      if (!guestSatisfactionScoreData?.monthlyData) return <div>No Guest Satisfaction Score data</div>;
+      if (!guestSatisfactionScoreData?.monthlyData || guestSatisfactionScoreData.monthlyData === 0) {
+        return <div>No Guest Satisfaction Score data</div>;
+      }
     
       const guestSatisfactionChartData = {
         labels: guestSatisfactionScoreData.monthlyData.map((item) => `Property ${item.propertyid}`),
@@ -318,7 +328,9 @@ export default function FinancialDashboard() {
     }
 
     if (chartType === "alos") {
-      if (!alosData?.monthlyData) return <div>No Average Length of Stay data</div>;
+      if (!alosData?.monthlyData || alosData.monthlyData === 0) {
+        return <div>No Average Length of Stay data</div>;
+      }
     
       const alosChartData = {
         labels: alosData.monthlyData.map((item) => `Property ${item.propertyid}`),
