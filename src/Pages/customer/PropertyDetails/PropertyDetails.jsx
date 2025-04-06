@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useParams, useNavigate } from 'react-router-dom';
-import { IoIosArrowDown, IoIosArrowUp, IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { useLocation, useNavigate } from 'react-router-dom';
+import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { IoMdClose } from "react-icons/io";
 import { IoReturnUpBackOutline } from "react-icons/io5";
 import { FaWifi, FaParking, FaSwimmingPool, FaHotTub, FaTv, FaUtensils, FaSnowflake, FaPaw, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaLock, FaBell, FaMapMarkerAlt, FaTree, FaMountain, FaCity } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
@@ -71,11 +72,13 @@ const PropertyDetails = () => {
     additionalRequests: ''
   });
   const navigate = useNavigate();
+  const [showDescriptionOverlay, setShowDescriptionOverlay] = useState(false);
 
   const facilitiesArray = propertyDetails?.facilities
   ? propertyDetails.facilities.split(",") 
   : [];
 
+  const description = propertyDetails?.propertydescription;
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -221,12 +224,11 @@ const PropertyDetails = () => {
 
       await requestBooking(createdReservation.reservationid);
       console.log('Booking request sent');
+      console.log('Reservation added to the cart');
 
       displayToast('success', 'Reservation added to the cart');
-        setTimeout(() => {
         setShowBookingForm(false);
         navigate('/cart');
-      }, 5000);
 
     } catch (error) {
       console.error('Reservation error:', error);
@@ -276,9 +278,9 @@ const PropertyDetails = () => {
 
   return (
     <div className="property-details-page">
-      {!showAllPhotos && !isFullscreen && !showBookingForm && !showAllFacilities ? (
+      {!showAllPhotos && !isFullscreen && !showBookingForm ? (
         <>
-            <Navbar />
+          <Navbar />
             
           <div className="property-details-container">
             <h1 className="property-title">{propertyDetails?.propertyaddress}</h1>
@@ -350,7 +352,7 @@ const PropertyDetails = () => {
               </div>
             </div>
   
-            {!showAllPhotos && !isFullscreen && !showBookingForm && !showAllFacilities && (
+            {!showAllPhotos && !isFullscreen && !showBookingForm && (
               <div className="mobile-booking-bar">
                 <div className="mobile-booking-bar-content">
                   <div className="mobile-price-info">
@@ -414,13 +416,22 @@ const PropertyDetails = () => {
                 <hr/>
                 <div className="property-features">
                   <h2 className="property-font">Description</h2>
-                  <p className="property-font1">{propertyDetails?.propertydescription}</p>
+                  <div className="property-description">
+                    <p>
+                      {description.length > 20 ? `${description.slice(0, 20)}...` : description}
+                      {description.length > 20 && (
+                        <button className="show-more-btn" onClick={() => setShowDescriptionOverlay(true)}>
+                          Show more
+                        </button>
+                      )}
+                    </p>
+                  </div>
                 </div>
                 <hr/>
                 <div className="property-features">
                   <h2 className="property-font">What this place offers</h2>
                   <div className="facilities-details">
-                    {(showAllFacilities ? facilitiesArray : facilitiesArray.slice(0, 10)).map((facilityName, index) => {
+                    {(facilitiesArray.slice(0, 10)).map((facilityName, index) => {
                         const facility = facilities.find(f => f.name === facilityName.trim());
                         return (
                             <div key={index} className="facilities-item">
@@ -432,30 +443,32 @@ const PropertyDetails = () => {
                   </div>
   
                   {facilitiesArray.length > 10 && (
-                    <button className="show-all-facilities" onClick={() =>setShowAllFacilities(true)}>
+                    <button className="show-all-facilities" onClick={() => setShowAllFacilities(true)}>
                         Show All Facilities
                     </button>
                   )}
 
                   {showAllFacilities && (
                     <div className="facilities-overlay">
-                      <div className="facilities-overlay-content">
-                        <div className="facilities-overlay-header">
-                          <h3>What this place offers</h3>
-                          <button className="close-overlay" onClick={() => setShowAllFacilities(false)}>X</button>
+                        <div className="facilities-overlay-content">
+                            <div className="facilities-overlay-header">
+                                <h3>What this place offers</h3>
+                                <button className="close-overlay" onClick={() => setShowAllFacilities(false)}>
+                                  <IoMdClose />
+                                </button>
+                            </div>
+                            <div className="full-facilities-list">
+                                {facilitiesArray.map((facilityName, index) => {
+                                    const facility = facilities.find(f => f.name === facilityName.trim());
+                                    return (
+                                        <div key={index} className="facilities-overlay-item">
+                                            {facility ? facility.icon : null}
+                                            <span>{facilityName.trim()}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
                         </div>
-                        <div className="full-facilities-list">
-                          {facilitiesArray.map((facilityName, index) => {
-                            const facility = facilities.find(f => f.name === facilityName.trim());
-                            return (
-                              <div key={index} className="facilities-item">
-                                {facility ? facility.icon : null}
-                                <span>{facilityName.trim()}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
                     </div>
                    )}
                 </div>
@@ -519,7 +532,6 @@ const PropertyDetails = () => {
                 <span><IoReturnUpBackOutline/></span> Request to book
               </button>
             </div>
-
             <div className="booking-content">
               <div className="booking-left">
                 <div className="trip-section">
@@ -749,7 +761,7 @@ const PropertyDetails = () => {
         <div className="fullscreen-overlay">
           <div className="fullscreen-header">
             <button className="close-btn" onClick={handleCloseFullscreen}>
-              X 
+              <IoMdClose />
             </button>
             <div className="image-counter">
               {selectedImageIndex + 1} / {propertyDetails.propertyimage.length}
@@ -786,6 +798,22 @@ const PropertyDetails = () => {
         </div>
 
         
+      )}
+
+      {showDescriptionOverlay && (
+        <div className="description-overlay">
+            <div className="description-overlay-content">
+                <div className="description-overlay-header">
+                    <h3>Description</h3>
+                    <button className="close-overlay" onClick={() => setShowDescriptionOverlay(false)}>
+                      <IoMdClose />
+                    </button>
+                </div>
+                <div className="full-description">
+                    <p>{description}</p>
+                </div>
+            </div>
+        </div>
       )}
 
       {showToast && <Toast type={toastType} message={toastMessage} />}
