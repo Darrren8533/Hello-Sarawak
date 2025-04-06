@@ -65,7 +65,7 @@ export default function FinancialDashboard() {
   });
 
   const renderChart = () => {
-    if (!financeData?.monthlyData) return null;
+    if (!financeData?.monthlyData) return <h1>No Reservation Made!</h1>;
 
     if (chartType === "occupancy") {
       if (!occupancyData?.monthlyData) return <div>No occupancy data</div>;
