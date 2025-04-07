@@ -338,20 +338,11 @@ const Product = () => {
               {activeTab === 'location' && (
                 <div>
                   <h3>Popular destinations</h3>
-                  <div className="destinations-grid">
-                    <select
-                            name="clusterName"
-                            value={selectedCluster}
-                            onChange={(e) => setSelectedCluster(e.target.value)}
-                    >
-                            <option value="">Select Cluster (City)</option>
-                            {clusters.map((cluster, index) => (
-                                <option key={index} value={cluster}>
-                                    {cluster}
-                                </option>
-                            ))}
-                    </select>
-                  </div>
+                  <ClusterSelector 
+                    selectedCluster={selectedCluster}
+                    setSelectedCluster={setSelectedCluster}
+                    clusters={clusters}
+                  />
                 </div>
               )}
               
@@ -498,6 +489,47 @@ const Product = () => {
       <Back_To_Top_Button />
       <Footer />
       </AuthProvider>
+    </div>
+  );
+};
+
+// 新的城市选择器组件设计
+const ClusterSelector = ({ selectedCluster, setSelectedCluster, clusters }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div className="cluster-selector">
+      <div 
+        className="cluster-selector-header"
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span className="cluster-label">
+          {selectedCluster || "Select Your Destination"}
+        </span>
+        <i className="cluster-icon">
+          {isOpen ? "↑" : "↓"}
+        </i>
+      </div>
+      
+      {isOpen && (
+        <div className="cluster-options">
+          {clusters.map((cluster, index) => (
+            <div
+              key={index}
+              className={`cluster-option ${selectedCluster === cluster ? 'selected' : ''}`}
+              onClick={() => {
+                setSelectedCluster(cluster);
+                setIsOpen(false);
+              }}
+            >
+              <span className="cluster-name">{cluster}</span>
+              {selectedCluster === cluster && (
+                <span className="check-icon">✓</span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
