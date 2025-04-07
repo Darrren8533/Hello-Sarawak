@@ -140,62 +140,77 @@ const BackUserProfile = () => {
         const file = e.target.files[0];
         if (!file) return;
 
-        setAvatar(file);
-
         const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => {
+        reader.onload = (event) => {
             const img = new Image();
-            img.src = reader.result;
+            img.src = event.target.result;
+
             img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                const maxSize = 200;
+
+                const maxWidth = 300;
+                const maxHeight = 300;
                 let width = img.width;
                 let height = img.height;
 
+
                 if (width > height) {
-                    if (width > maxSize) {
-                        height *= maxSize / width;
-                        width = maxSize;
+                    if (width > maxWidth) {
+                        height *= maxWidth / width;
+                        width = maxWidth;
                     }
                 } else {
-                    if (height > maxSize) {
-                        width *= maxSize / height;
-                        height = maxSize;
+                    if (height > maxHeight) {
+                        width *= maxHeight / height;
+                        height = maxHeight;
                     }
                 }
 
+                const canvas = document.createElement('canvas');
                 canvas.width = width;
                 canvas.height = height;
+                const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
 
-                const resizedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+
+                const resizedBase64 = canvas.toDataURL('image/jpeg', 0.7);
                 setPreviewAvatar(resizedBase64);
-                setUserData((prevData) => ({ ...prevData, uimage: resizedBase64.split(',')[1] }));
+                setUserData(prev => ({ ...prev, uimage: resizedBase64 }));
             };
         };
+        reader.readAsDataURL(file);
     };
 
    const handleAvatarUpload = async () => {
-        if (!userData.uimage) {
-            return displayToast('error', 'No avatar data to upload');
-        }
-
         try {
-            const response = await uploadAvatar(userid, userData.uimage);
+            if (!userData.uimage) {
+                throw new Error('No processed image data available');
+            }
+
+            setIsLoading(true);
+        
+            const pureBase64 = userData.uimage.includes(',') 
+                ? userData.uimage.split(',')[1] 
+                : userData.uimage;
+
+            const response = await uploadAvatar(userid, pureBase64);
+        
             if (response.success) {
-                displayToast('success', response.message);
+
+                const updatedData = await fetchUserData(userid);
+                setUserData(updatedData);
+
+                const updatedAvatar = updatedData.uimage.startsWith('http') 
+                    ? updatedData.uimage 
+                    : `data:image/jpeg;base64,${updatedData.uimage}`;
             
-                setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`);
-                setUserData((prevData) => ({
-                    ...prevData,
-                    uimage: response.data.uimage,
-                }));
+                setPreviewAvatar(updatedAvatar);
+                displayToast('success', 'Avatar updated successfully');
+            
             }
         } catch (error) {
-            console.error('Avatar Upload Error:', error);
-            displayToast('error', error.message || 'Failed to upload avatar');
+            displayToast('error', error.message || 'Avatar upload failed');
+        } finally {
+            setIsLoading(false);
         }
     };
     
