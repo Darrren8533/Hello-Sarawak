@@ -177,33 +177,28 @@ const BackUserProfile = () => {
         };
     };
 
-    const handleAvatarUpload = async () => {
-        if (!avatar) {
-            return displayToast('error', 'Please select an avatar to upload');
+   const handleAvatarUpload = async () => {
+        if (!userData.uimage) {
+            return displayToast('error', 'No avatar data to upload');
         }
 
-        const reader = new FileReader();
-        reader.onloadend = async () => {
-            let base64String = reader.result.split(',')[1];
-
-            try {
-                const response = await uploadAvatar(userData.userid, base64String);
-                if (response.success) {
-                    displayToast('success', response.message);
-                    setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`);
-                    setUserData((prevData) => ({
-                        ...prevData,
-                        uimage: response.data.uimage,
-                    }));
-                }
-            } catch (error) {
-                console.error('Avatar Upload Error:', error);
-                displayToast('error', error.message || 'Failed to upload avatar');
+        try {
+            const response = await uploadAvatar(userid, userData.uimage);
+            if (response.success) {
+                displayToast('success', response.message);
+            
+                setPreviewAvatar(`data:image/jpeg;base64,${response.data.uimage}`);
+                setUserData((prevData) => ({
+                    ...prevData,
+                    uimage: response.data.uimage,
+                }));
             }
-        };
-        reader.readAsDataURL(avatar);
+        } catch (error) {
+            console.error('Avatar Upload Error:', error);
+            displayToast('error', error.message || 'Failed to upload avatar');
+        }
     };
-
+    
     const handleUpdate = async () => {
         const nameRegex = /^[A-Za-z\s]*$/;
         const usernameRegex = /^[a-zA-Z0-9_]{6,15}$/;
