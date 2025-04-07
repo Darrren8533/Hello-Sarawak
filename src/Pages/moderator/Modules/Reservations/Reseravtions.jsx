@@ -320,7 +320,7 @@ const Reservations = () => {
                 ),
         },
         { header: 'Property Name', accessor: 'propertyaddress' },
-        { header: 'Total Price', accessor: 'totalprice' },
+        { header: 'Total Price(RM)', accessor: 'totalprice' },
         {
             header: 'Status',
             accessor: 'reservationstatus',
