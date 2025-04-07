@@ -49,7 +49,7 @@ import '../../Component/MainContent/MainContent.css';
     return () => clearInterval(checkInterval);
   }, [navigate]);
 
-  if (!isAuthorized) {
+  if (!isLoggedIn || usergroup !== 'Owner') {
     return <NoAccess />;
   }
 
