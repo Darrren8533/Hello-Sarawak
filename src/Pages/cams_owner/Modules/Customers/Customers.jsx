@@ -4,6 +4,7 @@ import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown'
 import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
+import Toast from '../../../../Component/Toast/Toast';
 import { FaEye, FaUserTag } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -18,9 +19,19 @@ const Customers = () => {
     const [showRoleModal, setShowRoleModal] = useState(false);
     const [roleCustomer, setRoleCustomer] = useState(null);
     const [selectedRole, setSelectedRole] = useState('');
+    const [toastMessage, setToastMessage] = useState('');
+    const [showToast, setShowToast] = useState(false);
+    const [toastType, setToastType] = useState('');
     const API_URL = import.meta.env.VITE_API_URL;
     
     const roles = ['Customer', 'Moderator', 'Administrator'];
+
+    const displayToast = (type, message) => {
+        setToastType(type);
+        setToastMessage(message);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 5000);
+    };
 
     useEffect(() => {
         const fetchCustomerData = async () => {
@@ -79,11 +90,14 @@ const Customers = () => {
                         : customer
                 ));
                 setShowRoleModal(false);
+                displayToast('success', `Successfully assigned ${selectedRole} role to ${roleCustomer.ufirstname} ${roleCustomer.ulastname}`);
             } else {
                 console.error('Failed to assign role:', data.message);
+                displayToast('error', `Failed to assign role: ${data.message || 'Unknown error'}`);
             }
         } catch (error) {
             console.error('Error assigning role:', error);
+            displayToast('error', 'Error assigning role. Please try again.');
         }
     };
 
@@ -128,6 +142,8 @@ const Customers = () => {
 
     return (
         <div>
+            {showToast && <Toast type={toastType} message={toastMessage} />}
+            
             <div className="header-container">
                 <h1 className="dashboard-page-title">Customer Details</h1>
                 <SearchBar value={searchKey} onChange={(newValue) => setSearchKey(newValue)} placeholder="Search customers..." />
@@ -148,7 +164,6 @@ const Customers = () => {
                 onClose={() => setSelectedCustomer(null)}
             />
             
-            {/* Role Assignment Modal */}
             {showRoleModal && (
                 <div className="modal-overlay">
                     <div className="modal-container">
