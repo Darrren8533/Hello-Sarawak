@@ -16,7 +16,7 @@ import { FaFacebook } from "react-icons/fa";
 import { AiFillInstagram } from "react-icons/ai";
 
 // Import API function
-import { loginUser } from '../../../../Api/api';
+import { loginUser, forgotPassword, googleLogin } from '../../../../Api/api';
 import { useGoogleLogin } from '@react-oauth/google';
 
 // Import Toast
@@ -35,7 +35,6 @@ const Login = () => {
 
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [email, setEmail] = useState('');
-  const API_URL = import.meta.env.VITE_API_URL;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -101,26 +100,13 @@ const Login = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch(`${API_URL}/forgot-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email }),
-      });
+      const data = await forgotPassword(email);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        displayToast('success', 'New password has been sent to your email');
-        setShowForgotPassword(false);
-        setEmail('');
-      } else {
-        displayToast('error', data.message || 'Reset password failed');
-      }
+      displayToast('success', 'New password has been sent to your email');
+      setShowForgotPassword(false);
+      setEmail('');
     } catch (error) {
-      console.error('Reset password request error:', error);
-      displayToast('error', 'Reset password failed');
+      displayToast('error', error.message || 'Reset password failed');
     }
   };
 
@@ -138,51 +124,40 @@ const Login = () => {
     setShowPassword((prev) => !prev);
   };
 
-  const googleLogin = useGoogleLogin({
+  const googleLoginHandler = useGoogleLogin({
     flow: 'implicit',
     onSuccess: async (tokenResponse) => {
       console.log("Google Login Success:", tokenResponse);
-  
+
       // Store token in localStorage
       localStorage.setItem("googleAccessToken", tokenResponse.access_token);
-  
+
       try {
-        const response = await fetch(`${API_URL}/google-login`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token: tokenResponse.access_token }),
-        });
-  
-        const data = await response.json();
-  
-        if (response.ok && data.success) {
-          localStorage.setItem("isLoggedIn", "true");
-          localStorage.setItem("userid", data.userid);
-          localStorage.setItem("username", data.username);
-          localStorage.setItem("usergroup", data.usergroup);
-          localStorage.setItem("uimage", data.uimage);
-  
-          displayToast("success", "Login successful! Redirecting...");
-  
-          if (data.uactivation === 'Inactive') {
-            displayToast('error', 'Your account is inactive.');
-          } else if (data.usergroup === 'Customer') {
-            setTimeout(() => navigate('/home'), 2000);
-          } else if (data.usergroup === 'Owner') {
-            setTimeout(() => navigate('/owner_dashboard'), 2000);
-          } else if (data.usergroup === 'Moderator') {
-            setTimeout(() => navigate('/moderator_dashboard'), 2000);
-          } else if (data.usergroup === 'Administrator') {
-            setTimeout(() => navigate('/administrator_dashboard'), 2000);
-          } else {
-            displayToast('error', 'Invalid User Group.');
-          }
+        const data = await googleLogin(tokenResponse.access_token);
+
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userid", data.userid);
+        localStorage.setItem("username", data.username);
+        localStorage.setItem("usergroup", data.usergroup);
+        localStorage.setItem("uimage", data.uimage);
+
+        displayToast("success", "Login successful! Redirecting...");
+
+        if (data.uactivation === 'Inactive') {
+          displayToast('error', 'Your account is inactive.');
+        } else if (data.usergroup === 'Customer') {
+          setTimeout(() => navigate('/home'), 2000);
+        } else if (data.usergroup === 'Owner') {
+          setTimeout(() => navigate('/owner_dashboard'), 2000);
+        } else if (data.usergroup === 'Moderator') {
+          setTimeout(() => navigate('/moderator_dashboard'), 2000);
+        } else if (data.usergroup === 'Administrator') {
+          setTimeout(() => navigate('/administrator_dashboard'), 2000);
         } else {
-          displayToast("error", data.message || "Google Login Failed");
+          displayToast('error', 'Invalid User Group.');
         }
       } catch (error) {
-        console.error("Error In Google Login:", error);
-        displayToast("error", "An unexpected error occurred. Please try again.");
+        displayToast("error", error.message || "An unexpected error occurred. Please try again.");
       }
     }
   });
@@ -310,7 +285,7 @@ const Login = () => {
 
             <div class="container_icon">
               <span class="social_button">
-                <FcGoogle class="icon_google" onClick={() => googleLogin()} />
+                <FcGoogle class="icon_google" onClick={() => googleLoginHandler()} />
               </span>
 
               <span class="social_button">
