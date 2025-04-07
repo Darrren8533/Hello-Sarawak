@@ -880,6 +880,7 @@ export const uploadAvatar = async (userid, base64String) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
         },
         body: JSON.stringify({ uimage: base64String }), 
       });
