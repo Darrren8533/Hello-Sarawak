@@ -5,6 +5,7 @@ import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown'
 import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
+import Toast from '../../../../Component/Toast/Toast';
 import { FaEye, FaBan, FaUserTag } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -22,6 +23,9 @@ const Operators = () => {
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [roleOperator, setRoleOperator] = useState(null);
   const [selectedAssignRole, setSelectedAssignRole] = useState('');
+  const [toastMessage, setToastMessage] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [toastType, setToastType] = useState('');
   const API_URL = import.meta.env.VITE_API_URL;
   
   const roles = ['Customer', 'Moderator', 'Administrator'];
@@ -37,6 +41,13 @@ const Operators = () => {
     };
     fetchUsers();
   }, []);
+
+  const displayToast = (type, message) => {
+    setToastType(type);
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 5000);
+  };
 
   const handleApplyFilters = () => {
     setAppliedFilters({ role: selectedRole });
@@ -125,11 +136,14 @@ const Operators = () => {
             : user
         ));
         setShowRoleModal(false);
+        displayToast('success', `Successfully assigned ${selectedAssignRole} role to ${roleOperator.ufirstname} ${roleOperator.ulastname}`);
       } else {
         console.error('Failed to assign role:', data.message);
+        displayToast('error', `Failed to assign role: ${data.message || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error assigning role:', error);
+      displayToast('error', 'Error assigning role. Please try again.');
     }
   };
 
@@ -167,6 +181,8 @@ const Operators = () => {
 
   return (
     <div>
+      {showToast && <Toast type={toastType} message={toastMessage} />}
+      
       <div className="header-container">
         <h1 className="dashboard-page-title">Operator Details</h1>
         <SearchBar
@@ -193,7 +209,6 @@ const Operators = () => {
         onClose={() => setSelectedOperator(null)}
       />
       
-      {/* Role Assignment Modal */}
       {showRoleModal && (
         <div className="modal-overlay">
           <div className="modal-container">
