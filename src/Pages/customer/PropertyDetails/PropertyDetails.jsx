@@ -10,7 +10,7 @@ import Toast from '../../../Component/Toast/Toast';
 import Footer from '../../../Component/Footer/footer';
 import Reviews from "../../../Component/Reviews/Reviews";
 import './PropertyDetails.css';
-import { createReservation, requestBooking } from '../../../../Api/api';
+import { createReservation, requestBooking, fetchUserData } from '../../../../Api/api';
 
 const facilities = [
     { name: "Wi-Fi", icon: <FaWifi className="facilities-icon"/> },
@@ -241,12 +241,7 @@ const PropertyDetails = () => {
     if (!userid) return;
 
     try {
-      const response = await fetch(`https://cams-backend.vercel.app/getUserInfo/${userid}`);
-      if (!response.ok) {
-        throw new Error('Failed to get user information');
-      }
-
-      const userData = await response.json();
+      const userData = await fetchUserData(userid);
       console.log('User information:', userData); 
       
       setBookingForm(prev => ({
@@ -418,8 +413,8 @@ const PropertyDetails = () => {
                   <h2 className="property-font">Description</h2>
                   <div className="property-description">
                     <p>
-                      {description.length > 100 ? `${description.slice(0, 100)}...` : description}
-                      {description.length > 100 && (
+                      {description.length > 20 ? `${description.slice(0, 20)}...` : description}
+                      {description.length > 20 && (
                         <button className="show-more-btn" onClick={() => setShowDescriptionOverlay(true)}>
                           Show more
                         </button>
