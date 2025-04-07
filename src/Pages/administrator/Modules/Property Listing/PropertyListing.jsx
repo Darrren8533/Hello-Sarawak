@@ -204,7 +204,6 @@ const PropertyListing = () => {
             options: [
                 { value: 'All', label: 'All Statuses' },
                 { value: 'Pending', label: 'Pending' },
-                { value: 'Reserved', label: 'Reserved' },
                 { value: 'Available', label: 'Available' },
                 { value: 'Unavailable', label: 'Unavailable' },
             ],
@@ -330,7 +329,7 @@ const columns = [
         ),
     },
     { header: 'Name', accessor: 'propertyaddress' },
-    { header: 'Price', accessor: 'rateamount' },
+    { header: 'Price(RM)', accessor: 'rateamount' },
     { header: 'Cluster', accessor: 'clustername' },
     {
         header: 'Status',
