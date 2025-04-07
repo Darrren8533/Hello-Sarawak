@@ -384,3 +384,105 @@
     height: 200px;
   }
 }
+
+.cluster-selector {
+  position: relative;
+  width: 100%;
+  font-family: 'Inter', sans-serif;
+}
+
+.cluster-selector-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cluster-selector-header:hover {
+  border-color: #CC8C18;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.cluster-label {
+  color: #1f2937;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.cluster-icon {
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.cluster-options {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 
+              0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 50;
+  animation: slideDown 0.2s ease-out;
+}
+
+.cluster-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.cluster-option:hover {
+  background-color: #f9fafb;
+}
+
+.cluster-option.selected {
+  background-color: #FDF6EC;
+  color: #CC8C18;
+}
+
+.cluster-name {
+  font-size: 0.95rem;
+}
+
+.check-icon {
+  color: #CC8C18;
+  font-size: 1rem;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 响应式设计 */
+@media (max-width: 640px) {
+  .cluster-selector-header {
+    padding: 10px 14px;
+  }
+  
+  .cluster-label {
+    font-size: 0.9rem;
+  }
+  
+  .cluster-options {
+    max-height: 250px;
+  }
+}
