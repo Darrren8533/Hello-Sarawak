@@ -5,7 +5,7 @@ import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown'
 import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
-import { FaEye, FaBan } from 'react-icons/fa';
+import { FaEye, FaBan, FaUserTag } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
@@ -19,6 +19,12 @@ const Operators = () => {
   const [selectedRole, setSelectedRole] = useState('All');
   const [appliedFilters, setAppliedFilters] = useState({ role: 'All' });
   const [selectedOperator, setSelectedOperator] = useState(null);
+  const [showRoleModal, setShowRoleModal] = useState(false);
+  const [roleOperator, setRoleOperator] = useState(null);
+  const [selectedAssignRole, setSelectedAssignRole] = useState('');
+  const API_URL = import.meta.env.VITE_API_URL;
+  
+  const roles = ['Customer', 'Moderator', 'Administrator'];
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -85,11 +91,51 @@ const Operators = () => {
         ucountry: user.ucountry || 'N/A',
       };
       setSelectedOperator(essentialFields);
+    } else if (action === 'assignRole') {
+      setRoleOperator(user);
+      setSelectedAssignRole(user.usergroup || 'Moderator');
+      setShowRoleModal(true);
+    }
+  };
+
+  const handleRoleChange = (e) => {
+    setSelectedAssignRole(e.target.value);
+  };
+
+  const handleRoleSubmit = async () => {
+    try {
+      const response = await fetch(`${API_URL}/users/assignRole`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userid: roleOperator.userid,
+          role: selectedAssignRole
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        // Update local state
+        setUsers(users.map(user => 
+          user.userid === roleOperator.userid 
+            ? {...user, usergroup: selectedAssignRole} 
+            : user
+        ));
+        setShowRoleModal(false);
+      } else {
+        console.error('Failed to assign role:', data.message);
+      }
+    } catch (error) {
+      console.error('Error assigning role:', error);
     }
   };
 
   const operatorDropdownItems = [
     { label: 'View Operator', icon: <FaEye />, action: 'view' },
+    { label: 'Assign Role', icon: <FaUserTag />, action: 'assignRole' },
   ];
 
   const columns = [
@@ -146,6 +192,49 @@ const Operators = () => {
         labels={displayLabels}
         onClose={() => setSelectedOperator(null)}
       />
+      
+      {/* Role Assignment Modal */}
+      {showRoleModal && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <h2>Assign Role to {roleOperator?.ufirstname} {roleOperator?.ulastname}</h2>
+              <button className="close-button" onClick={() => setShowRoleModal(false)}>×</button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group">
+                <label htmlFor="role" className="role-label">Select Role:</label>
+                <select 
+                  id="role" 
+                  value={selectedAssignRole} 
+                  onChange={handleRoleChange}
+                  className="role-select"
+                >
+                  {roles.map(role => (
+                    <option key={role} value={role}>{role}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <div className="button-group">
+                <button 
+                  className="cancel-button" 
+                  onClick={() => setShowRoleModal(false)}
+                >
+                  Cancel
+                </button>
+                <button 
+                  className="assign-button" 
+                  onClick={handleRoleSubmit}
+                >
+                  Assign Role
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
