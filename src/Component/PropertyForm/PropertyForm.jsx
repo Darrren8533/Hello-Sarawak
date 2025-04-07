@@ -138,11 +138,38 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const fileInputRef = useRef(null);
 
     useEffect(() => {
+        if (initialData?.facilities) {
+          const selected = initialData.facilities.split(',').map(f => f.trim());
+          setSelectedFacilities(selected);
+        }
+    }, [initialData]);
+      
+
+    useEffect(() => {
+        console.log("Initial Data:", initialData);
+        
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
             setFormData((prev) => ({ ...prev, username: storedUsername }));
         }
+    
         if (initialData) {
+            // Parse facilities - handle all possible cases
+            let facilitiesArray = [];
+            
+            if (initialData.facilities) {
+                if (typeof initialData.facilities === 'string') {
+                    // Handle empty string case
+                    facilitiesArray = initialData.facilities.trim() 
+                        ? initialData.facilities.split(",").map(facility => facility.trim())
+                        : [];
+                } else if (Array.isArray(initialData.facilities)) {
+                    facilitiesArray = initialData.facilities;
+                }
+            }
+            
+            console.log("Parsed facilities array:", facilitiesArray);
+    
             setFormData({
                 username: initialData.username || "",
                 propertyPrice: initialData.rateamount || "",
@@ -151,12 +178,17 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 propertyBedType: initialData.propertybedtype || "1",
                 propertyGuestPaxNo: initialData.propertyguestpaxno || "1",
                 propertyDescription: initialData.propertydescription || "",
-                facilities: initialData.facilities || [],
+                facilities: facilitiesArray,
                 propertyImage: initialData.propertyimage || [],
                 clusterName: initialData.clustername || "",
                 categoryName: initialData.categoryname || "",
             });
-            setSelectedFacilities(initialData.facilities || []);
+    
+            // Set the selected facilities
+            setSelectedFacilities(facilitiesArray);
+            console.log("Facilities from API:", initialData.facilities);
+console.log("Parsed facilities:", facilitiesArray);
+console.log("Selected facilities state:", selectedFacilities);
         }
     }, [initialData]);
 
@@ -344,13 +376,12 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         </select>
                     </div>
                     <div className="property-listing-form-group">
-                        <label>Property Price:</label>
+                        <label>Property Price (RM):</label>
                         <input
                             type="number"
                             name="propertyPrice"
                             value={formData.propertyPrice}
                             onChange={handleChange}
-                            step="0.01"
                             min="0"
                             required
                         />
@@ -405,7 +436,10 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                                 .filter((facility) => !selectedFacilities.includes(facility.name))
                                 .map((facility) => (
                                     <div
-                                        key={facility.name}
+                                        value={facility.name}
+                                        type="checkbox"
+                                        checked={selectedFacilities.includes(facility.name)}
+                                        onChange={handleChange}   
                                         className="facility-item"
                                         onClick={() => toggleFacility(facility.name)}
                                     >

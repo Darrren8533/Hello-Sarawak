@@ -54,35 +54,31 @@ const PropertyListing = () => {
         setTimeout(() => setShowToast(false), 5000);
     };
 
-    // React Query mutation for accepting property
+    // React Query mutation for accepting property (enabling)
     const acceptMutation = useMutation({
         mutationFn: async (propertyId) => {
             await propertyListingAccept(propertyId);
             return updatePropertyStatus(propertyId, 'Available');
         },
         onSuccess: (_, propertyId) => {
-            displayToast('success', 'Property Listing Request Accepted Successfully');
             queryClient.invalidateQueries({ queryKey: ['properties'] });
         },
         onError: (error) => {
             console.error('Failed to accept property', error);
-            displayToast('error', 'Failed to accept property listing request');
         }
     });
 
-    // React Query mutation for rejecting property
+    // React Query mutation for rejecting property (disabling)
     const rejectMutation = useMutation({
         mutationFn: async (propertyId) => {
             await propertyListingReject(propertyId);
             return updatePropertyStatus(propertyId, 'Unavailable');
         },
         onSuccess: (_, propertyId) => {
-            displayToast('success', 'Property Listing Request Rejected Successfully');
             queryClient.invalidateQueries({ queryKey: ['properties'] });
         },
         onError: (error) => {
             console.error('Failed to reject property', error);
-            displayToast('error', 'Failed to reject property listing request');
         }
     });
 
@@ -97,7 +93,6 @@ const PropertyListing = () => {
         },
         onError: (error) => {
             console.error('Failed to delete property', error);
-            displayToast('error', 'Failed to delete property. Please try again.');
         },
         onSettled: () => {
             setIsDialogOpen(false);
@@ -106,36 +101,53 @@ const PropertyListing = () => {
     });
 
     const handleAction = async (action, property) => {
-       if (action === 'view') {
-        setSelectedProperty({
-            propertyname: property.propertyaddress || 'N/A',
-            clustername: property.clustername || 'N/A',
-            categoryname: property.categoryname || 'N/A',
-            propertyprice: property.rateamount || 'N/A',
-            propertylocation: property.nearbylocation || 'N/A',
-            propertyguestpaxno: property.propertyguestpaxno || 'N/A',
-            propertystatus: property.propertystatus || 'N/A',
-            propertybedtype: property.propertybedtype || 'N/A',
-            propertydescription: property.propertydescription || 'N/A',
-            images: property.propertyimage || [],
-            username: property.username || 'N/A',
-        });
-    } else if (action === 'edit') {
-        setEditProperty({ ...property });
-        setIsPropertyFormOpen(true);
-    } else if (action === 'accept') {
-        acceptMutation.mutate(property.propertyid);
-    } else if (action === 'reject') {
-        rejectMutation.mutate(property.propertyid);
-    } else if (action === 'delete') {
-        if (property.propertystatus === 'Unavailable' && property.username === username) {
-            setPropertyToDelete(property.propertyid);
-            setIsDialogOpen(true);
-        } else {
-            displayToast('error', 'You do not have permission to delete this property.');
+        try {
+            if (action === 'view') {
+                setSelectedProperty({
+                    propertyname: property.propertyaddress || 'N/A',
+                    clustername: property.clustername || 'N/A',
+                    categoryname: property.categoryname || 'N/A',
+                    propertyprice: property.rateamount || 'N/A',
+                    propertylocation: property.nearbylocation || 'N/A',
+                    propertyguestpaxno: property.propertyguestpaxno || 'N/A',
+                    propertystatus: property.propertystatus || 'N/A',
+                    propertybedtype: property.propertybedtype || 'N/A',
+                    propertydescription: property.propertydescription || 'N/A',
+                    images: property.propertyimage || [],
+                    username: property.username || 'N/A',
+                });
+            } else if (action === 'edit') {
+                if (property.propertystatus === 'Available') {
+                    displayToast('error', 'You need to disable the property first before editing.');
+                    return;
+                }
+                setEditProperty({ ...property });
+                setIsPropertyFormOpen(true);
+            } else if (action === 'accept') {
+                await acceptMutation.mutateAsync(property.propertyid);
+                displayToast('success', 'Property Accepted Successfully');
+            } else if (action === 'reject') {
+                await rejectMutation.mutateAsync(property.propertyid);
+                displayToast('success', 'Property Rejected Successfully');
+            } else if (action === 'enable') {
+                await acceptMutation.mutateAsync(property.propertyid);
+                displayToast('success', 'Property Enabled Successfully');
+            } else if (action === 'disable') {
+                await rejectMutation.mutateAsync(property.propertyid);
+                displayToast('success', 'Property Disabled Successfully');
+            } else if (action === 'delete') {
+                if (property.propertystatus === 'Unavailable' && property.username === username) {
+                    setPropertyToDelete(property.propertyid);
+                    setIsDialogOpen(true);
+                } else {
+                    displayToast('error', 'You do not have permission to delete this property.');
+                }
+            } 
+        } catch (error) {
+            console.error('Error handling action:', error);
+            displayToast('error', 'An error occurred while processing your request.');
         }
-    }
-};
+    };
     
     const handleDeleteProperty = async () => {
         try {
@@ -238,6 +250,7 @@ const PropertyListing = () => {
         } else if (propertystatus === 'Available') {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
+                { label: 'Edit', icon: <FaEdit />, action: 'edit' },
             ];
         } else if (propertystatus === 'Unavailable') {
             return [
@@ -263,12 +276,12 @@ const PropertyListing = () => {
             } else if (propertystatus === 'Available') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Reject', icon: <FaTimes />, action: 'reject' },
+                    { label: 'Disable', icon: <FaTimes />, action: 'disable' },
                 ];
             } else if (propertystatus === 'Unavailable') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Accept', icon: <FaCheck />, action: 'accept' },
+                    { label: 'Enable', icon: <FaCheck />, action: 'enable' },
                 ];
             }
         } else {
@@ -276,13 +289,14 @@ const PropertyListing = () => {
             if (propertystatus === 'Available') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Reject', icon: <FaTimes />, action: 'reject' },
+                    { label: 'Edit', icon: <FaEdit />, action: 'edit' },
+                    { label: 'Disable', icon: <FaTimes />, action: 'disable' },
                 ];
             } else if (propertystatus === 'Unavailable') {
                 return [
                     { label: 'View Details', icon: <FaEye />, action: 'view' },
                     { label: 'Edit', icon: <FaEdit />, action: 'edit' },
-                    { label: 'Accept', icon: <FaCheck />, action: 'accept' },
+                    { label: 'Enable', icon: <FaCheck />, action: 'enable' },
                     { label: 'Delete', icon: <FaTrash />, action: 'delete' },
                 ];
             }
@@ -315,7 +329,7 @@ const columns = [
         ),
     },
     { header: 'Name', accessor: 'propertyaddress' },
-    { header: 'Price', accessor: 'rateamount' },
+    { header: 'Price(RM)', accessor: 'rateamount' },
     { header: 'Cluster', accessor: 'clustername' },
     {
         header: 'Status',
