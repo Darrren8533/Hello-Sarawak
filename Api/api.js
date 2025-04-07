@@ -562,7 +562,7 @@ export const createReservation = async (reservationData) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('服务器返回错误:', {
+      console.error('server error:', {
         status: response.status,
         statusText: response.statusText,
         errorData: errorData,
@@ -896,4 +896,49 @@ export const uploadAvatar = async (userid, base64String) => {
     }
   };
 
+// Forgot Password
+export const forgotPassword = async (email) => {
+    try {
+        const response = await fetch(`${API_URL}/forgot-password`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || 'Reset password failed');
+        }
+
+        return data; 
+    } catch (error) {
+        console.error('Reset password request error:', error);
+        throw error; 
+    }
+};
+
+// Google Login
+export const googleLogin = async (token) => {
+    try {
+        const response = await fetch(`${API_URL}/google-login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ token }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message || "Google Login Failed");
+        }
+
+        return data;
+    } catch (error) {
+        console.error("Error in Google Login:", error);
+        throw error; 
+    }
+};
 
