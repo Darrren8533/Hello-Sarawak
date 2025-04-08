@@ -11,6 +11,7 @@ import BooknPayLog from './Modules/BooknPay Log/BooknPayLog';
 import Finance from './Modules/Finance/Finances';
 import NoAccess from '../../Component/NoAccess/NoAccess';
 import Profile from './Modules/Profile/Profile';
+import AuditTrails from './Modules/Audit Trails/AuditTrails';
 import { FiHome, FiUsers, FiCalendar } from 'react-icons/fi';
 import { GoLog } from "react-icons/go";
 import { FaUserTie, FaHotel } from 'react-icons/fa';
@@ -65,6 +66,7 @@ import '../../Component/MainContent/MainContent.css';
     { path: '/administrator_dashboard/booknpay-log', label: 'BooknPayLog', icon: <GoLog /> },
     { path: '/administrator_dashboard/finance', label: 'Finance', icon: <VscGraphLine /> },
     { path: '/administrator_dashboard/profile', label: 'Profile', icon: <CgProfile /> },
+    { path: '/administrator_dashboard/audit-trails', label: 'AuditTrails', icon: <GoLog /> },
   ];
 
   const handleLogout = () => {
