@@ -64,9 +64,9 @@ import '../../Component/MainContent/MainContent.css';
     { path: '/administrator_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel />},
     { path: '/administrator_dashboard/reservations', label: 'Reservation', icon: <FiCalendar /> },
     { path: '/administrator_dashboard/booknpay-log', label: 'BooknPayLog', icon: <GoLog /> },
+    { path: '/administrator_dashboard/audit-trails', label: 'AuditTrails', icon: <GoLog /> },
     { path: '/administrator_dashboard/finance', label: 'Finance', icon: <VscGraphLine /> },
     { path: '/administrator_dashboard/profile', label: 'Profile', icon: <CgProfile /> },
-    { path: '/administrator_dashboard/audit-trails', label: 'AuditTrails', icon: <GoLog /> },
   ];
 
   const handleLogout = () => {
@@ -93,6 +93,7 @@ import '../../Component/MainContent/MainContent.css';
           <Route path="customers" element={<Customers />} />
           <Route path="reservations" element={<Reservations />} />
           <Route path="booknpay-log" element={<BooknPayLog />} />
+          <Route path="audit-trails" element={<AuditTrails />} />
           <Route path="finance" element={<Finance />} />
           <Route path="profile" element={<Profile />} /> 
           <Route path="*" element={<NoAccess />} />
