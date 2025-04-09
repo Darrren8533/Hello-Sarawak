@@ -6,9 +6,11 @@ import PropertyListing from './Modules/Property Listing/PropertyListing';
 import Reservations from './Modules/Reservations/Reseravtions';
 import NoAccess from '../../Component/NoAccess/NoAccess';
 import Profile from './Modules/Profile/Profile';
+import Profile from './Modules/Audit Trails/AuditTrails';
 import { FiCalendar, FiHome, FiUsers } from 'react-icons/fi';
 import { CgProfile } from "react-icons/cg";
 import { FaHotel } from 'react-icons/fa';
+import { MdHistory } from "react-icons/md";
 import '../../Component/MainContent/MainContent.css';
 
   const ModeratorDashboard = () => {
@@ -51,6 +53,7 @@ import '../../Component/MainContent/MainContent.css';
     { path: '/moderator_dashboard/dashboard', label: 'Dashboard', icon: <FiHome /> },
     { path: '/moderator_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel /> },
     { path: '/moderator_dashboard/reservations', label: 'Reservations', icon: <FiCalendar /> },
+    { path: '/moderator_dashboard/audit-trails', label: 'AuditTrails', icon: <MdHistory /> },
     { path: '/moderator_dashboard/profile', label: 'Profile', icon: <CgProfile /> },
   ];
 
@@ -74,6 +77,7 @@ import '../../Component/MainContent/MainContent.css';
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="property-listing" element={<PropertyListing />} />
           <Route path="reservations" element={<Reservations/>} />
+          <Route path="audit-trails" element={<AuditTrails />} />
           <Route path="profile" element={<Profile />} />
           <Route path="*" element={<NoAccess />} />
         </Routes>
