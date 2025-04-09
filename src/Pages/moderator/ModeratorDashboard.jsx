@@ -6,7 +6,7 @@ import PropertyListing from './Modules/Property Listing/PropertyListing';
 import Reservations from './Modules/Reservations/Reseravtions';
 import NoAccess from '../../Component/NoAccess/NoAccess';
 import Profile from './Modules/Profile/Profile';
-import Profile from './Modules/Audit Trails/AuditTrails';
+import AuditTrails from './Modules/Audit Trails/AuditTrails';
 import { FiCalendar, FiHome, FiUsers } from 'react-icons/fi';
 import { CgProfile } from "react-icons/cg";
 import { FaHotel } from 'react-icons/fa';
