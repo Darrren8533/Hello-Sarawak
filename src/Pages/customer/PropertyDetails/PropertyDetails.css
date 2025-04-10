@@ -1005,6 +1005,7 @@
     transition: all 0.3s ease;
     margin-top: 20px;
     justify-content: center;
+    overflow: hidden;
 }
 
 .photo-section img:hover {
