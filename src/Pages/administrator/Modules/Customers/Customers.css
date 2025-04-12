@@ -230,10 +230,10 @@
 
 .status-dot {
     position: absolute;
-    bottom: 3;
+    bottom: 0;
     right: 0;
-    width: 15px;
-    height: 15px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     border: 2px solid white;
   }
