@@ -27,11 +27,16 @@ ChartJS.register(
 
 export default function FinancialDashboard() {
   const [chartType, setChartType] = useState("revenue");
+  const userid = localStorage.getItem('userid');
 
-  // React Query hooks for data fetching
-  const { data: financeData, isLoading: financeLoading, error: financeError } = useQuery({
-    queryKey: ['finance'],
-    queryFn: fetchFinance
+  const {
+    data: financeData,
+    isLoading: financeLoading,
+    error: financeError
+  } = useQuery({
+    queryKey: ['finance', userid], 
+    queryFn: () => fetchFinance(userid),
+    enabled: !!userID
   });
 
   const { data: occupancyData } = useQuery({
