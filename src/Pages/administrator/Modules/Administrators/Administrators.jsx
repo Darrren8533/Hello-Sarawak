@@ -22,7 +22,7 @@ const Administrators = () => {
   const [selectedOperator, setSelectedOperator] = useState(null);
 
   // Fetch administrators using React Query
-  const { data: administrators = [], isLoading, error } = useQuery({
+  const { data: administrator = [], isLoading, error } = useQuery({
     queryKey: ['administrators'],
     queryFn: fetchAdministrators,
     staleTime: 30 * 60 * 1000,
@@ -48,7 +48,7 @@ const Administrators = () => {
   ];
 
   const displayLabels = {
-    administratorsid: 'administrators ID',
+    userid: 'ID',
     ufirstname: 'First Name',
     ulastname: 'Last Name',
     uemail: 'Email',
@@ -58,30 +58,30 @@ const Administrators = () => {
     ucountry: 'Country',
   };
 
-  // Filtering administrators based on search key and status
-  const filteredadministratorss = administrators.filter((administrators) => {
+  // Filtering users based on search key and status
+  const filteredUsers = administrator.filter((user) => {
     const searchInFields =
-      `${administrators.administratorsid} ${administrators.ufirstname} ${administrators.ulastname} ${administrators.uemail} ${administrators.uphoneno} ${administrators.uactivation}`
+      `${administrator.userid} ${administrator.ufirstname} ${administrator.ulastname} ${administrator.uemail} ${administrator.uphoneno} ${user.uactivation}`
         .toLowerCase()
         .includes(searchKey.toLowerCase());
 
     const statusFilter =
-      appliedFilters.status === 'All' || administrators.uactivation === appliedFilters.status;
+      appliedFilters.status === 'All' || administrator.uactivation === appliedFilters.status;
 
     return searchInFields && statusFilter;
   });
 
-  const handleAction = (action, administrators) => {
+  const handleAction = (action, administrator) => {
     if (action === 'view') {
       const essentialFields = {
-        administratorsid: administrators.administratorsid || 'N/A',
-        ufirstname: administrators.ufirstname || 'N/A',
-        ulastname: administrators.ulastname || 'N/A',
-        uemail: administrators.uemail || 'N/A',
-        uphoneno: administrators.uphoneno || 'N/A',
-        uactivation: administrators.uactivation || 'N/A',
-        ugender: administrators.ugender || 'N/A',
-        ucountry: administrators.ucountry || 'N/A',
+        userid: administrator.userid || 'N/A',
+        ufirstname: administrator.ufirstname || 'N/A',
+        ulastname: administrator.ulastname || 'N/A',
+        uemail: administrator.uemail || 'N/A',
+        uphoneno: administrator.uphoneno || 'N/A',
+        uactivation: administrator.uactivation || 'N/A',
+        ugender: administrator.ugender || 'N/A',
+        ucountry: administrator.ucountry || 'N/A',
       };
       setSelectedOperator(essentialFields);
     }
@@ -90,20 +90,20 @@ const Administrators = () => {
   const operatorDropdownItems = [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
 
   const columns = [
-    { header: 'ID', accessor: 'administratorsid' },
+    { header: 'ID', accessor: 'userid' },
     {
       header: 'Administrator',
       accessor: 'administrator',
-      render: (administrators) => (
-        <div className="administrator-container">
+      render: (administrator) => (
+        <div className="user-container">
           <div className="avatar-container">
-            {administrators.uimage && administrators.uimage.length > 0 ? (
+            {administrator.uimage && administrator.uimage.length > 0 ? (
               <img
-                src={`data:image/jpeg;base64,${administrators.uimage}`}
-                alt={`${administrators.ufirstname} ${administrators.ulastname}`}
-                className="administrator-avatar"
+                src={`data:image/jpeg;base64,${administrator.uimage}`}
+                alt={`${administrator.ufirstname} ${administrator.ulastname}`}
+                className="table-user-avatar"
                 onError={(e) => {
-                  console.error(`Failed to load avatar for admin ${administrators.administratorsid}:`, administrators.uimage);
+                  console.error(`Failed to load avatar for admin ${administrator.userid}:`, administrator.uimage);
                   e.target.src = '/public/avatar.png';
                 }}
               />
@@ -116,13 +116,13 @@ const Administrators = () => {
             )}
             <span
               className={`status-dot ${
-                administrators.ustatus === 'login' ? 'status-login' :
-                administrators.ustatus === 'registered' ? 'status-registered' :
+                administrator.ustatus === 'login' ? 'status-login' :
+                administrator.ustatus === 'registered' ? 'status-registered' :
                 'status-logout'
               }`}
             />
           </div>
-          <span className="administrator-administratorsname">{`${administrators.ufirstname} ${administrators.ulastname}` || 'N/A'}</span>
+          <span className="table-user-username">{`${administrator.ufirstname} ${administrator.ulastname}` || 'N/A'}</span>
         </div>
       ),
     },
@@ -131,9 +131,9 @@ const Administrators = () => {
     {
       header: 'Status',
       accessor: 'uactivation',
-      render: (administrators) => (
-        <span className={`status-badge ${administrators.uactivation?.toLowerCase() || 'active'}`}>
-          {administrators.uactivation || 'Active'}
+      render: (user) => (
+        <span className={`status-badge ${user.uactivation?.toLowerCase() || 'active'}`}>
+          {user.uactivation || 'Active'}
         </span>
       ),
     },
@@ -170,7 +170,7 @@ const Administrators = () => {
       ) : error ? (
         <p className="error-message">Failed to load administrators: {error.message}</p>
       ) : (
-        <PaginatedTable data={filteredadministratorss} columns={columns} rowKey="administratorsid" enableCheckbox={false} />
+        <PaginatedTable data={filteredUsers} columns={columns} rowKey="userid" enableCheckbox={false} />
       )}
 
       <Modal
