@@ -4,17 +4,24 @@
   color: #333; 
   font-weight: bold;
   font-size: 12px; 
+  display: inline-block;
 }
 
 .administrator {
   background-color: #C1F0C1; 
-  color: #333; 
+  color: #2E7D32; 
 }
 
 .moderator {
   background-color: #FFE9A3; 
-  color: #333; 
+  color: #FF8C00; 
 }
+
+.customer {
+  background-color: #ADD8E6; 
+  color: #1E3A8A; 
+}
+
 
 /* Role Assignment Modal Styles */
 .modal-overlay {
