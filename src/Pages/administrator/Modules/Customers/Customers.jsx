@@ -26,8 +26,10 @@ const Customers = () => {
     const [showToast, setShowToast] = useState(false);
     const [toastType, setToastType] = useState('');
 
+    // Initialize QueryClient
     const queryClient = useQueryClient();
 
+    // Fetch customers query
     const { data: customers = [], isLoading } = useQuery({
         queryKey: ['customers'],
         queryFn: fetchCustomers,
@@ -37,6 +39,7 @@ const Customers = () => {
         }
     });
 
+    // Define mutations
     const suspendMutation = useMutation({
         mutationFn: (userId) => suspendUser(userId),
         onSuccess: (_, userId) => {
@@ -44,7 +47,7 @@ const Customers = () => {
                 oldData.map(c => c.userid === userId ? { ...c, uactivation: 'Inactive' } : c)
             );
             const customer = customers.find(c => c.userid === userId);
-            displayToast('success', `User ${customer.username} has been suspended.`);
+            displayToast('success', `User ${customer.ufirstname} ${customer.ulastname} has been suspended.`);
         },
         onError: (error) => {
             console.error('Failed to suspend user:', error);
@@ -59,7 +62,7 @@ const Customers = () => {
                 oldData.map(c => c.userid === userId ? { ...c, uactivation: 'Active' } : c)
             );
             const customer = customers.find(c => c.userid === userId);
-            displayToast('success', `User ${customer.username} has been activated.`);
+            displayToast('success', `User ${customer.ufirstname} ${customer.ulastname} has been activated.`);
         },
         onError: (error) => {
             console.error('Failed to activate user:', error);
@@ -85,7 +88,7 @@ const Customers = () => {
             (customer) =>
                 (appliedFilters.status === 'All' || customer.uactivation === appliedFilters.status) &&
                 (
-                    `${customer.username} ${customer.uemail} ${customer.uactivation}`
+                    `${customer.ufirstname} ${customer.ulastname} ${customer.uemail} ${customer.uphoneno} ${customer.uactivation}`
                         .toLowerCase()
                         .includes(searchKey.toLowerCase())
                 )
@@ -108,8 +111,10 @@ const Customers = () => {
     ];
 
     const displayLabels = {
-        username: 'Username',
+        firstname: 'First Name',
+        lastname: 'Last Name',
         email: 'Email',
+        phoneno: 'Phone Number',
         uactivation: 'Status', 
         gender: 'Gender',
         country: 'Country',
@@ -118,8 +123,10 @@ const Customers = () => {
     const handleAction = async (action, customer) => {
         if (action === 'view') {
             const essentialFields = {
-                username: customer.username || 'N/A',
+                firstname: customer.ufirstname || 'N/A',
+                lastname: customer.ulastname || 'N/A',
                 email: customer.uemail || 'N/A',
+                phoneno: customer.uphoneno || 'N/A',
                 gender: customer.ugender || 'N/A',
                 country: customer.ucountry || 'N/A',
             };
@@ -152,33 +159,10 @@ const Customers = () => {
     };
 
     const columns = [
-        {
-            header: 'Avatar',
-            accessor: 'uimage',
-            render: (customer) => (
-                <div className="avatar-container">
-                    <img 
-                        src={customer.uimage || 'default-avatar.png'} 
-                        alt="Avatar" 
-                        className="customer-avatar"
-                    />
-                    <span 
-                        className={`status-dot ${customer.ustatus === 'login' ? 'status-login' : 'status-logout'}`}
-                    />
-                </div>
-            ),
-        },
-        { header: 'Username', accessor: 'username' },
+        { header: 'First Name', accessor: 'ufirstname' },
+        { header: 'Last Name', accessor: 'ulastname' },
         { header: 'Email', accessor: 'uemail' },
-        {
-            header: 'Login Status',
-            accessor: 'ustatus',
-            render: (customer) => (
-                <span className={`status-badge ${customer.ustatus?.toString()?.toLowerCase()}`}>
-                    {customer.ustatus || 'Unknown'}
-                </span>
-            ),
-        },
+        { header: 'Phone', accessor: 'uphoneno' },
         {
             header: 'Status',
             accessor: 'uactivation',
@@ -224,7 +208,7 @@ const Customers = () => {
 
             <Modal
                 isOpen={!!selectedCustomer}
-                title={selectedCustomer?.username}
+                title={`${selectedCustomer?.firstname} ${selectedCustomer?.lastname}`}
                 data={selectedCustomer || {}}
                 labels={displayLabels}
                 onClose={() => setSelectedCustomer(null)}
