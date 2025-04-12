@@ -19,24 +19,24 @@ import '../../../../Component/SearchBar/SearchBar.css';
 import '../Moderators/Moderators.css';
 
 const Moderators = () => {
-  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [filteredModerators, setFilteredModerators] = useState([]);
   const [searchKey, setSearchKey] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('All');
   const [appliedFilters, setAppliedFilters] = useState({ status: 'All' });
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [editUser, setEditUser] = useState(null);
+  const [selectedModerator, setSelectedModerator] = useState(null);
+  const [editModerator, setEditModerator] = useState(null);
   const [isModeratorFormOpen, setIsModeratorFormOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [userToDelete, setUserToDelete] = useState(null);
+  const [moderatorToDelete, setModeratorToDelete] = useState(null);
 
   // Initialize QueryClient
   const queryClient = useQueryClient();
 
   // Fetch moderators query
-  const { data: users = [], isLoading } = useQuery({
+  const { data: moderators = [], isLoading } = useQuery({
     queryKey: ['moderators'],
     queryFn: fetchModerators,
     staleTime: 30 * 60 * 1000,
@@ -45,57 +45,57 @@ const Moderators = () => {
 
   // Define mutations
   const suspendMutation = useMutation({
-    mutationFn: (userId) => suspendUser(userId),
-    onSuccess: (_, userId) => {
+    mutationFn: (moderatorId) => suspendUser(moderatorId),
+    onSuccess: (_, moderatorId) => {
       queryClient.setQueryData(['moderators'], (oldData) =>
-        oldData.map(u => u.userid === userId ? { ...u, uactivation: 'Inactive' } : u)
+        oldData.map(m => m.userid === moderatorId ? { ...m, uactivation: 'Inactive' } : m)
       );
-      const user = users.find(u => u.userid === userId);
-      displayToast('success', `User ${user.ufirstname} ${user.ulastname} has been suspended.`);
+      const moderator = moderators.find(m => m.userid === moderatorId);
+      displayToast('success', `Moderator ${moderator.ufirstname} ${moderator.ulastname} has been suspended.`);
     },
     onError: (error) => {
-      console.error('Failed to suspend user:', error);
-      displayToast('error', 'Error suspending user');
+      console.error('Failed to suspend moderator:', error);
+      displayToast('error', 'Error suspending moderator');
     }
   });
 
   const activateMutation = useMutation({
-    mutationFn: (userId) => activateUser(userId),
-    onSuccess: (_, userId) => {
+    mutationFn: (moderatorId) => activateUser(moderatorId),
+    onSuccess: (_, moderatorId) => {
       queryClient.setQueryData(['moderators'], (oldData) =>
-        oldData.map(u => u.userid === userId ? { ...u, uactivation: 'Active' } : u)
+        oldData.map(m => m.userid === moderatorId ? { ...m, uactivation: 'Active' } : m)
       );
-      const user = users.find(u => u.userid === userId);
-      displayToast('success', `User ${user.ufirstname} ${user.ulastname} has been activated.`);
+      const moderator = moderators.find(m => m.userid === moderatorId);
+      displayToast('success', `Moderator ${moderator.ufirstname} ${moderator.ulastname} has been activated.`);
     },
     onError: (error) => {
-      console.error('Failed to activate user:', error);
-      displayToast('error', 'Error activating user');
+      console.error('Failed to activate moderator:', error);
+      displayToast('error', 'Error activating moderator');
     }
   });
 
   const removeMutation = useMutation({
-    mutationFn: (userId) => removeUser(userId),
-    onSuccess: (_, userId) => {
+    mutationFn: (moderatorId) => removeUser(moderatorId),
+    onSuccess: (_, moderatorId) => {
       queryClient.setQueryData(['moderators'], (oldData) =>
-        oldData.filter(u => u.userid !== userId)
+        oldData.filter(m => m.userid !== moderatorId)
       );
-      const user = users.find(u => u.userid === userId);
-      displayToast('success', `User ${user.ufirstname} ${user.ulastname} removed successfully.`);
+      const moderator = moderators.find(m => m.userid === moderatorId);
+      displayToast('success', `Moderator ${moderator.ufirstname} ${moderator.ulastname} removed successfully.`);
       setIsDialogOpen(false);
-      setUserToDelete(null);
+      setModeratorToDelete(null);
     },
     onError: (error) => {
-      console.error('Error removing user:', error);
-      displayToast('error', 'Failed to remove user.');
+      console.error('Error removing moderator:', error);
+      displayToast('error', 'Failed to remove moderator.');
       setIsDialogOpen(false);
-      setUserToDelete(null);
+      setModeratorToDelete(null);
     }
   });
 
   useEffect(() => {
     applyFilters();
-  }, [users, searchKey, appliedFilters]);
+  }, [moderators, searchKey, appliedFilters]);
 
   const displayToast = (type, message) => {
     setToastType(type);
@@ -105,19 +105,19 @@ const Moderators = () => {
   };
 
   const applyFilters = () => {
-    const filtered = users.filter(
-      (user) =>
-        (appliedFilters.status === 'All' || (user.uactivation ?? 'Active').toLowerCase() === appliedFilters.status.toLowerCase()) &&
+    const filtered = moderators.filter(
+      (moderator) =>
+        (appliedFilters.status === 'All' || (moderator.uactivation ?? 'Active').toLowerCase() === appliedFilters.status.toLowerCase()) &&
         (
-          (user.userid?.toString().includes(searchKey.toLowerCase()) || '') ||
-          (user.ufirstname?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-          (user.ulastname?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-          (user.uemail?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-          (user.uphoneno?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-          (user.uactivation?.toLowerCase().includes(searchKey.toLowerCase()) || '')
+          (moderator.userid?.toString().includes(searchKey.toLowerCase()) || '') ||
+          (moderator.ufirstname?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+          (moderator.ulastname?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+          (moderator.uemail?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+          (moderator.uphoneno?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+          (moderator.uactivation?.toLowerCase().includes(searchKey.toLowerCase()) || '')
         )
     );
-    setFilteredUsers(filtered);
+    setFilteredModerators(filtered);
   };
 
   const handleApplyFilters = () => {
@@ -125,7 +125,7 @@ const Moderators = () => {
   };
 
   const handleCreateModerator = () => {
-    setEditUser(null);
+    setEditModerator(null);
     setIsModeratorFormOpen(true);
   };
 
@@ -153,45 +153,45 @@ const Moderators = () => {
     ucountry: 'Country'
   };
 
-  const handleAction = async (action, user) => {
+  const handleAction = async (action, moderator) => {
     if (action === 'view') {
-      setSelectedUser({
-        ufirstname: user.ufirstname || 'N/A',
-        ulastname: user.ulastname || 'N/A',
-        uemail: user.uemail || 'N/A',
-        uphoneno: user.uphoneno || 'N/A',
-        uactivation: user.uactivation,
-        ugender: user.ugender || 'N/A',
-        ucountry: user.ucountry || 'N/A',
+      setSelectedModerator({
+        ufirstname: moderator.ufirstname || 'N/A',
+        ulastname: moderator.ulastname || 'N/A',
+        uemail: moderator.uemail || 'N/A',
+        uphoneno: moderator.uphoneno || 'N/A',
+        uactivation: moderator.uactivation,
+        ugender: moderator.ugender || 'N/A',
+        ucountry: moderator.ucountry || 'N/A',
       });
     } else if (action === 'edit') {
-      setEditUser(user);
+      setEditModerator(moderator);
       setIsModeratorFormOpen(true);
     } else if (action === 'suspend') {
-      suspendMutation.mutate(user.userid);
+      suspendMutation.mutate(moderator.userid);
     } else if (action === 'activate') {
-      activateMutation.mutate(user.userid);
+      activateMutation.mutate(moderator.userid);
     } else if (action === 'remove') {
-      setUserToDelete(user);
+      setModeratorToDelete(moderator);
       setIsDialogOpen(true);
     }
   };
 
-  const handleRemoveUser = () => {
-    if (userToDelete) {
-      removeMutation.mutate(userToDelete.userid);
+  const handleRemoveModerator = () => {
+    if (moderatorToDelete) {
+      removeMutation.mutate(moderatorToDelete.userid);
     }
   };
 
-  const userDropdownItems = (userStatus) => {
-    if (userStatus === 'Inactive') {
+  const moderatorDropdownItems = (moderatorStatus) => {
+    if (moderatorStatus === 'Inactive') {
       return [
         { label: 'View Moderator', icon: <FaEye />, action: 'view' },
         { label: 'Edit', icon: <FaEdit />, action: 'edit' },
         { label: 'Activate', icon: <FaUser />, action: 'activate' },
         { label: 'Remove', icon: <FaTrash />, action: 'remove' },
       ];
-    } else if (userStatus === 'Active') {
+    } else if (moderatorStatus === 'Active') {
       return [
         { label: 'View Moderator', icon: <FaEye />, action: 'view' },
         { label: 'Edit', icon: <FaEdit />, action: 'edit' },
@@ -204,26 +204,58 @@ const Moderators = () => {
 
   const columns = [
     { header: 'ID', accessor: 'userid' },
-    { header: 'First Name', accessor: 'ufirstname' },
-    { header: 'Last Name', accessor: 'ulastname' },
+    {
+      header: 'Moderator',
+      accessor: 'moderator',
+      render: (moderator) => (
+        <div className="moderator-container">
+          <div className="avatar-container">
+            {moderator.uimage && moderator.uimage.length > 0 ? (
+              <img
+                src={`data:image/jpeg;base64,${moderator.uimage}`}
+                alt={moderator.username || 'Avatar'}
+                className="table-user-avatar"
+                onError={(e) => {
+                  console.error(`Failed to load avatar for moderator ${moderator.userid}:`, moderator.uimage);
+                  e.target.src = '/public/avatar.png';
+                }}
+              />
+            ) : (
+              <img
+                src="/public/avatar.png"
+                alt={moderator.username || 'Avatar'}
+                className="table-user-avatar"
+              />
+            )}
+            <span
+              className={`status-dot ${
+                moderator.ustatus === 'login' ? 'status-login' :
+                moderator.ustatus === 'registered' ? 'status-registered' :
+                'status-logout'
+              }`}
+            />
+          </div>
+         <span className="table-user-username">{moderator.username || 'N/A'}</span>
+        </div>
+      ),
+    },
     { header: 'Email', accessor: 'uemail' },
-    { header: 'Phone', accessor: 'uphoneno' },
     {
       header: 'Status',
       accessor: 'uactivation',
-      render: (user) => (
-        <span className={`status-badge ${(user.uactivation || 'Active').toLowerCase()}`}>
-          {user.uactivation || 'Active'}
+      render: (moderator) => (
+        <span className={`status-badge ${(moderator.uactivation || 'Active').toLowerCase()}`}>
+          {moderator.uactivation || 'Active'}
         </span>
       ),
     },
     {
       header: 'Actions',
       accessor: 'actions',
-      render: (user) => (
+      render: (moderator) => (
         <ActionDropdown
-          items={userDropdownItems(user.uactivation)} 
-          onAction={(action) => handleAction(action, user)}
+          items={moderatorDropdownItems(moderator.uactivation)} 
+          onAction={(action) => handleAction(action, moderator)}
         />
       ),
     },
@@ -245,7 +277,7 @@ const Moderators = () => {
         </div>
       ) : (
         <PaginatedTable
-          data={filteredUsers}
+          data={filteredModerators}
           columns={columns}
           rowKey="userid"
           enableCheckbox={false}
@@ -253,20 +285,20 @@ const Moderators = () => {
       )}
 
       <Modal
-        isOpen={!!selectedUser}
-        title={`${selectedUser?.ufirstname} ${selectedUser?.ulastname}`}
-        data={selectedUser || {}}
+        isOpen={!!selectedModerator}
+        title={`${selectedModerator?.ufirstname} ${selectedModerator?.ulastname}`}
+        data={selectedModerator || {}}
         labels={displayLabels}
-        onClose={() => setSelectedUser(null)}
+        onClose={() => setSelectedModerator(null)}
       />
 
       {isModeratorFormOpen && (
         <ModeratorForm
-          initialData={editUser}
+          initialData={editModerator}
           onSubmit={() => {
             setIsModeratorFormOpen(false);
             queryClient.invalidateQueries(['moderators']);
-            displayToast('success', editUser ? 'Moderator updated successfully!' : 'Moderator created successfully!');
+            displayToast('success', editModerator ? 'Moderator updated successfully!' : 'Moderator created successfully!');
           }}
           onClose={() => setIsModeratorFormOpen(false)}
         />
@@ -275,8 +307,8 @@ const Moderators = () => {
       <Alert
         isOpen={isDialogOpen}
         title="Confirm Remove"
-        message={`Are you sure you want to remove Moderator ${userToDelete?.ufirstname} ${userToDelete?.ulastname}?`}
-        onConfirm={handleRemoveUser}
+        message={`Are you sure you want to remove Moderator ${moderatorToDelete?.ufirstname} ${moderatorToDelete?.ulastname}?`}
+        onConfirm={handleRemoveModerator}
         onCancel={() => setIsDialogOpen(false)}
       />
 
