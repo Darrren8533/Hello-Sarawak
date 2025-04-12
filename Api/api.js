@@ -704,9 +704,9 @@ export const fetchBookLog = async () => {
   }
 };
 
-export const fetchFinance = async () => {
+export const fetchFinance = async (userid) => {
   try {
-      const response = await fetch(`${API_URL}/users/finance`);
+      const response = await fetch(`${API_URL}/users/finance?userid=${userid}`);
       const data = await response.json();
       return data; 
   } catch (error) {
