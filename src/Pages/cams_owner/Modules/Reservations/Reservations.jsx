@@ -77,7 +77,6 @@ const Reservations = () => {
         reservationid: "Reservation ID",
         propertyaddress: "Property Name",
         rateamount: "Total Price",
-        reservationpaxno: "Reservation Pax No",
         reservationstatus: "Reservation Status",
         checkindatetime: "Check-In Date Time",
         checkoutdatetime: "Check-Out Date Time",
@@ -92,7 +91,6 @@ const Reservations = () => {
                 (reservation.reservationid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                 (reservation.propertyaddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                 (reservation.rateamount?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (reservation.reservationpaxno?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                 (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                 (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '')
             )
@@ -110,7 +108,6 @@ const Reservations = () => {
                 reservationid: reservation.reservationid || 'N/A',
                 propertyaddress: reservation.propertyaddress || 'N/A',
                 rateamount: reservation.rateamount || 'N/A',
-                reservationpaxno: reservation.reservationpaxno || 'N/A',
                 reservationstatus: reservation.reservationstatus || 'N/A',
                 checkindatetime: reservation.checkindatetime || 'N/A',
                 checkoutdatetime: reservation.checkoutdatetime || 'N/A',
@@ -150,7 +147,6 @@ const Reservations = () => {
         },
         { header: 'Property Name', accessor: 'propertyaddress' },
         { header: 'Total Price', accessor: 'rateamount' },
-        { header: 'Pax', accessor: 'reservationpaxno' },
         {
             header: 'Status',
             accessor: 'reservationstatus',
