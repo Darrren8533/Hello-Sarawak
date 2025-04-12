@@ -71,23 +71,29 @@ const Customers = () => {
         },
     });
 
+    // Fetch individual user data with caching
     useEffect(() => {
         const enhanceCustomerData = async () => {
             if (customers.length > 0) {
                 try {
                     const enhanced = await Promise.all(
                         customers.map(async (customer) => {
+                            // Use queryClient.fetchQuery to cache fetchUserData
                             try {
-                                const userData = await fetchUserData(customer.userid);
+                                const userData = await queryClient.fetchQuery({
+                                    queryKey: ['userData', customer.userid],
+                                    queryFn: () => fetchUserData(customer.userid),
+                                    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+                                });
                                 return {
                                     ...customer,
-                                    username: userData.username || 'N/A', 
+                                    username: userData.username || 'N/A',
                                     uimage: userData.uimage
                                         ? userData.uimage.startsWith('http')
                                             ? userData.uimage
                                             : `data:image/jpeg;base64,${userData.uimage}`
                                         : 'default-avatar.png',
-                                    ustatus: userData.ustatus || 'logout', 
+                                    ustatus: userData.ustatus || 'logout',
                                 };
                             } catch (error) {
                                 console.error(`Failed to fetch data for user ${customer.userid}:`, error);
@@ -110,7 +116,7 @@ const Customers = () => {
         };
 
         enhanceCustomerData();
-    }, [customers]);
+    }, [customers, queryClient]);
 
     useEffect(() => {
         applyFilters();
@@ -245,7 +251,7 @@ const Customers = () => {
 
     return (
         <div>
-            <div class LZ="header-container">
+            <div className="header-container">
                 <h1 className="dashboard-page-title">Customer Details</h1>
                 <SearchBar
                     value={searchKey}
