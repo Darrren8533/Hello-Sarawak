@@ -75,23 +75,22 @@ const Moderators = () => {
   });
 
   const removeMutation = useMutation({
-    mutationFn: (moderatorId) => removeUser(moderatorId),
-    onSuccess: (_, moderatorId) => {
-      queryClient.setQueryData(['moderators'], (oldData) =>
-        oldData.filter(m => m.userid !== moderatorId)
-      );
-      const moderator = moderators.find(m => m.userid === moderatorId);
+  mutationFn: (moderatorId) => removeUser(moderatorId),
+  onSuccess: (_, moderatorId) => {
+    queryClient.setQueryData(['moderators'], (oldData) =>
+      oldData.filter(m => m.userid !== moderatorId)
+    );
+    const moderator = moderators.find(m => m.userid === moderatorId);
+    if (moderator) {
       displayToast('success', `Moderator ${moderator.ufirstname} ${moderator.ulastname} removed successfully.`);
-      setIsDialogOpen(false);
-      setModeratorToDelete(null);
-    },
-    onError: (error) => {
-      console.error('Error removing moderator:', error);
-      displayToast('error', 'Failed to remove moderator.');
-      setIsDialogOpen(false);
-      setModeratorToDelete(null);
     }
-  });
+  },
+  onError: (error) => {
+    console.error('Error removing moderator:', error);
+    displayToast('error', 'Failed to remove moderator.');
+  },
+});
+
 
   useEffect(() => {
     applyFilters();
