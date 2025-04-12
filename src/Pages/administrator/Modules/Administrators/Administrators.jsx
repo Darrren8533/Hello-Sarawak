@@ -1,29 +1,29 @@
-import React, { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { fetchAdministrators } from "../../../../../Api/api";
-import Filter from "../../../../Component/Filter/Filter";
-import ActionDropdown from "../../../../Component/ActionDropdown/ActionDropdown";
-import Modal from "../../../../Component/Modal/Modal";
-import SearchBar from "../../../../Component/SearchBar/SearchBar";
-import PaginatedTable from "../../../../Component/PaginatedTable/PaginatedTable";
-import Loader from "../../../../Component/Loader/Loader";
-import { FaEye } from "react-icons/fa";
-import "../../../../Component/MainContent/MainContent.css";
-import "../../../../Component/ActionDropdown/ActionDropdown.css";
-import "../../../../Component/Modal/Modal.css";
-import "../../../../Component/Filter/Filter.css";
-import "../../../../Component/SearchBar/SearchBar.css";
-import "./Administrator.css";
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchAdministrators } from '../../../../../Api/api';
+import Filter from '../../../../Component/Filter/Filter';
+import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
+import Modal from '../../../../Component/Modal/Modal';
+import SearchBar from '../../../../Component/SearchBar/SearchBar';
+import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
+import Loader from '../../../../Component/Loader/Loader';
+import { FaEye } from 'react-icons/fa';
+import '../../../../Component/MainContent/MainContent.css';
+import '../../../../Component/ActionDropdown/ActionDropdown.css';
+import '../../../../Component/Modal/Modal.css';
+import '../../../../Component/Filter/Filter.css';
+import '../../../../Component/SearchBar/SearchBar.css';
+import './Administrator.css';
 
 const Administrators = () => {
-  const [searchKey, setSearchKey] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("All");
-  const [appliedFilters, setAppliedFilters] = useState({ status: "All" });
+  const [searchKey, setSearchKey] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('All');
+  const [appliedFilters, setAppliedFilters] = useState({ status: 'All' });
   const [selectedOperator, setSelectedOperator] = useState(null);
 
   // Fetch administrators using React Query
-  const { data: users = [], isLoading, error } = useQuery({
-    queryKey: ["administrators"],
+  const { data: administrators = [], isLoading, error } = useQuery({
+    queryKey: ['administrators'],
     queryFn: fetchAdministrators,
     staleTime: 30 * 60 * 1000,
     refetchInterval: 1000,
@@ -35,78 +35,111 @@ const Administrators = () => {
 
   const filters = [
     {
-      name: "status",
-      label: "Status",
+      name: 'status',
+      label: 'Status',
       value: selectedStatus,
       onChange: setSelectedStatus,
       options: [
-        { value: "All", label: "All Statuses" },
-        { value: "Active", label: "Active" },
-        { value: "Inactive", label: "Inactive" },
+        { value: 'All', label: 'All Statuses' },
+        { value: 'Active', label: 'Active' },
+        { value: 'Inactive', label: 'Inactive' },
       ],
     },
   ];
 
   const displayLabels = {
-    userid: "User ID",
-    ufirstname: "First Name",
-    ulastname: "Last Name",
-    uemail: "Email",
-    uphoneno: "Phone Number",
-    uactivation: "Status",
-    ugender: "Gender",
-    ucountry: "Country",
+    userid: 'User ID',
+    ufirstname: 'First Name',
+    ulastname: 'Last Name',
+    uemail: 'Email',
+    uphoneno: 'Phone Number',
+    uactivation: 'Status',
+    ugender: 'Gender',
+    ucountry: 'Country',
   };
 
-  // Filtering users based on search key and status
-  const filteredUsers = users.filter((user) => {
+  // Filtering administrators based on search key and status
+  const filteredUsers = administrators.filter((user) => {
     const searchInFields =
       `${user.userid} ${user.ufirstname} ${user.ulastname} ${user.uemail} ${user.uphoneno} ${user.uactivation}`
         .toLowerCase()
         .includes(searchKey.toLowerCase());
 
     const statusFilter =
-      appliedFilters.status === "All" || user.uactivation === appliedFilters.status;
+      appliedFilters.status === 'All' || user.uactivation === appliedFilters.status;
 
     return searchInFields && statusFilter;
   });
 
   const handleAction = (action, user) => {
-    if (action === "view") {
+    if (action === 'view') {
       const essentialFields = {
-        userid: user.userid || "N/A",
-        ufirstname: user.ufirstname || "N/A",
-        ulastname: user.ulastname || "N/A",
-        uemail: user.uemail || "N/A",
-        uphoneno: user.uphoneno || "N/A",
-        uactivation: user.uactivation || "N/A",
-        ugender: user.ugender || "N/A",
-        ucountry: user.ucountry || "N/A",
+        userid: user.userid || 'N/A',
+        ufirstname: user.ufirstname || 'N/A',
+        ulastname: user.ulastname || 'N/A',
+        uemail: user.uemail || 'N/A',
+        uphoneno: user.uphoneno || 'N/A',
+        uactivation: user.uactivation || 'N/A',
+        ugender: user.ugender || 'N/A',
+        ucountry: user.ucountry || 'N/A',
       };
       setSelectedOperator(essentialFields);
     }
   };
 
-  const operatorDropdownItems = [{ label: "View Details", icon: <FaEye />, action: "view" }];
+  const operatorDropdownItems = [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
 
   const columns = [
-    { header: "ID", accessor: "userid" },
-    { header: "First Name", accessor: "ufirstname" },
-    { header: "Last Name", accessor: "ulastname" },
-    { header: "Email", accessor: "uemail" },
-    { header: "Phone", accessor: "uphoneno" },
+    { header: 'ID', accessor: 'userid' },
     {
-      header: "Status",
-      accessor: "uactivation",
+      header: 'Administrator',
+      accessor: 'administrator',
       render: (user) => (
-        <span className={`status-badge ${user.uactivation?.toLowerCase() || "active"}`}>
-          {user.uactivation || "Active"}
+        <div className="administrator-container">
+          <div className="avatar-container">
+            {user.uimage && user.uimage.length > 0 ? (
+              <img
+                src={`data:image/jpeg;base64,${user.uimage}`}
+                alt={`${user.ufirstname} ${user.ulastname}`}
+                className="administrator-avatar"
+                onError={(e) => {
+                  console.error(`Failed to load avatar for admin ${user.userid}:`, user.uimage);
+                  e.target.src = '/public/avatar.png';
+                }}
+              />
+            ) : (
+              <img
+                src="/public/avatar.png"
+                alt="Default Avatar"
+                className="administrator-avatar"
+              />
+            )}
+            <span
+              className={`status-dot ${
+                user.ustatus === 'login' ? 'status-login' :
+                user.ustatus === 'registered' ? 'status-registered' :
+                'status-logout'
+              }`}
+            />
+          </div>
+          <span className="administrator-username">{`${user.ufirstname} ${user.ulastname}` || 'N/A'}</span>
+        </div>
+      ),
+    },
+    { header: 'Email', accessor: 'uemail' },
+    { header: 'Phone', accessor: 'uphoneno' },
+    {
+      header: 'Status',
+      accessor: 'uactivation',
+      render: (user) => (
+        <span className={`status-badge ${user.uactivation?.toLowerCase() || 'active'}`}>
+          {user.uactivation || 'Active'}
         </span>
       ),
     },
     {
-      header: "Actions",
-      accessor: "actions",
+      header: 'Actions',
+      accessor: 'actions',
       render: (operator) => (
         <ActionDropdown
           items={operatorDropdownItems}
