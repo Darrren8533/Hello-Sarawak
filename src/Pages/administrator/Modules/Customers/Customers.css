@@ -207,6 +207,36 @@
     margin-right: 10px;
     font-size: 16px;
   }
+
+  .avatar-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .customer-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .status-dot {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+
+  .status-login {
+    background-color: #22c55e; 
+  }
+
+  .status-logout {
+    background-color: #9ca3af; 
+  }
   
   /* Enhanced modal */
   .modal-overlay {
@@ -279,8 +309,6 @@
     font-size: 16px;
     color: #2c3e50;
   }
-  
-
   
   /* Pagination controls */
   .pagination {
