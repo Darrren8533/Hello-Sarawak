@@ -157,8 +157,8 @@ const Customers = () => {
             header: 'Role',
             accessor: 'usergroup',
             render: (customer) => (
-                <span className={`role-badge ${customer.usergroup.toLowerCase()}`}>
-                  {customer.usergroup}
+                <span className={`role-badge ${customer.usergroup ? customer.usergroup.toLowerCase() : 'customer'}`}>
+                    {customer.usergroup || 'Customer'}
                 </span>
             ),
         },
