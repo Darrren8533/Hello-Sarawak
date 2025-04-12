@@ -36,7 +36,7 @@ export default function FinancialDashboard() {
   } = useQuery({
     queryKey: ['finance', userid], 
     queryFn: () => fetchFinance(userid),
-    enabled: !!userID
+    enabled: !!userid
   });
 
   const { data: occupancyData } = useQuery({
