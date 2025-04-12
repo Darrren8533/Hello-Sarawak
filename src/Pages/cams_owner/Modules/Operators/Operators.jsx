@@ -15,7 +15,7 @@ import '../../../../Component/SearchBar/SearchBar.css';
 import '../Operators/Operators.css';
 
 const Operators = () => {
-  const [users, setUsers] = useState([]);
+  const [operators, setOperators] = useState([]);
   const [searchKey, setSearchKey] = useState('');
   const [selectedRole, setSelectedRole] = useState('All');
   const [appliedFilters, setAppliedFilters] = useState({ role: 'All' });
@@ -31,15 +31,15 @@ const Operators = () => {
   const roles = ['Customer', 'Moderator', 'Administrator'];
 
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetchOperatorsData = async () => {
       try {
         const operatorData = await fetchOperators();
-        setUsers(operatorData);
+        setOperators(operatorData);
       } catch (error) {
         console.error('Failed to fetch operator details', error);
       }
     };
-    fetchUsers();
+    fetchOperatorsData();
   }, []);
 
   const displayToast = (type, message) => {
@@ -78,33 +78,33 @@ const Operators = () => {
   };
 
   // Filter logic for both search key and role
-  const filteredUsers = users.filter((user) => {
+  const filteredOperators = operators.filter((operator) => {
     const searchInFields =
-      `${user.ufirstname} ${user.ulastname} ${user.uemail} ${user.uphoneno} ${user.usergroup}`
+      `${operator.ufirstname} ${operator.ulastname} ${operator.uemail} ${operator.uphoneno} ${operator.usergroup}`
         .toLowerCase()
         .includes(searchKey.toLowerCase());
 
     const roleFilter =
-      appliedFilters.role === 'All' || user.usergroup === appliedFilters.role;
+      appliedFilters.role === 'All' || operator.usergroup === appliedFilters.role;
 
     return searchInFields && roleFilter;
   });
 
-  const handleAction = (action, user) => {
+  const handleAction = (action, operator) => {
     if (action === 'view') {
       const essentialFields = {
-        ufirstname: user.ufirstname || 'N/A',
-        ulastname: user.ulastname || 'N/A',
-        uemail: user.uemail || 'N/A',
-        uphoneno: user.uphoneno || 'N/A',
-        usergroup: user.usergroup || 'N/A',
-        ugender: user.ugender || 'N/A',
-        ucountry: user.ucountry || 'N/A',
+        ufirstname: operator.ufirstname || 'N/A',
+        ulastname: operator.ulastname || 'N/A',
+        uemail: operator.uemail || 'N/A',
+        uphoneno: operator.uphoneno || 'N/A',
+        usergroup: operator.usergroup || 'N/A',
+        ugender: operator.ugender || 'N/A',
+        ucountry: operator.ucountry || 'N/A',
       };
       setSelectedOperator(essentialFields);
     } else if (action === 'assignRole') {
-      setRoleOperator(user);
-      setSelectedAssignRole(user.usergroup || 'Moderator');
+      setRoleOperator(operator);
+      setSelectedAssignRole(operator.usergroup || 'Moderator');
       setShowRoleModal(true);
     }
   };
@@ -130,10 +130,10 @@ const Operators = () => {
       
       if (data.success) {
         // Update local state
-        setUsers(users.map(user => 
-          user.userid === roleOperator.userid 
-            ? {...user, usergroup: selectedAssignRole} 
-            : user
+        setOperators(operators.map(operator => 
+          operator.userid === roleOperator.userid 
+            ? {...operator, usergroup: selectedAssignRole} 
+            : operator
         ));
         setShowRoleModal(false);
         displayToast('success', `Successfully assigned ${selectedAssignRole} role to ${roleOperator.ufirstname} ${roleOperator.ulastname}`);
@@ -153,16 +153,48 @@ const Operators = () => {
   ];
 
   const columns = [
-    { header: 'First Name', accessor: 'ufirstname' },
-    { header: 'Last Name', accessor: 'ulastname' },
+    {
+      header: 'Operator',
+      accessor: 'operator',
+      render: (operator) => (
+        <div className="user-container">
+          <div className="avatar-container">
+            {operator.uimage && operator.uimage.length > 0 ? (
+              <img
+                src={`data:image/jpeg;base64,${operator.uimage}`}
+                alt={operator.username || 'Avatar'}
+                className="table-user-avatar"
+                onError={(e) => {
+                  console.error(`Failed to load avatar for operator ${operator.userid}:`, operator.uimage);
+                  e.target.src = '/public/avatar.png';
+                }}
+              />
+            ) : (
+              <img
+                src="/public/avatar.png"
+                alt="Default Avatar"
+                className="table-user-avatar"
+              />
+            )}
+            <span
+              className={`status-dot ${
+                operator.ustatus === 'login' ? 'status-login' :
+                operator.ustatus === 'registered' ? 'status-registered' :
+                'status-logout'
+              }`}
+            />
+          </div>
+          <span className="table-user-username">{operator.username || 'N/A'}</span>
+        </div>
+      ),
+    },
     { header: 'Email', accessor: 'uemail' },
-    { header: 'Phone', accessor: 'uphoneno' },
     {
       header: 'Role',
       accessor: 'usergroup',
-      render: (user) => (
-        <span className={`role-badge ${user.usergroup.toLowerCase()}`}>
-          {user.usergroup}
+      render: (operator) => (
+        <span className={`role-badge ${operator.usergroup ? operator.usergroup.toLowerCase() : 'operator'}`}>
+          {operator.usergroup || 'Operator'}
         </span>
       ),
     },
@@ -195,7 +227,7 @@ const Operators = () => {
       <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
       <PaginatedTable
-        data={filteredUsers}
+        data={filteredOperators}
         columns={columns}
         rowKey="userid"
         enableCheckbox={false}
