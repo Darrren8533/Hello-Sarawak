@@ -111,7 +111,7 @@ const Administrators = () => {
               <img
                 src="/public/avatar.png"
                 alt="Default Avatar"
-                className="administrator-avatar"
+                className="table-user-avatar"
               />
             )}
             <span
