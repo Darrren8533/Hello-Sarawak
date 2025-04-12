@@ -153,7 +153,16 @@ const Customers = () => {
         },
         { header: 'Email', accessor: 'uemail' },
         { header: 'Phone', accessor: 'uphoneno' },
-        { header: 'Role', accessor: 'usergroup' },
+        {
+            header: 'Role',
+            accessor: 'usergroup',
+            render: (user) => (
+                <span className={`role-badge ${user.usergroup.toLowerCase()}`}>
+                  {user.usergroup}
+                </span>
+            ),
+        },
+        
         {
             header: 'Actions',
             accessor: 'actions',
