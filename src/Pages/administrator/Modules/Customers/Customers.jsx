@@ -164,13 +164,13 @@ const Customers = () => {
             header: 'Customer',
             accessor: 'customer',
             render: (customer) => (
-                <div className="customer-container">
+                <div className="user-container">
                     <div className="avatar-container">
                         {customer.uimage && customer.uimage.length > 0 ? (
                             <img
                                 src={`data:image/jpeg;base64,${customer.uimage}`}
                                 alt={customer.username || 'Avatar'}
-                                className="customer-avatar"
+                                className="table-user-avatar"
                                 onError={(e) => {
                                     console.error(`Failed to load avatar for user ${customer.userid}:`, customer.uimage);
                                     e.target.src = '/public/avatar.png';
