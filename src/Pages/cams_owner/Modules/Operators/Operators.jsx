@@ -153,6 +153,7 @@ const Operators = () => {
   ];
 
   const columns = [
+    { header: 'ID', accessor: 'userid' },
     {
       header: 'Operator',
       accessor: 'operator',
