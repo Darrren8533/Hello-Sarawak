@@ -20,23 +20,24 @@ const Customers = () => {
     const [filteredCustomers, setFilteredCustomers] = useState([]);
     const [searchKey, setSearchKey] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('All');
-    const [appliedFilters, setAppliedFilters] = useState({ status: 'All' }); 
+    const [appliedFilters, setAppliedFilters] = useState({ status: 'All' });
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [toastMessage, setToastMessage] = useState('');
     const [showToast, setShowToast] = useState(false);
     const [toastType, setToastType] = useState('');
+    const [enhancedCustomers, setEnhancedCustomers] = useState([]);
 
     // Initialize QueryClient
     const queryClient = useQueryClient();
 
     // Fetch customers query
-    const { data: customers = [], isLoading } = useQuery({
+    const { data: customers = [], isLoading: isCustomersLoading } = useQuery({
         queryKey: ['customers'],
         queryFn: fetchCustomers,
         onError: (error) => {
             console.error('Failed to fetch customer details', error);
             displayToast('error', 'Failed to load customers. Please try again.');
-        }
+        },
     });
 
     // Define mutations
@@ -44,37 +45,76 @@ const Customers = () => {
         mutationFn: (userId) => suspendUser(userId),
         onSuccess: (_, userId) => {
             queryClient.setQueryData(['customers'], (oldData) =>
-                oldData.map(c => c.userid === userId ? { ...c, uactivation: 'Inactive' } : c)
+                oldData.map((c) => (c.userid === userId ? { ...c, uactivation: 'Inactive' } : c))
             );
-            const customer = customers.find(c => c.userid === userId);
-            displayToast('success', `User ${customer.ufirstname} ${customer.ulastname} has been suspended.`);
+            const customer = enhancedCustomers.find((c) => c.userid === userId);
+            displayToast('success', `User ${customer.username} has been suspended.`);
         },
         onError: (error) => {
             console.error('Failed to suspend user:', error);
             displayToast('error', 'Error suspending user');
-        }
+        },
     });
 
     const activateMutation = useMutation({
         mutationFn: (userId) => activateUser(userId),
         onSuccess: (_, userId) => {
             queryClient.setQueryData(['customers'], (oldData) =>
-                oldData.map(c => c.userid === userId ? { ...c, uactivation: 'Active' } : c)
+                oldData.map((c) => (c.userid === userId ? { ...c, uactivation: 'Active' } : c))
             );
-            const customer = customers.find(c => c.userid === userId);
-            displayToast('success', `User ${customer.ufirstname} ${customer.ulastname} has been activated.`);
+            const customer = enhancedCustomers.find((c) => c.userid === userId);
+            displayToast('success', `User ${customer.username} has been activated.`);
         },
         onError: (error) => {
             console.error('Failed to activate user:', error);
             displayToast('error', 'Error activating user');
-        }
+        },
     });
 
     useEffect(() => {
-        if (customers) {
-            applyFilters();
-        }
-    }, [customers, searchKey, appliedFilters]);
+        const enhanceCustomerData = async () => {
+            if (customers.length > 0) {
+                try {
+                    const enhanced = await Promise.all(
+                        customers.map(async (customer) => {
+                            try {
+                                const userData = await fetchUserData(customer.userid);
+                                return {
+                                    ...customer,
+                                    username: userData.username || 'N/A', 
+                                    uimage: userData.uimage
+                                        ? userData.uimage.startsWith('http')
+                                            ? userData.uimage
+                                            : `data:image/jpeg;base64,${userData.uimage}`
+                                        : 'default-avatar.png',
+                                    ustatus: userData.ustatus || 'logout', 
+                                };
+                            } catch (error) {
+                                console.error(`Failed to fetch data for user ${customer.userid}:`, error);
+                                return {
+                                    ...customer,
+                                    username: 'N/A',
+                                    uimage: 'default-avatar.png',
+                                    ustatus: 'logout',
+                                };
+                            }
+                        })
+                    );
+                    setEnhancedCustomers(enhanced);
+                    setFilteredCustomers(enhanced);
+                } catch (error) {
+                    console.error('Error enhancing customer data:', error);
+                    displayToast('error', 'Error loading user details.');
+                }
+            }
+        };
+
+        enhanceCustomerData();
+    }, [customers]);
+
+    useEffect(() => {
+        applyFilters();
+    }, [enhancedCustomers, searchKey, appliedFilters]);
 
     const displayToast = (type, message) => {
         setToastType(type);
@@ -84,14 +124,12 @@ const Customers = () => {
     };
 
     const applyFilters = () => {
-        const filtered = customers.filter(
+        const filtered = enhancedCustomers.filter(
             (customer) =>
                 (appliedFilters.status === 'All' || customer.uactivation === appliedFilters.status) &&
-                (
-                    `${customer.ufirstname} ${customer.ulastname} ${customer.uemail} ${customer.uphoneno} ${customer.uactivation}`
-                        .toLowerCase()
-                        .includes(searchKey.toLowerCase())
-                )
+                `${customer.username} ${customer.uemail} ${customer.uactivation}`
+                    .toLowerCase()
+                    .includes(searchKey.toLowerCase())
         );
         setFilteredCustomers(filtered);
     };
@@ -113,22 +151,20 @@ const Customers = () => {
     const displayLabels = {
         username: 'Username',
         email: 'Email',
-        phoneno: 'Phone Number',
-        uactivation: 'Status', 
+        uactivation: 'Status',
         gender: 'Gender',
         country: 'Country',
+        ustatus: 'Login Status',
     };
 
     const handleAction = async (action, customer) => {
         if (action === 'view') {
             const essentialFields = {
                 username: customer.username || 'N/A',
-                firstname: customer.ufirstname || 'N/A',
-                lastname: customer.ulastname || 'N/A',
                 email: customer.uemail || 'N/A',
-                phoneno: customer.uphoneno || 'N/A',
                 gender: customer.ugender || 'N/A',
                 country: customer.ucountry || 'N/A',
+                ustatus: customer.ustatus || 'N/A',
             };
             setSelectedCustomer(essentialFields);
         } else if (action === 'suspend') {
@@ -159,9 +195,33 @@ const Customers = () => {
     };
 
     const columns = [
+        {
+            header: 'Avatar',
+            accessor: 'uimage',
+            render: (customer) => (
+                <div className="avatar-container">
+                    <img
+                        src={customer.uimage || 'default-avatar.png'}
+                        alt="Avatar"
+                        className="customer-avatar"
+                    />
+                    <span
+                        className={`status-dot ${customer.ustatus === 'login' ? 'status-login' : 'status-logout'}`}
+                    />
+                </div>
+            ),
+        },
         { header: 'Username', accessor: 'username' },
         { header: 'Email', accessor: 'uemail' },
-        { header: 'Phone', accessor: 'uphoneno' },
+        {
+            header: 'Login Status',
+            accessor: 'ustatus',
+            render: (customer) => (
+                <span className={`status-badge ${customer.ustatus?.toLowerCase()}`}>
+                    {customer.ustatus || 'Unknown'}
+                </span>
+            ),
+        },
         {
             header: 'Status',
             accessor: 'uactivation',
@@ -185,14 +245,18 @@ const Customers = () => {
 
     return (
         <div>
-            <div className="header-container">
+            <div class LZ="header-container">
                 <h1 className="dashboard-page-title">Customer Details</h1>
-                <SearchBar value={searchKey} onChange={(newValue) => setSearchKey(newValue)} placeholder="Search customers..." />
+                <SearchBar
+                    value={searchKey}
+                    onChange={(newValue) => setSearchKey(newValue)}
+                    placeholder="Search customers..."
+                />
             </div>
 
             <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-            {isLoading ? (
+            {isCustomersLoading ? (
                 <div className="loader-box">
                     <Loader />
                 </div>
@@ -200,14 +264,14 @@ const Customers = () => {
                 <PaginatedTable
                     data={filteredCustomers}
                     columns={columns}
-                    rowKey="userID"
+                    rowKey="userid"
                     enableCheckbox={false}
                 />
             )}
 
             <Modal
                 isOpen={!!selectedCustomer}
-                title={`${selectedCustomer?.firstname} ${selectedCustomer?.lastname}`}
+                title={selectedCustomer?.username || 'Customer Details'}
                 data={selectedCustomer || {}}
                 labels={displayLabels}
                 onClose={() => setSelectedCustomer(null)}
