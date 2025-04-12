@@ -15,7 +15,7 @@
 .modal-container {
     background-color: white;
     border-radius: 8px;
-    width: 400px;
+    width: 450px;
     max-width: 90%;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
@@ -63,6 +63,12 @@
     border-radius: 4px;
     font-size: 16px;
     appearance: auto;
+    min-width: 200px;
+}
+
+.role-select option {
+    padding: 8px;
+    white-space: nowrap;
 }
 
 .modal-footer {
