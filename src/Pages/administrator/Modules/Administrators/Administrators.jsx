@@ -59,9 +59,9 @@ const Administrators = () => {
   };
 
   // Filtering users based on search key and status
-  const filteredUsers = administrator.filter((user) => {
+  const filteredUsers = administrator.filter((administrator) => {
     const searchInFields =
-      `${administrator.userid} ${administrator.ufirstname} ${administrator.ulastname} ${administrator.uemail} ${administrator.uphoneno} ${user.uactivation}`
+      `${administrator.userid} ${administrator.ufirstname} ${administrator.ulastname} ${administrator.uemail} ${administrator.uphoneno} ${administrator.uactivation}`
         .toLowerCase()
         .includes(searchKey.toLowerCase());
 
@@ -130,9 +130,9 @@ const Administrators = () => {
     {
       header: 'Status',
       accessor: 'uactivation',
-      render: (user) => (
-        <span className={`status-badge ${user.uactivation?.toLowerCase() || 'active'}`}>
-          {user.uactivation || 'Active'}
+      render: (administrator) => (
+        <span className={`status-badge ${administrator.uactivation?.toLowerCase() || 'active'}`}>
+          {administrator.uactivation || 'Active'}
         </span>
       ),
     },
