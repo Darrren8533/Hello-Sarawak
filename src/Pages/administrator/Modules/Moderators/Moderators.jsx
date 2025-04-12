@@ -51,7 +51,7 @@ const Moderators = () => {
         oldData.map(m => m.userid === moderatorId ? { ...m, uactivation: 'Inactive' } : m)
       );
       const moderator = moderators.find(m => m.userid === moderatorId);
-      displayToast('success', `Moderator ${moderator.ufirstname} ${moderator.ulastname} has been suspended.`);
+      displayToast('success', `Moderator ${moderator.username} has been suspended.`);
     },
     onError: (error) => {
       console.error('Failed to suspend moderator:', error);
@@ -66,7 +66,7 @@ const Moderators = () => {
         oldData.map(m => m.userid === moderatorId ? { ...m, uactivation: 'Active' } : m)
       );
       const moderator = moderators.find(m => m.userid === moderatorId);
-      displayToast('success', `Moderator ${moderator.ufirstname} ${moderator.ulastname} has been activated.`);
+      displayToast('success', `Moderator ${moderator.username} has been activated.`);
     },
     onError: (error) => {
       console.error('Failed to activate moderator:', error);
@@ -80,7 +80,7 @@ const Moderators = () => {
       queryClient.invalidateQueries(['moderators']);
       const moderator = moderators.find(m => m.userid === moderatorId);
       if (moderator) {
-        displayToast('success', `Moderator ${moderator.ufirstname} ${moderator.ulastname} removed successfully.`);
+        displayToast('success', `Moderator ${moderator.username} removed successfully.`);
       }
       setIsDialogOpen(false);
       setModeratorToDelete(null);
