@@ -180,7 +180,7 @@ const Customers = () => {
                             <img
                                 src="/public/avatar.png"
                                 alt="Default Avatar"
-                                className="customer-avatar"
+                                className="table-user-avatar"
                             />
                         )}
                         <span
@@ -191,7 +191,7 @@ const Customers = () => {
                             }`}
                         />
                     </div>
-                    <span className="customer-username">{customer.username || 'N/A'}</span>
+                    <span className="table-user-username">{customer.username || 'N/A'}</span>
                 </div>
             ),
         },
