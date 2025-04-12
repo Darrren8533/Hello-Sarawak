@@ -208,7 +208,7 @@ const Moderators = () => {
       header: 'Moderator',
       accessor: 'moderator',
       render: (moderator) => (
-        <div className="moderator-container">
+        <div className="user-container">
           <div className="avatar-container">
             {moderator.uimage && moderator.uimage.length > 0 ? (
               <img
