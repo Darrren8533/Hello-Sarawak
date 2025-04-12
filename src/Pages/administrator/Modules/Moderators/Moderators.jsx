@@ -77,9 +77,7 @@ const Moderators = () => {
   const removeMutation = useMutation({
     mutationFn: (moderatorId) => removeUser(moderatorId),
     onSuccess: (_, moderatorId) => {
-      queryClient.setQueryData(['moderators'], (oldData) =>
-        oldData.filter(m => m.userid !== moderatorId)
-      );
+      queryClient.invalidateQueries(['moderators']);
       const moderator = moderators.find(m => m.userid === moderatorId);
       if (moderator) {
         displayToast('success', `Moderator ${moderator.ufirstname} ${moderator.ulastname} removed successfully.`);
@@ -94,6 +92,7 @@ const Moderators = () => {
       setModeratorToDelete(null);
     },
   });
+
 
   useEffect(() => {
     applyFilters();
