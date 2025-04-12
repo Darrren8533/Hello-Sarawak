@@ -213,42 +213,42 @@
     align-items: center;
     gap: 12px;
     min-width: 200px; 
-}
+  }
 
 .avatar-container {
     position: relative;
     display: inline-block;
     flex-shrink: 0;
-}
+  }
 
 .customer-avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
-}
+  }
 
 .status-dot {
     position: absolute;
     bottom: 0;
     right: 0;
-    width: 10px;
-    height: 10px;
+    width: 20px;
+    height: 20px;
     border-radius: 50%;
     border: 2px solid white;
-}
+  }
 
 .status-login {
     background-color: #22c55e; 
-}
+  }
 
 .status-registered {
     background-color: #9ca3af; 
-}
+  }
 
 .status-logout {
     background-color: #DC143C; 
-}
+  }
 
 .customer-username {
     font-size: 14px;
@@ -257,7 +257,7 @@
     white-space: nowrap; 
     overflow: hidden;
     text-overflow: ellipsis; 
-}
+  }
   
   /* Enhanced modal */
   .modal-overlay {
