@@ -208,15 +208,17 @@
     font-size: 16px;
   }
 
-  customer-container {
+  .customer-container {
     display: flex;
     align-items: center;
-    gap: 10px; /* Space between avatar and username */
+    gap: 12px;
+    min-width: 200px; 
 }
 
 .avatar-container {
     position: relative;
     display: inline-block;
+    flex-shrink: 0;
 }
 
 .customer-avatar {
@@ -237,7 +239,7 @@
 }
 
 .status-login {
-    background-color: #22c55e;
+    background-color: #22c55e; 
 }
 
 .status-registered {
@@ -251,6 +253,10 @@
 .customer-username {
     font-size: 14px;
     font-weight: 500;
+    color: #333; 
+    white-space: nowrap; 
+    overflow: hidden;
+    text-overflow: ellipsis; 
 }
   
   /* Enhanced modal */
