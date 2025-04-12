@@ -28,11 +28,11 @@ const Reservations = () => {
                 const reservationData = await fetchReservation();
                 if (Array.isArray(reservationData)) {
                     const updatedReservations = reservationData.map(reservation => {
-                        const expiryDateTime = new Date(reservation.expiryDateTime).getTime();
+                        const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
                         const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
 
-                        if (reservation.reservationStatus === 'Pending' && currentDateTime > expiryDateTime) {
-                            return { ...reservation, reservationStatus: 'expired' };
+                        if (reservation.reservationstatus === 'Pending' && currentDateTime > reservationblocktime) {
+                            return { ...reservation, reservationstatus: 'expired' };
                         }
                         return reservation;
                     });
@@ -74,48 +74,48 @@ const Reservations = () => {
 
 
     const displayLabels = {
-        reservationID: "Reservation ID",
-        propertyName: "Property Name",
-        totalPrice: "Total Price",
-        reservationPaxNo: "Reservation Pax No",
-        reservationStatus: "Reservation Status",
-        checkInDateTime: "Check-In Date Time",
-        checkOutDateTime: "Check-Out Date Time",
+        reservationid: "Reservation ID",
+        propertyaddress: "Property Name",
+        rateamount: "Total Price",
+        reservationpaxno: "Reservation Pax No",
+        reservationstatus: "Reservation Status",
+        checkindatetime: "Check-In Date Time",
+        checkoutdatetime: "Check-Out Date Time",
         request: "Request",
         images: "Images"
     };
 
     const filteredReservations = reservations.filter(
         (reservation) =>
-            (appliedFilters.status === 'All' || (reservation.reservationStatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
+            (appliedFilters.status === 'All' || (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
             (
-                (reservation.reservationID?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (reservation.propertyName?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (reservation.totalPrice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (reservation.reservationPaxNo?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (reservation.reservationStatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (reservation.reservationid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (reservation.propertyaddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (reservation.rateamount?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (reservation.reservationpaxno?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                 (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '')
             )
     );
 
     const handleAction = (action, reservation) => {
 
-        if (reservation.reservationStatus === 'expired') {
+        if (reservation.reservationstatus === 'expired') {
             displayToast('error', 'Action cannot be performed. This reservation has expired.');
             return;
         }
 
         if (action === 'view') {
             setSelectedReservation({
-                reservationID: reservation.reservationID || 'N/A',
-                propertyName: reservation.propertyName || 'N/A',
-                totalPrice: reservation.totalPrice || 'N/A',
-                reservationPaxNo: reservation.reservationPaxNo || 'N/A',
-                reservationStatus: reservation.reservationStatus || 'N/A',
-                checkInDateTime: reservation.checkInDateTime || 'N/A',
-                checkOutDateTime: reservation.checkOutDateTime || 'N/A',
+                reservationid: reservation.reservationid || 'N/A',
+                propertyaddress: reservation.propertyaddress || 'N/A',
+                rateamount: reservation.rateamount || 'N/A',
+                reservationpaxno: reservation.reservationpaxno || 'N/A',
+                reservationstatus: reservation.reservationstatus || 'N/A',
+                checkindatetime: reservation.checkindatetime || 'N/A',
+                checkoutdatetime: reservation.checkoutdatetime || 'N/A',
                 request: reservation.request || 'N/A',
-                images: reservation.propertyImage || [],
+                images: reservation.propertyimage || [],
             });
         }
     };
@@ -132,15 +132,15 @@ const Reservations = () => {
     ];
 
     const columns = [
-        { header: 'ID', accessor: 'reservationID' },
+        { header: 'ID', accessor: 'reservationid' },
         {
             header: 'Image',
-            accessor: 'propertyImage',
+            accessor: 'propertyimage',
             render: (reservation) => (
-                Array.isArray(reservation.propertyImage) && reservation.propertyImage.length > 0 ? (
+                Array.isArray(reservation.propertyimage) && reservation.propertyimage.length > 0 ? (
                     <img
-                        src={`data:image/jpeg;base64,${reservation.propertyImage[0]}`}
-                        alt={reservation.propertyName}
+                        src={`data:image/jpeg;base64,${reservation.propertyimage[0]}`}
+                        alt={reservation.propertyaddress}
                         style={{ width: 80, height: 80 }}
                     />
                 ) : (
@@ -148,15 +148,15 @@ const Reservations = () => {
                 )
             ),
         },
-        { header: 'Property Name', accessor: 'propertyName' },
-        { header: 'Total Price', accessor: 'totalPrice' },
-        { header: 'Pax', accessor: 'reservationPaxNo' },
+        { header: 'Property Name', accessor: 'propertyaddress' },
+        { header: 'Total Price', accessor: 'rateamount' },
+        { header: 'Pax', accessor: 'reservationpaxno' },
         {
             header: 'Status',
-            accessor: 'reservationStatus',
+            accessor: 'reservationstatus',
             render: (reservation) => (
-                <span className={`status-badge ${(reservation.reservationStatus ?? 'Pending').toLowerCase()}`}>
-                    {reservation.reservationStatus}
+                <span className={`status-badge ${(reservation.reservationstatus ?? 'Pending').toLowerCase()}`}>
+                    {reservation.reservationstatus}
                 </span>
             ),
         },
@@ -187,13 +187,13 @@ const Reservations = () => {
             <PaginatedTable
                 data={filteredReservations}
                 columns={columns}
-                rowKey="reservationID"
+                rowKey="reservationid"
                 enableCheckbox={false} 
             />
 
             <Modal
                 isOpen={!!selectedReservation}
-                title={`Reservation ID: ${selectedReservation?.reservationID}`}
+                title={`Reservation ID: ${selectedReservation?.reservationid}`}
                 data={selectedReservation || {}}
                 labels={displayLabels} 
                 onClose={() => setSelectedReservation(null)}
