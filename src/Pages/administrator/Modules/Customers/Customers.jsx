@@ -183,7 +183,11 @@ const Customers = () => {
                             />
                         )}
                         <span
-                            className={`status-dot ${customer.ustatus === 'login' ? 'status-login' : 'status-logout'}`}
+                            className={`status-dot ${
+                                customer.ustatus === 'login' ? 'status-login' :
+                                customer.ustatus === 'registered' ? 'status-registered' :
+                                'status-logout'
+                            }`}
                         />
                     </div>
                     <span className="customer-username">{customer.username || 'N/A'}</span>
