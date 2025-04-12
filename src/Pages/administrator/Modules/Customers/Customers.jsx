@@ -35,7 +35,7 @@ const Customers = () => {
             console.error('Failed to fetch customer details', error);
             displayToast('error', 'Failed to load customers. Please try again.');
         },
-        staleTime: 5 * 60 * 1000, 
+        staleTime: 5 * 60 * 1000,
     });
 
     const suspendMutation = useMutation({
@@ -70,7 +70,6 @@ const Customers = () => {
 
     useEffect(() => {
         if (customers.length > 0) {
-
             console.log('Customers data:', customers.slice(0, 3).map((c) => ({
                 userid: c.userid,
                 username: c.username,
@@ -162,7 +161,7 @@ const Customers = () => {
     const columns = [
         {
             header: 'Customer',
-            accessor: 'customer', 
+            accessor: 'customer',
             render: (customer) => (
                 <div className="customer-container">
                     <div className="avatar-container">
@@ -184,14 +183,13 @@ const Customers = () => {
                             />
                         )}
                         <span
-                            className={`status-dot ${customer.ustatus === 'login' ? 'status-registered' : 'status-login' : 'status-logout'}`}
+                            className={`status-dot ${customer.ustatus === 'login' ? 'status-login' : 'status-logout'}`}
                         />
                     </div>
                     <span className="customer-username">{customer.username || 'N/A'}</span>
                 </div>
             ),
         },
-        { header: 'Username', accessor: 'username' },
         { header: 'Email', accessor: 'uemail' },
         {
             header: 'Login Status',
