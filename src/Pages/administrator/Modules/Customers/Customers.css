@@ -230,7 +230,7 @@
 
 .status-dot {
     position: absolute;
-    bottom: 0;
+    bottom: 3;
     right: 0;
     width: 15px;
     height: 15px;
