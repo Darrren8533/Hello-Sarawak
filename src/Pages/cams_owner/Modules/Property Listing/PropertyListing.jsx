@@ -50,9 +50,9 @@ const PropertyListing = () => {
     const handleAction = (action, property) => {
         if (action === 'view') {
             setSelectedProperty({
-                propertyname: property.propertyname || 'N/A',
-                propertyprice: property.propertyprice || 'N/A',
-                propertylocation: property.propertylocation || 'N/A',
+                propertyaddress: property.propertyaddress || 'N/A',
+                rateamount: property.rateamount || 'N/A',
+                nearbylocation: property.nearbylocation || 'N/A',
                 propertyguestpaxno: property.propertyguestpaxno || 'N/A',
                 propertystatus: property.propertystatus || 'N/A',
                 propertybedtype: property.propertybedtype || 'N/A',
@@ -83,9 +83,9 @@ const PropertyListing = () => {
     ];
 
     const displayLabels = {
-        propertyname: "Property Name",
-        propertyprice: "Property Price",
-        propertylocation: "Property Location",
+        propertyaddress: "Property Name",
+        rateamount: "Property Price",
+        nearbylocation: "Property Location",
         propertyguestpaxno: "Guest Capacity",
         propertystatus: "Property Status",
         propertybedtype: "Bed Type",
@@ -99,9 +99,9 @@ const PropertyListing = () => {
             (appliedFilters.status === 'All' || (property.propertystatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
             (
                 (property.propertyid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.propertyname?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.propertylocation?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.propertyprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.propertyaddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.clustername?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.rateamount?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                 (property.propertystatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
             )
     );
@@ -119,7 +119,7 @@ const PropertyListing = () => {
                 property.propertyimage && property.propertyimage.length > 0 ? (
                     <img
                         src={`data:image/jpeg;base64,${property.propertyimage[0]}`}
-                        alt={property.propertyname}
+                        alt={property.propertyaddress}
                         style={{ width: 80, height: 80 }}
                     />
                 ) : (
@@ -127,9 +127,9 @@ const PropertyListing = () => {
                 )
             )
         },
-        { header: 'Name', accessor: 'propertyname' },
-        { header: 'Price', accessor: 'propertyprice' },
-        { header: 'Location', accessor: 'propertylocation' },
+        { header: 'Name', accessor: 'propertyaddress' },
+        { header: 'Price', accessor: 'rateamount' },
+        { header: 'Cluster', accessor: 'clustername' },
         {
             header: 'Status',
             accessor: 'propertystatus',
@@ -169,7 +169,7 @@ const PropertyListing = () => {
 
             <Modal
                 isOpen={!!selectedProperty}
-                title={`${selectedProperty?.propertyname}`}
+                title={`${selectedProperty?.propertyaddress}`}
                 data={selectedProperty || {}}
                 labels={displayLabels}
                 onClose={() => setSelectedProperty(null)}
