@@ -122,12 +122,11 @@ const Administrators = () => {
               }`}
             />
           </div>
-          <span className="table-user-username">{`${administrator.ufirstname} ${administrator.ulastname}` || 'N/A'}</span>
+           <span className="table-user-username">{administrator.username || 'N/A'}</span>
         </div>
       ),
     },
     { header: 'Email', accessor: 'uemail' },
-    { header: 'Phone', accessor: 'uphoneno' },
     {
       header: 'Status',
       accessor: 'uactivation',
