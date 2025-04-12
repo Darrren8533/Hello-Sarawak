@@ -208,19 +208,25 @@
     font-size: 16px;
   }
 
-  .avatar-container {
+  customer-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Space between avatar and username */
+}
+
+.avatar-container {
     position: relative;
     display: inline-block;
-  }
+}
 
-  .customer-avatar {
+.customer-avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
     object-fit: cover;
-  }
+}
 
-  .status-dot {
+.status-dot {
     position: absolute;
     bottom: 0;
     right: 0;
@@ -228,15 +234,24 @@
     height: 10px;
     border-radius: 50%;
     border: 2px solid white;
-  }
+}
 
-  .status-login {
-    background-color: #22c55e; 
-  }
+.status-login {
+    background-color: #22c55e;
+}
 
-  .status-logout {
+.status-registered {
     background-color: #9ca3af; 
-  }
+}
+
+.status-logout {
+    background-color: #DC143C; 
+}
+
+.customer-username {
+    font-size: 14px;
+    font-weight: 500;
+}
   
   /* Enhanced modal */
   .modal-overlay {
