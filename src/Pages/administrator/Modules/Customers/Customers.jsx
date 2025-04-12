@@ -159,7 +159,7 @@ const Customers = () => {
     };
 
     const columns = [
-        { header: 'User ID', accessor: 'userid' },
+        { header: 'ID', accessor: 'userid' },
         {
             header: 'Customer',
             accessor: 'customer',
