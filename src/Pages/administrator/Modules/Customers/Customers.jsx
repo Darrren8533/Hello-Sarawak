@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchUserData, fetchCustomers, suspendUser, activateUser } from '../../../../../Api/api';
+import { fetchCustomers, suspendUser, activateUser } from '../../../../../Api/api';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
@@ -20,107 +20,58 @@ const Customers = () => {
     const [filteredCustomers, setFilteredCustomers] = useState([]);
     const [searchKey, setSearchKey] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('All');
-    const [appliedFilters, setAppliedFilters] = useState({ status: 'All' });
+    const [appliedFilters, setAppliedFilters] = useState({ status: 'All' }); 
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [toastMessage, setToastMessage] = useState('');
     const [showToast, setShowToast] = useState(false);
     const [toastType, setToastType] = useState('');
-    const [enhancedCustomers, setEnhancedCustomers] = useState([]);
 
-    // Initialize QueryClient
     const queryClient = useQueryClient();
 
-    // Fetch customers query
-    const { data: customers = [], isLoading: isCustomersLoading } = useQuery({
+    const { data: customers = [], isLoading } = useQuery({
         queryKey: ['customers'],
         queryFn: fetchCustomers,
         onError: (error) => {
             console.error('Failed to fetch customer details', error);
             displayToast('error', 'Failed to load customers. Please try again.');
-        },
+        }
     });
 
-    // Define mutations
     const suspendMutation = useMutation({
         mutationFn: (userId) => suspendUser(userId),
         onSuccess: (_, userId) => {
             queryClient.setQueryData(['customers'], (oldData) =>
-                oldData.map((c) => (c.userid === userId ? { ...c, uactivation: 'Inactive' } : c))
+                oldData.map(c => c.userid === userId ? { ...c, uactivation: 'Inactive' } : c)
             );
-            const customer = enhancedCustomers.find((c) => c.userid === userId);
+            const customer = customers.find(c => c.userid === userId);
             displayToast('success', `User ${customer.username} has been suspended.`);
         },
         onError: (error) => {
             console.error('Failed to suspend user:', error);
             displayToast('error', 'Error suspending user');
-        },
+        }
     });
 
     const activateMutation = useMutation({
         mutationFn: (userId) => activateUser(userId),
         onSuccess: (_, userId) => {
             queryClient.setQueryData(['customers'], (oldData) =>
-                oldData.map((c) => (c.userid === userId ? { ...c, uactivation: 'Active' } : c))
+                oldData.map(c => c.userid === userId ? { ...c, uactivation: 'Active' } : c)
             );
-            const customer = enhancedCustomers.find((c) => c.userid === userId);
+            const customer = customers.find(c => c.userid === userId);
             displayToast('success', `User ${customer.username} has been activated.`);
         },
         onError: (error) => {
             console.error('Failed to activate user:', error);
             displayToast('error', 'Error activating user');
-        },
+        }
     });
 
-    // Fetch individual user data with caching
     useEffect(() => {
-        const enhanceCustomerData = async () => {
-            if (customers.length > 0) {
-                try {
-                    const enhanced = await Promise.all(
-                        customers.map(async (customer) => {
-                            // Use queryClient.fetchQuery to cache fetchUserData
-                            try {
-                                const userData = await queryClient.fetchQuery({
-                                    queryKey: ['userData', customer.userid],
-                                    queryFn: () => fetchUserData(customer.userid),
-                                    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
-                                });
-                                return {
-                                    ...customer,
-                                    username: userData.username || 'N/A',
-                                    uimage: userData.uimage
-                                        ? userData.uimage.startsWith('http')
-                                            ? userData.uimage
-                                            : `data:image/jpeg;base64,${userData.uimage}`
-                                        : 'default-avatar.png',
-                                    ustatus: userData.ustatus || 'logout',
-                                };
-                            } catch (error) {
-                                console.error(`Failed to fetch data for user ${customer.userid}:`, error);
-                                return {
-                                    ...customer,
-                                    username: 'N/A',
-                                    uimage: 'default-avatar.png',
-                                    ustatus: 'logout',
-                                };
-                            }
-                        })
-                    );
-                    setEnhancedCustomers(enhanced);
-                    setFilteredCustomers(enhanced);
-                } catch (error) {
-                    console.error('Error enhancing customer data:', error);
-                    displayToast('error', 'Error loading user details.');
-                }
-            }
-        };
-
-        enhanceCustomerData();
-    }, [customers, queryClient]);
-
-    useEffect(() => {
-        applyFilters();
-    }, [enhancedCustomers, searchKey, appliedFilters]);
+        if (customers) {
+            applyFilters();
+        }
+    }, [customers, searchKey, appliedFilters]);
 
     const displayToast = (type, message) => {
         setToastType(type);
@@ -130,12 +81,14 @@ const Customers = () => {
     };
 
     const applyFilters = () => {
-        const filtered = enhancedCustomers.filter(
+        const filtered = customers.filter(
             (customer) =>
                 (appliedFilters.status === 'All' || customer.uactivation === appliedFilters.status) &&
-                `${customer.username} ${customer.uemail} ${customer.uactivation}`
-                    .toLowerCase()
-                    .includes(searchKey.toLowerCase())
+                (
+                    `${customer.username} ${customer.uemail} ${customer.uactivation}`
+                        .toLowerCase()
+                        .includes(searchKey.toLowerCase())
+                )
         );
         setFilteredCustomers(filtered);
     };
@@ -157,10 +110,9 @@ const Customers = () => {
     const displayLabels = {
         username: 'Username',
         email: 'Email',
-        uactivation: 'Status',
+        uactivation: 'Status', 
         gender: 'Gender',
         country: 'Country',
-        ustatus: 'Login Status',
     };
 
     const handleAction = async (action, customer) => {
@@ -170,7 +122,6 @@ const Customers = () => {
                 email: customer.uemail || 'N/A',
                 gender: customer.ugender || 'N/A',
                 country: customer.ucountry || 'N/A',
-                ustatus: customer.ustatus || 'N/A',
             };
             setSelectedCustomer(essentialFields);
         } else if (action === 'suspend') {
@@ -206,12 +157,12 @@ const Customers = () => {
             accessor: 'uimage',
             render: (customer) => (
                 <div className="avatar-container">
-                    <img
-                        src={customer.uimage || 'default-avatar.png'}
-                        alt="Avatar"
+                    <img 
+                        src={customer.uimage || 'default-avatar.png'} 
+                        alt="Avatar" 
                         className="customer-avatar"
                     />
-                    <span
+                    <span 
                         className={`status-dot ${customer.ustatus === 'login' ? 'status-login' : 'status-logout'}`}
                     />
                 </div>
@@ -223,7 +174,7 @@ const Customers = () => {
             header: 'Login Status',
             accessor: 'ustatus',
             render: (customer) => (
-                <span className={`status-badge ${customer.ustatus?.toLowerCase()}`}>
+                <span className={`status-badge ${customer.ustatus?.toString()?.toLowerCase()}`}>
                     {customer.ustatus || 'Unknown'}
                 </span>
             ),
@@ -253,16 +204,12 @@ const Customers = () => {
         <div>
             <div className="header-container">
                 <h1 className="dashboard-page-title">Customer Details</h1>
-                <SearchBar
-                    value={searchKey}
-                    onChange={(newValue) => setSearchKey(newValue)}
-                    placeholder="Search customers..."
-                />
+                <SearchBar value={searchKey} onChange={(newValue) => setSearchKey(newValue)} placeholder="Search customers..." />
             </div>
 
             <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-            {isCustomersLoading ? (
+            {isLoading ? (
                 <div className="loader-box">
                     <Loader />
                 </div>
@@ -270,14 +217,14 @@ const Customers = () => {
                 <PaginatedTable
                     data={filteredCustomers}
                     columns={columns}
-                    rowKey="userid"
+                    rowKey="userID"
                     enableCheckbox={false}
                 />
             )}
 
             <Modal
                 isOpen={!!selectedCustomer}
-                title={selectedCustomer?.username || 'Customer Details'}
+                title={selectedCustomer?.username}
                 data={selectedCustomer || {}}
                 labels={displayLabels}
                 onClose={() => setSelectedCustomer(null)}
