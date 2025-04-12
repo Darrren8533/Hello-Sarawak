@@ -159,6 +159,7 @@ const Customers = () => {
     };
 
     const columns = [
+        { header: 'User ID', accessor: 'userid' },
         {
             header: 'Customer',
             accessor: 'customer',
@@ -195,15 +196,6 @@ const Customers = () => {
             ),
         },
         { header: 'Email', accessor: 'uemail' },
-        {
-            header: 'Login Status',
-            accessor: 'ustatus',
-            render: (customer) => (
-                <span className={`status-badge ${customer.ustatus?.toLowerCase() || 'unknown'}`}>
-                    {customer.ustatus || 'Unknown'}
-                </span>
-            ),
-        },
         {
             header: 'Status',
             accessor: 'uactivation',
