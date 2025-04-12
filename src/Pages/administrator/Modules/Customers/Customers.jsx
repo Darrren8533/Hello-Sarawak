@@ -161,30 +161,33 @@ const Customers = () => {
 
     const columns = [
         {
-            header: 'Avatar',
-            accessor: 'uimage',
+            header: 'Customer',
+            accessor: 'customer', 
             render: (customer) => (
-                <div className="avatar-container">
-                    {customer.uimage && customer.uimage.length > 0 ? (
-                        <img
-                            src={`data:image/jpeg;base64,${customer.uimage}`}
-                            alt={customer.username || 'Avatar'}
-                            className="customer-avatar"
-                            onError={(e) => {
-                                console.error(`Failed to load avatar for user ${customer.userid}:`, customer.uimage);
-                                e.target.src = '/public/avatar.png'; 
-                            }}
+                <div className="customer-container">
+                    <div className="avatar-container">
+                        {customer.uimage && customer.uimage.length > 0 ? (
+                            <img
+                                src={`data:image/jpeg;base64,${customer.uimage}`}
+                                alt={customer.username || 'Avatar'}
+                                className="customer-avatar"
+                                onError={(e) => {
+                                    console.error(`Failed to load avatar for user ${customer.userid}:`, customer.uimage);
+                                    e.target.src = '/public/avatar.png';
+                                }}
+                            />
+                        ) : (
+                            <img
+                                src="/public/avatar.png"
+                                alt="Default Avatar"
+                                className="customer-avatar"
+                            />
+                        )}
+                        <span
+                            className={`status-dot ${customer.ustatus === 'login' ? 'status-registered' : 'status-login' : 'status-logout'}`}
                         />
-                    ) : (
-                        <img
-                            src="/public/avatar.png"
-                            alt="Default Avatar"
-                            className="customer-avatar"
-                        />
-                    )}
-                    <span
-                        className={`status-dot ${customer.ustatus === 'login' ? 'status-login' : 'status-logout'}`}
-                    />
+                    </div>
+                    <span className="customer-username">{customer.username || 'N/A'}</span>
                 </div>
             ),
         },
