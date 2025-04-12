@@ -109,7 +109,7 @@ const AuditTrails = () => {
   return (
     <div>
       <div className="header-container">
-        <h1 className="dashboard-page-title">Book & Pay Log</h1>
+        <h1 className="dashboard-page-title">Audit Trails</h1>
         <SearchBar
           value={searchKey}
           onChange={(newValue) => setSearchKey(newValue)}
