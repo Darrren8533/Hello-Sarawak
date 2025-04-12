@@ -116,8 +116,41 @@ const Customers = () => {
     };
 
     const columns = [
-        { header: 'First Name', accessor: 'ufirstname' },
-        { header: 'Last Name', accessor: 'ulastname' },
+        {
+            header: 'Customer',
+            accessor: 'customer',
+            render: (customer) => (
+                <div className="user-container">
+                    <div className="avatar-container">
+                        {customer.uimage && customer.uimage.length > 0 ? (
+                            <img
+                                src={`data:image/jpeg;base64,${customer.uimage}`}
+                                 alt={customer.username || 'Avatar'}
+                                 className="table-user-avatar"
+                                onError={(e) => {
+                                    console.error(`Failed to load avatar for customer ${customer.userid}:`, customer.uimage);
+                                    e.target.src = '/public/avatar.png';
+                                }}
+                            />
+                        ) : (
+                            <img
+                                src="/public/avatar.png"
+                                alt="Default Avatar"
+                                className="table-user-avatar"
+                            />
+                        )}
+                        <span
+                            className={`status-dot ${
+                                customer.ustatus === 'login' ? 'status-login' :
+                                customer.ustatus === 'registered' ? 'status-registered' :
+                                'status-logout'
+                            }`}
+                        />
+                    </div>
+                   <span className="table-user-username">{customer.username || 'N/A'}</span>
+                </div>
+            ),
+        },
         { header: 'Email', accessor: 'uemail' },
         { header: 'Phone', accessor: 'uphoneno' },
         { header: 'Role', accessor: 'usergroup' },
