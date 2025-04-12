@@ -48,7 +48,7 @@ const Administrators = () => {
   ];
 
   const displayLabels = {
-    userid: 'User ID',
+    administratorsid: 'administrators ID',
     ufirstname: 'First Name',
     ulastname: 'Last Name',
     uemail: 'Email',
@@ -59,29 +59,29 @@ const Administrators = () => {
   };
 
   // Filtering administrators based on search key and status
-  const filteredUsers = administrators.filter((user) => {
+  const filteredadministratorss = administrators.filter((administrators) => {
     const searchInFields =
-      `${user.userid} ${user.ufirstname} ${user.ulastname} ${user.uemail} ${user.uphoneno} ${user.uactivation}`
+      `${administrators.administratorsid} ${administrators.ufirstname} ${administrators.ulastname} ${administrators.uemail} ${administrators.uphoneno} ${administrators.uactivation}`
         .toLowerCase()
         .includes(searchKey.toLowerCase());
 
     const statusFilter =
-      appliedFilters.status === 'All' || user.uactivation === appliedFilters.status;
+      appliedFilters.status === 'All' || administrators.uactivation === appliedFilters.status;
 
     return searchInFields && statusFilter;
   });
 
-  const handleAction = (action, user) => {
+  const handleAction = (action, administrators) => {
     if (action === 'view') {
       const essentialFields = {
-        userid: user.userid || 'N/A',
-        ufirstname: user.ufirstname || 'N/A',
-        ulastname: user.ulastname || 'N/A',
-        uemail: user.uemail || 'N/A',
-        uphoneno: user.uphoneno || 'N/A',
-        uactivation: user.uactivation || 'N/A',
-        ugender: user.ugender || 'N/A',
-        ucountry: user.ucountry || 'N/A',
+        administratorsid: administrators.administratorsid || 'N/A',
+        ufirstname: administrators.ufirstname || 'N/A',
+        ulastname: administrators.ulastname || 'N/A',
+        uemail: administrators.uemail || 'N/A',
+        uphoneno: administrators.uphoneno || 'N/A',
+        uactivation: administrators.uactivation || 'N/A',
+        ugender: administrators.ugender || 'N/A',
+        ucountry: administrators.ucountry || 'N/A',
       };
       setSelectedOperator(essentialFields);
     }
@@ -90,20 +90,20 @@ const Administrators = () => {
   const operatorDropdownItems = [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
 
   const columns = [
-    { header: 'ID', accessor: 'userid' },
+    { header: 'ID', accessor: 'administratorsid' },
     {
       header: 'Administrator',
       accessor: 'administrator',
-      render: (user) => (
+      render: (administrators) => (
         <div className="administrator-container">
           <div className="avatar-container">
-            {user.uimage && user.uimage.length > 0 ? (
+            {administrators.uimage && administrators.uimage.length > 0 ? (
               <img
-                src={`data:image/jpeg;base64,${user.uimage}`}
-                alt={`${user.ufirstname} ${user.ulastname}`}
+                src={`data:image/jpeg;base64,${administrators.uimage}`}
+                alt={`${administrators.ufirstname} ${administrators.ulastname}`}
                 className="administrator-avatar"
                 onError={(e) => {
-                  console.error(`Failed to load avatar for admin ${user.userid}:`, user.uimage);
+                  console.error(`Failed to load avatar for admin ${administrators.administratorsid}:`, administrators.uimage);
                   e.target.src = '/public/avatar.png';
                 }}
               />
@@ -116,13 +116,13 @@ const Administrators = () => {
             )}
             <span
               className={`status-dot ${
-                user.ustatus === 'login' ? 'status-login' :
-                user.ustatus === 'registered' ? 'status-registered' :
+                administrators.ustatus === 'login' ? 'status-login' :
+                administrators.ustatus === 'registered' ? 'status-registered' :
                 'status-logout'
               }`}
             />
           </div>
-          <span className="administrator-username">{`${user.ufirstname} ${user.ulastname}` || 'N/A'}</span>
+          <span className="administrator-administratorsname">{`${administrators.ufirstname} ${administrators.ulastname}` || 'N/A'}</span>
         </div>
       ),
     },
@@ -131,9 +131,9 @@ const Administrators = () => {
     {
       header: 'Status',
       accessor: 'uactivation',
-      render: (user) => (
-        <span className={`status-badge ${user.uactivation?.toLowerCase() || 'active'}`}>
-          {user.uactivation || 'Active'}
+      render: (administrators) => (
+        <span className={`status-badge ${administrators.uactivation?.toLowerCase() || 'active'}`}>
+          {administrators.uactivation || 'Active'}
         </span>
       ),
     },
@@ -170,7 +170,7 @@ const Administrators = () => {
       ) : error ? (
         <p className="error-message">Failed to load administrators: {error.message}</p>
       ) : (
-        <PaginatedTable data={filteredUsers} columns={columns} rowKey="userid" enableCheckbox={false} />
+        <PaginatedTable data={filteredadministratorss} columns={columns} rowKey="administratorsid" enableCheckbox={false} />
       )}
 
       <Modal
