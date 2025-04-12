@@ -111,8 +111,7 @@ const Customers = () => {
     ];
 
     const displayLabels = {
-        firstname: 'First Name',
-        lastname: 'Last Name',
+        username: 'Username',
         email: 'Email',
         phoneno: 'Phone Number',
         uactivation: 'Status', 
@@ -123,6 +122,7 @@ const Customers = () => {
     const handleAction = async (action, customer) => {
         if (action === 'view') {
             const essentialFields = {
+                username: customer.username || 'N/A',
                 firstname: customer.ufirstname || 'N/A',
                 lastname: customer.ulastname || 'N/A',
                 email: customer.uemail || 'N/A',
@@ -159,8 +159,7 @@ const Customers = () => {
     };
 
     const columns = [
-        { header: 'First Name', accessor: 'ufirstname' },
-        { header: 'Last Name', accessor: 'ulastname' },
+        { header: 'Username', accessor: 'username' },
         { header: 'Email', accessor: 'uemail' },
         { header: 'Phone', accessor: 'uphoneno' },
         {
