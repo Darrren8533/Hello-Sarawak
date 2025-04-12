@@ -100,7 +100,7 @@ const Administrators = () => {
             {administrator.uimage && administrator.uimage.length > 0 ? (
               <img
                 src={`data:image/jpeg;base64,${administrator.uimage}`}
-                alt={`${administrator.ufirstname} ${administrator.ulastname}`}
+                alt={administrator.username || 'Avatar'}
                 className="table-user-avatar"
                 onError={(e) => {
                   console.error(`Failed to load avatar for admin ${administrator.userid}:`, administrator.uimage);
