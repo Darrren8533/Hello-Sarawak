@@ -12,7 +12,7 @@ import '../../../../Component/Modal/Modal.css';
 import '../../../../Component/Filter/Filter.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 
-const BooknPayLog = () => {
+const AuditTrails = () => {
   const [logs, setLogs] = useState([]);
   const [searchKey, setSearchKey] = useState('');
   const [selectedActionType, setSelectedActionType] = useState('All');
@@ -25,7 +25,7 @@ const BooknPayLog = () => {
         const logData = await fetchBookLog();
         setLogs(logData || []); // Ensure logs is always an array
       } catch (error) {
-        console.error('Failed to fetch Book & Pay Logs:', error);
+        console.error('Failed to fetch Audit Trails Logs:', error);
       }
     };
 
@@ -137,4 +137,4 @@ const BooknPayLog = () => {
   );
 };
 
-export default BooknPayLog;
+export default AuditTrails;
