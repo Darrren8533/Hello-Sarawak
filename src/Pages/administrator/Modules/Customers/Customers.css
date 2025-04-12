@@ -221,7 +221,7 @@
     flex-shrink: 0;
   }
 
-.customer-avatar {
+.table-user-avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -250,7 +250,7 @@
     background-color: #DC143C; 
   }
 
-.customer-username {
+.table-user-username {
     font-size: 18px;
     color: #333; 
     white-space: nowrap; 
