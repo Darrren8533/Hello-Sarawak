@@ -44,9 +44,14 @@ export default function FinancialDashboard() {
     queryFn: fetchOccupancyRate
   });
 
-  const { data: revPARData } = useQuery({
-    queryKey: ['revPAR'],
-    queryFn: fetchRevPAR
+  const {
+    data: revPARData,
+    isLoading: revPARLoading,
+    error: revPARError
+  } = useQuery({
+    queryKey: ['revPAR', userid],
+    queryFn: () => fetchRevPAR(userid),
+    enabled: !!userid 
   });
 
   const { data: cancellationRateData } = useQuery({
