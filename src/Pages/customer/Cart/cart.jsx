@@ -42,11 +42,13 @@ const Cart = () => {
     }, 3000);
   };
 
-  useEffect(() => {
+useEffect(() => {
+
   if (usergroup !== 'Customer') {
     queryClient.removeQueries({ queryKey: ['cart'] });
+    queryClient.removeQueries({ queryKey: ['reservations'] });
   }
-}, [usergroup]);
+}, [usergroup, queryClient]);
 
   // React Query hook for fetching cart data
   const { data: reservations = [], isLoading: loading } = useQuery({
