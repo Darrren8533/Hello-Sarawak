@@ -147,15 +147,17 @@ export default function FinancialDashboard() {
         return <div>No RevPAR data</div>;
       }
     
-      // Get the latest RevPAR value
-      const latestRevPAR = parseFloat(revPARData.monthlyData[revPARData.monthlyData.length - 1].revpar);
+      const months = revPARData.monthlyData.map((entry) => entry.month);
+      const revparValues = revPARData.monthlyData.map((entry) =>
+        parseFloat(entry.revpar)
+      );
     
       const revparChartData = {
-        labels: ["RevPAR"], // Single data point label
+        labels: months,
         datasets: [
           {
             label: "RevPAR ($)",
-            data: [latestRevPAR],
+            data: revparValues,
             fill: false,
             borderColor: "rgb(255, 159, 64)",
             tension: 0.3,
@@ -172,10 +174,11 @@ export default function FinancialDashboard() {
         responsive: true,
         plugins: {
           legend: { position: "top" },
-          title: { display: true, text: "RevPAR Data" },
+          title: { display: true, text: "Monthly RevPAR" },
           tooltip: {
             callbacks: {
-              label: (context) => `RevPAR: $${context.parsed.y.toFixed(2)}`,
+              label: (context) =>
+                `RevPAR: $${context.parsed.y?.toFixed(2) ?? 0}`,
             },
           },
         },
@@ -185,7 +188,7 @@ export default function FinancialDashboard() {
             title: { display: true, text: "RevPAR ($)" },
           },
           x: {
-            title: { display: true, text: "Metric" },
+            title: { display: true, text: "Month" },
           },
         },
       };
