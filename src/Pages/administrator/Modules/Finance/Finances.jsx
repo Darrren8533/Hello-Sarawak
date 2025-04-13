@@ -49,7 +49,7 @@ export default function FinancialDashboard() {
     isLoading: revPARLoading,
     error: revPARError
   } = useQuery({
-    queryKey: ['revPAR', userid],
+    queryKey: ['revpar', userid],
     queryFn: () => fetchRevPAR(userid),
     enabled: !!userid 
   });
