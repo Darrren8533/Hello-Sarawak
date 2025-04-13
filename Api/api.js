@@ -726,9 +726,9 @@ export const fetchOccupancyRate = async () => {
   }
 };
 
-export const fetchRevPAR = async () => {
+export const fetchRevPAR = async (userid) => {
   try {
-      const response = await fetch(`${API_URL}/users/RevPAR`);
+      const response = await fetch(`${API_URL}/users/RevPAR?userid=${userid}`);
       const data = await response.json();
       return data; 
   } catch (error) {
