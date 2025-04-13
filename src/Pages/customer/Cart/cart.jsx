@@ -19,6 +19,7 @@ const Cart = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [actionToConfirm, setActionToConfirm] = useState(null);
   const [selectedReservationId, setSelectedReservationId] = useState(null);
+  const userId = localStorage.getItem('userId');
   const usergroup = localStorage.getItem('usergroup');
   const taxRate = 0.10;
 
@@ -51,15 +52,15 @@ useEffect(() => {
 }, [usergroup, queryClient]);
 
   // React Query hook for fetching cart data
-  const { data: reservations = [], isLoading: loading } = useQuery({
-    queryKey: ['cart'],
-    queryFn: fetchCart,
-    enabled: usergroup === 'Customer',
-    onError: (error) => {
-      console.error('Error fetching reservations:', error);
-      displayToast('error', 'Failed to load your reservations. Please try again.');
-    }
-  });
+const { data: reservations = [], isLoading: loading } = useQuery({
+  queryKey: ['cart', usergroup, userId],
+  queryFn: fetchCart,
+  enabled: usergroup === 'Customer',
+  onError: (error) => {
+    console.error('Error fetching reservations:', error);
+    displayToast('error', 'Failed to load your reservations. Please try again.');
+  }
+});
 
   // Mutation for updating reservation status
   const updateStatusMutation = useMutation({
