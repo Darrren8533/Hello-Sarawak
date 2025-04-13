@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaArrowLeft, FaArrowRight, FaShoppingCart, FaHistory, FaTrash, FaCreditCard, FaCalendarAlt, FaFilter, FaSort, FaExclamationCircle } from 'react-icons/fa';
 import { removeReservation, updateReservationStatus } from '../../../../Api/api';
 import { Link } from 'react-router-dom';
@@ -41,6 +41,12 @@ const Cart = () => {
       setShowToast(false);
     }, 3000);
   };
+
+  useEffect(() => {
+  if (usergroup !== 'Customer') {
+    queryClient.removeQueries({ queryKey: ['cart'] });
+  }
+}, [usergroup]);
 
   // React Query hook for fetching cart data
   const { data: reservations = [], isLoading: loading } = useQuery({
