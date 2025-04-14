@@ -737,9 +737,9 @@ export const fetchRevPAR = async (userid) => {
   }
 };
 
-export const fetchCancellationRate = async () => {
+export const fetchCancellationRate = async (userid) => {
   try {
-      const response = await fetch(`${API_URL}/users/cancellation_rate`);
+      const response = await fetch(`${API_URL}/users/cancellation_rate?={userid}`);
       const data = await response.json();
       return data; 
   } catch (error) {
