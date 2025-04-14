@@ -39,9 +39,14 @@ export default function FinancialDashboard() {
     enabled: !!userid
   });
 
-  const { data: occupancyData } = useQuery({
-    queryKey: ['occupancy'],
-    queryFn: fetchOccupancyRate
+  const { 
+    data: occupancyData,
+    isLoading: occupancyLoading,
+    error: occupancyError
+  } = useQuery({
+    queryKey: ['occupancy_rate', userid],
+    queryFn: () => fetchOccupancyRate(userid),
+    enabled: !!userid
   });
 
   const {
@@ -88,16 +93,20 @@ export default function FinancialDashboard() {
     }
 
     if (chartType === "occupancy") {
-      if (!occupancyData?.monthlyData || occupancyData.monthlyData.length === 0) {
+      const data = occupancyData?.monthlyData;
+    
+      if (!data || data.length === 0) {
         return <div>No occupancy data available</div>;
       }
     
       const occupancyChartData = {
-        labels: occupancyData.monthlyData.map((item) => item.month),
+        labels: data.map((item) => item.month),
         datasets: [
           {
             label: "Occupancy Rate (%)",
-            data: occupancyData.monthlyData.map((item) => parseFloat(item.occupancy_rate)),
+            data: data.map((item) =>
+              item.occupancy_rate !== null ? parseFloat(item.occupancy_rate.toFixed(2)) : 0
+            ),
             fill: false,
             borderColor: "rgb(153, 102, 255)",
             tension: 0.3,
@@ -122,7 +131,7 @@ export default function FinancialDashboard() {
           },
           tooltip: {
             callbacks: {
-              label: (context) => `Occupancy Rate: ${context.parsed.y}%`,
+              label: (context) => `Occupancy Rate: ${context.parsed.y.toFixed(2)}%`,
             },
           },
         },
