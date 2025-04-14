@@ -715,9 +715,9 @@ export const fetchFinance = async (userid) => {
   }
 };
 
-export const fetchOccupancyRate = async () => {
+export const fetchOccupancyRate = async (userid) => {
   try {
-      const response = await fetch(`${API_URL}/users/occupancy_rate`);
+      const response = await fetch(`${API_URL}/users/occupancy_rate?userid=${userid}`);
       const data = await response.json();
       return data; 
   } catch (error) {
