@@ -59,7 +59,7 @@ export default function FinancialDashboard() {
     isLoading: cancellationRateLoading,
     error: cancellationRateError
   } = useQuery({
-    queryKey: ['cancellation_rate', userid],
+    queryKey: ['cancellationRate', userid],
     queryFn: () => fetchCancellationRate(userid),
     enabled: !!userid
   });
