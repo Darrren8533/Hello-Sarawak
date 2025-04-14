@@ -69,9 +69,14 @@ export default function FinancialDashboard() {
     enabled: !!userid
   });
 
-  const { data: customerRetentionRateData } = useQuery({
-    queryKey: ['customerRetentionRate'],
-    queryFn: fetchCustomerRetentionRate
+  const { 
+    data: customerRetentionRateData,
+    isLoading: customerRetentionRateLoading,
+    error: customerRetentionRateError
+  } = useQuery({
+    queryKey: ['customerRetentionRate', userid],
+    queryFn: () => fetchCustomerRetentionRate(userid),
+    enabled: !!userid
   });
 
   const { data: guestSatisfactionScoreData } = useQuery({
