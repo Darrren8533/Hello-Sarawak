@@ -54,9 +54,14 @@ export default function FinancialDashboard() {
     enabled: !!userid 
   });
 
-  const { data: cancellationRateData } = useQuery({
-    queryKey: ['cancellationRate'],
-    queryFn: fetchCancellationRate
+  const { 
+    data: cancellationRateData,
+    isLoading: cancellationRateLoading,
+    error: cancellationRateError
+  } = useQuery({
+    queryKey: ['cancellationRate', userid],
+    queryFn: () => fetchCancellationRate(userid),
+    enabled: !!userid
   });
 
   const { data: customerRetentionRateData } = useQuery({
@@ -201,12 +206,17 @@ export default function FinancialDashboard() {
         return <div>No cancellation data available</div>;
       }
     
+      const months = cancellationRateData.monthlyData.map((item) => item.month); 
+      const cancellationRates = cancellationRateData.monthlyData.map((item) =>
+        parseFloat(item.cancellation_rate)
+      );
+    
       const cancellationRateChartData = {
-        labels: ["Cancellation Rate"], 
+        labels: months, 
         datasets: [
           {
             label: "Cancellation Rate (%)",
-            data: cancellationRateData.monthlyData.map((item) => parseFloat(item.cancellation_rate)),
+            data: cancellationRates,
             fill: false,
             borderColor: "rgb(255, 0, 0)",
             tension: 0.3,
@@ -223,10 +233,11 @@ export default function FinancialDashboard() {
         responsive: true,
         plugins: {
           legend: { position: "top" },
-          title: { display: true, text: "Cancellation Rate" },
+          title: { display: true, text: "Monthly Cancellation Rate" },
           tooltip: {
             callbacks: {
-              label: (context) => `Cancellation Rate: ${context.parsed.y.toFixed(2)}%`,
+              label: (context) =>
+                `Cancellation Rate: ${context.parsed.y?.toFixed(2)}%`, 
             },
           },
         },
@@ -237,7 +248,7 @@ export default function FinancialDashboard() {
             title: { display: true, text: "Cancellation Rate (%)" },
           },
           x: {
-            title: { display: true, text: "Metric" },
+            title: { display: true, text: "Month" },
           },
         },
       };
