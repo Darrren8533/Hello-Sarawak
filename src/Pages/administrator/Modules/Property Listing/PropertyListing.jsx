@@ -123,6 +123,12 @@ const PropertyListing = () => {
                 }
                 setEditProperty({ ...property });
                 setIsPropertyFormOpen(true);
+            } else if (action === 'accept') {
+                await acceptMutation.mutateAsync(property.propertyid);
+                displayToast('success', 'Property Accepted Successfully');
+            } else if (action === 'reject') {
+                await rejectMutation.mutateAsync(property.propertyid);
+                displayToast('success', 'Property Rejected Successfully');
             } else if (action === 'enable') {
                 await acceptMutation.mutateAsync(property.propertyid);
                 displayToast('success', 'Property Enabled Successfully');
@@ -245,16 +251,58 @@ const PropertyListing = () => {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Edit', icon: <FaEdit />, action: 'edit' },
-                { label: 'Disable', icon: <FaCheck />, action: 'disable' },
             ];
         } else if (propertystatus === 'Unavailable') {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Edit', icon: <FaEdit />, action: 'edit' },
-                { label: 'Enable', icon: <FaTimes />, action: 'enable' },
             ];
         }
     }
+
+    if (isAdmin) {
+        if (!isOwner) {
+            // Admin managing moderator's property
+            if (property.username !== username && property.username.includes('admin')) {
+                // Current admin cannot reject or manage another admin's property
+                return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
+            }
+            if (propertystatus === 'Pending') {
+                return [
+                    { label: 'View Details', icon: <FaEye />, action: 'view' },
+                    { label: 'Accept', icon: <FaCheck />, action: 'accept' },
+                    { label: 'Reject', icon: <FaTimes />, action: 'reject' },
+                ];
+            } else if (propertystatus === 'Available') {
+                return [
+                    { label: 'View Details', icon: <FaEye />, action: 'view' },
+                    { label: 'Disable', icon: <FaTimes />, action: 'disable' },
+                ];
+            } else if (propertystatus === 'Unavailable') {
+                return [
+                    { label: 'View Details', icon: <FaEye />, action: 'view' },
+                    { label: 'Enable', icon: <FaCheck />, action: 'enable' },
+                ];
+            }
+        } else {
+            // Admin managing their own property
+            if (propertystatus === 'Available') {
+                return [
+                    { label: 'View Details', icon: <FaEye />, action: 'view' },
+                    { label: 'Edit', icon: <FaEdit />, action: 'edit' },
+                    { label: 'Disable', icon: <FaTimes />, action: 'disable' },
+                ];
+            } else if (propertystatus === 'Unavailable') {
+                return [
+                    { label: 'View Details', icon: <FaEye />, action: 'view' },
+                    { label: 'Edit', icon: <FaEdit />, action: 'edit' },
+                    { label: 'Enable', icon: <FaCheck />, action: 'enable' },
+                    { label: 'Delete', icon: <FaTrash />, action: 'delete' },
+                ];
+            }
+        }
+    }
+
     // Default: View only
     return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
 };
