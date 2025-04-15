@@ -32,7 +32,7 @@ const Reservations = () => {
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
     
     const queryClient = useQueryClient();
-    const loggedInUserId = localStorage.getItem('userid'); // Get logged-in user's ID
+    const loggedInUserId = localStorage.getItem('userid');
 
     // Fetch reservations with React Query
     const { data: reservationsData, isLoading: reservationsLoading } = useQuery({
@@ -78,6 +78,7 @@ const Reservations = () => {
                 return [];
             }
             const response = await getOperatorProperties(loggedInUserId);
+            console.log('Fetched properties for user', loggedInUserId, response.data); // Debug
             return response.data || [];
         },
     });
@@ -272,7 +273,7 @@ const Reservations = () => {
     };
 
     const reservationDropdownItems = (reservationStatus, reservation) => {
-
+      
         const isPropertyOwned = Array.isArray(administratorProperties) && administratorProperties.some(
             (property) => property.propertyaddress === reservation.propertyaddress
         );
