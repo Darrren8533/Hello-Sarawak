@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
@@ -32,6 +32,7 @@ const Reservations = () => {
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
     
     const queryClient = useQueryClient();
+    const loggedInUserId = localStorage.getItem('userid'); // Get logged-in user's ID
 
     // Fetch reservations with React Query
     const { data: reservationsData, isLoading: reservationsLoading } = useQuery({
@@ -68,16 +69,25 @@ const Reservations = () => {
         queryFn: fetchOperators,
     });
 
-    // Fetch administrator properties when needed
+    // Fetch administrator properties
     const { data: administratorProperties = [], refetch: refetchProperties } = useQuery({
-        queryKey: ['administratorProperties'],
+        queryKey: ['administratorProperties', loggedInUserId],
         queryFn: async () => {
-            const userid = localStorage.getItem('userid');
-            const response = await getOperatorProperties(userid);
-            return response.data;
+            if (!loggedInUserId) {
+                console.error('No user ID found in localStorage');
+                return [];
+            }
+            const response = await getOperatorProperties(loggedInUserId);
+            return response.data || [];
         },
-        enabled: false, // Don't run this query automatically
     });
+
+    // Ensure properties are fetched on mount
+    useEffect(() => {
+        if (loggedInUserId) {
+            refetchProperties();
+        }
+    }, [loggedInUserId, refetchProperties]);
 
     // Update reservation status mutation
     const updateStatusMutation = useMutation({
@@ -176,18 +186,12 @@ const Reservations = () => {
             setSelectedReservation(essentialFields);
         } else if (action === 'accept') {
             try {
-                // Using optimistic updates with React Query
                 const newStatus = 'Accepted';
-                
-                // Update the status first
                 await updateStatusMutation.mutateAsync({ 
                     reservationId: reservation.reservationid, 
                     newStatus 
                 });
-                
-                // Then send the acceptance email
                 await acceptBookingMutation.mutateAsync(reservation.reservationid);
-        
                 displayToast('success', 'Reservation Accepted Successfully');
             } catch (error) {
                 console.error('Failed to accept reservation or send email', error);
@@ -197,17 +201,13 @@ const Reservations = () => {
             const rejectedID = {
                 reservationid: reservation.reservationid || 'N/A',
             };
-    
             setRejectedReservationID(rejectedID);
-    
             try {
                 const newStatus = 'Rejected';
-                
                 await updateStatusMutation.mutateAsync({ 
                     reservationId: reservation.reservationid, 
                     newStatus 
                 });
-    
                 setShowMessageBox(true);
                 displayToast('success', 'Reservation Rejected Successfully');
             } catch (error) {
@@ -219,10 +219,8 @@ const Reservations = () => {
 
     const handleMessageBoxSelect = async (mode) => {
         if (mode === 'suggest') {
-            // Trigger the properties query
             refetchProperties();
         }
-
         setMessageBoxMode(mode);
         setShowMessageBox(false);
     };
@@ -238,7 +236,6 @@ const Reservations = () => {
                     propertyAddress: selectedProperty,
                     reservationId: rejectedReservationID.reservationid
                 });
-
                 displayToast('success', 'New Room Suggestion Email Sent Successfully');
                 setMessageBoxMode(null);
             } catch (error) {
@@ -264,7 +261,6 @@ const Reservations = () => {
                     reservationId: rejectedReservationID.reservationid,
                     operators: selectedOperators
                 });
-
                 displayToast('success', 'Suggest Notification Sent Successfully');
                 setMessageBoxMode(null);
             } catch (error) {
@@ -275,8 +271,13 @@ const Reservations = () => {
         }
     };
 
-    const reservationDropdownItems = (reservationStatus) => {
-        if (reservationStatus === 'Pending') {
+    const reservationDropdownItems = (reservationStatus, reservation) => {
+
+        const isPropertyOwned = Array.isArray(administratorProperties) && administratorProperties.some(
+            (property) => property.propertyaddress === reservation.propertyaddress
+        );
+
+        if (reservationStatus === 'Pending' && isPropertyOwned) {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Accept', icon: <FaCheck />, action: 'accept' },
@@ -294,7 +295,7 @@ const Reservations = () => {
     };
 
     const getFilteredProperties = () => {
-        if (!Array.isArray(administratorProperties)) return []; // Ensure an array
+        if (!Array.isArray(administratorProperties)) return [];
         return administratorProperties.filter(property => {
             const matchesSearch = property.propertyaddress.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
             const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
@@ -335,7 +336,7 @@ const Reservations = () => {
             accessor: 'actions',
             render: (reservation) => (
                 <ActionDropdown
-                    items={reservationDropdownItems(reservation.reservationstatus)}
+                    items={reservationDropdownItems(reservation.reservationstatus, reservation)}
                     onAction={(action) => handleAction(action, reservation)}
                 />
             ),
