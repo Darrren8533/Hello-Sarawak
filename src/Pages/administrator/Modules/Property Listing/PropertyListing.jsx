@@ -1,195 +1,116 @@
-import React, { useState, useEffect } from 'react';
-import { fetchPropertiesListingTable, updatePropertyStatus, deleteProperty, propertyListingAccept, propertyListingReject, fetchReservation } from '../../../../../Api/api';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification, fetchPropertiesListingTable } from '../../../../../Api/api';
+import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
-import PropertyForm from '../../../../Component/PropertyForm/PropertyForm';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
-import Filter from '../../../../Component/Filter/Filter';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Toast from '../../../../Component/Toast/Toast';
-import Alert from '../../../../Component/Alert/Alert';
 import Loader from '../../../../Component/Loader/Loader';
-import { FaEye, FaEdit, FaTrash, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaEye, FaCheck, FaTimes } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
-import '../Property Listing/PropertyListing.css';
+import '../../../../Component/ActionDropdown/ActionDropdown.css';
+import '../../../../Component/Modal/Modal.css';
+import '../../../../Component/Filter/Filter.css';
+import './Reservations.css';
 
-const PropertyListing = () => {
+const Reservations = () => {
     const [searchKey, setSearchKey] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('All');
     const [appliedFilters, setAppliedFilters] = useState({ status: 'All' });
-    const [selectedProperty, setSelectedProperty] = useState(null);
-    const [editProperty, setEditProperty] = useState(null);
-    const [isPropertyFormOpen, setIsPropertyFormOpen] = useState(false);
+    const [selectedReservation, setSelectedReservation] = useState(null);
     const [toastMessage, setToastMessage] = useState('');
-    const [showToast, setShowToast] = useState(false);
     const [toastType, setToastType] = useState('');
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const [propertyToDelete, setPropertyToDelete] = useState(null);
-    const [page, setPage] = useState(1);
-    const [pageSize, setPageSize] = useState(10);
+    const [showToast, setShowToast] = useState(false);
+    const [showMessageBox, setShowMessageBox] = useState(false);
+    const [messageBoxMode, setMessageBoxMode] = useState(null);
+    const [selectedProperty, setSelectedProperty] = useState(null);
+    const [selectedOperators, setSelectedOperators] = useState([]);
+    const [rejectedReservationID, setRejectedReservationID] = useState(null);
+    const [suggestSearchKey, setSuggestSearchKey] = useState('');
+    const [priceRange, setPriceRange] = useState({ min: '', max: '' });
     
     const queryClient = useQueryClient();
-    
-    // Use React Query to fetch properties
-    const { data, isLoading, error } = useQuery({
-        queryKey: ['properties', page, pageSize, appliedFilters],
-        queryFn: () => fetchPropertiesListingTable(page, pageSize, appliedFilters.status !== 'All' ? appliedFilters.status : undefined),
-        select: (data) => ({
-            properties: (data?.properties || []).filter(property => property.propertyid !== undefined),
-            totalCount: data?.totalCount || 0
-        }),
-        staleTime: 30 * 60 * 1000,
-        refetchInterval: 1000,  
-    });
-    
-    // Extract properties from query result
-    const properties = data?.properties || [];
-    const totalCount = data?.totalCount || 0;
+    const currentUserId = localStorage.getItem('userid');
 
-    const displayToast = (type, message) => {
-        setToastType(type);
-        setToastMessage(message);
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 5000);
-    };
+    // Fetch reservations with React Query
+    const { data: reservationsData, isLoading: reservationsLoading } = useQuery({
+        queryKey: ['reservations'],
+        queryFn: async () => {
+            try {
+                const reservationData = await fetchReservation();
+                if (Array.isArray(reservationData)) {
+                    return reservationData.map(reservation => {
+                        const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
+                        const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
 
-    // React Query mutation for accepting property (enabling)
-    const acceptMutation = useMutation({
-        mutationFn: async (propertyId) => {
-            await propertyListingAccept(propertyId);
-            return updatePropertyStatus(propertyId, 'Available');
-        },
-        onSuccess: (_, propertyId) => {
-            queryClient.invalidateQueries({ queryKey: ['properties'] });
-        },
-        onError: (error) => {
-            console.error('Failed to accept property', error);
-        }
-    });
-
-    // React Query mutation for rejecting property (disabling)
-    const rejectMutation = useMutation({
-        mutationFn: async (propertyId) => {
-            await propertyListingReject(propertyId);
-            return updatePropertyStatus(propertyId, 'Unavailable');
-        },
-        onSuccess: (_, propertyId) => {
-            queryClient.invalidateQueries({ queryKey: ['properties'] });
-        },
-        onError: (error) => {
-            console.error('Failed to reject property', error);
-        }
-    });
-
-    // React Query mutation for deleting property
-    const deleteMutation = useMutation({
-        mutationFn: async (propertyId) => {
-            return deleteProperty(propertyId);
-        },
-        onSuccess: () => {
-            displayToast('success', 'Property deleted successfully');
-            queryClient.invalidateQueries({ queryKey: ['properties'] });
-        },
-        onError: (error) => {
-            console.error('Failed to delete property', error);
-        },
-        onSettled: () => {
-            setIsDialogOpen(false);
-            setPropertyToDelete(null);
-        }
-    });
-
-    const handleAction = async (action, property) => {
-        try {
-            if (action === 'view') {
-                setSelectedProperty({
-                    propertyname: property.propertyaddress || 'N/A',
-                    clustername: property.clustername || 'N/A',
-                    categoryname: property.categoryname || 'N/A',
-                    propertyprice: property.rateamount || 'N/A',
-                    propertylocation: property.nearbylocation || 'N/A',
-                    propertyguestpaxno: property.propertyguestpaxno || 'N/A',
-                    propertystatus: property.propertystatus || 'N/A',
-                    propertybedtype: property.propertybedtype || 'N/A',
-                    propertydescription: property.propertydescription || 'N/A',
-                    images: property.propertyimage || [],
-                    username: property.username || 'N/A',
-                });
-            } else if (action === 'edit') {
-                if (property.propertystatus === 'Available') {
-                    displayToast('error', 'You need to disable the property first before editing.');
-                    return;
-                }
-                setEditProperty({ ...property });
-                setIsPropertyFormOpen(true);
-            } else if (action === 'accept') {
-                await acceptMutation.mutateAsync(property.propertyid);
-                displayToast('success', 'Property Accepted Successfully');
-            } else if (action === 'reject') {
-                await rejectMutation.mutateAsync(property.propertyid);
-                displayToast('success', 'Property Rejected Successfully');
-            } else if (action === 'enable') {
-                await acceptMutation.mutateAsync(property.propertyid);
-                displayToast('success', 'Property Enabled Successfully');
-            } else if (action === 'disable') {
-                await rejectMutation.mutateAsync(property.propertyid);
-                displayToast('success', 'Property Disabled Successfully');
-            } else if (action === 'delete') {
-                if (property.propertystatus === 'Unavailable' && property.username === username) {
-                    setPropertyToDelete(property.propertyid);
-                    setIsDialogOpen(true);
+                        if (reservation.reservationstatus === 'Pending' && currentDateTime > reservationblocktime) {
+                            return { ...reservation, reservationstatus: 'expired' };
+                        }
+                        return reservation;
+                    });
                 } else {
-                    displayToast('error', 'You do not have permission to delete this property.');
+                    console.error("Invalid data format received:", reservationData);
+                    return [];
                 }
-            } 
-        } catch (error) {
-            console.error('Error handling action:', error);
-            displayToast('error', 'An error occurred while processing your request.');
-        }
-    };
-    
-    const handleDeleteProperty = async () => {
-        try {
-            const property = properties.find((prop) => prop.propertyid === propertyToDelete);
-
-            if (!property) {
-                displayToast('error', 'Property not found. Please refresh the page and try again.');
-                setIsDialogOpen(false);
-                setPropertyToDelete(null);
-                return;
+            } catch (error) {
+                console.error('Failed to fetch reservation details:', error);
+                throw error;
             }
+        },
+        staleTime: 30 * 60 * 1000,
+        refetchInterval: 1000,
+    });
 
-            if (property.propertystatus !== 'Unavailable') {
-                displayToast('error', 'Only unavailable properties can be deleted.');
-                setIsDialogOpen(false);
-                setPropertyToDelete(null);
-                return;
-            }
+    // Fetch properties to get property owner information
+    const { data: properties = [] } = useQuery({
+        queryKey: ['properties'],
+        queryFn: fetchPropertiesListingTable,
+    });
 
-            // Use React Query to fetch reservations
-            const reservationsQuery = await queryClient.fetchQuery({
-                queryKey: ['reservations', propertyToDelete],
-                queryFn: fetchReservation
-            });
-            
-            const hasReservation = reservationsQuery.some(reservation => reservation.propertyid === propertyToDelete);
+    // Fetch operators with React Query
+    const { data: operators = [] } = useQuery({
+        queryKey: ['operators'],
+        queryFn: fetchOperators,
+    });
 
-            if (hasReservation) {
-                displayToast('error', 'This property has an existing reservation and cannot be deleted.');
-                setIsDialogOpen(false);
-                setPropertyToDelete(null);
-                return;
-            }
+    // Fetch administrator properties when needed
+    const { data: administratorProperties = [], refetch: refetchProperties } = useQuery({
+        queryKey: ['administratorProperties'],
+        queryFn: async () => {
+            const userid = localStorage.getItem('userid');
+            const response = await getOperatorProperties(userid);
+            return response.data;
+        },
+        enabled: false,
+    });
 
-            deleteMutation.mutate(propertyToDelete);
-        } catch (error) {
-            console.error('Failed to delete property:', error);
-            displayToast('error', 'Failed to delete property. Please try again.');
-            setIsDialogOpen(false);
-            setPropertyToDelete(null);
-        }
-    };
+    // Update reservation status mutation
+    const updateStatusMutation = useMutation({
+        mutationFn: ({ reservationId, newStatus }) => 
+            updateReservationStatus(reservationId, newStatus),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['reservations'] });
+        },
+    });
+
+    // Accept booking mutation
+    const acceptBookingMutation = useMutation({
+        mutationFn: (reservationId) => acceptBooking(reservationId),
+    });
+
+    // Suggest new room mutation
+    const suggestRoomMutation = useMutation({
+        mutationFn: ({ propertyAddress, reservationId }) => 
+            suggestNewRoom(propertyAddress, reservationId),
+    });
+
+    // Send notification mutation
+    const sendNotificationMutation = useMutation({
+        mutationFn: ({ reservationId, operators }) => 
+            sendSuggestNotification(reservationId, operators),
+    });
 
     const handleApplyFilters = () => {
         setAppliedFilters({ status: selectedStatus });
@@ -204,236 +125,399 @@ const PropertyListing = () => {
             options: [
                 { value: 'All', label: 'All Statuses' },
                 { value: 'Pending', label: 'Pending' },
-                { value: 'Available', label: 'Available' },
-                { value: 'Unavailable', label: 'Unavailable' },
+                { value: 'Accepted', label: 'Accepted' },
+                { value: 'Rejected', label: 'Rejected' },
+                { value: 'Canceled', label: 'Canceled' },
+                { value: 'Paid', label: 'Paid' },
+                { value: 'Expired', label: 'Expired' },
             ],
         },
     ];
 
     const displayLabels = {
-        propertyname: "Property Name",
-        clustername: "Cluster Name",
-        categoryname: "Category Name",
-        propertyprice: "Property Price",
-        propertylocation: "Property Location",
-        propertyguestpaxno: "Guest Capacity",
-        propertystatus: "Property Status",
-        propertybedtype: "Bed Type",
-        propertydescription: "Description",
+        reservationid: "Reservation ID",
+        propertyaddress: "Property Name",
+        checkindatetime: "Check-In Date Time",
+        checkoutdatetime: "Check-Out Date Time",
+        reservationblocktime: "Block Time",
+        request: "Request",
+        totalprice: "Total Price",
+        reservationstatus: "Status",
+        userid: "User ID",
         images: "Images",
-        username: "Operator Name"
     };
 
-    const filteredProperties = properties.filter(
-        (property) => (
-            (property.propertyid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-            (property.propertyaddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-            (property.clustername?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-            (property.rateamount?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-            (property.propertystatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
+    const filteredReservations = Array.isArray(reservationsData)
+        ? reservationsData.filter(
+            (reservation) =>
+                (appliedFilters.status === 'All' || (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
+                (
+                    (reservation.reservationid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.propertyaddress?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '')
+                )
         )
-    );
+        : [];
 
-    const propertyDropdownItems = (property, username, usergroup) => {
-    const isOwner = property.username === username; 
-    const isModerator = usergroup === 'Moderator';
-    const isAdmin = usergroup === 'Administrator';
+    const isOwnProperty = (propertyAddress) => {
+        const property = properties.find(p => p.propertyaddress === propertyAddress);
+        return property && property.userid === currentUserId;
+    };
 
-    const { propertystatus } = property;
-
-    if (isModerator) {
-        // Logic for moderator
-        if (propertystatus === 'Pending') {
-            return [
-                { label: 'View Details', icon: <FaEye />, action: 'view' },
-            ];
-        } else if (propertystatus === 'Available') {
-            return [
-                { label: 'View Details', icon: <FaEye />, action: 'view' },
-                { label: 'Edit', icon: <FaEdit />, action: 'edit' },
-            ];
-        } else if (propertystatus === 'Unavailable') {
-            return [
-                { label: 'View Details', icon: <FaEye />, action: 'view' },
-                { label: 'Edit', icon: <FaEdit />, action: 'edit' },
-            ];
+    const handleAction = async (action, reservation) => {
+        if (reservation.reservationstatus === 'expired') {
+            displayToast('error', 'Action cannot be performed. This reservation has expired.');
+            return;
         }
-    }
-
-    if (isAdmin) {
-        if (!isOwner) {
-            // Admin managing moderator's property
-            if (property.username !== username && property.username.includes('admin')) {
-                // Current admin cannot reject or manage another admin's property
-                return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
+    
+        if (action === 'view') {
+            const essentialFields = {
+                reservationid: reservation.reservationid || 'N/A',
+                propertyaddress: reservation.propertyaddress || 'N/A',
+                checkindatetime: reservation.checkindatetime || 'N/A',
+                checkoutdatetime: reservation.checkoutdatetime || 'N/A',
+                reservationblocktime: reservation.reservationblocktime || 'N/A',
+                request: reservation.request || 'N/A',
+                totalprice: reservation.totalprice || 'N/A',
+                rcid: reservation.rcid || 'N/A',
+                reservationstatus: reservation.reservationstatus || 'N/A',
+                userid: reservation.userid || 'N/A',
+                images: reservation.propertyimage || [],
+            };
+            setSelectedReservation(essentialFields);
+        } else if (action === 'accept') {
+            try {
+                const newStatus = 'Accepted';
+                
+                await updateStatusMutation.mutateAsync({ 
+                    reservationId: reservation.reservationid, 
+                    newStatus 
+                });
+                
+                await acceptBookingMutation.mutateAsync(reservation.reservationid);
+        
+                displayToast('success', 'Reservation Accepted Successfully');
+            } catch (error) {
+                console.error('Failed to accept reservation or send email', error);
+                displayToast('error', 'Failed to accept reservation');
             }
-            if (propertystatus === 'Pending') {
-                return [
-                    { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Accept', icon: <FaCheck />, action: 'accept' },
-                    { label: 'Reject', icon: <FaTimes />, action: 'reject' },
-                ];
-            } else if (propertystatus === 'Available') {
-                return [
-                    { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Disable', icon: <FaTimes />, action: 'disable' },
-                ];
-            } else if (propertystatus === 'Unavailable') {
-                return [
-                    { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Enable', icon: <FaCheck />, action: 'enable' },
-                ];
+        } else if (action === 'reject') {
+            const rejectedID = {
+                reservationid: reservation.reservationid || 'N/A',
+            };
+    
+            setRejectedReservationID(rejectedID);
+    
+            try {
+                const newStatus = 'Rejected';
+                
+                await updateStatusMutation.mutateAsync({ 
+                    reservationId: reservation.reservationid, 
+                    newStatus 
+                });
+    
+                setShowMessageBox(true);
+                displayToast('success', 'Reservation Rejected Successfully');
+            } catch (error) {
+                console.error('Failed to update reservation status', error);
+                displayToast('error', 'Failed to reject reservation');
+            }
+        }
+    };
+
+    const handleMessageBoxSelect = async (mode) => {
+        if (mode === 'suggest') {
+            refetchProperties();
+        }
+
+        setMessageBoxMode(mode);
+        setShowMessageBox(false);
+    };
+
+    const handlePropertySelect = (propertyaddress) => {
+        setSelectedProperty(propertyaddress);
+    };
+
+    const handleConfirmSuggestion = async () => {
+        if (selectedProperty && rejectedReservationID.reservationid) {
+            try {
+                await suggestRoomMutation.mutateAsync({
+                    propertyAddress: selectedProperty,
+                    reservationId: rejectedReservationID.reservationid
+                });
+
+                displayToast('success', 'New Room Suggestion Email Sent Successfully');
+                setMessageBoxMode(null);
+            } catch (error) {
+                displayToast('error', 'Error Sending New Room Suggestion Email');
             }
         } else {
-            // Admin managing their own property
-            if (propertystatus === 'Available') {
-                return [
-                    { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Edit', icon: <FaEdit />, action: 'edit' },
-                    { label: 'Disable', icon: <FaTimes />, action: 'disable' },
-                ];
-            } else if (propertystatus === 'Unavailable') {
-                return [
-                    { label: 'View Details', icon: <FaEye />, action: 'view' },
-                    { label: 'Edit', icon: <FaEdit />, action: 'edit' },
-                    { label: 'Enable', icon: <FaCheck />, action: 'enable' },
-                    { label: 'Delete', icon: <FaTrash />, action: 'delete' },
-                ];
-            }
+            displayToast('error', 'Please select a property to suggest');
         }
-    }
+    };
 
-    // Default: View only
-    return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
-};
+    const handleOperatorSelect = (userid) => {
+        setSelectedOperators((prevSelectedOperators) =>
+            prevSelectedOperators.includes(userid)
+                ? prevSelectedOperators.filter((id) => id !== userid)
+                : [...prevSelectedOperators, userid]
+        );
+    };
 
-    
-const username = localStorage.getItem('username');
-const usergroup = localStorage.getItem('usergroup'); 
+    const handleConfirmNotification = async () => {
+        if (selectedOperators.length > 0 && rejectedReservationID.reservationid) {
+            try {
+                await sendNotificationMutation.mutateAsync({
+                    reservationId: rejectedReservationID.reservationid,
+                    operators: selectedOperators
+                });
 
-const columns = [
-    { header: 'ID', accessor: 'propertyid' },
-    {
-        header: 'Image',
-        accessor: 'propertyimage',
-        render: (property) => (
-            property.propertyimage && property.propertyimage.length > 0 ? (
-                <img
-                    src={`data:image/jpeg;base64,${property.propertyimage[0]}`}
-                    alt={property.propertyname}
-                    style={{ width: 80, height: 80 }}
+                displayToast('success', 'Suggest Notification Sent Successfully');
+                setMessageBoxMode(null);
+            } catch (error) {
+                displayToast('error', 'Error Sending Suggest Notification');
+            }
+        } else {
+            displayToast('error', 'Please select at least one operator to notify');
+        }
+    };
+
+    const reservationDropdownItems = (reservationStatus, propertyAddress) => {
+        const isOwner = isOwnProperty(propertyAddress);
+        if (reservationStatus === 'Pending' && isOwner) {
+            return [
+                { label: 'View Details', icon: <FaEye />, action: 'view' },
+                { label: 'Accept', icon: <FaCheck />, action: 'accept' },
+                { label: 'Reject', icon: <FaTimes />, action: 'reject' },
+            ];
+        }
+        return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
+    };
+
+    const displayToast = (type, message) => {
+        setToastType(type);
+        setToastMessage(message);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 5000);
+    };
+
+    const getFilteredProperties = () => {
+        if (!Array.isArray(administratorProperties)) return [];
+        return administratorProperties.filter(property => {
+            const matchesSearch = property.propertyaddress.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
+            const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
+                (!priceRange.max || property.rateamount <= Number(priceRange.max));
+            return matchesSearch && matchesPrice;
+        });
+    };
+
+    const columns = [
+        { header: 'ID', accessor: 'reservationid' },
+        {
+            header: 'Image',
+            accessor: 'propertyimage',
+            render: (reservation) =>
+                reservation.propertyimage && reservation.propertyimage.length > 0 ? (
+                    <img
+                        src={`data:image/jpeg;base64,${reservation.propertyimage[0]}`}
+                        alt={`Property ${reservation.propertyaddress}`}
+                        style={{ width: 80, height: 80 }}
+                    />
+                ) : (
+                    <span>No Image</span>
+                ),
+        },
+        { header: 'Property Name', accessor: 'propertyaddress' },
+        { header: 'Total Price(RM)', accessor: 'totalprice' },
+        {
+            header: 'Status',
+            accessor: 'reservationstatus',
+            render: (reservation) => (
+                <span className={`reservation-status ${reservation.reservationstatus?.toLowerCase()}`}>
+                    {reservation.reservationstatus}
+                </span>
+            ),
+        },
+        {
+            header: 'Actions',
+            accessor: 'actions',
+            render: (reservation) => (
+                <ActionDropdown
+                    items={reservationDropdownItems(reservation.reservationstatus, reservation.propertyaddress)}
+                    onAction={(action) => handleAction(action, reservation)}
                 />
-            ) : (
-                <span>No Image</span>
-            )
-        ),
-    },
-    { header: 'Name', accessor: 'propertyaddress' },
-    { header: 'Price(RM)', accessor: 'rateamount' },
-    { header: 'Cluster', accessor: 'clustername' },
-    {
-        header: 'Status',
-        accessor: 'propertystatus',
-        render: (property) => (
-            <span className={`property-status ${(property.propertystatus ?? 'Pending').toLowerCase()}`}>
-                {property.propertystatus || 'Pending'}
-            </span>
-        ),
-    },
-    {
-        header: 'Actions',
-        accessor: 'actions',
-        render: (property) => (
-            <ActionDropdown
-                items={propertyDropdownItems(property, username, usergroup)}
-                onAction={(action) => handleAction(action, property)}
-            />
-        ),
-    },
-];
-
-    // Handle page change
-    const handlePageChange = (newPage) => {
-        setPage(newPage);
-    };
-
-    // Handle page size change
-    const handlePageSizeChange = (newPageSize) => {
-        setPageSize(newPageSize);
-        setPage(1); // Reset to first page when changing page size
-    };
+            ),
+        },
+    ];
 
     return (
         <div>
+            {showToast && <Toast type={toastType} message={toastMessage} />}
             <div className="header-container">
-                <h1 className="dashboard-page-title">Property Listings</h1>
-                <SearchBar value={searchKey} onChange={(newValue) => setSearchKey(newValue)} placeholder="Search properties..." />
+                <h1 className="dashboard-page-title">Reservations</h1>
+                <SearchBar value={searchKey} onChange={(newValue) => setSearchKey(newValue)} placeholder="Search reservations..." />
             </div>
 
             <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-            <button
-                className="create-property-button"
-                onClick={() => {
-                    setEditProperty(null);
-                    setIsPropertyFormOpen(true);
-                }}
-            >
-                Create New Property
-            </button>
-
-            {isLoading ? (
-            <div className="loader-box">
-                <Loader />
-            </div>
-        ) : error ? (
-            <div className="error-message">
-                Error loading properties. Please try again.
-            </div>
-        ) : (
-            <PaginatedTable
-                data={filteredProperties}
-                columns={columns}
-                rowKey="propertyid"
-                currentPage={page}
-                pageSize={pageSize}
-                totalCount={totalCount}
-                onPageChange={handlePageChange}
-                onPageSizeChange={handlePageSizeChange}
-            />
-        )}
+            {reservationsLoading ? (
+                <div className="loader-box">
+                    <Loader />
+                </div>
+            ) : (
+                <PaginatedTable
+                    data={filteredReservations}
+                    columns={columns}
+                    rowKey="reservationid"
+                    enableCheckbox={false}
+                />
+            )}
 
             <Modal
-                isOpen={!!selectedProperty}
-                title={`${selectedProperty?.propertyname}`}
-                data={selectedProperty || {}}
+                isOpen={!!selectedReservation}
+                title={`Reservation ID: ${selectedReservation?.reservationid}`}
+                data={selectedReservation || {}}
                 labels={displayLabels}
-                onClose={() => setSelectedProperty(null)}
+                onClose={() => setSelectedReservation(null)}
             />
 
-            {isPropertyFormOpen && (
-                <PropertyForm
-                    initialData={editProperty}
-                    onSubmit={() => {
-                    setIsPropertyFormOpen(false);
-                    queryClient.invalidateQueries({ queryKey: ['properties'] });
-                    displayToast('success', editProperty? 'Property updated successfully' : 'Property created successfully');
-                }}
-                    onClose={() => setIsPropertyFormOpen(false)}
-            />
-        )}
+            {showMessageBox && (
+                <div className="custom-message-box-overlay">
+                    <div className="custom-message-box">
+                        <h2>Choose An Action</h2>
+                        <p>Please Select An Action For The Rejection:</p>
+                        <div className="message-box-buttons">
+                            <button onClick={() => handleMessageBoxSelect('suggest')}>Suggest</button>
+                            <button onClick={() => handleMessageBoxSelect('notify')}>Notify Suggest</button>
+                            <button onClick={() => setShowMessageBox(false)}>Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
-            <Alert
-                isOpen={isDialogOpen}
-                title="Confirm Delete"
-                message="Are you sure you want to delete this property?"
-                onConfirm={handleDeleteProperty}
-                onCancel={() => setIsDialogOpen(false)}
-            />
+            {messageBoxMode === 'suggest' && (
+                <div className="custom-message-box-overlay">
+                    <div className="suggest-properties custom-message-box">
+                        <div className="suggest-header">
+                            <h2>Select A Property To Suggest</h2>
+                            <div className="close-button" onClick={() => setMessageBoxMode('')}>X</div>
+                        </div>
 
-            {showToast && <Toast type={toastType} message={toastMessage} />}
+                        <div className="suggest-filters">
+                            <div className="search-container">
+                                <input
+                                    type="text"
+                                    placeholder="Search property name..."
+                                    value={suggestSearchKey}
+                                    onChange={(e) => setSuggestSearchKey(e.target.value)}
+                                    className="suggest-search-input"
+                                />
+                            </div>
+                            <div className="price-filter">
+                                <div className="price-input-group">
+                                    <input
+                                        type="number"
+                                        placeholder="Min price"
+                                        value={priceRange.min}
+                                        onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
+                                        className="price-input"
+                                    />
+                                    <span className="price-separator">-</span>
+                                    <input
+                                        type="number"
+                                        placeholder="Max price"
+                                        value={priceRange.max}
+                                        onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
+                                        className="price-input"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="property-list">
+                            {getFilteredProperties().length > 0 ? (
+                                getFilteredProperties().map((property) => (
+                                    <div key={property.propertyaddress} className="property-card">
+                                        <input
+                                            type="radio"
+                                            id={`property-${property.propertyaddress}`}
+                                            name="property"
+                                            value={property.propertyaddress}
+                                            onChange={() => handlePropertySelect(property.propertyaddress)}
+                                            className="property-radio"
+                                        />
+                                        <label htmlFor={`property-${property.propertyaddress}`} className="property-label">
+                                            <div className="property-image-container">
+                                                <img
+                                                    src={`data:image/jpeg;base64,${property.images[0]}`}
+                                                    alt={property.propertyaddress}
+                                                    className="property-image"
+                                                />
+                                            </div>
+                                            <div className="property-details">
+                                                <h3 className="property-title">{property.propertyaddress}</h3>
+                                                <p className="property-info-text">{property.propertyguestpaxno} Pax</p>
+                                                <p className="property-price">RM {property.rateamount}</p>
+                                            </div>
+                                        </label>
+                                    </div>
+                                ))
+                            ) : (
+                                <p className="no-property-message">No properties match your search criteria</p>
+                            )}
+                        </div>
+                        <button className="confirm-button" onClick={handleConfirmSuggestion}>
+                            Confirm Suggestion
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {messageBoxMode === 'notify' && (
+                <div className="custom-message-box-overlay">
+                    <div className="suggest-properties custom-message-box">
+                        <div className="close-button" onClick={() => setMessageBoxMode('')}>X</div>
+                        <h2>Select Operators To Notify</h2>
+                        <div className="operator-list">
+                            <div className="select-all-checkbox">
+                                <input
+                                    type="checkbox"
+                                    id="select-all-operators"
+                                    checked={selectedOperators.length === operators.length && operators.length > 0}
+                                    onChange={(e) => {
+                                        const checked = e.target.checked;
+                                        setSelectedOperators(checked ? operators.map(operator => operator.userid) : []);
+                                    }}
+                                />
+                                <label htmlFor="select-all-operators">Select All</label>
+                            </div>
+
+                            {operators.length > 0 ? (
+                                operators.map((operator) => (
+                                    <div key={operator.userid} className="operator-option">
+                                        <input
+                                            type="checkbox"
+                                            id={`operator-${operator.userid}`}
+                                            value={operator.userid}
+                                            checked={selectedOperators.includes(operator.userid)}
+                                            onChange={() => handleOperatorSelect(operator.userid)}
+                                        />
+                                        <label htmlFor={`operator-${operator.userid}`}>
+                                            {operator.ufirstname} {operator.ulastname} ({operator.username}) - {operator.usergroup}
+                                        </label>
+                                    </div>
+                                ))
+                            ) : (
+                                <p>No operator available to notify</p>
+                            )}
+                        </div>
+                        <button onClick={handleConfirmNotification}>Confirm Selection</button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
 
-export default PropertyListing;
+export default Reservations;
