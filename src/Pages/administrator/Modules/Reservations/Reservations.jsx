@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification } from '../../../../../Api/api';
+import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification, fetchPropertiesListingTable } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
@@ -32,6 +32,7 @@ const Reservations = () => {
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
     
     const queryClient = useQueryClient();
+    const currentUserId = localStorage.getItem('userid');
 
     // Fetch reservations with React Query
     const { data: reservationsData, isLoading: reservationsLoading } = useQuery({
@@ -62,6 +63,12 @@ const Reservations = () => {
         refetchInterval: 1000,
     });
 
+    // Fetch properties data to match property owners
+    const { data: propertiesData } = useQuery({
+        queryKey: ['properties'],
+        queryFn: fetchPropertiesListingTable,
+    });
+
     // Fetch operators with React Query
     const { data: operators = [] } = useQuery({
         queryKey: ['operators'],
@@ -76,7 +83,7 @@ const Reservations = () => {
             const response = await getOperatorProperties(userid);
             return response.data;
         },
-        enabled: false, // Don't run this query automatically
+        enabled: false, 
     });
 
     // Update reservation status mutation
@@ -140,6 +147,17 @@ const Reservations = () => {
         images: "Images",
     };
 
+    // Check if property belongs to current user
+    const isPropertyOwner = (propertyAddress) => {
+        if (!propertiesData || !Array.isArray(propertiesData)) return false;
+        
+        const property = propertiesData.find(
+            property => property.propertyaddress === propertyAddress
+        );
+        
+        return property && property.userid === currentUserId;
+    };
+
     const filteredReservations = Array.isArray(reservationsData)
         ? reservationsData.filter(
             (reservation) =>
@@ -176,7 +194,7 @@ const Reservations = () => {
             setSelectedReservation(essentialFields);
         } else if (action === 'accept') {
             try {
-                // Using optimistic updates with React Query
+                
                 const newStatus = 'Accepted';
                 
                 // Update the status first
@@ -275,8 +293,9 @@ const Reservations = () => {
         }
     };
 
-    const reservationDropdownItems = (reservationStatus) => {
-        if (reservationStatus === 'Pending') {
+    const reservationDropdownItems = (reservation) => {
+
+        if (reservation.reservationstatus === 'Pending' && isPropertyOwner(reservation.propertyaddress)) {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Accept', icon: <FaCheck />, action: 'accept' },
@@ -294,7 +313,7 @@ const Reservations = () => {
     };
 
     const getFilteredProperties = () => {
-        if (!Array.isArray(administratorProperties)) return []; // Ensure an array
+        if (!Array.isArray(administratorProperties)) return [];
         return administratorProperties.filter(property => {
             const matchesSearch = property.propertyaddress.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
             const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
@@ -335,7 +354,7 @@ const Reservations = () => {
             accessor: 'actions',
             render: (reservation) => (
                 <ActionDropdown
-                    items={reservationDropdownItems(reservation.reservationstatus)}
+                    items={reservationDropdownItems(reservation)}
                     onAction={(action) => handleAction(action, reservation)}
                 />
             ),
