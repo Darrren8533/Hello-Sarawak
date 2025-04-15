@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification, fetchPropertiesListing } from '../../../../../Api/api';
+import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification, fetchPropertiesListingTable } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
@@ -32,8 +32,7 @@ const Reservations = () => {
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
     
     const queryClient = useQueryClient();
-    const loggedInUserId = localStorage.getItem('userid');
-    const username = localStorage.getItem('username');
+    const currentUserId = localStorage.getItem('userid');
 
     // Fetch reservations with React Query
     const { data: reservationsData, isLoading: reservationsLoading } = useQuery({
@@ -64,52 +63,28 @@ const Reservations = () => {
         refetchInterval: 1000,
     });
 
+    // Fetch properties to get property owner information
+    const { data: properties = [] } = useQuery({
+        queryKey: ['properties'],
+        queryFn: fetchPropertiesListingTable,
+    });
+
     // Fetch operators with React Query
     const { data: operators = [] } = useQuery({
         queryKey: ['operators'],
         queryFn: fetchOperators,
     });
 
-    // Fetch administrator properties for suggestions
+    // Fetch administrator properties when needed
     const { data: administratorProperties = [], refetch: refetchProperties } = useQuery({
-        queryKey: ['administratorProperties', loggedInUserId],
+        queryKey: ['administratorProperties'],
         queryFn: async () => {
-            if (!loggedInUserId) {
-                console.error('No user ID found in localStorage');
-                return [];
-            }
-            const response = await getOperatorProperties(loggedInUserId);
-            console.log('Fetched properties for user', loggedInUserId, response.data);
-            return response.data || [];
+            const userid = localStorage.getItem('userid');
+            const response = await getOperatorProperties(userid);
+            return response.data;
         },
+        enabled: false,
     });
-
-    // Fetch all properties to get owner userids
-    const { data: allProperties = [], error: propertiesError } = useQuery({
-        queryKey: ['propertiesListing', username],
-        queryFn: async () => {
-            if (!username) {
-                console.error('No username found in localStorage');
-                return [];
-            }
-            try {
-                const response = await fetchPropertiesListing(username);
-                console.log('Fetched all properties for username', username, response.properties);
-                return response.properties || [];
-            } catch (error) {
-                console.error('Failed to fetch properties listing:', error);
-                return [];
-            }
-        },
-        enabled: !!username,
-    });
-
-    // Ensure properties are fetched on mount
-    useEffect(() => {
-        if (loggedInUserId) {
-            refetchProperties();
-        }
-    }, [loggedInUserId, refetchProperties]);
 
     // Update reservation status mutation
     const updateStatusMutation = useMutation({
@@ -185,6 +160,11 @@ const Reservations = () => {
         )
         : [];
 
+    const isOwnProperty = (propertyAddress) => {
+        const property = properties.find(p => p.propertyaddress === propertyAddress);
+        return property && property.userid === currentUserId;
+    };
+
     const handleAction = async (action, reservation) => {
         if (reservation.reservationstatus === 'expired') {
             displayToast('error', 'Action cannot be performed. This reservation has expired.');
@@ -209,11 +189,14 @@ const Reservations = () => {
         } else if (action === 'accept') {
             try {
                 const newStatus = 'Accepted';
+                
                 await updateStatusMutation.mutateAsync({ 
                     reservationId: reservation.reservationid, 
                     newStatus 
                 });
+                
                 await acceptBookingMutation.mutateAsync(reservation.reservationid);
+        
                 displayToast('success', 'Reservation Accepted Successfully');
             } catch (error) {
                 console.error('Failed to accept reservation or send email', error);
@@ -223,13 +206,17 @@ const Reservations = () => {
             const rejectedID = {
                 reservationid: reservation.reservationid || 'N/A',
             };
+    
             setRejectedReservationID(rejectedID);
+    
             try {
                 const newStatus = 'Rejected';
+                
                 await updateStatusMutation.mutateAsync({ 
                     reservationId: reservation.reservationid, 
                     newStatus 
                 });
+    
                 setShowMessageBox(true);
                 displayToast('success', 'Reservation Rejected Successfully');
             } catch (error) {
@@ -243,6 +230,7 @@ const Reservations = () => {
         if (mode === 'suggest') {
             refetchProperties();
         }
+
         setMessageBoxMode(mode);
         setShowMessageBox(false);
     };
@@ -258,6 +246,7 @@ const Reservations = () => {
                     propertyAddress: selectedProperty,
                     reservationId: rejectedReservationID.reservationid
                 });
+
                 displayToast('success', 'New Room Suggestion Email Sent Successfully');
                 setMessageBoxMode(null);
             } catch (error) {
@@ -283,6 +272,7 @@ const Reservations = () => {
                     reservationId: rejectedReservationID.reservationid,
                     operators: selectedOperators
                 });
+
                 displayToast('success', 'Suggest Notification Sent Successfully');
                 setMessageBoxMode(null);
             } catch (error) {
@@ -293,35 +283,15 @@ const Reservations = () => {
         }
     };
 
-    const reservationDropdownItems = (reservationStatus, reservation) => {
-        // Log all available property addresses for debugging
-        console.log('All properties addresses:', allProperties.map(p => p.propertyaddress));
-        console.log('Reservation:', reservation.reservationid, 
-                    'Property:', reservation.propertyaddress, 
-                    'Logged-in UserID:', loggedInUserId, 
-                    'Username:', username);
-
-        // Find the property to get its owner's userid
-        const property = Array.isArray(allProperties) && allProperties.find(
-            (prop) => prop.propertyaddress === reservation.propertyaddress
-        );
-
-        console.log('Found property:', property);
-        console.log('Property Owner UserID:', property?.userid);
-
-        // Check if the logged-in user is the property owner
-        const isPropertyOwner = property && property.userid && loggedInUserId && 
-                              property.userid.toString() === loggedInUserId.toString();
-
-        if (reservationStatus === 'Pending' && isPropertyOwner) {
-            console.log('Showing Accept/Reject for reservation:', reservation.reservationid);
+    const reservationDropdownItems = (reservationStatus, propertyAddress) => {
+        const isOwner = isOwnProperty(propertyAddress);
+        if (reservationStatus === 'Pending' && isOwner) {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Accept', icon: <FaCheck />, action: 'accept' },
                 { label: 'Reject', icon: <FaTimes />, action: 'reject' },
             ];
         }
-        console.log('Hiding Accept/Reject for reservation:', reservation.reservationid);
         return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
     };
 
@@ -374,7 +344,7 @@ const Reservations = () => {
             accessor: 'actions',
             render: (reservation) => (
                 <ActionDropdown
-                    items={reservationDropdownItems(reservation.reservationstatus, reservation)}
+                    items={reservationDropdownItems(reservation.reservationstatus, reservation.propertyaddress)}
                     onAction={(action) => handleAction(action, reservation)}
                 />
             ),
