@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification } from '../../../../../Api/api';
+import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification, fetchPropertiesListingTable } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
@@ -33,6 +33,7 @@ const Reservations = () => {
     
     const queryClient = useQueryClient();
     const loggedInUserId = localStorage.getItem('userid');
+    const username = localStorage.getItem('username');
 
     // Fetch reservations with React Query
     const { data: reservationsData, isLoading: reservationsLoading } = useQuery({
@@ -69,7 +70,7 @@ const Reservations = () => {
         queryFn: fetchOperators,
     });
 
-    // Fetch administrator properties
+    // Fetch administrator properties for suggestions
     const { data: administratorProperties = [], refetch: refetchProperties } = useQuery({
         queryKey: ['administratorProperties', loggedInUserId],
         queryFn: async () => {
@@ -78,9 +79,24 @@ const Reservations = () => {
                 return [];
             }
             const response = await getOperatorProperties(loggedInUserId);
-            console.log('Fetched properties for user', loggedInUserId, response.data); // Debug
+            console.log('Fetched properties for user', loggedInUserId, response.data);
             return response.data || [];
         },
+    });
+
+    // Fetch all properties to get owner userids
+    const { data: allProperties = [] } = useQuery({
+        queryKey: ['propertiesListing', username],
+        queryFn: async () => {
+            if (!username) {
+                console.error('No username found in localStorage');
+                return [];
+            }
+            const response = await fetchPropertiesListingTable(username);
+            console.log('Fetched all properties for username', username, response.properties);
+            return response.properties || [];
+        },
+        enabled: !!username,
     });
 
     // Ensure properties are fetched on mount
@@ -273,18 +289,30 @@ const Reservations = () => {
     };
 
     const reservationDropdownItems = (reservationStatus, reservation) => {
-      
-        const isPropertyOwned = Array.isArray(administratorProperties) && administratorProperties.some(
-            (property) => property.propertyaddress === reservation.propertyaddress
+
+        const property = Array.isArray(allProperties) && allProperties.find(
+            (prop) => prop.propertyaddress === reservation.propertyaddress
         );
 
-        if (reservationStatus === 'Pending' && isPropertyOwned) {
+        console.log('Reservation:', reservation.reservationid, 
+                    'Property:', reservation.propertyaddress, 
+                    'Property Owner UserID:', property?.userid, 
+                    'Logged-in UserID:', loggedInUserId, 
+                    'Username:', username);
+
+        // Check if the logged-in user is the property owner
+        const isPropertyOwner = property && loggedInUserId && 
+                              property.userid.toString() === loggedInUserId.toString();
+
+        if (reservationStatus === 'Pending' && isPropertyOwner) {
+            console.log('Showing Accept/Reject for reservation:', reservation.reservationid);
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Accept', icon: <FaCheck />, action: 'accept' },
                 { label: 'Reject', icon: <FaTimes />, action: 'reject' },
             ];
         }
+        console.log('Hiding Accept/Reject for reservation:', reservation.reservationid);
         return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
     };
 
