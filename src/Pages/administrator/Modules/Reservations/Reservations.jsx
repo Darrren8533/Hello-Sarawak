@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification, fetchPropertiesListingTable } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
@@ -30,11 +30,9 @@ const Reservations = () => {
     const [rejectedReservationID, setRejectedReservationID] = useState(null);
     const [suggestSearchKey, setSuggestSearchKey] = useState('');
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
-    const [propertyOwnershipMap, setPropertyOwnershipMap] = useState({});
     
     const queryClient = useQueryClient();
     const currentUserId = localStorage.getItem('userid');
-    const currentUsername = localStorage.getItem('username');
 
     // Fetch reservations with React Query
     const { data: reservationsData, isLoading: reservationsLoading } = useQuery({
@@ -66,26 +64,10 @@ const Reservations = () => {
     });
 
     // Fetch properties data to match property owners
-    const { data: propertiesData, isLoading: propertiesLoading } = useQuery({
+    const { data: propertiesData } = useQuery({
         queryKey: ['properties'],
         queryFn: fetchPropertiesListingTable,
     });
-
-    // Build a mapping of property addresses to owner usernames/IDs
-    useEffect(() => {
-        if (propertiesData && Array.isArray(propertiesData)) {
-            const ownershipMap = {};
-            propertiesData.forEach(property => {
-                if (property.propertyaddress && (property.userid || property.username)) {
-                    ownershipMap[property.propertyaddress] = {
-                        userid: property.userid,
-                        username: property.username
-                    };
-                }
-            });
-            setPropertyOwnershipMap(ownershipMap);
-        }
-    }, [propertiesData]);
 
     // Fetch operators with React Query
     const { data: operators = [] } = useQuery({
@@ -167,30 +149,13 @@ const Reservations = () => {
 
     // Check if property belongs to current user
     const isPropertyOwner = (propertyAddress) => {
-        if (!propertyAddress) return false;
+        if (!propertiesData || !Array.isArray(propertiesData)) return false;
         
-        // Check the ownership map first
-        const propertyOwner = propertyOwnershipMap[propertyAddress];
+        const property = propertiesData.find(
+            property => property.propertyaddress === propertyAddress
+        );
         
-        if (propertyOwner) {
-            // Check by userId (primary) or username (backup)
-            return (propertyOwner.userid && propertyOwner.userid === currentUserId) || 
-                   (propertyOwner.username && propertyOwner.username === currentUsername);
-        }
-        
-        // Fallback to direct check in case the map isn't built yet
-        if (propertiesData && Array.isArray(propertiesData)) {
-            const property = propertiesData.find(
-                property => property.propertyaddress === propertyAddress
-            );
-            
-            if (property) {
-                return (property.userid && property.userid === currentUserId) || 
-                       (property.username && property.username === currentUsername);
-            }
-        }
-        
-        return false;
+        return property && property.userid === currentUserId;
     };
 
     const filteredReservations = Array.isArray(reservationsData)
@@ -329,13 +294,8 @@ const Reservations = () => {
     };
 
     const reservationDropdownItems = (reservation) => {
-        const canManageReservation = isPropertyOwner(reservation.propertyaddress);
-        
-        // For debugging - log the ownership check details
-        console.log(`Property: ${reservation.propertyaddress}, Owner: ${JSON.stringify(propertyOwnershipMap[reservation.propertyaddress])}, CanManage: ${canManageReservation}`);
-        
         // Only show accept/reject options if the property belongs to current user
-        if (reservation.reservationstatus === 'Pending' && canManageReservation) {
+        if (reservation.reservationstatus === 'Pending' && isPropertyOwner(reservation.propertyaddress)) {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Accept', icon: <FaCheck />, action: 'accept' },
@@ -411,7 +371,7 @@ const Reservations = () => {
 
             <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-            {reservationsLoading || propertiesLoading ? (
+            {reservationsLoading ? (
                 <div className="loader-box">
                     <Loader />
                 </div>
