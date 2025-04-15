@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification, fetchPropertiesListingTable } from '../../../../../Api/api';
+import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
@@ -32,7 +32,6 @@ const Reservations = () => {
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
     
     const queryClient = useQueryClient();
-    const currentUserId = localStorage.getItem('userid');
 
     // Fetch reservations with React Query
     const { data: reservationsData, isLoading: reservationsLoading } = useQuery({
@@ -63,12 +62,6 @@ const Reservations = () => {
         refetchInterval: 1000,
     });
 
-    // Fetch properties to get property owner information
-    const { data: properties = [] } = useQuery({
-        queryKey: ['properties'],
-        queryFn: fetchPropertiesListingTable,
-    });
-
     // Fetch operators with React Query
     const { data: operators = [] } = useQuery({
         queryKey: ['operators'],
@@ -83,7 +76,7 @@ const Reservations = () => {
             const response = await getOperatorProperties(userid);
             return response.data;
         },
-        enabled: false,
+        enabled: false, // Don't run this query automatically
     });
 
     // Update reservation status mutation
@@ -160,11 +153,6 @@ const Reservations = () => {
         )
         : [];
 
-    const isOwnProperty = (propertyAddress) => {
-        const property = properties.find(p => p.propertyaddress === propertyAddress);
-        return property && property.userid === currentUserId;
-    };
-
     const handleAction = async (action, reservation) => {
         if (reservation.reservationstatus === 'expired') {
             displayToast('error', 'Action cannot be performed. This reservation has expired.');
@@ -188,13 +176,16 @@ const Reservations = () => {
             setSelectedReservation(essentialFields);
         } else if (action === 'accept') {
             try {
+                // Using optimistic updates with React Query
                 const newStatus = 'Accepted';
                 
+                // Update the status first
                 await updateStatusMutation.mutateAsync({ 
                     reservationId: reservation.reservationid, 
                     newStatus 
                 });
                 
+                // Then send the acceptance email
                 await acceptBookingMutation.mutateAsync(reservation.reservationid);
         
                 displayToast('success', 'Reservation Accepted Successfully');
@@ -228,6 +219,7 @@ const Reservations = () => {
 
     const handleMessageBoxSelect = async (mode) => {
         if (mode === 'suggest') {
+            // Trigger the properties query
             refetchProperties();
         }
 
@@ -283,9 +275,8 @@ const Reservations = () => {
         }
     };
 
-    const reservationDropdownItems = (reservationStatus, propertyAddress) => {
-        const isOwner = isOwnProperty(propertyAddress);
-        if (reservationStatus === 'Pending' && isOwner) {
+    const reservationDropdownItems = (reservationStatus) => {
+        if (reservationStatus === 'Pending') {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Accept', icon: <FaCheck />, action: 'accept' },
@@ -303,7 +294,7 @@ const Reservations = () => {
     };
 
     const getFilteredProperties = () => {
-        if (!Array.isArray(administratorProperties)) return [];
+        if (!Array.isArray(administratorProperties)) return []; // Ensure an array
         return administratorProperties.filter(property => {
             const matchesSearch = property.propertyaddress.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
             const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
@@ -344,7 +335,7 @@ const Reservations = () => {
             accessor: 'actions',
             render: (reservation) => (
                 <ActionDropdown
-                    items={reservationDropdownItems(reservation.reservationstatus, reservation.propertyaddress)}
+                    items={reservationDropdownItems(reservation.reservationstatus)}
                     onAction={(action) => handleAction(action, reservation)}
                 />
             ),
