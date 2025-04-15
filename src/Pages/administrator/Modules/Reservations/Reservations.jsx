@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification, fetchPropertiesListingTable } from '../../../../../Api/api';
+import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification, fetchPropertiesListing } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
@@ -85,16 +85,21 @@ const Reservations = () => {
     });
 
     // Fetch all properties to get owner userids
-    const { data: allProperties = [] } = useQuery({
+    const { data: allProperties = [], error: propertiesError } = useQuery({
         queryKey: ['propertiesListing', username],
         queryFn: async () => {
             if (!username) {
                 console.error('No username found in localStorage');
                 return [];
             }
-            const response = await fetchPropertiesListingTable(username);
-            console.log('Fetched all properties for username', username, response.properties);
-            return response.properties || [];
+            try {
+                const response = await fetchPropertiesListing(username);
+                console.log('Fetched all properties for username', username, response.properties);
+                return response.properties || [];
+            } catch (error) {
+                console.error('Failed to fetch properties listing:', error);
+                return [];
+            }
         },
         enabled: !!username,
     });
@@ -289,19 +294,23 @@ const Reservations = () => {
     };
 
     const reservationDropdownItems = (reservationStatus, reservation) => {
+        // Log all available property addresses for debugging
+        console.log('All properties addresses:', allProperties.map(p => p.propertyaddress));
+        console.log('Reservation:', reservation.reservationid, 
+                    'Property:', reservation.propertyaddress, 
+                    'Logged-in UserID:', loggedInUserId, 
+                    'Username:', username);
 
+        // Find the property to get its owner's userid
         const property = Array.isArray(allProperties) && allProperties.find(
             (prop) => prop.propertyaddress === reservation.propertyaddress
         );
 
-        console.log('Reservation:', reservation.reservationid, 
-                    'Property:', reservation.propertyaddress, 
-                    'Property Owner UserID:', property?.userid, 
-                    'Logged-in UserID:', loggedInUserId, 
-                    'Username:', username);
+        console.log('Found property:', property);
+        console.log('Property Owner UserID:', property?.userid);
 
         // Check if the logged-in user is the property owner
-        const isPropertyOwner = property && loggedInUserId && 
+        const isPropertyOwner = property && property.userid && loggedInUserId && 
                               property.userid.toString() === loggedInUserId.toString();
 
         if (reservationStatus === 'Pending' && isPropertyOwner) {
