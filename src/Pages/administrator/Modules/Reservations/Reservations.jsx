@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification, fetchPropertiesListingTable } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
@@ -30,9 +30,11 @@ const Reservations = () => {
     const [rejectedReservationID, setRejectedReservationID] = useState(null);
     const [suggestSearchKey, setSuggestSearchKey] = useState('');
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+    const [propertyOwnershipMap, setPropertyOwnershipMap] = useState({});
     
     const queryClient = useQueryClient();
     const currentUserId = localStorage.getItem('userid');
+    const currentUsername = localStorage.getItem('username');
 
     // Fetch reservations with React Query
     const { data: reservationsData, isLoading: reservationsLoading } = useQuery({
@@ -64,10 +66,26 @@ const Reservations = () => {
     });
 
     // Fetch properties data to match property owners
-    const { data: propertiesData } = useQuery({
+    const { data: propertiesData, isLoading: propertiesLoading } = useQuery({
         queryKey: ['properties'],
         queryFn: fetchPropertiesListingTable,
     });
+
+    // Build a mapping of property addresses to owner usernames/IDs
+    useEffect(() => {
+        if (propertiesData && Array.isArray(propertiesData)) {
+            const ownershipMap = {};
+            propertiesData.forEach(property => {
+                if (property.propertyaddress && (property.userid || property.username)) {
+                    ownershipMap[property.propertyaddress] = {
+                        userid: property.userid,
+                        username: property.username
+                    };
+                }
+            });
+            setPropertyOwnershipMap(ownershipMap);
+        }
+    }, [propertiesData]);
 
     // Fetch operators with React Query
     const { data: operators = [] } = useQuery({
@@ -83,7 +101,7 @@ const Reservations = () => {
             const response = await getOperatorProperties(userid);
             return response.data;
         },
-        enabled: false, 
+        enabled: false, // Don't run this query automatically
     });
 
     // Update reservation status mutation
@@ -149,13 +167,30 @@ const Reservations = () => {
 
     // Check if property belongs to current user
     const isPropertyOwner = (propertyAddress) => {
-        if (!propertiesData || !Array.isArray(propertiesData)) return false;
+        if (!propertyAddress) return false;
         
-        const property = propertiesData.find(
-            property => property.propertyaddress === propertyAddress
-        );
+        // Check the ownership map first
+        const propertyOwner = propertyOwnershipMap[propertyAddress];
         
-        return property && property.userid === currentUserId;
+        if (propertyOwner) {
+            // Check by userId (primary) or username (backup)
+            return (propertyOwner.userid && propertyOwner.userid === currentUserId) || 
+                   (propertyOwner.username && propertyOwner.username === currentUsername);
+        }
+        
+        // Fallback to direct check in case the map isn't built yet
+        if (propertiesData && Array.isArray(propertiesData)) {
+            const property = propertiesData.find(
+                property => property.propertyaddress === propertyAddress
+            );
+            
+            if (property) {
+                return (property.userid && property.userid === currentUserId) || 
+                       (property.username && property.username === currentUsername);
+            }
+        }
+        
+        return false;
     };
 
     const filteredReservations = Array.isArray(reservationsData)
@@ -194,7 +229,7 @@ const Reservations = () => {
             setSelectedReservation(essentialFields);
         } else if (action === 'accept') {
             try {
-                
+                // Using optimistic updates with React Query
                 const newStatus = 'Accepted';
                 
                 // Update the status first
@@ -294,8 +329,13 @@ const Reservations = () => {
     };
 
     const reservationDropdownItems = (reservation) => {
-
-        if (reservation.reservationstatus === 'Pending' && isPropertyOwner(reservation.propertyaddress)) {
+        const canManageReservation = isPropertyOwner(reservation.propertyaddress);
+        
+        // For debugging - log the ownership check details
+        console.log(`Property: ${reservation.propertyaddress}, Owner: ${JSON.stringify(propertyOwnershipMap[reservation.propertyaddress])}, CanManage: ${canManageReservation}`);
+        
+        // Only show accept/reject options if the property belongs to current user
+        if (reservation.reservationstatus === 'Pending' && canManageReservation) {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Accept', icon: <FaCheck />, action: 'accept' },
@@ -313,7 +353,7 @@ const Reservations = () => {
     };
 
     const getFilteredProperties = () => {
-        if (!Array.isArray(administratorProperties)) return [];
+        if (!Array.isArray(administratorProperties)) return []; // Ensure an array
         return administratorProperties.filter(property => {
             const matchesSearch = property.propertyaddress.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
             const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
@@ -371,7 +411,7 @@ const Reservations = () => {
 
             <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-            {reservationsLoading ? (
+            {reservationsLoading || propertiesLoading ? (
                 <div className="loader-box">
                     <Loader />
                 </div>
