@@ -35,7 +35,7 @@ const Reservations = () => {
     const currentUserId = localStorage.getItem('userid');
 
     // Fetch reservations with React Query
-    const { data: reservationsData, isLoading: reservationsLoading } = useQuery({
+    const { data: reservationsData = [], isLoading: reservationsLoading } = useQuery({
         queryKey: ['reservations'],
         queryFn: async () => {
             try {
@@ -64,9 +64,10 @@ const Reservations = () => {
     });
 
     // Fetch properties data to match property owners
-    const { data: propertiesData } = useQuery({
+    const { data: propertiesData = [] } = useQuery({
         queryKey: ['properties'],
         queryFn: fetchPropertiesListingTable,
+        onError: (error) => console.error('Failed to fetch properties:', error),
     });
 
     // Fetch operators with React Query
@@ -83,7 +84,7 @@ const Reservations = () => {
             const response = await getOperatorProperties(userid);
             return response.data;
         },
-        enabled: false, // Don't run this query automatically
+        enabled: false,
     });
 
     // Update reservation status mutation
@@ -149,24 +150,27 @@ const Reservations = () => {
 
     // Check if property belongs to current user
     const isPropertyOwner = (propertyAddress) => {
-        if (!propertiesData || !Array.isArray(propertiesData)) return false;
+        if (!propertiesData || !Array.isArray(propertiesData) || !currentUserId) {
+            return false;
+        }
         
         const property = propertiesData.find(
             property => property.propertyaddress === propertyAddress
         );
         
-        return property && property.userid === currentUserId;
+        return property?.userid === currentUserId;
     };
 
     const filteredReservations = Array.isArray(reservationsData)
         ? reservationsData.filter(
             (reservation) =>
-                (appliedFilters.status === 'All' || (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
+                (appliedFilters.status === 'All' || 
+                 (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
                 (
-                    (reservation.reservationid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.propertyaddress?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '')
+                    reservation.reservationid?.toString().toLowerCase().includes(searchKey.toLowerCase()) ||
+                    reservation.propertyaddress?.toString().toLowerCase().includes(searchKey.toLowerCase()) ||
+                    reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) ||
+                    reservation.request?.toLowerCase().includes(searchKey.toLowerCase())
                 )
         )
         : [];
@@ -194,21 +198,18 @@ const Reservations = () => {
             setSelectedReservation(essentialFields);
         } else if (action === 'accept') {
             try {
-                // Using optimistic updates with React Query
                 const newStatus = 'Accepted';
                 
-                // Update the status first
                 await updateStatusMutation.mutateAsync({ 
                     reservationId: reservation.reservationid, 
                     newStatus 
                 });
                 
-                // Then send the acceptance email
                 await acceptBookingMutation.mutateAsync(reservation.reservationid);
         
                 displayToast('success', 'Reservation Accepted Successfully');
             } catch (error) {
-                console.error('Failed to accept reservation or send email', error);
+                console.error('Failed to accept reservation:', error);
                 displayToast('error', 'Failed to accept reservation');
             }
         } else if (action === 'reject') {
@@ -229,7 +230,7 @@ const Reservations = () => {
                 setShowMessageBox(true);
                 displayToast('success', 'Reservation Rejected Successfully');
             } catch (error) {
-                console.error('Failed to update reservation status', error);
+                console.error('Failed to reject reservation:', error);
                 displayToast('error', 'Failed to reject reservation');
             }
         }
@@ -237,7 +238,6 @@ const Reservations = () => {
 
     const handleMessageBoxSelect = async (mode) => {
         if (mode === 'suggest') {
-            // Trigger the properties query
             refetchProperties();
         }
 
@@ -250,7 +250,7 @@ const Reservations = () => {
     };
 
     const handleConfirmSuggestion = async () => {
-        if (selectedProperty && rejectedReservationID.reservationid) {
+        if (selectedProperty && rejectedReservationID?.reservationid) {
             try {
                 await suggestRoomMutation.mutateAsync({
                     propertyAddress: selectedProperty,
@@ -260,6 +260,7 @@ const Reservations = () => {
                 displayToast('success', 'New Room Suggestion Email Sent Successfully');
                 setMessageBoxMode(null);
             } catch (error) {
+                console.error('Error sending new room suggestion:', error);
                 displayToast('error', 'Error Sending New Room Suggestion Email');
             }
         } else {
@@ -276,7 +277,7 @@ const Reservations = () => {
     };
 
     const handleConfirmNotification = async () => {
-        if (selectedOperators.length > 0 && rejectedReservationID.reservationid) {
+        if (selectedOperators.length > 0 && rejectedReservationID?.reservationid) {
             try {
                 await sendNotificationMutation.mutateAsync({
                     reservationId: rejectedReservationID.reservationid,
@@ -286,6 +287,7 @@ const Reservations = () => {
                 displayToast('success', 'Suggest Notification Sent Successfully');
                 setMessageBoxMode(null);
             } catch (error) {
+                console.error('Error sending notification:', error);
                 displayToast('error', 'Error Sending Suggest Notification');
             }
         } else {
@@ -294,7 +296,6 @@ const Reservations = () => {
     };
 
     const reservationDropdownItems = (reservation) => {
-        // Only show accept/reject options if the property belongs to current user
         if (reservation.reservationstatus === 'Pending' && isPropertyOwner(reservation.propertyaddress)) {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
@@ -313,7 +314,7 @@ const Reservations = () => {
     };
 
     const getFilteredProperties = () => {
-        if (!Array.isArray(administratorProperties)) return []; // Ensure an array
+        if (!Array.isArray(administratorProperties)) return [];
         return administratorProperties.filter(property => {
             const matchesSearch = property.propertyaddress.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
             const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
