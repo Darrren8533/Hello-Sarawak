@@ -44,9 +44,9 @@ const Reservations = () => {
         const userGroup = localStorage.getItem('userGroup');
         
         setCurrentUser({
-            username,
-            userid,
-            userGroup
+            username: username || '',
+            userid: userid || '',
+            userGroup: userGroup || ''
         });
         
         console.log('Current user loaded:', { username, userid, userGroup });
@@ -83,9 +83,18 @@ const Reservations = () => {
     });
 
     // Fetch properties to get property owner information
-    const { data: properties = [] } = useQuery({
+    const { data: properties = [], isLoading: propertiesLoading, error: propertiesError } = useQuery({
         queryKey: ['properties'],
-        queryFn: fetchPropertiesListingTable,
+        queryFn: async () => {
+            try {
+                const propertiesData = await fetchPropertiesListingTable();
+                console.log('Properties Data:', propertiesData);
+                return Array.isArray(propertiesData) ? propertiesData : [];
+            } catch (error) {
+                console.error('Failed to fetch properties:', error);
+                return [];
+            }
+        },
     });
 
     // Fetch operators with React Query
@@ -100,9 +109,9 @@ const Reservations = () => {
         queryFn: async () => {
             const userid = localStorage.getItem('userid');
             const response = await getOperatorProperties(userid);
-            return response.data;
+            return Array.isArray(response.data) ? response.data : [];
         },
-        enabled: false, 
+        enabled: false, // Don't run this query automatically
     });
 
     // Update reservation status mutation
@@ -136,8 +145,26 @@ const Reservations = () => {
     };
 
     const isPropertyOwner = (propertyAddress) => {
+        if (propertiesLoading) {
+            console.log('Properties still loading');
+            return false;
+        }
+        if (propertiesError) {
+            console.error('Properties fetch error:', propertiesError);
+            return false;
+        }
+        if (!Array.isArray(properties)) {
+            console.error('Properties is not an array:', properties);
+            return false;
+        }
+        if (!currentUser.userid) {
+            console.log('No current user ID available');
+            return false;
+        }
         const property = properties.find(p => p.propertyaddress === propertyAddress);
-        return property && property.userid === currentUser.userid;
+        const isOwner = property && property.userid === currentUser.userid;
+        console.log('Ownership check:', { propertyAddress, foundProperty: property, isOwner, currentUserId: currentUser.userid });
+        return isOwner;
     };
 
     const filters = [
@@ -225,6 +252,31 @@ const Reservations = () => {
                 console.error('Failed to accept reservation or send email', error);
                 displayToast('error', 'Failed to accept reservation');
             }
+        } else if (action === 'reject') {
+            if (!isPropertyOwner(reservation.propertyaddress)) {
+                displayToast('error', 'You can only reject reservations for your own properties.');
+                return;
+            }
+            const rejectedID = {
+                reservationid: reservation.reservationid || 'N/A',
+            };
+    
+            setRejectedReservationID(rejectedID);
+    
+            try {
+                const newStatus = 'Rejected';
+                
+                await updateStatusMutation.mutateAsync({ 
+                    reservationId: reservation.reservationid, 
+                    newStatus 
+                });
+    
+                setShowMessageBox(true);
+                displayToast('success', 'Reservation Rejected Successfully');
+            } catch (error) {
+                console.error('Failed to update reservation status', error);
+                displayToast('error', 'Failed to reject reservation');
+            }
         }
     };
 
@@ -242,7 +294,7 @@ const Reservations = () => {
     };
 
     const handleConfirmSuggestion = async () => {
-        if (selectedProperty && rejectedReservationID.reservationid) {
+        if (selectedProperty && rejectedReservationID?.reservationid) {
             try {
                 await suggestRoomMutation.mutateAsync({
                     propertyAddress: selectedProperty,
@@ -252,6 +304,7 @@ const Reservations = () => {
                 displayToast('success', 'New Room Suggestion Email Sent Successfully');
                 setMessageBoxMode(null);
             } catch (error) {
+                console.error('Error sending new room suggestion:', error);
                 displayToast('error', 'Error Sending New Room Suggestion Email');
             }
         } else {
@@ -268,7 +321,7 @@ const Reservations = () => {
     };
 
     const handleConfirmNotification = async () => {
-        if (selectedOperators.length > 0 && rejectedReservationID.reservationid) {
+        if (selectedOperators.length > 0 && rejectedReservationID?.reservationid) {
             try {
                 await sendNotificationMutation.mutateAsync({
                     reservationId: rejectedReservationID.reservationid,
@@ -278,6 +331,7 @@ const Reservations = () => {
                 displayToast('success', 'Suggest Notification Sent Successfully');
                 setMessageBoxMode(null);
             } catch (error) {
+                console.error('Error sending suggest notification:', error);
                 displayToast('error', 'Error Sending Suggest Notification');
             }
         } else {
@@ -290,6 +344,7 @@ const Reservations = () => {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Accept', icon: <FaCheck />, action: 'accept' },
+                { label: 'Reject', icon: <FaTimes />, action: 'reject' },
             ];
         }
         return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
@@ -303,9 +358,12 @@ const Reservations = () => {
     };
 
     const getFilteredProperties = () => {
-        if (!Array.isArray(administratorProperties)) return [];
+        if (!Array.isArray(administratorProperties)) {
+            console.error('administratorProperties is not an array:', administratorProperties);
+            return [];
+        }
         return administratorProperties.filter(property => {
-            const matchesSearch = property.propertyaddress.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
+            const matchesSearch = property.propertyaddress?.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
             const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
                 (!priceRange.max || property.rateamount <= Number(priceRange.max));
             return matchesSearch && matchesPrice;
@@ -499,7 +557,7 @@ const Reservations = () => {
                                         <input
                                             type="checkbox"
                                             id={`operator-${operator.userid}`}
-                                            value={owner.userid}
+                                            value={operator.userid}
                                             checked={selectedOperators.includes(operator.userid)}
                                             onChange={() => handleOperatorSelect(operator.userid)}
                                         />
