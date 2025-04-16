@@ -770,9 +770,9 @@ export const fetchGuestSatisfactionScore = async (userid) => {
   }
 };
 
-export const fetchALOS = async () => {
+export const fetchALOS = async (userid) => {
   try {
-      const response = await fetch(`${API_URL}/users/alos`);
+      const response = await fetch(`${API_URL}/users/alos?userid=${userid}`);
       const data = await response.json();
       return data; 
   } catch (error) {
