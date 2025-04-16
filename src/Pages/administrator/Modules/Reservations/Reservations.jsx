@@ -32,7 +32,7 @@ const Reservations = () => {
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
     
     const queryClient = useQueryClient();
-    const currentUserId = localStorage.getItem('userid');
+    const currentUsername = localStorage.getItem('username');
 
     // Fetch reservations with React Query
     const { data: reservationsData = [], isLoading: reservationsLoading } = useQuery({
@@ -64,9 +64,13 @@ const Reservations = () => {
     });
 
     // Fetch properties data to match property owners
-    const { data: propertiesData = [] } = useQuery({
+    const { data: propertiesData = [], isLoading: propertiesLoading, error: propertiesError } = useQuery({
         queryKey: ['properties'],
-        queryFn: fetchPropertiesListingTable,
+        queryFn: async () => {
+            const data = await fetchPropertiesListingTable();
+            console.log('Properties Data:', data);
+            return data;
+        },
         onError: (error) => console.error('Failed to fetch properties:', error),
     });
 
@@ -148,17 +152,24 @@ const Reservations = () => {
         images: "Images",
     };
 
-    // Check if property belongs to current user
+    // Check if property belongs to current user based on username
     const isPropertyOwner = (propertyAddress) => {
-        if (!propertiesData || !Array.isArray(propertiesData) || !currentUserId) {
+        if (!propertiesData || !Array.isArray(propertiesData) || !currentUsername) {
+            console.log('Missing data:', { propertiesData, currentUsername, propertyAddress });
             return false;
         }
         
         const property = propertiesData.find(
-            property => property.propertyaddress === propertyAddress
+            property => property.propertyaddress.toLowerCase() === propertyAddress.toLowerCase()
         );
         
-        return property?.userid === currentUserId;
+        const isOwner = property?.username.toLowerCase() === currentUsername.toLowerCase();
+        console.log('Property Check:', { 
+            propertyAddress, 
+            foundProperty: property, 
+            isOwner 
+        });
+        return isOwner;
     };
 
     const filteredReservations = Array.isArray(reservationsData)
@@ -361,6 +372,24 @@ const Reservations = () => {
             ),
         },
     ];
+
+    if (propertiesLoading) {
+        return (
+            <div className="loader-box">
+                <Loader />
+            </div>
+        );
+    }
+
+    if (propertiesError) {
+        console.error('Properties Error:', propertiesError);
+        return <div>Error loading properties: {propertiesError.message}</div>;
+    }
+
+    if (!currentUsername) {
+        console.error('No username found in localStorage');
+        return <div>Error: Please log in to view reservations</div>;
+    }
 
     return (
         <div>
