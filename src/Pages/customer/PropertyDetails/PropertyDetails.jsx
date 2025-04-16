@@ -3,15 +3,14 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 import { IoMdClose } from "react-icons/io";
 import { IoReturnUpBackOutline } from "react-icons/io5";
-import { FaWifi, FaParking, FaSwimmingPool, FaHotTub, FaTv, FaUtensils, FaSnowflake, FaPaw, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaLock, FaBell, FaMapMarkerAlt, FaTree, FaMountain, FaCity } from "react-icons/fa";
+import { FaStar, FaUser, FaBed, FaWifi, FaParking, FaSwimmingPool, FaHotTub, FaTv, FaUtensils, FaSnowflake, FaPaw, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaLock, FaBell, FaMapMarkerAlt, FaTree, FaMountain, FaCity } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 import Navbar from '../../../Component/Navbar/navbar';
 import Toast from '../../../Component/Toast/Toast';
 import Footer from '../../../Component/Footer/footer';
-import Reviews from "../../../Component/Reviews/Reviews";
-import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
-import { createReservation, requestBooking, fetchUserData } from '../../../../Api/api';
 import './PropertyDetails.css';
+import { createReservation, requestBooking, getCoordinates, fetchUserData } from '../../../../Api/api';
 
 const facilities = [
     { name: "Wi-Fi", icon: <FaWifi className="facilities-icon"/> },
@@ -54,14 +53,11 @@ const PropertyDetails = () => {
   const [bookingData, setBookingData] = useState({
     checkIn: '',
     checkOut: '',
-    adults: 1,
-    children: 0,
   });
   const [showAllFacilities, setShowAllFacilities] = useState(false);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [isEditingDates, setIsEditingDates] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
   const [totalNights, setTotalNights] = useState(0);
   const [totalprice, settotalprice] = useState(0);
   const [bookingForm, setBookingForm] = useState({
@@ -74,19 +70,33 @@ const PropertyDetails = () => {
   });
   const navigate = useNavigate();
   const [showDescriptionOverlay, setShowDescriptionOverlay] = useState(false);
+  const [locationCoords, setLocationCoords] = useState({ lat: null, lng: null });
 
   const facilitiesArray = propertyDetails?.facilities
   ? propertyDetails.facilities.split(",") 
   : [];
-
   const description = propertyDetails?.propertydescription;
+
+  useEffect(() => {
+    const fetchCoordinates = async () => {
+      try {
+        if (propertyDetails?.nearbylocation) {
+          const coords = await getCoordinates(propertyDetails?.nearbylocation);
+          setLocationCoords(coords);
+        }
+      } catch (error) {
+        console.error('Error fetching coordinates:', error);
+      }
+    };
+
+    fetchCoordinates();
+  }, [propertyDetails]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setBookingData((prev) => {
       const updatedData = { ...prev, [name]: value };
 
-      // Ensure check-in is not greater than or equal to check-out
       if (
         (name === "checkIn" && new Date(value) >= new Date(prev.checkOut)) ||
         (name === "checkOut" && new Date(prev.checkIn) >= new Date(value))
@@ -94,7 +104,6 @@ const PropertyDetails = () => {
         updatedData.checkOut = "";
       }
 
-      // Calculate total price if check-in or check-out changes
       if (name === "checkIn" || name === "checkOut") {
         calculatetotalprice(
           name === "checkIn" ? value : prev.checkIn,
@@ -106,37 +115,9 @@ const PropertyDetails = () => {
     });
   };
 
-  const nextSlide = () => {
-    setCurrentSlide((prev) => (prev === propertyDetails?.propertyimage.length - 1 ? 0 : prev + 1));
-  };
-  
-  const prevSlide = () => {
-    setCurrentSlide((prev) => (prev === 0 ? propertyDetails?.propertyimage.length - 1 : prev - 1));
-  };
-
-  const handleImageClick = () => {
-    setShowAllPhotos(true);
-    document.body.style.overflow = 'hidden';
-  };
-
   const handleCloseFullscreen = () => {
     setIsFullscreen(false);
     document.body.style.overflow = 'auto';
-  };
-
-  const handleShowAllPhotos = () => {
-    setShowAllPhotos(true);
-    document.body.style.overflow = 'hidden';
-  };
-
-  const handleCloseAllPhotos = () => {
-    setShowAllPhotos(false);
-    document.body.style.overflow = 'auto';
-  };
-
-  const handleBookNowClick = (e) => {
-    e.preventDefault();
-    setShowBookingForm(true);
   };
 
   const handlePhotoClick = (index) => {
@@ -216,7 +197,6 @@ const PropertyDetails = () => {
         reservationstatus: 'Pending'
       };
 
-
       const createdReservation = await createReservation(reservationData);
 
       if (!createdReservation || !createdReservation.reservationid) {
@@ -224,16 +204,14 @@ const PropertyDetails = () => {
       }
 
       await requestBooking(createdReservation.reservationid);
-      console.log('Booking request sent');
-      console.log('Reservation added to the cart');
 
-      displayToast('success', 'Reservation added to the cart');
+      displayToast('success', 'Reservation created');
+      if (displayToast('success', 'Reservation created')){
         setShowBookingForm(false);
-        navigate('/cart');
-
+        navigate('/cart');  
+      }
     } catch (error) {
-      console.error('Reservation error:', error);
-      displayToast('error', 'Failed to add to cart');
+      displayToast('error', 'Failed to create reservation');
     }
   };
 
@@ -272,548 +250,509 @@ const PropertyDetails = () => {
     }
   }, [showBookingForm]);
 
-  return (
-    <div className="property-details-page">
-      <AuthProvider>
-      {!showAllPhotos && !isFullscreen && !showBookingForm ? (
-        <>
-          <Navbar />
-            
-          <div className="property-details-container">
-            <h1 className="property-title">{propertyDetails?.propertyaddress}</h1>
-            <div className="gallery-section">
+  const [guests, setGuests] = useState(1);
 
-              <div className="mobile-slideshow">
-                {propertyDetails?.propertyimage && propertyDetails.propertyimage.length > 0 && (
-                  <>
+  const googleMapSrc = locationCoords.lat && locationCoords.lng
+    ? `https://www.google.com/maps/embed/v1/view?key=AIzaSyCe27HezKpItahXjMFcWXf3LwFcjI7pZFk&center=${locationCoords.lat},${locationCoords.lng}&zoom=14`
+    : "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.9586177612214!2d110.31007237509338!3d1.749442560160908!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31faff9851a3becb%3A0xf308ff203e894002!2sDamai%20Beach!5e0!3m2!1sen!2smy!4v1731252464570!5m2!1sen!2smy";
+
+  return (
+    <div className="property-details">
+      <AuthProvider>
+      <div className="property-details-main-container">
+        <Navbar />
+        <div className="Main_Image_gallery_container">
+          <div className="Image_gallery_card_1">
+            <img 
+              src={`data:image/jpeg;base64,${propertyDetails.propertyimage[0]}`} 
+              onClick={() => setShowAllPhotos(true)}  
+              className="main_gallery_image" 
+              alt="Main Gallery" 
+            />
+          </div>
+
+          <div className="Image_gallery_container">
+            <div className="Image_gallery_card_2">
+              <img 
+                src={`data:image/jpeg;base64,${propertyDetails.propertyimage[1]}`} 
+                onClick={() => setShowAllPhotos(true)}
+                className="second_gallery_image" 
+                alt="Second Gallery" 
+              />
+            </div>
+            <div className="Image_gallery_card_2">
+              <img 
+                src={`data:image/jpeg;base64,${propertyDetails.propertyimage[2]}`} 
+                onClick={() => setShowAllPhotos(true)} 
+                className="second_gallery_image" 
+                alt="Second Gallery" 
+              />
+            </div>
+          </div>
+        </div>
+
+        {showAllPhotos && (
+          <div className="all-photos-view">
+            <div className="photos-header">
+              <button className="back-button" onClick={() => setShowAllPhotos(false)}>
+                <span><IoReturnUpBackOutline /></span>
+              </button>
+            </div>
+            
+            <div className="photos-grid">
+              <div className="photos-container">
+                {propertyDetails?.propertyimage?.map((image, index) => (
+                  <div key={index} className="photo-section">
                     <img 
-                      src={`data:image/jpeg;base64,${propertyDetails.propertyimage[currentSlide]}`} 
-                      alt={`slide ${currentSlide + 1}`}
-                      onClick={handleImageClick}
+                      src={`data:image/jpeg;base64,${image}`} 
+                      alt={`Property image ${index + 1}`}
+                      onClick={() => handlePhotoClick(index)}
                     />
-                    <button className="slide-nav prev" onClick={prevSlide}>
-                      <IoIosArrowBack/>
-                    </button>
-                    <button className="slide-nav next" onClick={nextSlide}>
-                      <IoIosArrowForward/>
-                    </button>
-                    <div className="slide-indicators">
-                      {propertyDetails?.propertyimage && propertyDetails.propertyimage.map((_, index) => (
-                        <span 
-                          key={index} 
-                          className={`indicator ${index === currentSlide ? 'active' : ''}`}
-                          onClick={() => setCurrentSlide(index)}
-                        />
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
-              
-              <div className="gallery-grid">
-                <div className="gallery-main">
-                  {propertyDetails?.propertyimage && propertyDetails.propertyimage.length > 0 && (
-                    <img 
-                      src={`data:image/jpeg;base64,${propertyDetails.propertyimage[0]}`} 
-                      alt="main image"
-                      onClick={handleImageClick}
-                    />
-                  )}
-                </div>
-                <div className="gallery-secondary">
-                  {propertyDetails?.propertyimage && 
-                    propertyDetails.propertyimage.slice(1, 5).map((image, index) => (
-                      <div key={index} className="gallery-item">
-                        <img 
-                          src={`data:image/jpeg;base64,${image}`} 
-                          alt={`${index + 1}`}
-                          onClick={handleImageClick}
-                        />
-                        {index === 3 && (
-                          <button 
-                            className="show-all-photos"
-                            onClick={handleShowAllPhotos}
-                          >
-                            <span className="show-all-photos-icon">
-                              <svg viewBox="0 0 16 16" width="16" height="16">
-                                <path d="M1 3h14v10H1V3zm1 1v8h12V4H2zm1 1h4v3H3V5zm0 4h4v3H3V9zm5-4h4v3H8V5zm0 4h4v3H8V9z" fill="currentColor"/>
-                              </svg>
-                            </span>
-                            Show all photos
-                          </button>
-                        )}
-                      </div>
-                    ))
-                  }
-                </div>
+                  </div>
+                ))}
               </div>
             </div>
-  
-            {!showAllPhotos && !isFullscreen && !showBookingForm && (
-              <div className="mobile-booking-bar">
-                <div className="mobile-booking-bar-content">
-                  <div className="mobile-price-info">
-                    <h3>${propertyDetails?.rateamount} <span>/night</span></h3>
-                    <span>{propertyDetails?.propertyguestpaxno} guests max</span>
+          </div>
+        )}
+
+        {isFullscreen && (
+          <div className="fullscreen-overlay">
+            <div className="fullscreen-header">
+              <button className="close-btn" onClick={handleCloseFullscreen}>
+                <IoMdClose />
+              </button>
+              <div className="image-counter">
+                {selectedImageIndex + 1} / {propertyDetails.propertyimage.length}
+              </div>
+            </div>
+
+            <div className="fullscreen-content">
+              <button 
+                className="nav-btn prev-btn"
+                onClick={() => setSelectedImageIndex((prev) => 
+                  prev === 0 ? propertyDetails.propertyimage.length - 1 : prev - 1
+                )}
+              >
+                <IoIosArrowBack />
+              </button>
+
+              <img 
+                src={`data:image/jpeg;base64,${propertyDetails.propertyimage[selectedImageIndex]}`}
+                alt={`fullscreen image ${selectedImageIndex + 1}`}
+                className="fullscreen-image"
+              />
+
+              <button 
+                className="nav-btn next-btn"
+                onClick={() => setSelectedImageIndex((prev) => 
+                  prev === propertyDetails.propertyimage.length - 1 ? 0 : prev + 1
+                )}
+              >
+                <IoIosArrowForward />
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="Details_container">
+          <div className="Description_container">
+            <div className="first_container">
+              <div className="Room_name_container">
+                <h2 className="Room_name">{propertyDetails?.propertyaddress}</h2>
+                <p className="Rating">
+                  4.8
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="30" viewBox="0 0 20 20">
+                    <FaStar />
+                  </svg>
+                </p>
+              </div>
+
+              <div className="sub_details">
+                <div className="Room_location">
+                  <FaMapMarkerAlt className="icon_location"/>
+                  <p>{propertyDetails?.clustername}</p>
+                </div>
+
+                <div className="Room_location">
+                    <FaBed className="icon_location"/>
+                  <p>{propertyDetails?.propertybedtype} Bed</p>
+                </div>
+
+                <div className="Room_location">
+                    <FaUser className="icon_location"/>
+                  <p>{propertyDetails?.propertyguestpaxno} Guest</p>
+                </div>
+
+                <div className="profile_section">
+                  <div className="round_card">
+                    <img src={propertyDetails.uimage.startsWith('http') ? propertyDetails.uimage : `data:image/jpeg;base64,${propertyDetails.uimage}`}
+                         className="admin_profile"
+                         alt="Admin" />
+                    <p className="admin_name">
+                      Hosted by {propertyDetails?.username || "Unknown Host"}</p>
                   </div>
-                  <button className="mobile-book-now-btn" onClick={handleBookNowClick}>
-                    Book Now
-                  </button>
                 </div>
               </div>
-            )}
-  
-            {isFullscreen && (
-               <div className="fullscreen-overlay">
-               <button className="fullscreen-close-btn" onClick={handleCloseFullscreen}>
-                 ✕
-               </button>
-               <button 
-                  className="fullscreen-nav-btn prev-btn"
-                  onClick={() => setSelectedImageIndex((prev) => 
-                    prev === 0 ? propertyDetails.propertyimage.length - 1 : prev - 1
+
+              <hr className="custom-line" />
+
+              <div className="Room_description_container">
+                <h2 className="About_text">About This Place</h2>
+                <p className="Room_description">
+                  {description.length > 200 ? `${description.slice(0, 200)}...` : description}
+                    {description.length > 200 && (
+                      <button className="show-more-btn" onClick={() => setShowDescriptionOverlay(true)}>
+                        Show more
+                      </button>
                   )}
-                >
-                   <IoIosArrowBack/>
-                </button>
-  
-                <img 
-                  src={`data:image/jpeg;base64,${propertyDetails.propertyimage[selectedImageIndex]}`}
-                  alt={`fullscreen image ${selectedImageIndex + 1}`}
-                  className="fullscreen-image"
-                />
-  
-                <button 
-                  className="fullscreen-nav-btn next-btn"
-                  onClick={() => setSelectedImageIndex((prev) => 
-                    prev === propertyDetails.propertyimage.length - 1 ? 0 : prev + 1
-                  )}
-                >
-                   <IoIosArrowForward/>
-                </button>
-             </div>
-            )}
-  
-            <div className="content-section">
-              <div className="left-content">
-                <div className="property-features">
-                  <h2 className="property-font">{propertyDetails?.nearbylocation}</h2>
-                </div>
-                <hr/>
-                <div className="property-features">
-                  <h2 className="property-font">{propertyDetails?.uimage && (
-                    <img 
-                    src={propertyDetails.uimage.startsWith('http') ? propertyDetails.uimage : `data:image/jpeg;base64,${propertyDetails.uimage}`} 
-                    alt="Host Avatar"
-                    className="product-avatar"
-                    /> 
-                    )}
-                    Hosted by {propertyDetails?.username || "Unknown Host"}</h2>
-                </div>
-                <hr/>
-                <div className="property-features">
-                  <h2 className="property-font">Description</h2>
-                  <div className="property-description">
-                    <p>
-                      {description.length > 200 ? `${description.slice(0, 200)}...` : description}
-                      {description.length > 200 && (
-                        <button className="show-more-btn" onClick={() => setShowDescriptionOverlay(true)}>
-                          Show more
+                </p>
+                {showDescriptionOverlay && (
+                  <div className="description-overlay">
+                    <div className="description-overlay-content">
+                      <div className="description-overlay-header">
+                        <button className="close-overlay" onClick={() => setShowDescriptionOverlay(false)}>
+                          <IoMdClose />
                         </button>
-                      )}
-                    </p>
+                      </div>
+                      <div className="full-description">
+                        <h2 className="About_text">About This Place</h2>
+                        <p className="Room_description">{description}</p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-                <hr/>
-                <div className="property-features">
-                  <h2 className="property-font">What this place offers</h2>
+                )}
+              </div>
+
+              <div className="Facilities_Main_Container">
+                <h2 className="Facilities_text">What this place offers</h2>
+                <hr className="custom-line" />
+                <div className="Facilities_Icon_Container">
                   <div className="facilities-details">
-                    {(facilitiesArray.slice(0, 10)).map((facilityName, index) => {
+                    {(facilitiesArray.slice(0, 9)).map((facilityName, index) => {
                         const facility = facilities.find(f => f.name === facilityName.trim());
                         return (
-                            <div key={index} className="facilities-item">
-                                {facility ? facility.icon : null}
-                                <span>{facilityName.trim()}</span>
-                            </div>
+                          <div key={index} className="facilities-item">
+                            {facility ? facility.icon : null}
+                            <span>{facilityName.trim()}</span>
+                          </div>
                         );
                     })}
                   </div>
-  
-                  {facilitiesArray.length > 10 && (
-                    <button className="show-all-facilities" onClick={() => setShowAllFacilities(true)}>
-                        Show All Facilities
-                    </button>
-                  )}
 
                   {showAllFacilities && (
                     <div className="facilities-overlay">
-                        <div className="facilities-overlay-content">
-                            <div className="facilities-overlay-header">
-                                <h3>What this place offers</h3>
-                                <button className="close-overlay" onClick={() => setShowAllFacilities(false)}>
-                                  <IoMdClose />
-                                </button>
-                            </div>
-                            <div className="full-facilities-list">
-                                {facilitiesArray.map((facilityName, index) => {
-                                    const facility = facilities.find(f => f.name === facilityName.trim());
-                                    return (
-                                        <div key={index} className="facilities-overlay-item">
-                                            {facility ? facility.icon : null}
-                                            <span>{facilityName.trim()}</span>
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                      <div className="facilities-overlay-content">
+                        <div className="facilities-overlay-header">
+                          <button className="close-overlay" onClick={() => setShowAllFacilities(false)}>
+                            <IoMdClose />
+                          </button>
                         </div>
+                        <div className="full-facilities-list">
+                          <h3 className="Facilities_text">What this place offers</h3>
+                          {facilitiesArray.map((facilityName, index) => {
+                            const facility = facilities.find(f => f.name === facilityName.trim());
+                            return (
+                              <div key={index} className="facilities-overlay-item">
+                                {facility ? facility.icon : null}
+                                <span>{facilityName.trim()}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
                     </div>
-                   )}
+                  )}
                 </div>
+                <button className="More_button" onClick={() => setShowAllFacilities(true)}>More</button>
               </div>
 
-              <div className="right-content">
-                <div className="booking-section">
-                  <h2>Booking Information</h2>
-                  <div className="price-info">
-                    <h3>${propertyDetails?.rateamount} <span>/night</span></h3><br/>
-                    <h6>Maximum Guest: {propertyDetails?.propertyguestpaxno} </h6>
-                    <h6>Bed: {propertyDetails?.propertybedtype} Size</h6>
+              <div className="Location_Main_Container">
+                <h2 className="Location_text">Hotel Location</h2>
+                <hr className="custom-line" />
+
+                <div className="Google_map_container">
+                  <iframe
+                    src={googleMapSrc}
+                    width="100%"
+                    height="450"
+                    style={{ border: 0, borderRadius: '5px' }}
+                    allowFullScreen=""
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                  ></iframe>
+                </div>
+              </div>
+            </div>
+
+            <div className="second_container">
+              <div className="booking_card">
+                <div className="price_section">
+                  <span className="room_price">${propertyDetails?.rateamount}</span>
+                  <span className="price_night">/night</span>
+                </div>
+
+                <div className="dates_section">
+                  <div className="date_input">
+                    <div className="date_label">CHECK-IN</div>
+                    <input type="date" name="checkIn" className="date_picker" value={bookingData.checkIn} onChange={handleInputChange} min={new Date().toISOString().split("T")[0]}/>
                   </div>
-                  <form className="booking-form" onSubmit={handleBookNowClick}>
-                    <div className="date-inputs">
-                      <div className="input-group">
-                        <label>CHECK-IN</label>
-                        <input 
-                          id="check-in"
-                          type="date"
-                          name="checkIn"
-                          value={bookingData.checkIn}
-                          onChange={handleInputChange}
-                          min={new Date().toISOString().split("T")[0]} // Disables past dates
-                        />
-                      </div>
-                      <div className="input-group">
-                        <label>CHECKOUT</label>
-                        <input 
-                          id="check-out"
-                          type="date"
-                          name="checkOut"
-                          value={bookingData.checkOut}
-                          onChange={handleInputChange}
-                          min={bookingData.checkIn ? new Date(new Date(bookingData.checkIn).setDate(new Date(bookingData.checkIn).getDate() + 1)).toISOString().split("T")[0] : ""} // Minimum check-out date is check-in + 1
-                          disabled={!bookingData.checkIn} // Disables field until check-in is selected
-                        />
-                      </div>
-                    </div>
-                    <button type="submit" className="book-now-btn">
-                      Book Now
-                    </button>
-                  </form>
+                  <div className="date_input">
+                    <div className="date_label">CHECK-OUT</div>
+                    <input type="date" 
+                           name="checkOut"
+                           className="date_picker" 
+                           value={bookingData.checkOut}
+                           onChange={handleInputChange}
+                           disabled={!bookingData.checkIn}
+                           min={bookingData.checkIn ? new Date(new Date(bookingData.checkIn).setDate(new Date(bookingData.checkIn).getDate() + 1)).toISOString().split("T")[0] : ""} 
+                    />
+                  </div>
                 </div>
+
+                <div className="guests_section">
+                  <div className="guests_label">GUESTS</div>
+                  <select className="guests_select" value={guests} onChange={(e) => setGuests(e.target.value)}>
+                    <option value="1">1 guest</option>
+                    <option value="2">2 guests</option>
+                    <option value="3">3 guests</option>
+                    <option value="4">4 guests</option>
+                    <option value="5">5 guests</option>
+                  </select>
+                </div>
+
+                <div className="price_details">
+                  <div className="price_item">
+                    <div>${propertyDetails?.rateamount} × {totalNights} nights</div>
+                    <div>${propertyDetails?.rateamount * totalNights}</div>
+                  </div>
+                  <div className="price_item">
+                    <div>Cleaning fee (10%)</div>
+                    <div>${Math.floor(propertyDetails?.rateamount * totalNights * 0.1)}</div>
+                  </div>
+                  <div className="price_item">
+                    <div>Service fee (10%)</div>
+                    <div>${Math.floor(propertyDetails?.rateamount * totalNights * 0.1)}</div>
+                  </div>
+                  <div className="price_total">
+                    <div><strong>Total (MYR)</strong></div>
+                    <div><strong>${totalprice}</strong></div>
+                  </div>
+                </div>
+
+                <br /><br />
+                <button className="reserve_button" onClick={() => setShowBookingForm(true)}>Book Now</button>
               </div>
             </div>
-            <hr/>
-            <div classname="content-section">
-              <Reviews />
-            </div>
-            <hr/>
           </div>
+        </div>
 
-          <Footer />
-        </>
-      ) : (
-        <div className="booking-overlay">
-          <div className="booking-modal">
-            <div className="booking-header">
-              <button className="back-button" onClick={() => setShowBookingForm(false)}>
-                <span><IoReturnUpBackOutline/></span> Request to book
-              </button>
-            </div>
-            <div className="booking-content">
-              <div className="booking-left">
-                <div className="trip-section">
-                  <h2>Your trip</h2>
+        {showBookingForm && (
+          <div className="booking-overlay">
+            <div className="booking-modal">
+              <div className="booking-header">
+                <button className="back-button" onClick={() => setShowBookingForm(false)}>
+                  <span><IoReturnUpBackOutline /></span> Request to book
+                </button>
+              </div>
+              <div className="booking-content">
+                <div className="booking-left">
+                  <div className="trip-section">
+                    <h2>Your trip</h2>
+                    <br />
+                    <div className="trip-dates">
+                      <div className="section-header">
+                        <h3>Dates</h3>
+                        <button 
+                          className="edit-button"
+                          onClick={() => setIsEditingDates(!isEditingDates)}
+                        >
+                          Edit
+                        </button>
+                      </div>
+                      {isEditingDates ? (
+                        <div className="dates-editor">
+                          <div className="date-input-group">
+                            <label>Check-in</label>
+                            <input 
+                              id="check-in"
+                              type="date"
+                              name="checkIn"
+                              value={bookingData.checkIn}
+                              onChange={handleInputChange}
+                              min={new Date().toISOString().split("T")[0]}
+                            />
+                          </div>
+                          <div className="date-input-group">
+                            <label>Check-out</label>
+                            <input 
+                              type="date"
+                              name="checkOut"
+                              value={bookingData.checkOut}
+                              onChange={handleInputChange}
+                              min={bookingData.checkIn ? new Date(new Date(bookingData.checkIn).setDate(new Date(bookingData.checkIn).getDate() + 1)).toISOString().split("T")[0] : ""}
+                              disabled={!bookingData.checkIn}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <p>{bookingData.checkIn} - {bookingData.checkOut}</p>
+                      )}
+                    </div>
+                    <br />
+                  </div>
 
-                  <br/>
-                  
-                  <div className="trip-dates">
-                    <div className="section-header">
-                      <h3>Dates</h3>
-                      <button 
-                        className="edit-button"
-                        onClick={() => setIsEditingDates(!isEditingDates)}
-                      >
-                        Edit
+                  <div className="login-section">
+                    <div className="guest-details-section">
+                      <h2>Guest details</h2>
+                      <div className="form-grid">
+                        <div className="form-group title-group">
+                          <label>Title</label>
+                          <div className="title-options">
+                            <label className="radio-label">
+                              <input 
+                                type="radio" 
+                                name="title" 
+                                value="Mr." 
+                                checked={bookingForm.title === 'Mr.'} 
+                                onChange={handleFormChange}
+                              />
+                              <span>Mr.</span>
+                            </label>
+                            <label className="radio-label">
+                              <input 
+                                type="radio" 
+                                name="title" 
+                                value="Mrs." 
+                                checked={bookingForm.title === 'Mrs.'} 
+                                onChange={handleFormChange}
+                              />
+                              <span>Mrs.</span>
+                            </label>
+                            <label className="radio-label">
+                              <input 
+                                type="radio" 
+                                name="title" 
+                                value="Ms." 
+                                checked={bookingForm.title === 'Ms.'} 
+                                onChange={handleFormChange}
+                              />
+                              <span>Ms.</span>
+                            </label>
+                          </div>
+                        </div>
+
+                        <div className="form-group">
+                          <label>First name</label>
+                          <input
+                            type="text"
+                            name="firstName"
+                            value={bookingForm.firstName}
+                            onChange={handleFormChange}
+                            placeholder="Enter your first name"
+                            required
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label>Last name</label>
+                          <input
+                            type="text"
+                            name="lastName"
+                            value={bookingForm.lastName}
+                            onChange={handleFormChange}
+                            placeholder="Enter your last name"
+                            required
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label>Email</label>
+                          <input
+                            type="email"
+                            name="email"
+                            value={bookingForm.email}
+                            onChange={handleFormChange}
+                            placeholder="Enter your email"
+                            required
+                          />
+                        </div>
+
+                        <div className="form-group">
+                          <label>Phone number</label>
+                          <input
+                            type="tel"
+                            name="phoneNumber"
+                            value={bookingForm.phoneNumber}
+                            onChange={handleFormChange}
+                            placeholder="Enter your phone number"
+                            required
+                          />
+                        </div>
+
+                        <div className="form-group full-width">
+                          <label>Additional requests</label>
+                          <textarea
+                            name="additionalRequests"
+                            value={bookingForm.additionalRequests}
+                            onChange={handleFormChange}
+                            placeholder="Any special requests?"
+                            rows="4"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <br /><br />
+                    <button className="continue-button" onClick={handleAddToCart}>Add to Cart</button>
+
+                    <div className="divider">or</div>
+
+                    <div className="social-buttons">
+                      <button className="social-button google">
+                        <FcGoogle />
+                        Continue with Google
                       </button>
                     </div>
-                    {isEditingDates ? (
-                      <div className="dates-editor">
-                        <div className="date-input-group">
-                          <label>Check-in</label>
-                          <input 
-                            id="check-in"
-                            type="date"
-                            name="checkIn"
-                            value={bookingData.checkIn}
-                            onChange={handleInputChange}
-                            min={new Date().toISOString().split("T")[0]} // Disables past dates
-                          />
+                  </div>
+                </div>
+
+                <div className="booking-right">
+                  <div className="property-card">
+                    <img 
+                      src={`data:image/jpeg;base64,${propertyDetails?.propertyimage[0]}`} 
+                      alt={propertyDetails?.propertyname}
+                    />
+                    <div className="property-info">
+                      <h3>{propertyDetails?.propertyname}</h3>
+                    </div>
+                  </div>
+
+                  {totalNights > 0 && (
+                    <div className="price-details">
+                      <h3>Price details</h3>
+                      <div className="price-breakdown">
+                        <div className="price-row">
+                          <span>RM {propertyDetails?.rateamount} × {totalNights} night</span>
+                          <span>RM {propertyDetails?.rateamount * totalNights}</span>
                         </div>
-                        <div className="date-input-group">
-                          <label>Check-out</label>
-                          <input 
-                            type="date"
-                            name="checkOut"
-                            value={bookingData.checkOut}
-                            onChange={handleInputChange}
-                            min={bookingData.checkIn ? new Date(new Date(bookingData.checkIn).setDate(new Date(bookingData.checkIn).getDate() + 1)).toISOString().split("T")[0] : ""} // Minimum check-out date is check-in + 1
-                            disabled={!bookingData.checkIn} // Disables field until check-in is selected
-                          />
+                        <div className="price-row">
+                          <span>Taxes (10%)</span>
+                          <span>RM {Math.floor(propertyDetails?.rateamount * totalNights * 0.1)}</span>
+                        </div>
+                        <div className="price-total">
+                          <span>Total (MYR)</span>
+                          <span>RM {totalprice}</span>
                         </div>
                       </div>
-                    ) : (
-                      <p>{bookingData.checkIn} - {bookingData.checkOut}</p>
-                    )}
-                  </div>
-
-                  <br/>
-
-                  
-                </div>
-
-                <div className="login-section">
-                <div className="guest-details-section">
-                  <h2>Guest details</h2>
-                  <div className="form-grid">
-                    <div className="form-group title-group">
-                      <label>Title</label>
-                      <div className="title-options">
-                        <label className="radio-label">
-                          <input 
-                            type="radio" 
-                            name="title" 
-                            value="Mr." 
-                            checked={bookingForm.title === 'Mr.'} 
-                            onChange={handleFormChange}
-                          />
-                          <span>Mr.</span>
-                        </label>
-                        <label className="radio-label">
-                          <input 
-                            type="radio" 
-                            name="title" 
-                            value="Mrs." 
-                            checked={bookingForm.title === 'Mrs.'} 
-                            onChange={handleFormChange}
-                          />
-                          <span>Mrs.</span>
-                        </label>
-                        <label className="radio-label">
-                          <input 
-                            type="radio" 
-                            name="title" 
-                            value="Ms." 
-                            checked={bookingForm.title === 'Ms.'} 
-                            onChange={handleFormChange}
-                          />
-                          <span>Ms.</span>
-                        </label>
-                      </div>
                     </div>
-
-                    <div className="form-group">
-                      <label>First name</label>
-                      <input
-                        type="text"
-                        name="firstName"
-                        value={bookingForm.firstName}
-                        onChange={handleFormChange}
-                        placeholder="Enter your first name"
-                        required
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label>Last name</label>
-                      <input
-                        type="text"
-                        name="lastName"
-                        value={bookingForm.lastName}
-                        onChange={handleFormChange}
-                        placeholder="Enter your last name"
-                        required
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label>Email</label>
-                      <input
-                        type="email"
-                        name="email"
-                        value={bookingForm.email}
-                        onChange={handleFormChange}
-                        placeholder="Enter your email"
-                        required
-                      />
-                    </div>
-
-                    <div className="form-group">
-                      <label>Phone number</label>
-                      <input
-                        type="tel"
-                        name="phoneNumber"
-                        value={bookingForm.phoneNumber}
-                        onChange={handleFormChange}
-                        placeholder="Enter your phone number"
-                        required
-                      />
-                    </div>
-
-                    <div className="form-group full-width">
-                      <label>Additional requests</label>
-                      <textarea
-                        name="additionalRequests"
-                        value={bookingForm.additionalRequests}
-                        onChange={handleFormChange}
-                        placeholder="Any special requests?"
-                        rows="4"
-                      />
-                    </div>
-                  </div>
-                </div><br/><br/>
-                <button className="continue-button" onClick={handleAddToCart}>Add to Cart</button>
-
-                <div className="divider">or</div>
-
-                <div className="social-buttons">
-                  <button className="social-button google">
-                    <FcGoogle />
-                    Continue with Google
-                  </button>
+                  )}
                 </div>
               </div>
-              </div>
-
-              <div className="booking-right">
-                <div className="property-card">
-                  <img 
-                    src={`data:image/jpeg;base64,${propertyDetails?.propertyimage[0]}`} 
-                    alt={propertyDetails?.propertyname}
-                  />
-                  <div className="property-info">
-                    <h3>{propertyDetails?.propertyname}</h3>
-                  </div>
-                </div>
-
-                {totalNights > 0 && (
-                <div className="price-details">
-                  <h3>Price details</h3>
-                  <div className="price-breakdown">
-                    <div className="price-row">
-                    <span>RM {propertyDetails?.rateamount} × {totalNights} night</span>
-                    <span>RM{propertyDetails?.rateamount * totalNights}</span>
-                    </div>
-                    <div className="price-row">
-                      <span>Taxes (10%)</span>
-                      <span>RM{Math.floor(propertyDetails?.rateamount * totalNights * 0.1)}</span>
-                    </div>
-                    <div className="price-total">
-                      <span>Total (MYR)</span>
-                      <span>RM{totalprice}</span>
-                    </div>
-                  </div>
-                </div>
-                )}
-              </div>
             </div>
           </div>
-        </div>
-      )}
-
-      {showAllPhotos && (
-        <div className="all-photos-view">
-          <div className="photos-header">
-            <button className="back-button" onClick={handleCloseAllPhotos}>
-              <span><IoReturnUpBackOutline/></span>
-            </button>
-            <div className="header-actions">
-            </div>
-          </div>
-          
-          <div className="photos-grid">
-            <div className="photos-container">
-              {propertyDetails?.propertyimage?.map((image, index) => (
-                <div key={index} className="photo-section">
-                  <img src={`data:image/jpeg;base64,${image}`} alt={`Property image ${index + 1}`}
-                    onClick={() => handlePhotoClick(index)}
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {isFullscreen && (
-        <div className="fullscreen-overlay">
-          <div className="fullscreen-header">
-            <button className="close-btn" onClick={handleCloseFullscreen}>
-              <IoMdClose />
-            </button>
-            <div className="image-counter">
-              {selectedImageIndex + 1} / {propertyDetails.propertyimage.length}
-            </div>
-            <div className="header-actions">
-            </div>
-          </div>
-
-          <div className="fullscreen-content">
-            <button 
-              className="nav-btn prev-btn"
-              onClick={() => setSelectedImageIndex((prev) => 
-                prev === 0 ? propertyDetails.propertyimage.length - 1 : prev - 1
-              )}
-            >
-              <IoIosArrowBack/>
-            </button>
-
-            <img 
-              src={`data:image/jpeg;base64,${propertyDetails.propertyimage[selectedImageIndex]}`}
-              alt={`fullscreen image ${selectedImageIndex + 1}`}
-              className="fullscreen-image"
-            />
-
-            <button 
-              className="nav-btn next-btn"
-              onClick={() => setSelectedImageIndex((prev) => 
-                prev === propertyDetails.propertyimage.length - 1 ? 0 : prev + 1
-              )}
-            >
-              <IoIosArrowForward/>
-            </button>
-          </div>
-        </div>
-
-        
-      )}
-
-      {showDescriptionOverlay && (
-        <div className="description-overlay">
-            <div className="description-overlay-content">
-                <div className="description-overlay-header">
-                    <h3>Description</h3>
-                    <button className="close-overlay" onClick={() => setShowDescriptionOverlay(false)}>
-                      <IoMdClose />
-                    </button>
-                </div>
-                <div className="full-description">
-                    <p>{description}</p>
-                </div>
-            </div>
-        </div>
-      )}
-
-      {showToast && <Toast type={toastType} message={toastMessage} />}
+        )}
+        {showToast && <Toast type={toastType} message={toastMessage} />}
+      </div>
+      <Footer />
       </AuthProvider>
     </div>
   );
