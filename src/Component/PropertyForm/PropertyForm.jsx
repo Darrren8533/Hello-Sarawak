@@ -177,7 +177,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     
             setFormData({
                 username: initialData.username || "",
-                propertyPrice: initialData.rateamount || "",
+                propertyPrice: initialData.rateamount || "1",
                 propertyAddress: initialData.propertyaddress || "",
                 nearbyLocation: initialData.nearbylocation || "",
                 propertyBedType: initialData.propertybedtype || "1",
