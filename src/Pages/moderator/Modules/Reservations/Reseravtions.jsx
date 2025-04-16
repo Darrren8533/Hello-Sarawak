@@ -102,7 +102,7 @@ const Reservations = () => {
             const response = await getOperatorProperties(userid);
             return response.data;
         },
-        enabled: false, // Don't run this query automatically
+        enabled: false, 
     });
 
     // Update reservation status mutation
