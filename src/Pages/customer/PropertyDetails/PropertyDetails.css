@@ -1,64 +1,396 @@
-.property-details-page {
-    min-height: 100vh;
-    background-color: white;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+.property-details{
+    max-width: 100%;
 }
 
-.property-details-container {
-    max-width: 1050px;
+.property-details-main-container{
+    display: block;
     margin: 0 auto;
-    padding: 24px;
-    background-color: white;
-    margin-top: 100px;
-    margin-bottom: 100px;
-}
-
-.property-font {
-    font-size: 20px;
-    font-weight: bold;
-}
-
-.property-font1 {
-    font-size: 18px;
-}
-
-.property-images {
     width: 100%;
-    height: 400px;
-    border-radius: 12px;
-    overflow: hidden;
-    margin-bottom: 2rem;
+    max-width: 1200px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
 }
 
-.property-info-section {
-    display: grid;
-    grid-template-columns: 2fr 2fr;
-    gap: 2rem;
-    padding: 2rem;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.property-header {
-    margin-bottom: 2rem;
-}
-
-.property-header h1 {
-    font-size: 2rem;
-    color: #333;
-    margin-bottom: 0.5rem;
-}
-
-.property-rating {
+.Main_Image_gallery_container{
+    margin-top: 120px;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: auto;
     display: flex;
-    gap: 0.25rem;
+    gap: 20px;
 }
 
-.product-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%; 
-    margin-right: 15px;
+.Image_gallery_container{
+    justify-content: center;
+    align-items: center;
+    width: auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 5px;
+}
+
+.Image_gallery_card_1{
+    width: 50rem;
+    height: auto;
+    border: none;
+}
+
+.Image_gallery_card_2{
+    width: 30rem;
+    height: auto;
+    border: none;
+}
+
+.main_gallery_image{
+    height: 580px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.second_gallery_image{
+    height: 285px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.main_gallery_image:hover{
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.01);
+    filter: brightness(0.9);
+}
+
+.second_gallery_image:hover{
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: scale(1.01);
+    filter: brightness(0.9);
+}
+
+.Details_container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.Description_container{
+    display: flex;
+    width: 100%;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 100px;
+}
+
+.first_container{
+    margin: 0 auto;
+    display: block;
+    max-width: 1000px;
+    width: 100%;
+    text-align: left;
+    padding-bottom: 25px;
+}
+
+.second_container{
+    display: block;
+    margin-top: 35px;
+    width: 55%;
+    position: sticky;
+    top: 30px;
+}
+
+.Room_name_container{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.Room_name{
+    font-weight: 400;
+    font-size: 30px;
+}
+
+.Rating{
+    font-size: 20px;
+    color: #818181;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 30px;
+    cursor: pointer;
+}
+
+.sub_details{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.Room_location{
+    color: #000000;
+    display: flex;
+    gap: 10px;
+    font-size: 15px;
+    justify-content: center;
+    align-items: center;
+}
+
+.Room_location p{
+    font-size: 18px; 
+}
+
+.profile_section{
+    display: flex;
+    margin-left: 50px;
+}
+
+.round_card{
+    width: auto;
+    height: auto;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.admin_profile{
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 60px;
+    margin-bottom: 10px;
+}
+
+.admin_name{
+    font-size: 18px;
+    color: #818181;
+}
+
+.Room_description{
+    margin-top: 20px;
+    font-size: 15px;
+    color: #818181;
+    white-space: pre-wrap; 
+    overflow: auto; 
+}
+
+.custom-line {
+    border: 0;               
+    border-top: 2px solid #ccc; 
+    margin: 20px 0;         
+}
+
+.About_text{
+  font-weight: 400;
+  font-size: 25px;
+}
+
+.Room_description_container{
+  margin-top: 30px;
+  display: block;
+}
+  
+.icon_location{
+    color: #818181;
+    margin-bottom: 10px;
+    font-size: 25px;
+    fill: currentColor; 
+    display: inline-flex; 
+    align-items: center; 
+    justify-content: center;
+}
+
+.Facilities_Main_Container{
+    border: 1px solid #dddddd;
+    border-radius: 12px;
+    padding: 0 35px;
+    padding-bottom: 20px;
+    box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.12);
+    margin-top: 60px;
+    display: block;
+}
+
+.Facilities_Icon_Container{
+    padding-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.Facilities_column{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.Facilities_text{
+    margin-top: 20px;
+    font-weight: 400;
+    font-size: 25px;
+}
+
+.Facilities_Details{
+    font-size: 15px;
+    color: #818181;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.Location_Main_Container{
+    border: 1px solid #dddddd;
+    border-radius: 12px;
+    padding: 0 35px;
+    padding-bottom: 20px;
+    box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.12);
+    margin-top: 60px;
+    display: block;
+}
+
+.Location_text{
+    margin-top: 20px;
+    font-weight: 400;
+    font-size: 25px;
+}
+
+.More_button{
+    width: 100px;
+    height: 40px;
+    border-radius: 10px;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.3s ease;
+}
+
+.More_button:hover{
+    background-color: #000000;
+    color: #ffffff;
+}
+
+/* Booking Form Styles */
+.booking_card {
+    border: 1px solid #dddddd;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0px 6px 16px rgba(0, 0, 0, 0.12);
+}
+  
+.price_section {
+    margin-bottom: 20px;
+}
+  
+.room_price {
+    font-size: 22px;
+    font-weight: 600;
+}
+  
+.price_night {
+    font-size: 16px;
+    font-weight: 400;
+}
+  
+.dates_section {
+    display: flex;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+  
+.date_input {
+    width: 50%;
+    padding: 10px;
+}
+  
+.date_input:first-child {
+    border-right: 1px solid #dddddd;
+}
+  
+.date_label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+  
+.date_picker {
+    border: none;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    outline: none;
+}
+  
+.guests_section {
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+  
+.guests_label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+  
+.guests_select {
+    border: none;
+    width: 100%;
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    outline: none;
+}
+  
+.reserve_button {
+    width: 100%;
+    background-color: #FF385C;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+  
+.price_details {
+    margin-top: 20px;
+    border-top: 1px solid #dddddd;
+    padding-top: 20px;
+}
+  
+.price_item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    font-size: 16px;
+}
+  
+.price_total {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #dddddd;
+    font-size: 16px;
 }
 
 .description-overlay {
@@ -124,7 +456,7 @@
 .facilities-details {
     margin-top: 20px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 20px;
 }
 
@@ -140,22 +472,6 @@
 
 .facilities-icon{
     font-size: 1.8rem;
-}
-
-.show-all-facilities {
-    margin-top: 15px;
-    padding: 10px 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background: #ffffff;
-    color: rgb(0, 0, 0);
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.show-all-facilities:hover {
-    background: #d2d2d2;
 }
 
 .facilities-overlay {
@@ -232,40 +548,6 @@
     border-bottom: none;
 }
 
-.booking-section {
-    background-color: white;
-    border-radius: 12px;
-    padding: 24px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin: 20px 0;
-    max-width: 400px;
-}
-
-.booking-section h2 {
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: #333;
-}
-
-.booking-price {
-    font-size: 28px;
-    font-weight: 600;
-    color: #1a73e8;
-    margin-bottom: 16px;
-}
-
-.booking-price span {
-    font-size: 16px;
-    color: #666;
-    font-weight: normal;
-}
-
-.booking-dates {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 20px;
-}
-
 .date-input {
     flex: 1;
 }
@@ -282,23 +564,6 @@
     padding: 10px;
     border: 1px solid #ddd;
     border-radius: 6px;
-}
-
-.book-now-btn {
-    width: 100%;
-    padding: 14px;
-    background-color: #1a73e8;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.book-now-btn:hover {
-    background-color: #1557b0;
 }
 
 .booking-info {
@@ -464,8 +729,8 @@
 }
 
 .fullscreen-image {
-    max-height: calc(100vh - 80px);
-    max-width: 100%;
+    height: 600px;
+    width: 100%;
     object-fit: contain;
 }
 
@@ -1005,7 +1270,6 @@
     transition: all 0.3s ease;
     margin-top: 20px;
     justify-content: center;
-    overflow: hidden;
 }
 
 .photo-section img:hover {
