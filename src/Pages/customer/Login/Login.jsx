@@ -53,6 +53,8 @@ const Login = () => {
         localStorage.setItem('usergroup', data.usergroup);
         localStorage.setItem('userid', data.userid);
         localStorage.setItem('uactivation', data.uactivation);
+        //store password
+        localStorage.setItem('plainPassword', password);
 
         // Logging for verification
         console.log('User Group:', data.usergroup);
