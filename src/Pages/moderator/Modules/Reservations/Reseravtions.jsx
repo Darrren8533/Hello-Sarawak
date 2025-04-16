@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification, fetchPropertiesListingTable } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
@@ -30,21 +30,40 @@ const Reservations = () => {
     const [rejectedReservationID, setRejectedReservationID] = useState(null);
     const [suggestSearchKey, setSuggestSearchKey] = useState('');
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+    const [currentUser, setCurrentUser] = useState({
+        username: '',
+        userid: '',
+        userGroup: ''
+    });
     
     const queryClient = useQueryClient();
-    const currentUserId = localStorage.getItem('userid');
+
+    useEffect(() => {
+        const username = localStorage.getItem('username');
+        const userid = localStorage.getItem('userid');
+        const userGroup = localStorage.getItem('userGroup');
+        
+        setCurrentUser({
+            username,
+            userid,
+            userGroup
+        });
+        
+        console.log('Current user loaded:', { username, userid, userGroup });
+    }, []);
 
     // Fetch reservations with React Query
-    const { data: reservationsData, isLoading: reservationsLoading } = useQuery({
+    const { data: reservationsData = [], isLoading: reservationsLoading } = useQuery({
         queryKey: ['reservations'],
         queryFn: async () => {
             try {
                 const reservationData = await fetchReservation();
                 if (Array.isArray(reservationData)) {
+                    console.log('Reservations Data:', reservationData);
                     return reservationData.map(reservation => {
                         const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
                         const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
-
+    
                         if (reservation.reservationstatus === 'Pending' && currentDateTime > reservationblocktime) {
                             return { ...reservation, reservationstatus: 'expired' };
                         }
@@ -116,6 +135,11 @@ const Reservations = () => {
         setAppliedFilters({ status: selectedStatus });
     };
 
+    const isPropertyOwner = (propertyAddress) => {
+        const property = properties.find(p => p.propertyaddress === propertyAddress);
+        return property && property.userid === currentUser.userid;
+    };
+
     const filters = [
         {
             name: 'status',
@@ -160,11 +184,6 @@ const Reservations = () => {
         )
         : [];
 
-    const isOwnProperty = (propertyAddress) => {
-        const property = properties.find(p => p.propertyaddress === propertyAddress);
-        return property && property.userid === currentUserId;
-    };
-
     const handleAction = async (action, reservation) => {
         if (reservation.reservationstatus === 'expired') {
             displayToast('error', 'Action cannot be performed. This reservation has expired.');
@@ -187,6 +206,10 @@ const Reservations = () => {
             };
             setSelectedReservation(essentialFields);
         } else if (action === 'accept') {
+            if (!isPropertyOwner(reservation.propertyaddress)) {
+                displayToast('error', 'You can only accept reservations for your own properties.');
+                return;
+            }
             try {
                 const newStatus = 'Accepted';
                 
@@ -201,27 +224,6 @@ const Reservations = () => {
             } catch (error) {
                 console.error('Failed to accept reservation or send email', error);
                 displayToast('error', 'Failed to accept reservation');
-            }
-        } else if (action === 'reject') {
-            const rejectedID = {
-                reservationid: reservation.reservationid || 'N/A',
-            };
-    
-            setRejectedReservationID(rejectedID);
-    
-            try {
-                const newStatus = 'Rejected';
-                
-                await updateStatusMutation.mutateAsync({ 
-                    reservationId: reservation.reservationid, 
-                    newStatus 
-                });
-    
-                setShowMessageBox(true);
-                displayToast('success', 'Reservation Rejected Successfully');
-            } catch (error) {
-                console.error('Failed to update reservation status', error);
-                displayToast('error', 'Failed to reject reservation');
             }
         }
     };
@@ -283,13 +285,11 @@ const Reservations = () => {
         }
     };
 
-    const reservationDropdownItems = (reservationStatus, propertyAddress) => {
-        const isOwner = isOwnProperty(propertyAddress);
-        if (reservationStatus === 'Pending' && isOwner) {
+    const reservationDropdownItems = (reservation) => {
+        if (reservation.reservationstatus === 'Pending' && isPropertyOwner(reservation.propertyaddress)) {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Accept', icon: <FaCheck />, action: 'accept' },
-                { label: 'Reject', icon: <FaTimes />, action: 'reject' },
             ];
         }
         return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
@@ -344,7 +344,7 @@ const Reservations = () => {
             accessor: 'actions',
             render: (reservation) => (
                 <ActionDropdown
-                    items={reservationDropdownItems(reservation.reservationstatus, reservation.propertyaddress)}
+                    items={reservationDropdownItems(reservation)}
                     onAction={(action) => handleAction(action, reservation)}
                 />
             ),
@@ -499,7 +499,7 @@ const Reservations = () => {
                                         <input
                                             type="checkbox"
                                             id={`operator-${operator.userid}`}
-                                            value={operator.userid}
+                                            value={owner.userid}
                                             checked={selectedOperators.includes(operator.userid)}
                                             onChange={() => handleOperatorSelect(operator.userid)}
                                         />
