@@ -52,7 +52,7 @@ const Reservations = () => {
         console.log('Current user loaded:', { username, userid, userGroup });
     }, []);
 
-    // Fetch reservations with React Query
+    // Fetch all reservations with React Query
     const { data: reservationsData = [], isLoading: reservationsLoading } = useQuery({
         queryKey: ['reservations'],
         queryFn: async () => {
@@ -217,10 +217,6 @@ const Reservations = () => {
             };
             setSelectedReservation(essentialFields);
         } else if (action === 'accept') {
-            if (!isPropertyOwner(reservation)) {
-                displayToast('error', 'You can only accept reservations for your own properties.');
-                return;
-            }
             try {
                 const newStatus = 'Accepted';
                 
@@ -237,10 +233,6 @@ const Reservations = () => {
                 displayToast('error', 'Failed to accept reservation');
             }
         } else if (action === 'reject') {
-            if (!isPropertyOwner(reservation)) {
-                displayToast('error', 'You can only reject reservations for your own properties.');
-                return;
-            }
             const rejectedID = {
                 reservationid: reservation.reservationid || 'N/A',
             };
