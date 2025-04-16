@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification, fetchPropertiesListingTable } from '../../../../../Api/api';
+import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
@@ -82,21 +82,6 @@ const Reservations = () => {
         refetchInterval: 1000,
     });
 
-    // Fetch properties to get property owner information
-    const { data: properties = [], isLoading: propertiesLoading, error: propertiesError } = useQuery({
-        queryKey: ['properties'],
-        queryFn: async () => {
-            try {
-                const propertiesData = await fetchPropertiesListingTable();
-                console.log('Properties Data:', propertiesData);
-                return Array.isArray(propertiesData) ? propertiesData : [];
-            } catch (error) {
-                console.error('Failed to fetch properties:', error);
-                return [];
-            }
-        },
-    });
-
     // Fetch operators with React Query
     const { data: operators = [] } = useQuery({
         queryKey: ['operators'],
@@ -144,26 +129,25 @@ const Reservations = () => {
         setAppliedFilters({ status: selectedStatus });
     };
 
-    const isPropertyOwner = (propertyAddress) => {
-        if (propertiesLoading) {
-            console.log('Properties still loading');
+    const isPropertyOwner = (reservation) => {
+        if (!currentUser.username || !reservation) {
+            console.log('Missing data:', { currentUser, reservation });
             return false;
         }
-        if (propertiesError) {
-            console.error('Properties fetch error:', propertiesError);
+    
+        const propertyOwnerUsername = reservation.property_owner_username;
+        if (!propertyOwnerUsername) {
+            console.log('Property owner username missing in reservation:', reservation);
             return false;
         }
-        if (!Array.isArray(properties)) {
-            console.error('Properties is not an array:', properties);
-            return false;
-        }
-        if (!currentUser.userid) {
-            console.log('No current user ID available');
-            return false;
-        }
-        const property = properties.find(p => p.propertyaddress === propertyAddress);
-        const isOwner = property && property.userid === currentUser.userid;
-        console.log('Ownership check:', { propertyAddress, foundProperty: property, isOwner, currentUserId: currentUser.userid });
+    
+        const isOwner = propertyOwnerUsername.toLowerCase() === currentUser.username.toLowerCase();
+        console.log('Ownership Check:', { 
+            currentUsername: currentUser.username, 
+            propertyOwnerUsername, 
+            userGroup: currentUser.userGroup, 
+            isOwner 
+        });
         return isOwner;
     };
 
@@ -233,7 +217,7 @@ const Reservations = () => {
             };
             setSelectedReservation(essentialFields);
         } else if (action === 'accept') {
-            if (!isPropertyOwner(reservation.propertyaddress)) {
+            if (!isPropertyOwner(reservation)) {
                 displayToast('error', 'You can only accept reservations for your own properties.');
                 return;
             }
@@ -253,7 +237,7 @@ const Reservations = () => {
                 displayToast('error', 'Failed to accept reservation');
             }
         } else if (action === 'reject') {
-            if (!isPropertyOwner(reservation.propertyaddress)) {
+            if (!isPropertyOwner(reservation)) {
                 displayToast('error', 'You can only reject reservations for your own properties.');
                 return;
             }
@@ -340,7 +324,7 @@ const Reservations = () => {
     };
 
     const reservationDropdownItems = (reservation) => {
-        if (reservation.reservationstatus === 'Pending' && isPropertyOwner(reservation.propertyaddress)) {
+        if (reservation.reservationstatus === 'Pending' && isPropertyOwner(reservation)) {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Accept', icon: <FaCheck />, action: 'accept' },
@@ -363,7 +347,7 @@ const Reservations = () => {
             return [];
         }
         return administratorProperties.filter(property => {
-            const matchesSearch = property.propertyaddress?.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
+            const matchesSearch = property.propertyaddress?.toString().toLowerCase().includes(suggestSearchKey.toLowerCase()) || '';
             const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
                 (!priceRange.max || property.rateamount <= Number(priceRange.max));
             return matchesSearch && matchesPrice;
