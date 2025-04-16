@@ -39,7 +39,7 @@ const resizeImage = (file, maxWidth, maxHeight) => {
                     resolve(resizedFile);
                 },
                 'image/jpeg',
-                0.9 // JPEG quality (0 to 1)
+                0.9
             );
         };
         img.onerror = (error) => reject(error);
@@ -79,7 +79,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         { name: "Nearby Attractions", icon: <FaMapMarkerAlt /> },
         { name: "Garden", icon: <FaTree /> },
         { name: "Mountain View", icon: <FaMountain /> },
-        { name: "City View", icon: <FaCity /> },
+        { name: "City View", icon: <FaCity /> }
     ];
 
     const clusters = [
@@ -107,13 +107,20 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         "Sebuyau",
         "Saratok",
         "Selangau",
-        "Tebedu",
+        "Tebedu"
     ];
 
-    const categories = ["Single Room",
-                        "Double Room",
-                        "Triple Room"
-                       
+    const categories = [
+        "Resort",
+        "Hotel",
+        "Inn",
+        "Guesthouse",
+        "Villa",
+        "Apartment",
+        "Cabin",
+        "Farm Stay",
+        "Cottage",
+        "Hostel"
     ];
 
     const [formData, setFormData] = useState({
@@ -136,6 +143,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const [toastType, setToastType] = useState("");
     const [selectedFacilities, setSelectedFacilities] = useState([]);
     const fileInputRef = useRef(null);
+    const locationInputRef = useRef(null);
 
     useEffect(() => {
         if (initialData?.facilities) {
@@ -145,16 +153,13 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     }, [initialData]);
       
 
-    useEffect(() => {
-        console.log("Initial Data:", initialData);
-        
+    useEffect(() => {  
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
             setFormData((prev) => ({ ...prev, username: storedUsername }));
         }
     
         if (initialData) {
-            // Parse facilities - handle all possible cases
             let facilitiesArray = [];
             
             if (initialData.facilities) {
@@ -186,11 +191,20 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     
             // Set the selected facilities
             setSelectedFacilities(facilitiesArray);
-            console.log("Facilities from API:", initialData.facilities);
-console.log("Parsed facilities:", facilitiesArray);
-console.log("Selected facilities state:", selectedFacilities);
         }
     }, [initialData]);
+
+    useEffect(() => {
+        if (window.google) {
+            const autocomplete = new window.google.maps.places.Autocomplete(locationInputRef.current);
+            autocomplete.addListener('place_changed', () => {
+                const place = autocomplete.getPlace();
+                if (place && place.formatted_address) {
+                    setFormData((prev) => ({ ...prev, nearbyLocation: place.formatted_address }));
+                }
+            });
+        }
+    }, []);
 
     const toggleFacility = (facilityName) => {
         setSelectedFacilities((prev) =>
@@ -376,7 +390,7 @@ console.log("Selected facilities state:", selectedFacilities);
                         </select>
                     </div>
                     <div className="property-listing-form-group">
-                        <label>Property Price (RM):</label>
+                        <label>Property Price (MYR):</label>
                         <input
                             type="number"
                             name="propertyPrice"
@@ -417,6 +431,7 @@ console.log("Selected facilities state:", selectedFacilities);
                             onChange={handleChange}
                             placeholder="e.g. No.123, LOT 1234, Lorong 1, Jalan ABC, Kuching, Sarawak"
                             required
+                            ref={locationInputRef}
                         />
                     </div>
                     <div className="property-listing-form-group full-width">
