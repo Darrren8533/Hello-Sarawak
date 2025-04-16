@@ -89,9 +89,14 @@ export default function FinancialDashboard() {
     enabled: !!userid
   });
 
-  const { data: alosData } = useQuery({
-    queryKey: ['alos'],
-    queryFn: fetchALOS
+  const { 
+    data: alosData,
+    isLoading: alosLoading,
+    error: alosError
+  } = useQuery({
+    queryKey: ['alos', userid],
+    queryFn: () => fetchALOS(userid),
+    enabled: !!userid
   });
 
   if (financeLoading) return <div className="loader-box"><Loader /></div>;
@@ -387,12 +392,12 @@ export default function FinancialDashboard() {
     }
 
     if (chartType === "alos") {
-      if (!alosData?.monthlyData || alosData.monthlyData === 0) {
+      if (!alosData?.monthlyData || alosData.monthlyData.length === 0) {
         return <div>No Average Length of Stay data</div>;
       }
     
       const alosChartData = {
-        labels: alosData.monthlyData.map((item) => `Property ${item.propertyid}`),
+        labels: alosData.monthlyData.map((item) => item.month),
         datasets: [
           {
             label: "Average Length of Stay (Days)",
@@ -413,7 +418,7 @@ export default function FinancialDashboard() {
         responsive: true,
         plugins: {
           legend: { position: "top" },
-          title: { display: true, text: "Average Length of Stay per Property" },
+          title: { display: true, text: "Average Length of Stay (Monthly)" },
           tooltip: {
             callbacks: {
               label: (context) => `ALOS: ${context.parsed.y.toFixed(2)} days`,
@@ -426,7 +431,7 @@ export default function FinancialDashboard() {
             title: { display: true, text: "Days" },
           },
           x: {
-            title: { display: true, text: "Properties" },
+            title: { display: true, text: "Month" },
           },
         },
       };
