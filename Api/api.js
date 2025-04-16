@@ -759,9 +759,9 @@ export const fetchCustomerRetentionRate = async (userid) => {
   }
 };
 
-export const fetchGuestSatisfactionScore = async () => {
+export const fetchGuestSatisfactionScore = async (userid) => {
   try {
-      const response = await fetch(`${API_URL}/users/guest_satisfaction_score`);
+      const response = await fetch(`${API_URL}/users/guest_satisfaction_score?userid=${userid}`);
       const data = await response.json();
       return data; 
   } catch (error) {
