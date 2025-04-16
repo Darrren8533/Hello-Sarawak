@@ -260,7 +260,7 @@ const PropertyDetails = () => {
     <div className="property-details">
       <AuthProvider>
       <div className="property-details-main-container">
-        <Navbar />
+        {!showBookingForm && <Navbar />}
         <div className="Main_Image_gallery_container">
           <div className="Image_gallery_card_1">
             <img 
@@ -409,7 +409,7 @@ const PropertyDetails = () => {
                 {showDescriptionOverlay && (
                   <div className="description-overlay">
                     <div className="description-overlay-content">
-                      <div className="description-overlay-header">
+                      <div className="overlay-header">
                         <button className="close-overlay" onClick={() => setShowDescriptionOverlay(false)}>
                           <IoMdClose />
                         </button>
@@ -442,7 +442,7 @@ const PropertyDetails = () => {
                   {showAllFacilities && (
                     <div className="facilities-overlay">
                       <div className="facilities-overlay-content">
-                        <div className="facilities-overlay-header">
+                        <div className="overlay-header">
                           <button className="close-overlay" onClick={() => setShowAllFacilities(false)}>
                             <IoMdClose />
                           </button>
@@ -551,7 +551,7 @@ const PropertyDetails = () => {
             <div className="booking-modal">
               <div className="booking-header">
                 <button className="back-button" onClick={() => setShowBookingForm(false)}>
-                  <span><IoReturnUpBackOutline /></span> Request to book
+                  <span><IoReturnUpBackOutline/> Booking Information</span>
                 </button>
               </div>
               <div className="booking-content">
