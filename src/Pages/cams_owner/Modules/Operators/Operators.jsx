@@ -136,7 +136,7 @@ const Operators = () => {
             : operator
         ));
         setShowRoleModal(false);
-        displayToast('success', `Successfully assigned ${selectedAssignRole} role to ${roleOperator.ufirstname} ${roleOperator.ulastname}`);
+        displayToast('success', `Successfully assigned ${selectedAssignRole} role to ${roleOperator.username}`);
       } else {
         console.error('Failed to assign role:', data.message);
         displayToast('error', `Failed to assign role: ${data.message || 'Unknown error'}`);
