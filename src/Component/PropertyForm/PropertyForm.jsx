@@ -125,7 +125,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
 
     const [formData, setFormData] = useState({
         username: "",
-        propertyPrice: "",
+        propertyPrice: "1",
         propertyAddress: "",
         nearbyLocation: "",
         propertyBedType: "1",
@@ -177,11 +177,11 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     
             setFormData({
                 username: initialData.username || "",
-                propertyPrice: initialData.rateamount || "1",
+                propertyPrice: initialData.rateamount || "",
                 propertyAddress: initialData.propertyaddress || "",
                 nearbyLocation: initialData.nearbylocation || "",
-                propertyBedType: initialData.propertybedtype || "1",
-                propertyGuestPaxNo: initialData.propertyguestpaxno || "1",
+                propertyBedType: initialData.propertybedtype || "",
+                propertyGuestPaxNo: initialData.propertyguestpaxno || "",
                 propertyDescription: initialData.propertydescription || "",
                 facilities: facilitiesArray,
                 propertyImage: initialData.propertyimage || [],
