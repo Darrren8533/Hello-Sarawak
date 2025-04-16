@@ -65,7 +65,7 @@ const BackUserProfile = () => {
                     udob: data.udob || 'Not Provided',
                     utitle: data.utitle || 'Not Provided',
                     ucountry: data.ucountry || 'Not Provided',
-                    password: data.password || '',
+                    password: plainPassword || '',
                     ...data
                 };
 
