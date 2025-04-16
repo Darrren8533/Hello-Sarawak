@@ -271,18 +271,23 @@ export default function FinancialDashboard() {
     }
 
     if (chartType === "retention") {
-      if (!customerRetentionRateData?.monthlyData || customerRetentionRateData.monthlyData.length === 0) {
-        return <div>No Retention Rate data</div>;
+      if (
+        !customerRetentionRateData?.monthlyData ||
+        customerRetentionRateData.monthlyData.length === 0
+      ) {
+        return <div>No Retention Rate data available</div>;
       }
     
       const retentionRateChartData = {
-        labels: ["Retention Rate"], 
+        labels: customerRetentionRateData.monthlyData.map((item) => item.month),
         datasets: [
           {
             label: "Retention Rate (%)",
-            data: customerRetentionRateData.monthlyData.map((item) => parseFloat(item.customer_retention_rate)),
+            data: customerRetentionRateData.monthlyData.map((item) =>
+              parseFloat(item.customer_retention_rate)
+            ),
             fill: false,
-            borderColor: "rgb(54, 162, 235)", 
+            borderColor: "rgb(54, 162, 235)",
             tension: 0.3,
             pointBackgroundColor: "rgb(54, 162, 235)",
             pointBorderColor: "#fff",
@@ -297,10 +302,11 @@ export default function FinancialDashboard() {
         responsive: true,
         plugins: {
           legend: { position: "top" },
-          title: { display: true, text: "Retention Rate" },
+          title: { display: true, text: "Monthly Customer Retention Rate Trend" },
           tooltip: {
             callbacks: {
-              label: (context) => `Retention Rate: ${context.parsed.y.toFixed(2)}%`,
+              label: (context) =>
+                `Retention Rate: ${context.parsed.y.toFixed(2)}%`,
             },
           },
         },
@@ -311,7 +317,7 @@ export default function FinancialDashboard() {
             title: { display: true, text: "Retention Rate (%)" },
           },
           x: {
-            title: { display: true, text: "Metric" },
+            title: { display: true, text: "Month" },
           },
         },
       };
