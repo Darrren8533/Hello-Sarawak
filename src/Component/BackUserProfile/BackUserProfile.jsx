@@ -21,6 +21,7 @@ const BackUserProfile = () => {
 
     const userid = localStorage.getItem('userid');
     const googleAccessToken = localStorage.getItem('googleAccessToken');
+    const plainPassword = localStorage.getItem('plainPassword');
 
     const generateRandomNumber = () => Math.floor(100000 + Math.random() * 900000);
 
@@ -501,7 +502,7 @@ const BackUserProfile = () => {
                                             <input
                                                 type={showPassword ? 'text' : 'password'}
                                                 name="password"
-                                                value={userData.password || ''}
+                                                value={plainPassword || ''}
                                                 onChange={handleInputChange}
                                                 className="back-password-input"
                                                 placeholder={userData.password ? '' : 'Not Provided'}
