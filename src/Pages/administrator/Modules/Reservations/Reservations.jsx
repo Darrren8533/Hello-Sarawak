@@ -34,16 +34,17 @@ const Reservations = () => {
     const queryClient = useQueryClient();
 
     // Fetch reservations with React Query
-    const { data: reservationsData, isLoading: reservationsLoading } = useQuery({
+    const { data: reservationsData = [], isLoading: reservationsLoading } = useQuery({
         queryKey: ['reservations'],
         queryFn: async () => {
             try {
                 const reservationData = await fetchReservation();
                 if (Array.isArray(reservationData)) {
+                    console.log('Reservations Data:', reservationData);
                     return reservationData.map(reservation => {
                         const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
                         const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
-
+    
                         if (reservation.reservationstatus === 'Pending' && currentDateTime > reservationblocktime) {
                             return { ...reservation, reservationstatus: 'expired' };
                         }
@@ -61,8 +62,8 @@ const Reservations = () => {
         staleTime: 30 * 60 * 1000,
         refetchInterval: 1000,
     });
-
-    // Fetch operators with React Query
+ // Fetch operators with React Query
+   
     const { data: operators = [] } = useQuery({
         queryKey: ['operators'],
         queryFn: fetchOperators,
@@ -107,6 +108,28 @@ const Reservations = () => {
 
     const handleApplyFilters = () => {
         setAppliedFilters({ status: selectedStatus });
+    };
+
+    const isPropertyOwner = (reservation) => {
+        if (!currentUsername || !reservation) {
+            console.log('Missing data:', { currentUsername, reservation });
+            return false;
+        }
+    
+        const propertyOwnerUsername = reservation.property_owner_username;
+        if (!propertyOwnerUsername) {
+            console.log('Property owner username missing in reservation:', reservation);
+            return false;
+        }
+    
+        const isOwner = propertyOwnerUsername.toLowerCase() === currentUsername.toLowerCase();
+        console.log('Ownership Check:', { 
+            currentUsername, 
+            propertyOwnerUsername, 
+            userGroup, 
+            isOwner 
+        });
+        return isOwner;
     };
 
     const filters = [
@@ -275,8 +298,8 @@ const Reservations = () => {
         }
     };
 
-    const reservationDropdownItems = (reservationStatus) => {
-        if (reservationStatus === 'Pending') {
+    const reservationDropdownItems = (reservation) => {
+        if (reservation.reservationstatus === 'Pending' && isPropertyOwner(reservation)) {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Accept', icon: <FaCheck />, action: 'accept' },
