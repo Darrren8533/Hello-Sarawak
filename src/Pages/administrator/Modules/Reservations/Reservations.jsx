@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
@@ -30,8 +30,28 @@ const Reservations = () => {
     const [rejectedReservationID, setRejectedReservationID] = useState(null);
     const [suggestSearchKey, setSuggestSearchKey] = useState('');
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+    const [currentUser, setCurrentUser] = useState({
+        username: '',
+        userid: '',
+        userGroup: ''
+    });
     
     const queryClient = useQueryClient();
+
+
+    useEffect(() => {
+        const username = localStorage.getItem('username');
+        const userid = localStorage.getItem('userid');
+        const userGroup = localStorage.getItem('userGroup');
+        
+        setCurrentUser({
+            username,
+            userid,
+            userGroup
+        });
+        
+        console.log('Current user loaded:', { username, userid, userGroup });
+    }, []);
 
     // Fetch reservations with React Query
     const { data: reservationsData = [], isLoading: reservationsLoading } = useQuery({
@@ -111,8 +131,8 @@ const Reservations = () => {
     };
 
     const isPropertyOwner = (reservation) => {
-        if (!currentUsername || !reservation) {
-            console.log('Missing data:', { currentUsername, reservation });
+        if (!currentUser.username || !reservation) {
+            console.log('Missing data:', { currentUser, reservation });
             return false;
         }
     
@@ -122,11 +142,11 @@ const Reservations = () => {
             return false;
         }
     
-        const isOwner = propertyOwnerUsername.toLowerCase() === currentUsername.toLowerCase();
+        const isOwner = propertyOwnerUsername.toLowerCase() === currentUser.username.toLowerCase();
         console.log('Ownership Check:', { 
-            currentUsername, 
+            currentUsername: currentUser.username, 
             propertyOwnerUsername, 
-            userGroup, 
+            userGroup: currentUser.userGroup, 
             isOwner 
         });
         return isOwner;
@@ -199,16 +219,16 @@ const Reservations = () => {
             setSelectedReservation(essentialFields);
         } else if (action === 'accept') {
             try {
-                // Using optimistic updates with React Query
+
                 const newStatus = 'Accepted';
                 
-                // Update the status first
+
                 await updateStatusMutation.mutateAsync({ 
                     reservationId: reservation.reservationid, 
                     newStatus 
                 });
                 
-                // Then send the acceptance email
+   
                 await acceptBookingMutation.mutateAsync(reservation.reservationid);
         
                 displayToast('success', 'Reservation Accepted Successfully');
@@ -358,7 +378,7 @@ const Reservations = () => {
             accessor: 'actions',
             render: (reservation) => (
                 <ActionDropdown
-                    items={reservationDropdownItems(reservation.reservationstatus)}
+                    items={reservationDropdownItems(reservation)}
                     onAction={(action) => handleAction(action, reservation)}
                 />
             ),
