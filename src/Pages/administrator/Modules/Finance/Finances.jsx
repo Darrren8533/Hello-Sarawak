@@ -585,23 +585,17 @@ export default function FinancialDashboard() {
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
-            <h2 className="text-sm font-medium text-gray-500">
-              Total Reservations
-            </h2>
+            <h2 className="text-sm font-medium text-gray-500">Total Reservations (This Year)</h2>
             <p className="text-2xl font-bold">
               {Array.isArray(financeData?.monthlyData)
-                ? financeData.monthlyData.reduce((sum, item) => sum + item.monthlyreservations, 0)
+                ? financeData.monthlyData
+                    .filter((item) => {
+                      const currentYear = new Date().getFullYear();
+                      const itemYear = parseInt(item.month.split("-")[0]); // Extract year from "YYYY-MM"
+                      return itemYear === currentYear;
+                    })
+                    .reduce((sum, item) => sum + Number(item.monthlyreservations), 0)
                 : 0}
-            </p>
-            <p
-              className={`text-sm ${
-                Number(getMonthlyStats().reservations.growth) > 0
-                  ? "text-green-500"
-                  : "text-red-500"
-              }`}
-            >
-              {Number(getMonthlyStats().reservations.growth) > 0 ? "+" : ""}
-              {getMonthlyStats().reservations.growth}% from last month
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
