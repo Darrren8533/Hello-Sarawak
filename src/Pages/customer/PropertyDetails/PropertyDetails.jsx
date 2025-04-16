@@ -9,8 +9,9 @@ import Navbar from '../../../Component/Navbar/navbar';
 import Toast from '../../../Component/Toast/Toast';
 import Footer from '../../../Component/Footer/footer';
 import Reviews from "../../../Component/Reviews/Reviews";
-import './PropertyDetails.css';
+import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 import { createReservation, requestBooking, fetchUserData } from '../../../../Api/api';
+import './PropertyDetails.css';
 
 const facilities = [
     { name: "Wi-Fi", icon: <FaWifi className="facilities-icon"/> },
@@ -273,6 +274,7 @@ const PropertyDetails = () => {
 
   return (
     <div className="property-details-page">
+      <AuthProvider>
       {!showAllPhotos && !isFullscreen && !showBookingForm ? (
         <>
           <Navbar />
@@ -812,7 +814,7 @@ const PropertyDetails = () => {
       )}
 
       {showToast && <Toast type={toastType} message={toastMessage} />}
-
+      </AuthProvider>
     </div>
   );
 };
