@@ -90,7 +90,7 @@ const Customers = () => {
                         : customer
                 ));
                 setShowRoleModal(false);
-                displayToast('success', `Successfully assigned ${selectedRole} role to ${roleCustomer.ufirstname} ${roleCustomer.ulastname}`);
+                displayToast('success', `Successfully assigned ${selectedRole} role to ${roleCustomer.username}`);
             } else {
                 console.error('Failed to assign role:', data.message);
                 displayToast('error', `Failed to assign role: ${data.message || 'Unknown error'}`);
