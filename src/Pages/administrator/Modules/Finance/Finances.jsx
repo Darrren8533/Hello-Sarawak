@@ -79,9 +79,14 @@ export default function FinancialDashboard() {
     enabled: !!userid
   });
 
-  const { data: guestSatisfactionScoreData } = useQuery({
-    queryKey: ['guestSatisfactionScore'],
-    queryFn: fetchGuestSatisfactionScore
+  const { 
+    data: guestSatisfactionScoreData,
+    isLoading: guestSatisfactionScoreLoading,
+    error: guestSatisfactionScoreError
+  } = useQuery({
+    queryKey: ['guestSatisfactionScore', userid],
+    queryFn: () => fetchGuestSatisfactionScore(userid),
+    enabled: !!userid
   });
 
   const { data: alosData } = useQuery({
@@ -326,16 +331,21 @@ export default function FinancialDashboard() {
     }
 
     if (chartType === "satisfaction") {
-      if (!guestSatisfactionScoreData?.monthlyData || guestSatisfactionScoreData.monthlyData === 0) {
+      if (
+        !guestSatisfactionScoreData?.monthlyData ||
+        guestSatisfactionScoreData.monthlyData.length === 0
+      ) {
         return <div>No Guest Satisfaction Score data</div>;
       }
     
       const guestSatisfactionChartData = {
-        labels: guestSatisfactionScoreData.monthlyData.map((item) => `Property ${item.propertyid}`),
+        labels: guestSatisfactionScoreData.monthlyData.map((item) => item.month),
         datasets: [
           {
             label: "Guest Satisfaction Score",
-            data: guestSatisfactionScoreData.monthlyData.map((item) => parseFloat(item.guest_satisfaction_score)),
+            data: guestSatisfactionScoreData.monthlyData.map((item) =>
+              parseFloat(item.guest_satisfaction_score)
+            ),
             fill: false,
             borderColor: "rgb(255, 99, 132)",
             tension: 0.3,
@@ -352,7 +362,7 @@ export default function FinancialDashboard() {
         responsive: true,
         plugins: {
           legend: { position: "top" },
-          title: { display: true, text: "Guest Satisfaction Score" },
+          title: { display: true, text: "Monthly Guest Satisfaction Score" },
           tooltip: {
             callbacks: {
               label: (context) => `Score: ${context.parsed.y.toFixed(2)}`,
@@ -366,12 +376,14 @@ export default function FinancialDashboard() {
             title: { display: true, text: "Average Score" },
           },
           x: {
-            title: { display: true, text: "Properties" },
+            title: { display: true, text: "Month" },
           },
         },
       };
     
-      return <Line data={guestSatisfactionChartData} options={guestSatisfactionOptions} />;
+      return (
+        <Line data={guestSatisfactionChartData} options={guestSatisfactionOptions} />
+      );
     }
 
     if (chartType === "alos") {
