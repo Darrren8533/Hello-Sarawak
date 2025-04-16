@@ -41,6 +41,7 @@ const Reservations = () => {
             try {
                 const reservationData = await fetchReservation();
                 if (Array.isArray(reservationData)) {
+                    console.log('Reservations Data:', reservationData); // Log to inspect
                     return reservationData.map(reservation => {
                         const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
                         const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
@@ -159,13 +160,15 @@ const Reservations = () => {
             return false;
         }
         
+        const normalizedPropertyAddress = (propertyAddress || '').toLowerCase();
         const property = propertiesData.find(
-            property => property.propertyaddress.toLowerCase() === propertyAddress.toLowerCase()
+            property => (property.propertyaddress || '').toLowerCase() === normalizedPropertyAddress
         );
         
         const isOwner = property?.username.toLowerCase() === currentUsername.toLowerCase();
         console.log('Property Check:', { 
             propertyAddress, 
+            normalizedPropertyAddress,
             foundProperty: property, 
             isOwner 
         });
@@ -179,7 +182,7 @@ const Reservations = () => {
                  (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
                 (
                     reservation.reservationid?.toString().toLowerCase().includes(searchKey.toLowerCase()) ||
-                    reservation.propertyaddress?.toString().toLowerCase().includes(searchKey.toLowerCase()) ||
+                    (reservation.propertyAddress || reservation.propertyaddress || '').toString().toLowerCase().includes(searchKey.toLowerCase()) ||
                     reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) ||
                     reservation.request?.toLowerCase().includes(searchKey.toLowerCase())
                 )
@@ -195,7 +198,7 @@ const Reservations = () => {
         if (action === 'view') {
             const essentialFields = {
                 reservationid: reservation.reservationid || 'N/A',
-                propertyaddress: reservation.propertyaddress || 'N/A',
+                propertyaddress: (reservation.propertyAddress || reservation.propertyaddress) || 'N/A',
                 checkindatetime: reservation.checkindatetime || 'N/A',
                 checkoutdatetime: reservation.checkoutdatetime || 'N/A',
                 reservationblocktime: reservation.reservationblocktime || 'N/A',
@@ -307,7 +310,8 @@ const Reservations = () => {
     };
 
     const reservationDropdownItems = (reservation) => {
-        if (reservation.reservationstatus === 'Pending' && isPropertyOwner(reservation.propertyaddress)) {
+        const propertyAddress = reservation.propertyAddress || reservation.propertyaddress;
+        if (reservation.reservationstatus === 'Pending' && isPropertyOwner(propertyAddress)) {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Accept', icon: <FaCheck />, action: 'accept' },
@@ -327,7 +331,7 @@ const Reservations = () => {
     const getFilteredProperties = () => {
         if (!Array.isArray(administratorProperties)) return [];
         return administratorProperties.filter(property => {
-            const matchesSearch = property.propertyaddress.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
+            const matchesSearch = (property.propertyaddress || '').toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
             const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
                 (!priceRange.max || property.rateamount <= Number(priceRange.max));
             return matchesSearch && matchesPrice;
@@ -343,14 +347,14 @@ const Reservations = () => {
                 reservation.propertyimage && reservation.propertyimage.length > 0 ? (
                     <img
                         src={`data:image/jpeg;base64,${reservation.propertyimage[0]}`}
-                        alt={`Property ${reservation.propertyaddress}`}
+                        alt={`Property ${(reservation.propertyAddress || reservation.propertyaddress)}`}
                         style={{ width: 80, height: 80 }}
                     />
                 ) : (
                     <span>No Image</span>
                 ),
         },
-        { header: 'Property Name', accessor: 'propertyaddress' },
+        { header: 'Property Name', accessor: (reservation) => (reservation.propertyAddress || reservation.propertyaddress) },
         { header: 'Total Price(RM)', accessor: 'totalprice' },
         {
             header: 'Status',
