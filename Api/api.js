@@ -942,3 +942,13 @@ export const googleLogin = async (token) => {
     }
 };
 
+// Google Map
+export const getCoordinates = async (location) => {
+  const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=AIzaSyCe27HezKpItahXjMFcWXf3LwFcjI7pZFk`);
+  const data = await response.json();
+  if (data.results && data.results.length > 0) {
+    const { lat, lng } = data.results[0].geometry.location;
+    return { lat, lng };
+  }
+  throw new Error('Location not found');
+};
