@@ -585,18 +585,40 @@ export default function FinancialDashboard() {
             </p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
-            <h2 className="text-sm font-medium text-gray-500">Total Reservations (This Year)</h2>
+            <h2 className="text-sm font-medium text-gray-500">Total Reservations</h2>
             <p className="text-2xl font-bold">
               {Array.isArray(financeData?.monthlyData)
-                ? financeData.monthlyData
-                    .filter((item) => {
-                      const currentYear = new Date().getFullYear();
-                      const itemYear = parseInt(item.month.split("-")[0]); // Extract year from "YYYY-MM"
-                      return itemYear === currentYear;
-                    })
-                    .reduce((sum, item) => sum + Number(item.monthlyreservations), 0)
+                ? financeData.monthlyData.reduce((sum, item) => sum + Number(item.monthlyreservations), 0)
                 : 0}
             </p>
+            {(() => {
+              if (
+                Array.isArray(financeData?.monthlyData) &&
+                financeData.monthlyData.length >= 2
+              ) {
+                // Sort data by month (format YYYY-MM)
+                const sorted = [...financeData.monthlyData].sort(
+                  (a, b) => new Date(a.month) - new Date(b.month)
+                );
+          
+                const current = Number(sorted[sorted.length - 1].monthlyreservations);
+                const previous = Number(sorted[sorted.length - 2].monthlyreservations);
+                const growth = previous === 0 ? 0 : (((current - previous) / previous) * 100).toFixed(1);
+          
+                return (
+                  <p
+                    className={`text-sm ${
+                      growth >= 0 ? "text-green-500" : "text-red-500"
+                    }`}
+                  >
+                    {growth >= 0 ? "+" : ""}
+                    {growth}% from last month
+                  </p>
+                );
+              } else {
+                return <p className="text-sm text-gray-400">Not enough data</p>;
+              }
+            })()}
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
             <h2 className="text-sm font-medium text-gray-500">
