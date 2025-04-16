@@ -26,14 +26,12 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
-    const login = (id, avatar) => {
+    const login = (id) => {
         setIsLoggedIn(true);
         setUserID(id);
-        setUserAvatar(avatar);
         localStorage.setItem("userid", id);
         localStorage.setItem("isLoggedIn", "true");
-        avatar && localStorage.setItem("userAvatar", avatar);
-    };
+    };    
 
     const logout = () => {
         setIsLoggedIn(false);
