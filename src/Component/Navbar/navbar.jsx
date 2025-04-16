@@ -14,7 +14,7 @@ function Navbar() {
     const { isLoggedIn, userAvatar, userID, logout, updateAvatar } = useAuth();
     
     // React Query for user data
-    const { data: userData } = useQuery({
+    const { data: userData, isLoading: isUserLoading } = useQuery({
         queryKey: ['userData', userID],
         queryFn: () => fetchUserData(userID),
         enabled: !!isLoggedIn && !!userID, // Only run when logged in and userID exists
@@ -59,6 +59,13 @@ function Navbar() {
             eventBus.off('avatarUpdated', handleAvatarUpdate);
         };
     }, [updateAvatar]);
+
+    useEffect(() => {
+        if (userData?.uimage) {
+            const avatarUrl = `data:image/jpeg;base64,${userData.uimage}`;
+            updateAvatar(avatarUrl);
+        }
+    }, [userData, updateAvatar]);
 
     const handleLogout = async () => {
         try {
@@ -169,14 +176,14 @@ function Navbar() {
 
                     <div className="d-flex justify-content-end">
                         
-                        {isLoggedIn && isCustomer &&(
+                        {isLoggedIn && isCustomer && !isUserLoading && (
                             <button
                                 className="user-icon-button"
                                 onClick={() => navigate('/profile')}
                                 style={{ border: 'none', background: 'transparent', cursor: 'pointer', marginRight: '20px' }}
                             >
                                 <img
-                                    src={userAvatar || DefaultAvatar}
+                                    src={userAvatar ? userAvatar : DefaultAvatar}
                                     alt="User Avatar"
                                     style={{ width: '40px', height: '40px', borderRadius: '50%' }}
                                     onError={handleImageError}
