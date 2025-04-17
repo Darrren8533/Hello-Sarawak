@@ -731,11 +731,10 @@ const Product = () => {
             ) : (
               <p className="no-properties-message">No properties available.</p>
             )}
-            {hasMore && !isLoading && properties.length > 0 && (
-              <div className="loading-more">
-                {isLoadingMore ? "Loading more properties" : "Scroll to bottom to load more"}
-              </div>
-            )}
+            
+            {isLoadingMore && hasMore && [1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+              <SkeletonPropertyCard key={`loading-more-skeleton-${index}`} />
+            ))}
           </div>
         )}
         </div>
