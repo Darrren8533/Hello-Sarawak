@@ -1,18 +1,19 @@
 .actions-button {
   background: none;
   border: none;
-  border-radius: 7px;
+  border-radius:TITLE: 7px;
   cursor: pointer;
   font-size: 24px;
   color: #666;
   padding: 0;
-  display: flex;
+  display: inline-flex;
   justify-content: center;
   align-items: center;
   width: 40px;
   height: 40px;
   transition: background-color 0.3s ease, transform 0.2s ease;
   text-align: center;
+  margin-left: 0;
 }
 
 .actions-button:hover {
@@ -31,8 +32,8 @@
   border-radius: 6px;
   padding: 8px 0;
   min-width: 130px;
-  overflow: hidden; 
-  max-height: none; 
+  overflow: hidden;
+  max-height: none;
 }
 
 .dropdown-item {
