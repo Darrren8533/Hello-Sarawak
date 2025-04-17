@@ -80,6 +80,7 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    text-align: center;
   }
   
   .styled-table tbody tr {
