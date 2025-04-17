@@ -467,7 +467,7 @@ const PropertyDetails = () => {
               </div>
 
               <div className="Location_Main_Container">
-                <h2 className="Location_text">Hotel Location</h2>
+                <h2 className="Location_text">Location</h2>
                 <hr className="custom-line" />
 
                 <div className="Google_map_container">
