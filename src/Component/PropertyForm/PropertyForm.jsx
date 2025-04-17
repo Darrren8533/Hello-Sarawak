@@ -257,7 +257,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         });
     };
 
-    const handleSubmit = async (e) => {
+   const handleSubmit = async (e) => {
         e.preventDefault();
         if (formData.propertyImage.length < 5) {
             setToastMessage("Please upload at least 5 images");
@@ -265,6 +265,13 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             setShowToast(true);
             return;
         }
+        if (formData.propertyImage.length > 10) {
+            setToastMessage("You cannot upload more than 10 images");
+            setToastType("error");
+            setShowToast(true);
+            return;
+        }
+    }
 
         const data = new FormData();
         data.append("username", formData.username);
