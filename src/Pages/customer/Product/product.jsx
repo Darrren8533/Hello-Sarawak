@@ -8,7 +8,6 @@ import Footer from '../../../Component/Footer/footer';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
 import Toast from '../../../Component/Toast/Toast';
 import ImageSlider from '../../../Component/ImageSlider/ImageSlider';
-import Loader from '../../../Component/Loader/Loader';
 import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 
 // Import API
@@ -439,99 +438,135 @@ const Product = () => {
     );
   };
 
+  const ClusterSelector = ({ selectedCluster, setSelectedCluster, clusters }) => {
+    const [isOpen, setIsOpen] = useState(false);
+  
+    return (
+      <div className="cluster-selector">
+        <div 
+          className="cluster-selector-header"
+          onClick={() => setIsOpen(!isOpen)}
+        >
+          <span className="cluster-label">
+            {selectedCluster || "Select Your Destination"}
+          </span>
+          <i className="cluster-icon">
+            {isOpen ? "↑" : "↓"}
+          </i>
+        </div>
+        
+        {isOpen && (
+          <div className="cluster-options">
+            {clusters.map((cluster, index) => (
+              <div
+                key={index}
+                className={`cluster-option ${selectedCluster === cluster ? 'selected' : ''}`}
+                onClick={() => {
+                  setSelectedCluster(cluster);
+                  setIsOpen(false);
+                }}
+              >
+                <span className="cluster-name">{cluster}</span>
+                {selectedCluster === cluster && (
+                  <span className="check-icon">✓</span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const SkeletonPropertyCard = () => {
+    return (
+      <div className="tour-property-item skeleton-item"> 
+        <div className="tour-property-image-box skeleton-image-box">
+          <div className="skeleton-pulse"></div>
+        </div>
+        <div className="tour-property-info">
+          <div className="property-location skeleton-location">
+            <div className="skeleton-pulse skeleton-title"></div>
+            <div className="tour-property-rating skeleton-rating">
+              <div className="skeleton-pulse skeleton-rating-pill"></div>
+            </div>
+          </div>
+          <div className="skeleton-pulse skeleton-cluster"></div>
+          <div className="property-details-row">
+            <div className="property-price skeleton-price">
+              <div className="skeleton-pulse skeleton-price-amount"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div>
       <AuthProvider>
       <Navbar />
       <br /><br /><br />
-
+  
       {renderSearchSection()}
-
+  
       <div className="property-container_for_product">
         <h2>Available Properties</h2>
-
+  
         {isLoading ? (
-          <div className="loader-box">
-            <Loader />
+          <div className="scrollable-container_for_product">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+              <SkeletonPropertyCard key={`skeleton-${index}`} />
+            ))}
           </div>
-      ) : (
-        <div className="scrollable-container_for_product">
-          {properties.length > 0 ? (
-            properties.map((property) => (
-              <div className="tour-property-item" key={property.propertyid} property={property} onClick={() => handleViewDetails(property)}> 
-                <div className="tour-property-image-box">
-                  {property.propertyimage && property.propertyimage.length > 0 ? (
-                     <ImageSlider images={property.propertyimage}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }} />
-                  ) : (
-                    <p>No images available</p>
-                  )}
+        ) : (
+          <div className="scrollable-container_for_product">
+            {properties.length > 0 ? (
+              properties.map((property) => (
+                <div className="tour-property-item" key={property.propertyid} property={property} onClick={() => handleViewDetails(property)}> 
+                  <div className="tour-property-image-box">
+                    {property.propertyimage && property.propertyimage.length > 0 ? (
+                       <ImageSlider images={property.propertyimage}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }} />
+                    ) : (
+                      <p>No images available</p>
+                    )}
+                  </div>
+                  <div className="tour-property-info">
+                    <div className="property-location">
+                      <h4>{property.propertyaddress}</h4>
+  
+                      <div className="tour-property-rating">
+                        <span className="rating-number">{rating}</span>
+                        <FaStar />
+                      </div>
+                    </div>
+                    <span className="property-cluster">{property.clustername}</span>
+                    <div className="property-details-row">
+                      <div className="property-price">
+                        <span className="price-amount">${property.rateamount}</span>
+                        <span className="price-period">/night</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="tour-property-info">
-                  <h4>{property.propertyaddress}</h4>
-                  <p>{property.clustername}</p>
-                  <div className="tour-property-rating">{renderStars(rating)}</div>
-                  <h5>From ${property.rateamount}/night</h5>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p>No properties available.</p>
-          )}
+              ))
+            ) : (
+              <p className="no-properties-message">No properties available.</p>
+            )}
+          </div>
+        )}
         </div>
-      )}
+  
+        {showToast && <Toast type={toastType} message={toastMessage} />}
+        <br /><br /><br /><br /><br /><br />
+        <Back_To_Top_Button />
+        <Footer />
+        </AuthProvider>
       </div>
-
-      {showToast && <Toast type={toastType} message={toastMessage} />}
-      <br /><br /><br /><br /><br /><br />
-      <Back_To_Top_Button />
-      <Footer />
-      </AuthProvider>
-    </div>
-  );
-};
-
-// 新的城市选择器组件设计
-const ClusterSelector = ({ selectedCluster, setSelectedCluster, clusters }) => {
-  const [isOpen, setIsOpen] = useState(false);
-
-  return (
-    <div className="cluster-selector">
-      <div 
-        className="cluster-selector-header"
-        onClick={() => setIsOpen(!isOpen)}
-      >
-        <span className="cluster-label">
-          {selectedCluster || "Select Your Destination"}
-        </span>
-        <i className="cluster-icon">
-          {isOpen ? "↑" : "↓"}
-        </i>
-      </div>
-      
-      {isOpen && (
-        <div className="cluster-options">
-          {clusters.map((cluster, index) => (
-            <div
-              key={index}
-              className={`cluster-option ${selectedCluster === cluster ? 'selected' : ''}`}
-              onClick={() => {
-                setSelectedCluster(cluster);
-                setIsOpen(false);
-              }}
-            >
-              <span className="cluster-name">{cluster}</span>
-              {selectedCluster === cluster && (
-                <span className="check-icon">✓</span>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
+    );
 };
 
 export default Product;
