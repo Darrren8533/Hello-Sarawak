@@ -61,7 +61,7 @@
     border-collapse: collapse;
     margin: 25px 0;
     font-size: 18px;
-    text-align: center;
+    text-align: left;
     table-layout: auto;
     border-radius: 14px;
     overflow: hidden;
@@ -71,7 +71,7 @@
     background: #D3D3D3;
     color: #333;
     font-weight: bold;
-    text-align: center;
+    text-align: left;
   }
   
   .styled-table th,
@@ -81,7 +81,7 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
-    text-align: center;
+    text-align: left;
   }
   
   .styled-table tbody tr {
