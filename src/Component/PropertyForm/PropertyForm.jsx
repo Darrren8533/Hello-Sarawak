@@ -271,7 +271,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             setShowToast(true);
             return;
         }
-    }
+
 
         const data = new FormData();
         data.append("username", formData.username);
