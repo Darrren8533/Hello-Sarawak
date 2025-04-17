@@ -206,9 +206,8 @@ const PropertyDetails = () => {
       await requestBooking(createdReservation.reservationid);
 
       displayToast('success', 'Reservation created');
-      if (displayToast('success', 'Reservation created')){
-        setShowBookingForm(false);
-        navigate('/cart');  
+      setShowBookingForm(false);
+      navigate('/cart');  
       }
     } catch (error) {
       displayToast('error', 'Failed to create reservation');
