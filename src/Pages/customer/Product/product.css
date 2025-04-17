@@ -433,11 +433,6 @@
   margin-top: 10px;
 }
 
-/* Make sure loader is removed when using skeleton */
-.loader-box {
-  display: none;
-}
-
 @media (max-width: 768px) {
   .home .container_for_product {
     max-width: 100%;
