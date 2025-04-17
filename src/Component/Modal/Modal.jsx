@@ -1,68 +1,123 @@
-import React, { useState } from 'react';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import './Modal.css';
 
 const Modal = ({ isOpen, title, data, labels = {}, onClose }) => {
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [fadeClass, setFadeClass] = useState('fade-in');
 
-    if (!isOpen) return null;
+  useEffect(() => {
+    // Reset the image index when modal opens or data changes
+    setCurrentImageIndex(0);
+    setFadeClass('fade-in');
+  }, [isOpen, data]);
 
-    const hasMultipleImages = data.images && data.images.length > 1;
+  if (!isOpen) return null;
 
-    const nextImage = () => {
-        if (hasMultipleImages) {
-            setCurrentImageIndex((currentImageIndex + 1) % data.images.length);
-        }
-    };
+  const hasMultipleImages = data.images && data.images.length > 1;
 
-    const prevImage = () => {
-        if (hasMultipleImages) {
-            setCurrentImageIndex(
-                (currentImageIndex - 1 + data.images.length) % data.images.length
-            );
-        }
-    };
+  const handleImageTransition = (newIndex) => {
+    if (isTransitioning) return;
+    
+    setIsTransitioning(true);
+    setFadeClass('fade-out');
+    
+    setTimeout(() => {
+      setCurrentImageIndex(newIndex);
+      setFadeClass('fade-in');
+      
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 300); // Match CSS transition duration
+    }, 300); // Match CSS transition duration
+  };
 
-    return (
-        <div className="modal-overlay">
-            <div className="modal-content custom-modal">
-                <h2 className="modal-title">{title}</h2>
-                <div className="modal-body">
-                    {data.images && data.images.length > 0 ? (
-                        <div className="image-slideshow">
-                            {hasMultipleImages && (
-                                <button className="image-slideshow-button left" onClick={prevImage}>
-                                    <FaArrowLeft />
-                                </button>
-                            )}
-                            <img
-                                src={`data:image/jpeg;base64,${data.images[currentImageIndex]}`}
-                                alt={`${title} - Image ${currentImageIndex + 1}`}
-                                className="image-slideshow-image"
-                            />
-                            {hasMultipleImages && (
-                                <button className="image-slideshow-button right" onClick={nextImage}>
-                                    <FaArrowRight />
-                                </button>
-                            )}
-                        </div>
-                    ) : data.images ? (
-                        <p>No Image Available</p>
-                    ) : null}
+  const nextImage = () => {
+    if (hasMultipleImages) {
+      const newIndex = (currentImageIndex + 1) % data.images.length;
+      handleImageTransition(newIndex);
+    }
+  };
 
-                    {Object.keys(data).map((key) =>
-                        key !== 'images' ? (
-                            <p key={key}>
-                                <strong>{labels[key] || key.replace(/([A-Z])/g, ' $1')}: </strong>
-                                {data[key]}
-                            </p>
-                        ) : null
-                    )}
-                </div>
-                <button className="close-button" onClick={onClose}>X</button>
-            </div>
+  const prevImage = () => {
+    if (hasMultipleImages) {
+      const newIndex = (currentImageIndex - 1 + data.images.length) % data.images.length;
+      handleImageTransition(newIndex);
+    }
+  };
+
+  return (
+    <div className="modal-overlay">
+      <div className="modal-container">
+        <div className="modal-header">
+          <h2 className="modal-title">{title}</h2>
+          <button className="modal-close-icon" onClick={onClose}>
+            <X size={20} />
+          </button>
         </div>
-    );
+
+        <div className="modal-body">
+          {data.images && data.images.length > 0 ? (
+            <div className="image-gallery">
+              <div className="image-container">
+                <img
+                  src={`data:image/jpeg;base64,${data.images[currentImageIndex]}`}
+                  alt={`${title} - Image ${currentImageIndex + 1}`}
+                  className={`gallery-image ${fadeClass}`}
+                />
+                
+                {hasMultipleImages && (
+                  <>
+                    <button 
+                      className="gallery-nav gallery-prev" 
+                      onClick={prevImage}
+                      disabled={isTransitioning}
+                    >
+                      <ChevronLeft size={20} />
+                    </button>
+                    <button 
+                      className="gallery-nav gallery-next" 
+                      onClick={nextImage}
+                      disabled={isTransitioning}
+                    >
+                      <ChevronRight size={20} />
+                    </button>
+                    <div className="image-counter">
+                      {currentImageIndex + 1} / {data.images.length}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          ) : data.images ? (
+            <div className="no-image">
+              <p>No Image Available</p>
+            </div>
+          ) : null}
+
+          <div className="data-container">
+            {Object.keys(data).map((key) =>
+              key !== 'images' ? (
+                <div key={key} className="data-item">
+                  <div className="data-label">
+                    {labels[key] || key.replace(/([A-Z])/g, ' $1')}
+                  </div>
+                  <div className="data-value">{data[key]}</div>
+                </div>
+              ) : null
+            )}
+          </div>
+        </div>
+
+        <div className="modal-footer">
+          <button className="close-button" onClick={onClose}>
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Modal;
