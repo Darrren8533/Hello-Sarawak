@@ -89,20 +89,12 @@ export const propertiesListing = async (propertyData) => {
 };
 
 // Fetch Properties (Product)
-export const fetchProduct = async ({ pageParam = 1 }) => {
-  try {
-    console.log(`Requesting page ${pageParam} with limit 8`);
-    const response = await fetch(`${API_URL}/product?page=${pageParam}&limit=8`);
-    if (!response.ok) {
-      throw new Error('Failed to fetch properties');
-    }
-    const data = await response.json();
-    console.log(`Fetched page ${pageParam} with ${data.length} items`);
-    return data;
-  } catch (error) {
-    console.error('Error fetching properties:', error);
-    throw error;
-  }
+export const fetchProduct = async ({ pageParam }) => {
+  const limit = 8;
+  const res = await fetch(`${API_URL}/product?page=${pageParam}&limit=${limit}`);
+  if (!res.ok) throw new Error("Failed to fetch product");
+  const data = await res.json();
+  return data;
 };
 
 // Fetch Properties (Dashboard)
