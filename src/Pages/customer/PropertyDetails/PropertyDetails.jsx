@@ -262,7 +262,7 @@ const PropertyDetails = () => {
     <div>
       <AuthProvider>
       <div className="property-details-main-container">
-        {!showBookingForm && <Navbar />}
+        {!showAllPhotos && !showBookingForm && <Navbar />}
         <div className="Main_Image_gallery_container">
           <div className="Image_gallery_card_1">
             <img 
