@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -45,27 +45,12 @@ const Product = () => {
   });
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
   const [activeTab, setActiveTab] = useState(null);
-  const navigate = useNavigate();
-
-  // Use React Query to fetch properties
-  const { data: fetchedProperties, isLoading, error } = useQuery({
-    queryKey: ['properties'],
-    queryFn: fetchProduct,
-  });
-
-  // Set properties when data is fetched
-  useEffect(() => {
-    if (fetchedProperties) {
-      setProperties(fetchedProperties);
-    }
-  }, [fetchedProperties]);
-
-  // Show error toast if fetching fails
-  useEffect(() => {
-    if (error) {
-      displayToast('error', 'Failed to load properties');
-    }
-  }, [error]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [allProperties, setAllProperties] = useState([]);
+  const [loadedPropertyIds, setLoadedPropertyIds] = useState(new Set());
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const observer = useRef();
 
   const clusters = [
     "Kuching",
@@ -94,6 +79,115 @@ const Product = () => {
     "Selangau",
     "Tebedu",
   ];
+  
+  const lastPropertyElementRef = useCallback(node => {
+    if (observer.current) observer.current.disconnect();
+    observer.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && entries[0].intersectionRatio === 1 && hasMore && !isLoadingMore) {
+        const scrollPosition = window.innerHeight + window.pageYOffset;
+        const documentHeight = document.documentElement.offsetHeight;
+        
+        if (documentHeight - scrollPosition < 50) {
+          setIsLoadingMore(true);
+          loadMoreProperties();
+        }
+      }
+    }, {
+      threshold: 1.0, 
+      rootMargin: '0px 0px 50px 0px' 
+    });
+    
+    if (node) observer.current.observe(node);
+  }, [hasMore, isLoadingMore]);
+  
+  const navigate = useNavigate();
+
+  // Use React Query to fetch properties
+  const { data: fetchedProperties, isLoading, error } = useQuery({
+    queryKey: ['properties'],
+    queryFn: fetchProduct,
+  });
+
+  // Set all properties when data is fetched
+  useEffect(() => {
+    if (fetchedProperties) {
+      setAllProperties(fetchedProperties);
+      setProperties([]);
+      setLoadedPropertyIds(new Set());
+      setPage(1);
+      setHasMore(true);
+      setIsLoadingMore(false);
+    }
+  }, [fetchedProperties]);
+
+  // Load initial properties
+  useEffect(() => {
+    if (allProperties.length > 0 && properties.length === 0) {
+      loadInitialProperties();
+    }
+  }, [allProperties, properties.length]);
+
+  const loadInitialProperties = () => {
+    const initialPropertyIds = new Set();
+    const initialProperties = allProperties.slice(0, 8);
+    
+    initialProperties.forEach(prop => initialPropertyIds.add(prop.propertyid));
+    
+    setProperties(initialProperties);
+    setLoadedPropertyIds(initialPropertyIds);
+    setPage(2);
+    setHasMore(allProperties.length > 8);
+  };
+
+  const loadMoreProperties = () => {
+    const startIndex = (page - 1) * 8;
+    const endIndex = page * 8;
+    
+    if (startIndex >= allProperties.length) {
+      setHasMore(false);
+      setIsLoadingMore(false);
+      return;
+    }
+    
+    const nextProperties = allProperties.slice(startIndex, endIndex);
+    
+    const currentLoadedIds = new Set([...loadedPropertyIds]);
+    
+    const filteredProperties = nextProperties.filter(
+      property => !currentLoadedIds.has(property.propertyid)
+    );
+    
+    if (filteredProperties.length === 0) {
+      setHasMore(false);
+      setIsLoadingMore(false);
+      return;
+    }
+    
+    const newPropertyIds = new Set(currentLoadedIds);
+    filteredProperties.forEach(prop => newPropertyIds.add(prop.propertyid));
+    
+    setTimeout(() => {
+      const uniqueProperties = [...properties];
+      filteredProperties.forEach(property => {
+        if (!uniqueProperties.some(p => p.propertyid === property.propertyid)) {
+          uniqueProperties.push(property);
+        }
+      });
+      
+      setProperties(uniqueProperties);
+      setLoadedPropertyIds(newPropertyIds);
+      setPage(page + 1);
+      setHasMore(endIndex < allProperties.length);
+      setIsLoadingMore(false);
+    }, 500);
+  };
+
+  // Show error toast if fetching fails
+  useEffect(() => {
+    if (error) {
+      displayToast('error', 'Failed to load properties');
+    }
+  }, [error]);
 
   // Create refs for search segments
   const locationRef = useRef(null);
@@ -170,12 +264,12 @@ const Product = () => {
   
     try {
       // Use the cached data from React Query when possible
-      const allProperties = fetchedProperties || await queryClient.fetchQuery({
+      const fetchedProps = fetchedProperties || await queryClient.fetchQuery({
         queryKey: ['properties'],
         queryFn: fetchProduct
       });
   
-      const availableProperties = allProperties.filter((property) => {
+      const availableProperties = fetchedProps.filter((property) => {
         const existingCheckin = new Date(property.checkindatetime);
         const existingCheckout = new Date(property.checkoutdatetime);
 
@@ -194,7 +288,22 @@ const Product = () => {
         displayToast('success', `Found ${availableProperties.length} available properties`);
       }
   
-      setProperties(availableProperties); // Update the displayed properties
+      setAllProperties(availableProperties);
+      setProperties([]);
+      setLoadedPropertyIds(new Set());
+      setPage(1);
+      setHasMore(true);
+      setIsLoadingMore(false);
+      
+      const initialProperties = availableProperties.slice(0, 8);
+      const initialPropertyIds = new Set(initialProperties.map(prop => prop.propertyid));
+      
+      setProperties(initialProperties);
+      setLoadedPropertyIds(initialPropertyIds);
+      setPage(2);
+      setHasMore(availableProperties.length > 8);
+      setIsLoadingMore(false);
+      
     } catch (error) {
       console.error('Error filtering properties:', error);
       displayToast('error', 'Failed to filter properties');
@@ -502,6 +611,25 @@ const Product = () => {
     );
   };
 
+  // 添加页面滚动监听
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isLoadingMore || !hasMore) return;
+      
+      const scrollPosition = window.innerHeight + window.pageYOffset;
+      const documentHeight = document.documentElement.offsetHeight;
+      
+      // 如果滚动到页面底部
+      if (documentHeight - scrollPosition < 50) {
+        setIsLoadingMore(true);
+        loadMoreProperties();
+      }
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [isLoadingMore, hasMore, page]);
+
   return (
     <div>
       <AuthProvider>
@@ -522,39 +650,91 @@ const Product = () => {
         ) : (
           <div className="scrollable-container_for_product">
             {properties.length > 0 ? (
-              properties.map((property) => (
-                <div className="tour-property-item" key={property.propertyid} property={property} onClick={() => handleViewDetails(property)}> 
-                  <div className="tour-property-image-box">
-                    {property.propertyimage && property.propertyimage.length > 0 ? (
-                       <ImageSlider images={property.propertyimage}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }} />
-                    ) : (
-                      <p>No images available</p>
-                    )}
-                  </div>
-                  <div className="tour-property-info">
-                    <div className="property-location">
-                      <h4>{property.propertyaddress}</h4>
-  
-                      <div className="tour-property-rating">
-                        <span className="rating-number">{rating}</span>
-                        <FaStar />
+              properties.map((property, index) => {
+                if (properties.length === index + 1) {
+                  return (
+                    <div 
+                      ref={lastPropertyElementRef}
+                      className="tour-property-item" 
+                      key={property.propertyid} 
+                      onClick={() => handleViewDetails(property)}
+                    > 
+                      <div className="tour-property-image-box">
+                        {property.propertyimage && property.propertyimage.length > 0 ? (
+                          <ImageSlider 
+                            images={property.propertyimage}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }} 
+                          />
+                        ) : (
+                          <p>No images available</p>
+                        )}
+                      </div>
+                      <div className="tour-property-info">
+                        <div className="property-location">
+                          <h4>{property.propertyaddress}</h4>
+                          <div className="tour-property-rating">
+                            <span className="rating-number">{rating}</span>
+                            <FaStar />
+                          </div>
+                        </div>
+                        <span className="property-cluster">{property.clustername}</span>
+                        <div className="property-details-row">
+                          <div className="property-price">
+                            <span className="price-amount">${property.rateamount}</span>
+                            <span className="price-period">/night</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <span className="property-cluster">{property.clustername}</span>
-                    <div className="property-details-row">
-                      <div className="property-price">
-                        <span className="price-amount">${property.rateamount}</span>
-                        <span className="price-period">/night</span>
+                  );
+                } else {
+                  return (
+                    <div 
+                      className="tour-property-item" 
+                      key={property.propertyid} 
+                      onClick={() => handleViewDetails(property)}
+                    > 
+                      <div className="tour-property-image-box">
+                        {property.propertyimage && property.propertyimage.length > 0 ? (
+                          <ImageSlider 
+                            images={property.propertyimage}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }} 
+                          />
+                        ) : (
+                          <p>No images available</p>
+                        )}
+                      </div>
+                      <div className="tour-property-info">
+                        <div className="property-location">
+                          <h4>{property.propertyaddress}</h4>
+                          <div className="tour-property-rating">
+                            <span className="rating-number">{rating}</span>
+                            <FaStar />
+                          </div>
+                        </div>
+                        <span className="property-cluster">{property.clustername}</span>
+                        <div className="property-details-row">
+                          <div className="property-price">
+                            <span className="price-amount">${property.rateamount}</span>
+                            <span className="price-period">/night</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              ))
+                  );
+                }
+              })
             ) : (
               <p className="no-properties-message">No properties available.</p>
+            )}
+            {hasMore && !isLoading && properties.length > 0 && (
+              <div className="loading-more">
+                {isLoadingMore ? "Loading more properties" : "Scroll to bottom to load more"}
+              </div>
             )}
           </div>
         )}
