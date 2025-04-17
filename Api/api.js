@@ -116,7 +116,6 @@ export const fetchPropertiesListingTable = async () => {
     }
 
     const data = await response.json();
-    console.log(`Fetched page ${pageParam} with ${data.length} items`); // Add logging to verify
     return data; 
   } catch (error) {
     console.error('Error fetching properties', error);
