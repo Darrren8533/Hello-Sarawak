@@ -89,18 +89,17 @@ export const propertiesListing = async (propertyData) => {
 };
 
 // Fetch Properties (Product)
-export const fetchProduct = async () => {
+export const fetchProduct = async ({ pageParam = 1 }) => {
   try {
-    const response = await fetch(`${API_URL}/product`);
-
+    const response = await fetch(`${API_URL}/product?page=${pageParam}&limit=8`);
     if (!response.ok) {
       throw new Error('Failed to fetch properties');
     }
     const data = await response.json();
-    return data; 
+    return data;
   } catch (error) {
     console.error('Error fetching properties:', error);
-    throw error; 
+    throw error;
   }
 };
 
