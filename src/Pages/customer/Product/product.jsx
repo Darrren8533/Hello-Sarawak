@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useInfiniteQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { useQuery, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // Import Components
 import Navbar from '../../../Component/Navbar/navbar';
@@ -46,71 +46,19 @@ const Product = () => {
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
   const [activeTab, setActiveTab] = useState(null);
   const navigate = useNavigate();
-  
-  // Ref for intersection observer
-  const loadMoreRef = useRef(null);
 
-  // Use React Query's useInfiniteQuery for pagination
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
-    error
-  } = useInfiniteQuery({
-    queryKey: ['product'],
-    queryFn: async ({ pageParam = 1 }) => {
-      console.log(`Fetching page ${pageParam}`);
-      const items = await fetchProduct({ pageParam });
-      
-      // Return both the data and a nextPage parameter
-      return {
-        items: items,
-        nextPage: items.length === 8 ? pageParam + 1 : undefined
-      };
-    },
-    getNextPageParam: (lastPage) => lastPage.nextPage,
+  // Use React Query to fetch properties
+  const { data: fetchedProperties, isLoading, error } = useQuery({
+    queryKey: ['properties'],
+    queryFn: fetchProduct,
   });
 
   // Set properties when data is fetched
   useEffect(() => {
-    if (data) {
-      console.log('Data pages:', data.pages.length);
-      
-      // Correctly flatten the pages structure
-      const allProperties = data.pages.flatMap(page => page.items);
-      console.log('Total properties after flatten:', allProperties.length);
-      setProperties(allProperties);
+    if (fetchedProperties) {
+      setProperties(fetchedProperties);
     }
-  }, [data]);
-
-  // Update the intersection observer implementation
-  useEffect(() => {
-    if (!hasNextPage || isFetchingNextPage) return;
-  
-    const observer = new IntersectionObserver(
-      entries => {
-        // Log intersection for debugging
-        console.log("Intersection detected:", entries[0].isIntersecting);
-        if (entries[0].isIntersecting && hasNextPage) {
-          console.log("Fetching next page");
-          fetchNextPage();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
-
-    return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
-      }
-    };
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+  }, [fetchedProperties]);
 
   // Show error toast if fetching fails
   useEffect(() => {
@@ -221,35 +169,32 @@ const Product = () => {
     const totalGuests = bookingData.adults + bookingData.children;
   
     try {
-      // Reset and refetch with filters - Using queryClient to invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ['properties'] });
-      
-      // For filtering, you'll need to adjust your API to accept filtering parameters
-      // For now, we'll filter the client-side data
-      if (data) {
-        const allProperties = data.pages.flatMap(page => page);
-        
-        const availableProperties = allProperties.filter((property) => {
-          const existingCheckin = new Date(property.checkindatetime);
-          const existingCheckout = new Date(property.checkoutdatetime);
+      // Use the cached data from React Query when possible
+      const allProperties = fetchedProperties || await queryClient.fetchQuery({
+        queryKey: ['properties'],
+        queryFn: fetchProduct
+      });
+  
+      const availableProperties = allProperties.filter((property) => {
+        const existingCheckin = new Date(property.checkindatetime);
+        const existingCheckout = new Date(property.checkoutdatetime);
 
-          if (property.propertyguestpaxno < totalGuests) return false;
-          
-          if (checkIn < existingCheckout && checkOut > existingCheckin) return false; 
-          
-          if (property.clustername !== selectedCluster) return false;
-    
-          return true; 
-        });
-    
-        if (availableProperties.length === 0) {
-          displayToast('error', 'No available properties match your criteria');
-        } else {
-          displayToast('success', `Found ${availableProperties.length} available properties`);
-        }
-    
-        setProperties(availableProperties); // Update the displayed properties
+        if (property.propertyguestpaxno < totalGuests) return false;
+        
+        if (checkIn < existingCheckout && checkOut > existingCheckin) return false; 
+        
+        if (property.clustername !== selectedCluster) return false;
+  
+        return true; 
+      });
+  
+      if (availableProperties.length === 0) {
+        displayToast('error', 'No available properties match your criteria');
+      } else {
+        displayToast('success', `Found ${availableProperties.length} available properties`);
       }
+  
+      setProperties(availableProperties); // Update the displayed properties
     } catch (error) {
       console.error('Error filtering properties:', error);
       displayToast('error', 'Failed to filter properties');
@@ -577,49 +522,37 @@ const Product = () => {
         ) : (
           <div className="scrollable-container_for_product">
             {properties.length > 0 ? (
-              <>
-                {properties.map((property) => (
-                  <div className="tour-property-item" key={property.propertyid} property={property} onClick={() => handleViewDetails(property)}> 
-                    <div className="tour-property-image-box">
-                      {property.propertyimage && property.propertyimage.length > 0 ? (
-                        <ImageSlider images={property.propertyimage}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }} />
-                      ) : (
-                        <p>No images available</p>
-                      )}
-                    </div>
-                    <div className="tour-property-info">
-                      <div className="property-location">
-                        <h4>{property.propertyaddress}</h4>
-    
-                        <div className="tour-property-rating">
-                          <span className="rating-number">{rating}</span>
-                          <FaStar />
-                        </div>
+              properties.map((property) => (
+                <div className="tour-property-item" key={property.propertyid} property={property} onClick={() => handleViewDetails(property)}> 
+                  <div className="tour-property-image-box">
+                    {property.propertyimage && property.propertyimage.length > 0 ? (
+                       <ImageSlider images={property.propertyimage}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }} />
+                    ) : (
+                      <p>No images available</p>
+                    )}
+                  </div>
+                  <div className="tour-property-info">
+                    <div className="property-location">
+                      <h4>{property.propertyaddress}</h4>
+  
+                      <div className="tour-property-rating">
+                        <span className="rating-number">{rating}</span>
+                        <FaStar />
                       </div>
-                      <span className="property-cluster">{property.clustername}</span>
-                      <div className="property-details-row">
-                        <div className="property-price">
-                          <span className="price-amount">${property.rateamount}</span>
-                          <span className="price-period">/night</span>
-                        </div>
+                    </div>
+                    <span className="property-cluster">{property.clustername}</span>
+                    <div className="property-details-row">
+                      <div className="property-price">
+                        <span className="price-amount">${property.rateamount}</span>
+                        <span className="price-period">/night</span>
                       </div>
                     </div>
                   </div>
-                ))}
-                
-                {/* Loading reference element - when visible, it triggers loading more */}
-                <div ref={loadMoreRef} className="loading-more">
-                  {isFetchingNextPage && (
-                    <div className="loading-spinner-container">
-                      <div className="loading-spinner"></div>
-                      <p>Loading more properties...</p>
-                    </div>
-                  )}
                 </div>
-              </>
+              ))
             ) : (
               <p className="no-properties-message">No properties available.</p>
             )}
