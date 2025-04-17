@@ -208,7 +208,6 @@ const PropertyDetails = () => {
       displayToast('success', 'Reservation created');
       setShowBookingForm(false);
       navigate('/cart');  
-      }
     } catch (error) {
       displayToast('error', 'Failed to create reservation');
     }
