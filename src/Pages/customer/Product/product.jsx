@@ -59,7 +59,7 @@ const Product = () => {
     isLoading,
     error
   } = useInfiniteQuery({
-    queryKey: ['properties'],
+    queryKey: ['product'],
     queryFn: async ({ pageParam = 1 }) => {
       console.log(`Fetching page ${pageParam}`);
       const items = await fetchProduct({ pageParam });
