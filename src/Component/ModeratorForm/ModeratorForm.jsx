@@ -3,7 +3,6 @@ import { createModerator, updateUser } from "../../../Api/api";
 import { FaUserCircle, FaUserAlt, FaMailBulk, FaHashtag } from 'react-icons/fa';
 import { RiLockPasswordFill, RiLockPasswordLine, RiGlobalLine } from 'react-icons/ri';
 import { MdCall } from 'react-icons/md';
-import { BiMaleFemale } from 'react-icons/bi';
 import Toast from "../Toast/Toast";
 import "./ModeratorForm.css";
 
@@ -23,6 +22,9 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
     const [toastType, setToastType] = useState('');
 
     useEffect(() => {
+       
+        console.log('initialData:', initialData);
+
         if (initialData) {
             setFirstName(initialData.ufirstname || '');
             setLastName(initialData.ulastname || '');
@@ -30,8 +32,20 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
             setEmail(initialData.uemail || '');
             setPhoneNo(initialData.uphoneno || '');
             setCountry(initialData.ucountry || '');
-            setZipCode(initialData.uzipcode|| '');
+            setZipCode(initialData.uzipcode || '');
             setTitle(initialData.utitle || '');
+            setPassword(''); 
+            setConfirmPassword(''); 
+        } else {
+          
+            setFirstName('');
+            setLastName('');
+            setUsername('');
+            setEmail('');
+            setPhoneNo('');
+            setCountry('');
+            setZipCode('');
+            setTitle('');
             setPassword('');
             setConfirmPassword('');
         }
@@ -41,7 +55,7 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
         setToastType(type);
         setToastMessage(message);
         setShowToast(true);
-        setTimeout(() => setShowToast(false), 5000); // Hide the toast after 5 seconds
+        setTimeout(() => setShowToast(false), 5000);
     };
 
     const handleSubmit = async (e) => {
@@ -152,10 +166,10 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
                             <input
                                 type="password"
                                 name="password"
-                                value={initialData ? "******" : password} // Show masked password if initialData exists
-                                onChange={(e) => !initialData && setPassword(e.target.value)} // Allow change only if no initialData
-                                readOnly={!!initialData} // Make field non-editable if initialData exists
-                                required={!initialData} // Require input only if no initialData
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                readOnly={!!initialData}
+                                required={!initialData}
                             />
                         </div>
                     </div>
@@ -166,10 +180,10 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
                             <input
                                 type="password"
                                 name="confirmPassword"
-                                value={initialData ? "******" : confirmPassword} 
-                                onChange={(e) => !initialData && setConfirmPassword(e.target.value)} 
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
                                 readOnly={!!initialData}
-                                required={!initialData} 
+                                required={!initialData}
                             />
                         </div>
                     </div>
