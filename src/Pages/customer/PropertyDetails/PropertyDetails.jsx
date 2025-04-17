@@ -205,13 +205,11 @@ const PropertyDetails = () => {
 
       await requestBooking(createdReservation.reservationid);
 
-      displayToast('success', 'Reservation added to the cart');
-
-        setTimeout(() => {
+      displayToast('success', 'Reservation created');
+      setTimeout(() => {
         setShowBookingForm(false);
         navigate('/cart');
-      }, 5000);
-        
+      }, 5000);  
     } catch (error) {
       displayToast('error', 'Failed to create reservation');
     }
@@ -255,7 +253,7 @@ const PropertyDetails = () => {
   const [guests, setGuests] = useState(1);
 
   const googleMapSrc = locationCoords.lat && locationCoords.lng
-    ? `https://www.google.com/maps/embed/v1/view?key=AIzaSyCe27HezKpItahXjMFcWXf3LwFcjI7pZFk&center=${locationCoords.lat},${locationCoords.lng}&zoom=14`
+    ? `https://www.google.com/maps/embed/v1/place?key=AIzaSyCe27HezKpItahXjMFcWXf3LwFcjI7pZFk&q=${encodeURIComponent(propertyDetails.nearbylocation)}&zoom=14`
     : "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.9586177612214!2d110.31007237509338!3d1.749442560160908!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31faff9851a3becb%3A0xf308ff203e894002!2sDamai%20Beach!5e0!3m2!1sen!2smy!4v1731252464570!5m2!1sen!2smy";
 
   return (
