@@ -72,7 +72,7 @@
     padding: 1rem 1rem;
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: baseline;
 }
 
 .close-btn {
@@ -81,9 +81,6 @@
     cursor: pointer;
     padding: 5px;
     transition: 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .close-btn:hover {
@@ -212,15 +209,6 @@ a.login-button:hover {
         margin-left: 22px;
     }
 }
-  
-@media (min-width: 481px) {
-    .mobile-auth-item {
-        display: none;
-    }
-    
-    .offcanvas-header {
-        display: none;
-    }
 
 @media (min-width: 481px) {
     .mobile-auth-item {
@@ -253,5 +241,4 @@ a.login-button:hover {
     .nav-link:hover {
         color: #e0e0e0 !important;
     }
-}
 }
