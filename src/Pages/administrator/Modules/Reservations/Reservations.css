@@ -30,9 +30,9 @@
 }
 
 .pending {
-  background-color: rgba(241, 196, 15, 0.15);
-  color: #f1c40f;
-  border: 1px solid rgba(241, 196, 15, 0.3);
+ background-color: rgba(211, 155, 0, 0.15);
+  color: #d39b00;
+  border: 1px solid rgba(211, 155, 0, 0.3);
 }
 
 .paid {
