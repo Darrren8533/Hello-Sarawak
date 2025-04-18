@@ -115,7 +115,7 @@ const Register = () => {
 
       <div className="container flex">
         <div className="videoDiv">
-          <video src={video} autoPlay muted loop></video>
+          <video className="register_page_video" src={video} autoPlay muted loop></video>
           <div className="textDiv">
             <h2 className="title_A">Hello Sarawak</h2>
             <h3 className="title_B">Your Journey Begins</h3>
