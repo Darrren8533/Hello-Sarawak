@@ -224,7 +224,7 @@ const Register = () => {
           <div className="container_button">
             <button type="submit" className="btn"><span>Sign Up</span></button>
               <Link to={'/login'}>
-                <button type="button" className="btn" style={{ marginTop: '10px' }}><span>Login</span></button>
+                <button type="button" className="btn_responsive" style={{ marginTop: '10px' }}><span>Login</span></button>
               </Link>
           </div>
 
