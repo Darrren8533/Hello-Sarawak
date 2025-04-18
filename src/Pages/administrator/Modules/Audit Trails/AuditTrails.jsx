@@ -54,10 +54,13 @@ const AuditTrails = () => {
   ];
 
   const displayLabels = {
-    updatedBy: 'Updated By',
+    audittrailid: 'Audit Trail ID',
+    entityid: 'Entity ID',
+    entitytype: 'Entity Type',
     timestamp: 'Timestamp',
-    propertyID: 'Property ID',
     action: 'Action',
+    actiontype: 'Action Type',
+    updatedby: 'Updated By',
   };
 
   const filteredLogs = logs.filter((log) => {
