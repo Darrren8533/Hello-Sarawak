@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
+import { IoIosArrowBack, IoIosArrowForward, IoIosBed } from "react-icons/io";
 import { IoMdClose } from "react-icons/io";
 import { IoReturnUpBackOutline } from "react-icons/io5";
-import { FaStar, FaUser, FaBed, FaWifi, FaParking, FaSwimmingPool, FaHotTub, FaTv, FaUtensils, FaSnowflake, FaPaw, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaLock, FaBell, FaMapMarkerAlt, FaTree, FaMountain, FaCity } from "react-icons/fa";
+import { FaStar, FaUser, FaWifi, FaParking, FaSwimmingPool, FaHotTub, FaTv, FaUtensils, FaSnowflake, FaPaw, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaLock, FaBell, FaMapMarkerAlt, FaTree, FaMountain, FaCity } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 import Navbar from '../../../Component/Navbar/navbar';
@@ -205,11 +205,13 @@ const PropertyDetails = () => {
 
       await requestBooking(createdReservation.reservationid);
 
-      displayToast('success', 'Reservation created');
-      setTimeout(() => {
+      displayToast('success', 'Reservation added to the cart');
+
+        setTimeout(() => {
         setShowBookingForm(false);
         navigate('/cart');
-      }, 5000);  
+      }, 5000);
+        
     } catch (error) {
       displayToast('error', 'Failed to create reservation');
     }
@@ -257,7 +259,7 @@ const PropertyDetails = () => {
     : "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.9586177612214!2d110.31007237509338!3d1.749442560160908!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31faff9851a3becb%3A0xf308ff203e894002!2sDamai%20Beach!5e0!3m2!1sen!2smy!4v1731252464570!5m2!1sen!2smy";
 
   return (
-    <div className="property-details">
+    <div>
       <AuthProvider>
       <div className="property-details-main-container">
         {!showAllPhotos && !showBookingForm && <Navbar />}
@@ -354,42 +356,44 @@ const PropertyDetails = () => {
           </div>
         )}
 
+        {/* Details Container */}
         <div className="Details_container">
           <div className="Description_container">
             <div className="first_container">
               <div className="Room_name_container">
                 <h2 className="Room_name">{propertyDetails?.propertyaddress}</h2>
-                <p className="Rating">
+                <div className='Rating_Container'>
+                <p className="Rating_score">
                   4.8
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="30" viewBox="0 0 20 20">
-                    <FaStar />
-                  </svg>
                 </p>
+                <FaStar className='icon_star'/>
+                </div>
               </div>
 
               <div className="sub_details">
                 <div className="Room_location">
-                  <FaMapMarkerAlt className="icon_location"/>
+                  <FaMapMarkerAlt className="icon_location_room"/>
                   <p>{propertyDetails?.clustername}</p>
                 </div>
 
                 <div className="Room_location">
-                    <FaBed className="icon_location"/>
+                    <IoIosBed className="icon_bed_room"/>
                   <p>{propertyDetails?.propertybedtype} Bed</p>
                 </div>
 
                 <div className="Room_location">
-                    <FaUser className="icon_location"/>
+                    <FaUser className="icon_guest_room"/>
                   <p>{propertyDetails?.propertyguestpaxno} Guest</p>
                 </div>
 
                 <div className="profile_section">
-                  <div className="round_card">
+                  <div className="profile_card_property">
                     <img src={propertyDetails.uimage.startsWith('http') ? propertyDetails.uimage : `data:image/jpeg;base64,${propertyDetails.uimage}`}
                          className="admin_profile"
                          alt="Admin" />
                     <p className="admin_name">
-                      Hosted by {propertyDetails?.username || "Unknown Host"}</p>
+                      {propertyDetails?.username || "Unknown Host"}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -467,7 +471,7 @@ const PropertyDetails = () => {
               </div>
 
               <div className="Location_Main_Container">
-                <h2 className="Location_text">Location</h2>
+                <h2 className="Location_text">Hotel Location</h2>
                 <hr className="custom-line" />
 
                 <div className="Google_map_container">
