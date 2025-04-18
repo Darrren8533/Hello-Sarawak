@@ -60,11 +60,11 @@ const AuditTrails = () => {
     timestamp: 'Timestamp',
     action: 'Action',
     actiontype: 'Action Type',
-    updatedby: 'Updated By',
+    userid: 'User ID',
   };
 
   const filteredLogs = logs.filter((log) => {
-    const searchInFields = `${log.updatedBy} ${log.propertyID} ${log.action}`
+    const searchInFields = `${log.userid} ${log.entityid} ${log.actiontype}`
       .toLowerCase()
       .includes(searchKey.toLowerCase());
 
@@ -78,10 +78,12 @@ const AuditTrails = () => {
   const handleAction = (action, log) => {
     if (action === 'view') {
       const essentialFields = {
-        updatedBy: log.updatedBy || 'N/A',
+        userid: log.userid || 'N/A',
+        entityid: log.entityid || 'N/A',
+        entitytype: log.entitytype || 'N/A',
         timestamp: log.timestamp || 'N/A',
-        propertyID: log.propertyID || 'N/A',
         action: log.action || 'N/A',
+        actiontype: log.actiontype || 'N/A',
       };
       setSelectedLog(essentialFields);
     }
@@ -92,10 +94,13 @@ const AuditTrails = () => {
   ];
 
   const columns = [
-    { header: 'Updated By', accessor: 'updatedBy' },
+    { header: 'Audit Trail ID', accessor: 'audittrailid' },
+    { header: 'Entity ID', accessor: 'entityid' },
+    { header: 'Entity Type', accessor: 'entitytype' },
     { header: 'Timestamp', accessor: 'timestamp' },
-    { header: 'Property ID', accessor: 'propertyID' },
     { header: 'Action', accessor: 'action' },
+    { header: 'Action Type', accessor: 'actiontype' },
+    { header: 'User ID', accessor: 'userid' },
     {
       header: 'Actions',
       accessor: 'actions',
@@ -116,7 +121,7 @@ const AuditTrails = () => {
         <SearchBar
           value={searchKey}
           onChange={(newValue) => setSearchKey(newValue)}
-          placeholder="Search logs..."
+          placeholder="Search audit trail..."
         />
       </div>
 
@@ -125,13 +130,13 @@ const AuditTrails = () => {
       <PaginatedTable
         data={filteredLogs}
         columns={columns}
-        rowKey={(log) => `${log.timestamp}-${log.propertyID}`} // Unique key
+        rowKey={(log) => `${log.timestamp}-${log.audittrailid}`} 
         enableCheckbox={false}
       />
 
       <Modal
         isOpen={!!selectedLog}
-        title="Log Details"
+        title="Audit Trail Details"
         data={selectedLog || {}}
         labels={displayLabels}
         onClose={() => setSelectedLog(null)}
