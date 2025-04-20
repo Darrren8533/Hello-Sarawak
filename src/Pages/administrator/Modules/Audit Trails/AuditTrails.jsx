@@ -5,7 +5,7 @@ import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable'
 import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown'; // Ensure this is imported
-import { fetchBookLog } from '../../../../../Api/api';
+import { auditTrails } from '../../../../../Api/api';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
@@ -13,23 +13,25 @@ import '../../../../Component/Filter/Filter.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 
 const AuditTrails = () => {
-  const [logs, setLogs] = useState([]);
+  const [auditTrails, setAuditTrails] = useState([]);
   const [searchKey, setSearchKey] = useState('');
   const [selectedActionType, setSelectedActionType] = useState('All');
   const [appliedFilters, setAppliedFilters] = useState({ actionType: 'All' });
   const [selectedLog, setSelectedLog] = useState(null);
 
+  const userid = localStorage.getItem('userid');
+
   useEffect(() => {
-    const fetchLogs = async () => {
+    const fetchAuditTrails = async (userid) => {
       try {
-        const logData = await fetchBookLog();
-        setLogs(logData || []); // Ensure logs is always an array
+        const auditTrailData = await auditTrails(userid);
+        setAuditTrails(auditTrailData || []);
       } catch (error) {
         console.error('Failed to fetch Audit Trails Logs:', error);
       }
     };
 
-    fetchLogs();
+    fetchAuditTrails();
   }, []);
 
   const handleApplyFilters = () => {
@@ -63,7 +65,7 @@ const AuditTrails = () => {
     userid: 'User ID',
   };
 
-  const filteredLogs = logs.filter((log) => {
+  const filteredLogs = auditTrails.filter((log) => {
     const searchInFields = `${log.userid} ${log.entityid} ${log.actiontype}`
       .toLowerCase()
       .includes(searchKey.toLowerCase());
