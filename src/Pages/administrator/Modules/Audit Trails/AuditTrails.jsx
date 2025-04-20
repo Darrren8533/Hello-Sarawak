@@ -94,13 +94,11 @@ const AuditTrails = () => {
   ];
 
   const columns = [
-    { header: 'Audit Trail ID', accessor: 'audittrailid' },
     { header: 'Entity ID', accessor: 'entityid' },
     { header: 'Entity Type', accessor: 'entitytype' },
-    { header: 'Timestamp', accessor: 'timestamp' },
     { header: 'Action', accessor: 'action' },
-    { header: 'Action Type', accessor: 'actiontype' },
     { header: 'User ID', accessor: 'userid' },
+    { header: 'Timestamp', accessor: 'timestamp' },
     {
       header: 'Actions',
       accessor: 'actions',
