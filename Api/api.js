@@ -704,6 +704,7 @@ export const fetchBookLog = async () => {
   }
 };
 
+// Fetch Finance 
 export const fetchFinance = async (userid) => {
   try {
       const response = await fetch(`${API_URL}/users/finance?userid=${userid}`);
@@ -715,6 +716,7 @@ export const fetchFinance = async (userid) => {
   }
 };
 
+// Fetch Occupancy Rate
 export const fetchOccupancyRate = async (userid) => {
   try {
       const response = await fetch(`${API_URL}/users/occupancy_rate?userid=${userid}`);
@@ -726,6 +728,7 @@ export const fetchOccupancyRate = async (userid) => {
   }
 };
 
+// Fetch Reservation per Available Room
 export const fetchRevPAR = async (userid) => {
   try {
       const response = await fetch(`${API_URL}/users/RevPAR?userid=${userid}`);
@@ -737,6 +740,7 @@ export const fetchRevPAR = async (userid) => {
   }
 };
 
+// Fetch Cancellation Rate
 export const fetchCancellationRate = async (userid) => {
   try {
       const response = await fetch(`${API_URL}/users/cancellation_rate?userid=${userid}`);
@@ -748,6 +752,7 @@ export const fetchCancellationRate = async (userid) => {
   }
 };
 
+// Fetch Customer Retention Rate
 export const fetchCustomerRetentionRate = async (userid) => {
   try {
       const response = await fetch(`${API_URL}/users/customer_retention_rate?userid=${userid}`);
@@ -759,6 +764,7 @@ export const fetchCustomerRetentionRate = async (userid) => {
   }
 };
 
+// Fetch Guest Satisfaction Score
 export const fetchGuestSatisfactionScore = async (userid) => {
   try {
       const response = await fetch(`${API_URL}/users/guest_satisfaction_score?userid=${userid}`);
@@ -770,6 +776,7 @@ export const fetchGuestSatisfactionScore = async (userid) => {
   }
 };
 
+// Fetch Average Length of Stay
 export const fetchALOS = async (userid) => {
   try {
       const response = await fetch(`${API_URL}/users/alos?userid=${userid}`);
@@ -953,6 +960,7 @@ export const getCoordinates = async (location) => {
   throw new Error('Location not found');
 };
 
+// Fetch Audit Trails
 export const auditTrails = async (userid) => {
   try {
     const response = await fetch(`${API_URL}/auditTrails/${userid}`, {
