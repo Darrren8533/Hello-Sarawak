@@ -963,8 +963,8 @@ export const getCoordinates = async (location) => {
 // Fetch Audit Trails
 export const auditTrails = async (userid) => {
   try {
-    const response = await fetch(`${API_URL}/auditTrails/${userid}`, {
-      method: 'POST',
+    const response = await fetch(`${API_URL}/auditTrails?userid=${userid}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -975,7 +975,8 @@ export const auditTrails = async (userid) => {
       throw new Error(errorData.message || 'Failed to fetch audit trails');
     }
 
-    return await response.json();
+    const data = await response.json();
+    return data.auditTrails;
   }catch (error) {
     console.error('API error: ', error);
     throw error;
