@@ -952,3 +952,24 @@ export const getCoordinates = async (location) => {
   }
   throw new Error('Location not found');
 };
+
+export const auditTrails = async (userid) => {
+  try {
+    const response = await fetch(`${API_URL}/auditTrails/${userid}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if(!response) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to fetch audit trails');
+    }
+
+    return await response.json();
+  }catch (error) {
+    console.error('API error: ', error);
+    throw error;
+  }
+};
