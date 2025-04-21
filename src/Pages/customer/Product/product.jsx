@@ -9,6 +9,7 @@ import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_To
 import Toast from '../../../Component/Toast/Toast';
 import ImageSlider from '../../../Component/ImageSlider/ImageSlider';
 import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
+import TawkMessenger from '../../../Component/TawkMessenger/TawkMessenger';
 
 // Import API
 import { fetchProduct } from '../../../../Api/api';
@@ -742,6 +743,7 @@ const Product = () => {
         {showToast && <Toast type={toastType} message={toastMessage} />}
         <br /><br /><br /><br /><br /><br />
         <Back_To_Top_Button />
+        <TawkMessenger />
         <Footer />
         </AuthProvider>
       </div>
