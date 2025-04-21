@@ -102,8 +102,8 @@ const Reservations = () => {
 
     // Update reservation status mutation
     const updateStatusMutation = useMutation({
-        mutationFn: ({ reservationId, newStatus }) => 
-            updateReservationStatus(reservationId, newStatus),
+        mutationFn: ({ reservationId, newStatus, userid }) => 
+            updateReservationStatus(reservationId, newStatus, userid),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['reservations'] });
         },
@@ -225,7 +225,8 @@ const Reservations = () => {
 
                 await updateStatusMutation.mutateAsync({ 
                     reservationId: reservation.reservationid, 
-                    newStatus 
+                    newStatus,
+                    userid: currentUser.userid
                 });
                 
    
@@ -248,7 +249,8 @@ const Reservations = () => {
                 
                 await updateStatusMutation.mutateAsync({ 
                     reservationId: reservation.reservationid, 
-                    newStatus 
+                    newStatus,
+                    userid: currentUser.userid
                 });
     
                 setShowMessageBox(true);
