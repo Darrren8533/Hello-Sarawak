@@ -93,6 +93,16 @@ const PropertyDetails = () => {
     fetchCoordinates();
   }, [propertyDetails]);
 
+  useEffect(() => {
+    const currentLocationKey = location.key;
+    const previousLocationKey = localStorage.getItem('previousLocationKey');
+    
+    if (currentLocationKey !== previousLocationKey) {
+      localStorage.setItem('previousLocationKey', currentLocationKey);
+      window.location.reload();
+    }
+  }, [location.key]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setBookingData((prev) => {
