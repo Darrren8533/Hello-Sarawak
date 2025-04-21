@@ -54,13 +54,13 @@ const BooknPayLog = () => {
   ];
 
   const displayLabels = {
-    userID: 'User ID',
+    userid: 'User ID',
     timestamp: 'Timestamp',
     action: 'Action',
   };
 
   const filteredLogs = logs.filter((log) => {
-    const searchInFields = `${log.userID} ${log.action}`
+    const searchInFields = `${log.userid} ${log.action}`
       .toLowerCase()
       .includes(searchKey.toLowerCase());
 
@@ -74,7 +74,7 @@ const BooknPayLog = () => {
   const handleAction = (action, log) => {
     if (action === 'view') {
       const essentialFields = {
-        userID: log.userID || 'N/A',
+        userid: log.userid || 'N/A',
         timestamp: log.timestamp || 'N/A',
         action: log.action || 'N/A',
       };
@@ -87,7 +87,7 @@ const BooknPayLog = () => {
   ];
 
   const columns = [
-    { header: 'User ID', accessor: 'userID' },
+    { header: 'User ID', accessor: 'userid' },
     { header: 'Timestamp', accessor: 'timestamp' },
     { header: 'Action', accessor: 'action' },
     {
@@ -119,7 +119,7 @@ const BooknPayLog = () => {
       <PaginatedTable
         data={filteredLogs}
         columns={columns}
-        rowKey={(log) => `${log.timestamp}-${log.userID}`} // Unique key
+        rowKey={(log) => `${log.timestamp}-${log.userid}`} // Unique key
         enableCheckbox={false}
       />
 
