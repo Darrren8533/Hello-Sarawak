@@ -54,14 +54,13 @@ const BooknPayLog = () => {
   ];
 
   const displayLabels = {
-    updatedBy: 'Updated By',
+    userID: 'User ID',
     timestamp: 'Timestamp',
-    propertyID: 'Property ID',
     action: 'Action',
   };
 
   const filteredLogs = logs.filter((log) => {
-    const searchInFields = `${log.updatedBy} ${log.propertyID} ${log.action}`
+    const searchInFields = `${log.userID} ${log.action}`
       .toLowerCase()
       .includes(searchKey.toLowerCase());
 
@@ -75,9 +74,8 @@ const BooknPayLog = () => {
   const handleAction = (action, log) => {
     if (action === 'view') {
       const essentialFields = {
-        updatedBy: log.updatedBy || 'N/A',
+        userID: log.userID || 'N/A',
         timestamp: log.timestamp || 'N/A',
-        propertyID: log.propertyID || 'N/A',
         action: log.action || 'N/A',
       };
       setSelectedLog(essentialFields);
@@ -89,9 +87,8 @@ const BooknPayLog = () => {
   ];
 
   const columns = [
-    { header: 'Updated By', accessor: 'updatedBy' },
+    { header: 'User ID', accessor: 'userID' },
     { header: 'Timestamp', accessor: 'timestamp' },
-    { header: 'Property ID', accessor: 'propertyID' },
     { header: 'Action', accessor: 'action' },
     {
       header: 'Actions',
@@ -122,7 +119,7 @@ const BooknPayLog = () => {
       <PaginatedTable
         data={filteredLogs}
         columns={columns}
-        rowKey={(log) => `${log.timestamp}-${log.propertyID}`} // Unique key
+        rowKey={(log) => `${log.timestamp}-${log.userID}`} // Unique key
         enableCheckbox={false}
       />
 
