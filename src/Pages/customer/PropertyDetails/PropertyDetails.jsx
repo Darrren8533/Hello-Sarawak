@@ -410,21 +410,26 @@ const PropertyDetails = () => {
                       </button>
                   )}
                 </p>
-                {showDescriptionOverlay && (
-                  <div className="description-overlay">
-                    <div className="description-overlay-content">
-                      <div className="overlay-header">
-                        <button className="close-overlay" onClick={() => setShowDescriptionOverlay(false)}>
-                          <IoMdClose />
-                        </button>
-                      </div>
-                      <div className="full-description">
-                        <h2 className="About_text">About This Place</h2>
-                        <p className="Room_description">{description}</p>
-                      </div>
+
+              {showDescriptionOverlay && (
+                <div className="description-overlay">
+                  <div className="description-overlay-content">
+                    <div className="overlay-header-About">
+                      <h2 className="About_text">About This Place</h2>
+                      <button 
+                        className="close-overlay" 
+                        onClick={() => setShowDescriptionOverlay(false)}
+                        aria-label="Close description"
+                      >
+                        <IoMdClose />
+                      </button>
+                    </div>
+                    <div className="full-description">
+                      <p className="Room_description">{description}</p>
                     </div>
                   </div>
-                )}
+                </div>
+              )}
               </div>
 
               <div className="Facilities_Main_Container">
@@ -443,30 +448,42 @@ const PropertyDetails = () => {
                     })}
                   </div>
 
-                  {showAllFacilities && (
-                    <div className="facilities-overlay">
-                      <div className="facilities-overlay-content">
-                        <div className="overlay-header">
-                          <button className="close-overlay" onClick={() => setShowAllFacilities(false)}>
-                            <IoMdClose />
-                          </button>
-                        </div>
-                        <div className="full-facilities-list">
-                          <h3 className="Facilities_text">What this place offers</h3>
+              {showAllFacilities && (
+                <div className="facilities-overlay" onClick={(e) => {
+                  if (e.target === e.currentTarget) setShowAllFacilities(false);
+                }}>
+                  <div className="facilities-overlay-content" role="dialog" aria-modal="true" aria-labelledby="facilities-title">
+                    <div className="overlay-header-Offer">
+                      <h3 id="facilities-title" className="Facilities_text">What this place offers</h3>
+                      <button 
+                        className="close-overlay" 
+                        onClick={() => setShowAllFacilities(false)}
+                        aria-label="Close facilities"
+                      >
+                        <IoMdClose />
+                      </button>
+                    </div>
+                    <div className="full-facilities-list">
+                      {facilitiesArray.length > 0 ? (
+                        <div className="facilities-grid">
                           {facilitiesArray.map((facilityName, index) => {
                             const facility = facilities.find(f => f.name === facilityName.trim());
                             return (
                               <div key={index} className="facilities-overlay-item">
-                                {facility ? facility.icon : null}
-                                <span>{facilityName.trim()}</span>
+                                <div className="facility-icon">{facility ? facility.icon : null}</div>
+                                <span className="facility-name">{facilityName.trim()}</span>
                               </div>
                             );
                           })}
                         </div>
-                      </div>
+                      ) : (
+                        <p className="no-facilities">No facilities available</p>
+                      )}
                     </div>
-                  )}
+                  </div>
                 </div>
+              )}
+              </div>
                 <button className="More_button" onClick={() => setShowAllFacilities(true)}>More</button>
               </div>
 
