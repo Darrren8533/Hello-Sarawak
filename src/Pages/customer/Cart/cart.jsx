@@ -64,7 +64,10 @@ const { data: reservations = [], isLoading: loading } = useQuery({
 
   // Mutation for updating reservation status
   const updateStatusMutation = useMutation({
-    mutationFn: ({ reservationId, status }) => updateReservationStatus(reservationId, status),
+    mutationFn: ({ reservationId, status }) => {
+      const userid = localStorage.getItem('userid');
+      return updateReservationStatus(reservationId, status, userid);
+    },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['cart'] });
       queryClient.invalidateQueries({ queryKey: ['reservations'] });
