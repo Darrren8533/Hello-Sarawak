@@ -76,6 +76,7 @@ const PropertyDetails = () => {
   ? propertyDetails.facilities.split(",") 
   : [];
   const description = propertyDetails?.propertydescription;
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     const fetchCoordinates = async () => {
@@ -113,6 +114,18 @@ const PropertyDetails = () => {
 
       return updatedData;
     });
+  };
+
+  const nextSlide = () => {
+    setCurrentSlide(prev => 
+      prev === propertyDetails.propertyimage.length - 1 ? 0 : prev + 1
+    );
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide(prev => 
+      prev === 0 ? propertyDetails.propertyimage.length - 1 : prev - 1
+    );
   };
 
   const handleCloseFullscreen = () => {
@@ -291,6 +304,39 @@ const PropertyDetails = () => {
           </div>
         </div>
 
+        {/* Mobile Slideshow */}
+        <div className="mobile-slideshow">
+          {propertyDetails?.propertyimage?.map((image, index) => (
+            <div key={index} className={`slide ${currentSlide === index ? 'active' : ''}`} 
+                style={{transform: `translateX(${100 * (index - currentSlide)}%)`, transition: 'transform 0.3s'}}>
+              <img 
+                src={`data:image/jpeg;base64,${image}`}
+                alt={`Property image ${index + 1}`}
+                onClick={() => setShowAllPhotos(true)} 
+              />
+            </div>
+          ))}
+          
+          <button className="slide-nav prev" onClick={prevSlide} aria-label="Previous image">
+            <IoIosArrowBack />
+          </button>
+          
+          <button className="slide-nav next" onClick={nextSlide} aria-label="Next image">
+            <IoIosArrowForward />
+          </button>
+          
+          <div className="slide-indicators">
+            {propertyDetails?.propertyimage?.map((_, index) => (
+              <div 
+                key={index} 
+                className={`indicator ${currentSlide === index ? 'active' : ''}`}
+                onClick={() => setCurrentSlide(index)}
+                aria-label={`Go to image ${index + 1}`}
+              ></div>
+            ))}
+          </div>
+        </div>
+
         {showAllPhotos && (
           <div className="all-photos-view">
             <div className="photos-header">
@@ -361,10 +407,10 @@ const PropertyDetails = () => {
               <div className="Room_name_container">
                 <h2 className="Room_name">{propertyDetails?.propertyaddress}</h2>
                 <div className='Rating_Container'>
-                <p className="Rating_score">
-                  4.8
-                </p>
-                <FaStar className='icon_star'/>
+                  <p className="Rating_score">
+                    4.8
+                  </p>
+                  <FaStar className='icon_star'/>
                 </div>
               </div>
 
@@ -446,41 +492,41 @@ const PropertyDetails = () => {
                     })}
                   </div>
 
-              {showAllFacilities && (
-                <div className="facilities-overlay" onClick={(e) => {
-                  if (e.target === e.currentTarget) setShowAllFacilities(false);
-                }}>
-                  <div className="facilities-overlay-content" role="dialog" aria-modal="true" aria-labelledby="facilities-title">
-                    <div className="overlay-header-Offer">
-                      <h3 id="facilities-title" className="Facilities_text">What this place offers</h3>
-                      <button 
-                        className="close-overlay" 
-                        onClick={() => setShowAllFacilities(false)}
-                        aria-label="Close facilities"
-                      >
-                        <IoMdClose />
-                      </button>
-                    </div>
-                    <div className="full-facilities-list">
-                      {facilitiesArray.length > 0 ? (
-                        <div className="facilities-grid">
-                          {facilitiesArray.map((facilityName, index) => {
-                            const facility = facilities.find(f => f.name === facilityName.trim());
-                            return (
-                              <div key={index} className="facilities-overlay-item">
-                                <div className="facility-icon">{facility ? facility.icon : null}</div>
-                                <span className="facility-name">{facilityName.trim()}</span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <p className="no-facilities">No facilities available</p>
-                      )}
+                {showAllFacilities && (
+                  <div className="facilities-overlay" onClick={(e) => {
+                    if (e.target === e.currentTarget) setShowAllFacilities(false);
+                  }}>
+                    <div className="facilities-overlay-content" role="dialog" aria-modal="true" aria-labelledby="facilities-title">
+                      <div className="overlay-header-Offer">
+                        <h3 id="facilities-title" className="Facilities_text">What this place offers</h3>
+                        <button 
+                          className="close-overlay" 
+                          onClick={() => setShowAllFacilities(false)}
+                          aria-label="Close facilities"
+                        >
+                          <IoMdClose />
+                        </button>
+                      </div>
+                      <div className="full-facilities-list">
+                        {facilitiesArray.length > 0 ? (
+                          <div className="facilities-grid">
+                            {facilitiesArray.map((facilityName, index) => {
+                              const facility = facilities.find(f => f.name === facilityName.trim());
+                              return (
+                                <div key={index} className="facilities-overlay-item">
+                                  <div className="facility-icon">{facility ? facility.icon : null}</div>
+                                  <span className="facility-name">{facilityName.trim()}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        ) : (
+                          <p className="no-facilities">No facilities available</p>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
               </div>
                 <button className="More_button" onClick={() => setShowAllFacilities(true)}>More</button>
               </div>
@@ -723,6 +769,7 @@ const PropertyDetails = () => {
                   </div>
                 </div>
 
+                {/*
                 <div className="booking-right">
                   <div className="property-card">
                     <img 
@@ -754,10 +801,27 @@ const PropertyDetails = () => {
                     </div>
                   )}
                 </div>
+                */}
               </div>
             </div>
           </div>
         )}
+
+        {/* Mobile Booking Bar*/}
+        <div className="mobile-booking-bar">
+          <div className="mobile-booking-bar-content">
+            <div className="mobile-price-info">
+              <h3>${propertyDetails?.rateamount} <span>/night</span></h3>
+              {totalNights > 0 && (
+                <span>Total: ${totalprice} for {totalNights} {totalNights === 1 ? 'night' : 'nights'}</span>
+              )}
+            </div>
+            <button className="mobile-book-now-btn" onClick={() => setShowBookingForm(true)}>
+              Book Now
+            </button>
+          </div>
+        </div>
+
         {showToast && <Toast type={toastType} message={toastMessage} />}
       </div>
       <Footer />
