@@ -42,6 +42,11 @@ body {
     box-shadow: var(--shadow);
 }
 
+.no-scroll {
+    overflow: hidden;
+    height: 100vh;
+}  
+
 .container_navbar {
     display: flex;
     justify-content: space-between;
@@ -80,6 +85,7 @@ body {
 }
 
 .offcanvas-header {
+    justify-content: space-between;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 1.25rem 1.5rem;
 }
@@ -87,7 +93,7 @@ body {
 .offcanvas-title {
     color: var(--white);
     font-size: 1.25rem;
-    font-weight: 500;
+    font-weight: 550;
     margin: 0;
 }
 
@@ -105,11 +111,6 @@ body {
 
 .close-btn:hover {
     background-color: rgba(255, 255, 255, 0.1);
-}
-
-.icon_close {
-    font-size: 18px !important;
-    color: var(--white) !important;
 }
 
 /* Navbar Navigation */
@@ -350,6 +351,10 @@ body {
         margin: 8px;
         min-height: 70px;
     }
+
+    .container_navbar {
+        padding: 0 0.5rem;
+    }
     
     .navbar.scrolled {
         margin: 0;
@@ -366,9 +371,40 @@ body {
     
     .mobile-auth-item {
         display: block !important;
+        margin-top: 5px;
     }
     
     .offcanvas {
         width: 75% !important;
+        max-width: 250px;
+    }
+
+    .offcanvas-body{
+        margin-left: 10px;
+        padding-top: 0.5rem;
+    }
+
+    .nav-item{
+        font-size: 13px;
+    }
+
+    .icon_close{
+        font-size: 12px !important;
+    }
+
+    .offcanvas-title {
+        font-weight: 450;
+        font-size: 17px;
+    }
+
+    .nav-link::after {
+        bottom: 6px;
+        left: 1px;
+        height: 1.5px;
+    }
+    
+    .nav-link:hover::after,
+    .nav-link.active::after {
+        width: 30px;
     }
 }
