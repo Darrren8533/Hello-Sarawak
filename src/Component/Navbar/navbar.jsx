@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
 import { logoutUser, fetchUserData } from '../../../Api/api';
 import { useQuery } from '@tanstack/react-query';
 import DefaultAvatar from '../../../src/public/avatar.png';
@@ -11,19 +11,30 @@ import './navbar.css';
 
 function Navbar() {
     const navigate = useNavigate();
+    const location = useLocation();
     const { isLoggedIn, userAvatar, userID, logout, updateAvatar } = useAuth();
+    const [isScrolled, setIsScrolled] = useState(false);
     
     // React Query for user data
     const { data: userData, isLoading: isUserLoading } = useQuery({
         queryKey: ['userData', userID],
         queryFn: () => fetchUserData(userID),
-        enabled: !!isLoggedIn && !!userID, // Only run when logged in and userID exists
-        staleTime: 5 * 60 * 1000, // Cache data for 5 minutes
-        cacheTime: 10 * 60 * 1000, // Keep unused data in cache for 10 minutes
+        enabled: !!isLoggedIn && !!userID,
+        staleTime: 5 * 60 * 1000,
+        cacheTime: 10 * 60 * 1000,
     });
     
-    // Derived state - no need for useState
+    // Derived state
     const isCustomer = userData?.usergroup === "Customer";
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setIsScrolled(window.scrollY > 10);
+        };
+        
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     useEffect(() => {
         const initOffcanvas = () => {
@@ -81,7 +92,7 @@ function Navbar() {
                 logout();
                 navigate('/');
             } else {
-                alert('Failed to logout');
+                console.error('Logout failed');
             }
         } catch (error) {
             console.error('Error during logout:', error);
@@ -90,7 +101,21 @@ function Navbar() {
 
     const handleImageError = (e) => {
         e.target.src = DefaultAvatar;
-        console.error('Avatar image load error:', e);
+    };
+
+    const closeOffcanvas = () => {
+        if (typeof bootstrap !== 'undefined') {
+            const offcanvasElement = document.getElementById('offcanvasNavbar');
+            if (offcanvasElement) {
+                const bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
+                if (bsOffcanvas) bsOffcanvas.hide();
+            }
+        }
+    };
+
+    // Check if the current path matches the nav link
+    const isActive = (path) => {
+        return location.pathname === path;
     };
 
     return (
@@ -106,9 +131,11 @@ function Navbar() {
                 />
             </Helmet>
 
-            <nav className="navbar navbar-expand-lg fixed-top">
-                <div className="container-fluid">
-                    <h1 className="navbar_brand mx-4 mb-0">Hello Sarawak</h1>
+            <nav className={`navbar navbar-expand-lg fixed-top ${isScrolled ? 'scrolled' : ''}`}>
+                <div className="container_navbar">
+                    <Link to="/" className="navbar-brand-link">
+                        <h1 className="navbar_brand">Hello Sarawak</h1>
+                    </Link>
 
                     <div className="offcanvas offcanvas-end" tabIndex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
                         <div className="offcanvas-header">
@@ -118,54 +145,84 @@ function Navbar() {
                             </button>
                         </div>
                         <div className="offcanvas-body">
-                            <ul className="navbar-nav justify-content-left flex-grow-1 pe-3">
-                                <li className="nav-item mx-4">
-                                    <Link className="nav-link mx-lg-2" to={isLoggedIn ? '/home' : '/'}>
+                            <ul className="navbar-nav">
+                                <li className="nav-item">
+                                    <Link 
+                                        className={`nav-link ${isActive(isLoggedIn ? '/home' : '/') ? 'active' : ''}`} 
+                                        to={isLoggedIn ? '/home' : '/'} 
+                                        onClick={closeOffcanvas}
+                                    >
                                         Home
                                     </Link>
                                 </li>
-                                <li className="nav-item mx-4">
-                                    <Link className="nav-link mx-lg-2" to={isLoggedIn ? '/product' : '/product'}>
+                                <li className="nav-item">
+                                    <Link 
+                                        className={`nav-link ${isActive('/product') ? 'active' : ''}`} 
+                                        to="/product" 
+                                        onClick={closeOffcanvas}
+                                    >
                                         Rooms
                                     </Link>
                                 </li>
-                                <li className="nav-item mx-4">
-                                    <Link className="nav-link mx-lg-2" to={isLoggedIn ? '/Cart' : '/Cart'}>
+                                <li className="nav-item">
+                                    <Link 
+                                        className={`nav-link ${isActive('/Cart') ? 'active' : ''}`} 
+                                        to="/Cart" 
+                                        onClick={closeOffcanvas}
+                                    >
                                         Cart
                                     </Link>
                                 </li>
-                                <li className="nav-item mx-4">
-                                    <Link className="nav-link mx-lg-2" to={isLoggedIn ? '/about_us' : '/about_us'}>
+                                <li className="nav-item">
+                                    <Link 
+                                        className={`nav-link ${isActive('/about_us') ? 'active' : ''}`} 
+                                        to="/about_us" 
+                                        onClick={closeOffcanvas}
+                                    >
                                         About Us
                                     </Link>
                                 </li>
-                                <li className="nav-item mx-4">
-                                    <Link className="nav-link mx-lg-2" to={isLoggedIn ? '/about_sarawak' : '/about_sarawak'}>
+                                <li className="nav-item">
+                                    <Link 
+                                        className={`nav-link ${isActive('/about_sarawak') ? 'active' : ''}`} 
+                                        to="/about_sarawak" 
+                                        onClick={closeOffcanvas}
+                                    >
                                         About Sarawak
                                     </Link>
                                 </li>
 
                                 {/* Mobile login/profile/logout options */}
-                                
                                 {isLoggedIn && isCustomer ? (
                                     <>
-                                        <li className="nav-item mx-4 mobile-auth-item">
-                                            <Link className="nav-link mx-lg-2" to="/profile">
+                                        <li className="nav-item mobile-auth-item">
+                                            <Link 
+                                                className={`nav-link ${isActive('/profile') ? 'active' : ''}`} 
+                                                to="/profile"
+                                                onClick={closeOffcanvas}
+                                            >
                                                 My Profile
                                             </Link>
                                         </li>
-                                        <li className="nav-item mx-4 mobile-auth-item">
+                                        <li className="nav-item mobile-auth-item">
                                             <span 
-                                                className="nav-link mx-lg-2 mobile-auth-link" 
-                                                onClick={handleLogout}
+                                                className="nav-link mobile-auth-link" 
+                                                onClick={() => {
+                                                    closeOffcanvas();
+                                                    handleLogout();
+                                                }}
                                             >
                                                 Logout
                                             </span>
                                         </li>
                                     </>
                                 ) : (
-                                    <li className="nav-item mx-4 mobile-auth-item">
-                                        <Link className="nav-link mx-lg-2" to="/login">
+                                    <li className="nav-item mobile-auth-item">
+                                        <Link 
+                                            className={`nav-link ${isActive('/login') ? 'active' : ''}`} 
+                                            to="/login"
+                                            onClick={closeOffcanvas}
+                                        >
                                             Login
                                         </Link>
                                     </li>
@@ -174,30 +231,31 @@ function Navbar() {
                         </div>
                     </div>
 
-                    <div className="d-flex justify-content-end">
-                        
-                        {isLoggedIn && isCustomer && !isUserLoading && (
+                    <div className="nav-actions">
+                        {isLoggedIn && isCustomer && !isUserLoading ? (
                             <button
                                 className="user-icon-button"
                                 onClick={() => navigate('/profile')}
-                                style={{ border: 'none', background: 'transparent', cursor: 'pointer', marginRight: '20px' }}
+                                aria-label="User Profile"
                             >
-                                <img
-                                    src={userAvatar ? userAvatar : DefaultAvatar}
-                                    alt="User Avatar"
-                                    style={{ width: '40px', height: '40px', borderRadius: '50%' }}
-                                    onError={handleImageError}
-                                />
+                                {userAvatar ? (
+                                    <img
+                                        src={userAvatar}
+                                        alt="User Avatar"
+                                        onError={handleImageError}
+                                    />
+                                ) : (
+                                    <FaUserCircle className="default-avatar" />
+                                )}
                             </button>
-                        )}
-
+                        ) : null}
                         
                         {isLoggedIn && isCustomer ? (
-                            <button onClick={handleLogout} className="logout-button">
+                            <button onClick={handleLogout} className="auth-button logout-button">
                                 Logout
                             </button>
                         ) : (
-                            <Link to="/login" className="login-button">
+                            <Link to="/login" className="auth-button login-button">
                                 Login
                             </Link>
                         )}
@@ -208,7 +266,7 @@ function Navbar() {
                             data-bs-toggle="offcanvas" 
                             data-bs-target="#offcanvasNavbar" 
                             aria-controls="offcanvasNavbar" 
-                            style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}
+                            aria-label="Toggle navigation"
                         >
                             <FaBars className="icon_navbar"/>
                         </button>
