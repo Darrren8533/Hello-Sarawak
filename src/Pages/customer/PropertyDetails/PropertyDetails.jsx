@@ -252,8 +252,6 @@ const PropertyDetails = () => {
     }
   }, [showBookingForm]);
 
-  const [guests, setGuests] = useState(1);
-
   const googleMapSrc = locationCoords.lat && locationCoords.lng
     ? `https://www.google.com/maps/embed/v1/place?key=AIzaSyCe27HezKpItahXjMFcWXf3LwFcjI7pZFk&q=${encodeURIComponent(propertyDetails.nearbylocation)}&zoom=14`
     : "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.9586177612214!2d110.31007237509338!3d1.749442560160908!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31faff9851a3becb%3A0xf308ff203e894002!2sDamai%20Beach!5e0!3m2!1sen!2smy!4v1731252464570!5m2!1sen!2smy";
@@ -528,17 +526,6 @@ const PropertyDetails = () => {
                            min={bookingData.checkIn ? new Date(new Date(bookingData.checkIn).setDate(new Date(bookingData.checkIn).getDate() + 1)).toISOString().split("T")[0] : ""} 
                     />
                   </div>
-                </div>
-
-                <div className="guests_section">
-                  <div className="guests_label">GUESTS</div>
-                  <select className="guests_select" value={guests} onChange={(e) => setGuests(e.target.value)}>
-                    <option value="1">1 guest</option>
-                    <option value="2">2 guests</option>
-                    <option value="3">3 guests</option>
-                    <option value="4">4 guests</option>
-                    <option value="5">5 guests</option>
-                  </select>
                 </div>
 
                 <div className="price_details">
