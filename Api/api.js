@@ -608,12 +608,12 @@ export const fetchReservation = async () => {
 };
 
 // Update reservation status
-export const updateReservationStatus = async (reservationid, status) => {
+export const updateReservationStatus = async (reservationid, status, userid) => {
   try {
     const response = await fetch(`${API_URL}/updateReservationStatus/${reservationid}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reservationStatus: status }),
+      body: JSON.stringify({ reservationStatus: status, userid: userid }),
     });
 
     if (!response.ok) {
