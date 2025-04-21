@@ -365,28 +365,6 @@ body {
     outline: none;
 }
   
-.guests_section {
-    border: 1px solid #dddddd;
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 20px;
-}
-  
-.guests_label {
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-    margin-bottom: 5px;
-}
-  
-.guests_select {
-    border: none;
-    width: 100%;
-    font-family: 'Poppins', sans-serif;
-    font-size: 14px;
-    outline: none;
-}
-  
 .reserve_button {
     width: 100%;
     background-color: #CC8C18;
