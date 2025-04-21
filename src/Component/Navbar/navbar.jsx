@@ -37,6 +37,30 @@ function Navbar() {
     }, []);
 
     useEffect(() => {
+        const offcanvasElement = document.getElementById('offcanvasNavbar');
+      
+        if (!offcanvasElement) return;
+      
+        const handleShow = () => {
+          if (window.innerWidth <= 480) {
+            document.body.classList.add('no-scroll');
+          }
+        };
+      
+        const handleHide = () => {
+          document.body.classList.remove('no-scroll');
+        };
+      
+        offcanvasElement.addEventListener('show.bs.offcanvas', handleShow);
+        offcanvasElement.addEventListener('hide.bs.offcanvas', handleHide);
+      
+        return () => {
+          offcanvasElement.removeEventListener('show.bs.offcanvas', handleShow);
+          offcanvasElement.removeEventListener('hide.bs.offcanvas', handleHide);
+        };
+      }, []);
+      
+    useEffect(() => {
         const initOffcanvas = () => {
             if (typeof bootstrap !== 'undefined') {
                 const offcanvasElement = document.getElementById('offcanvasNavbar');
