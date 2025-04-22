@@ -119,7 +119,6 @@ video {
   background: var(--paleGreen);
 }
 
-
 .loginPage {
   height: 100vh;
   width: 100%;
@@ -138,6 +137,7 @@ video {
   border-radius: 10px;
   background: rgb(232, 232, 232);
   align-items: center;
+  max-width: 1600px;
 }
 
 .loginPage .container .videoDiv {
@@ -500,7 +500,6 @@ video {
   }
   
   .icon_eye {
-    margin-left: 55px;
     font-size: 18px;
   }
   
