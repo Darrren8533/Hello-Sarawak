@@ -316,7 +316,7 @@ body {
 }
 
 /* Update existing Media Query for tablets/small desktops */
-@media(max-width: 991px) {
+@media(max-width: 1069px) {
     .navbar {
         padding: 0.5rem 1rem;
     }
@@ -336,9 +336,9 @@ body {
     }
     
     .navbar-nav {
-        margin-left: 0;
+        margin-left: 20px;
         flex-direction: column;
-        gap: 0.5rem;
+        gap: 40px;
     }
     
     .nav-link {
