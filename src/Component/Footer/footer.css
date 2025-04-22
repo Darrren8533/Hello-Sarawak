@@ -74,6 +74,28 @@
     color: #fff;
 }
 
+@media(max-width: 991px) {
+    .footer {
+        padding: 3.5rem 4rem;
+    }
+    
+    .footer-row {
+        gap: 6rem;
+    }
+    
+    .bottom {
+        gap: 5rem;
+    }
+    
+    .top h1 {
+        font-size: 2rem;
+    }
+    
+    .top p {
+        font-size: 1.3rem;
+    }
+}
+
 @media(max-width: 768px) {
     
     .footer {
