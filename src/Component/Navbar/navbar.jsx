@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
 import { logoutUser, fetchUserData } from '../../../Api/api';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import DefaultAvatar from '../../../src/public/avatar.png';
 import eventBus from '../EventBus/Eventbus';
 import { useAuth } from '../AuthContext/AuthContext';
@@ -11,6 +11,7 @@ import './navbar.css';
 
 function Navbar() {
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
     const location = useLocation();
     const { isLoggedIn, userAvatar, userID, logout, updateAvatar } = useAuth();
     const [isScrolled, setIsScrolled] = useState(false);
@@ -86,6 +87,7 @@ function Navbar() {
     useEffect(() => {
         const handleAvatarUpdate = (newAvatar) => {
             updateAvatar(newAvatar);
+            queryClient.invalidateQueries(['userData', userID]);
         };
 
         eventBus.on('avatarUpdated', handleAvatarUpdate);
@@ -93,7 +95,7 @@ function Navbar() {
         return () => {
             eventBus.off('avatarUpdated', handleAvatarUpdate);
         };
-    }, [updateAvatar]);
+    }, [updateAvatar, userID, queryClient]);
 
     useEffect(() => {
         if (userData?.uimage) {
@@ -267,6 +269,7 @@ function Navbar() {
                                         src={userAvatar}
                                         alt="User Avatar"
                                         onError={handleImageError}
+                                        key={userAvatar}
                                     />
                                 ) : (
                                     <FaUserCircle className="default-avatar" />
