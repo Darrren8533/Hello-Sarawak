@@ -336,9 +336,8 @@ body {
     }
     
     .navbar-nav {
-        margin-left: 20px;
         flex-direction: column;
-        gap: 40px;
+        gap: 5px;
     }
     
     .nav-link {
@@ -347,7 +346,7 @@ body {
     }
     
     .nav-link::after {
-        left: 5px;
+        left: 1px;
         transform: none;
         bottom: 5px;
     }
