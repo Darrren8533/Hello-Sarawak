@@ -315,7 +315,7 @@ body {
     }
 }
 
-/* Update existing Media Query for tablets/small desktops */
+/* 1069px Media Query  */
 @media(max-width: 1069px) {
     .navbar {
         padding: 0.5rem 1rem;
@@ -343,18 +343,18 @@ body {
     
     .nav-link {
         padding: 0.75rem 1.25rem;
-        font-size: 1.05rem;
+        font-size: 1rem;
     }
     
     .nav-link::after {
-        left: 1px;
+        left: 5px;
         transform: none;
         bottom: 5px;
     }
     
     .nav-link:hover::after,
     .nav-link.active::after {
-        width: 40px;
+        width: 50px;
     }
     
     .auth-button {
@@ -377,7 +377,7 @@ body {
     }
 }
 
-/* New Media Query for medium tablets */
+/* 768px Media Query  */
 @media(max-width: 768px) {
     .navbar {
         margin: 10px;
@@ -448,7 +448,7 @@ body {
     }
 }
 
-/* Refinements to existing mobile styles */
+/* 480px Media Query */
 @media(max-width: 480px) {
     .navbar {
         margin: 8px;
