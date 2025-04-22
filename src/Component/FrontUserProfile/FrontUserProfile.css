@@ -179,10 +179,53 @@
     z-index: 1;
 }
 
-/* Responsive styles for tablets - max-width: 768px */
+/* 991px Media Query */
+@media (max-width: 991px) {
+    .front-profile-container {
+        padding: 30px 25px;
+    }
+    
+    .front-profile-layout {
+        max-width: 900px;
+    }
+    
+    .front-sidebar-card {
+        width: 260px;
+        margin-right: 25px;
+    }
+    
+    .front-tab {
+        padding: 12px;
+        font-size: 0.95em;
+    }
+    
+    .front-content-card h2 {
+        font-size: 2.2rem;
+    }
+    
+    .front-profile-field {
+        padding: 25px 20px;
+    }
+    
+    .front-field-label {
+        margin: 8px;
+        font-size: 13px;
+    }
+    
+    .front-edit-section {
+        margin-top: 25px;
+    }
+
+    .front-field-value{
+        font-size: 13px;
+    }
+}
+
+/* 768px Media Query */
 @media (max-width: 768px) {
     .front-profile-container {
-        padding: 20px;
+        padding: 20px 15px;
+        margin-top: 100px;
     }
 
     .front-profile-layout {
@@ -194,10 +237,21 @@
         margin-right: 0;
         margin-bottom: 20px;
         position: static;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
     }
 
     .front-tab {
-        padding: 12px;
+        flex: 1;
+        min-width: 140px;
+        justify-content: center;
+        padding: 12px 8px;
+        margin-bottom: 0;
+    }
+
+    .front-content-card {
+        padding: 15px;
     }
 
     .front-content-card h2 {
@@ -215,9 +269,26 @@
     .front-password-field {
         position: relative;
     }
+    
+    .front-edit-section input,
+    .front-select-dropdown,
+    .front-edit-section .country-dropdown {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    
+    .front-eye-icon {
+        right: 10px;
+        top: 16px;
+    }
+
+    .front-avatar-image {
+        width: 60px;
+        height: 60px;
+    }
 }
 
-/* Mobile View */
+/* 480px Media Query */
 @media (max-width: 480px) {
     .front-profile-container {
         padding: 10px;
