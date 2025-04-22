@@ -315,37 +315,140 @@ body {
     }
 }
 
+/* Update existing Media Query for tablets/small desktops */
 @media(max-width: 991px) {
     .navbar {
-        padding: 0.5rem;
+        padding: 0.5rem 1rem;
+    }
+    
+    .container_navbar {
+        padding: 0 0.75rem;
+    }
+    
+    .navbar .navbar_brand {
+        font-size: 1.375rem;
+        padding-left: 15px;
     }
     
     .offcanvas-body {
         padding-top: 1rem;
+        margin-left: 25px;
     }
     
     .navbar-nav {
         margin-left: 0;
         flex-direction: column;
-        gap: 0.25rem;
+        gap: 0.5rem;
     }
     
     .nav-link {
-        padding: 0.75rem 1.5rem;
+        padding: 0.75rem 1.25rem;
+        font-size: 1.05rem;
     }
     
     .nav-link::after {
-        left: 1.5rem;
+        left: 1px;
         transform: none;
-        bottom: 10px;
+        bottom: 5px;
     }
     
     .nav-link:hover::after,
     .nav-link.active::after {
-        width: 30px;
+        width: 40px;
+    }
+    
+    .auth-button {
+        padding: 0.4rem 1rem;
+        font-size: 0.8rem;
+    }
+    
+    .user-icon-button img {
+        width: 38px;
+        height: 38px;
+    }
+
+    .icon_close {
+        font-size: 15px;
+    }
+
+    .offcanvas-title{
+        margin-left: 20px;
+        font-weight: 500;
     }
 }
 
+/* New Media Query for medium tablets */
+@media(max-width: 768px) {
+    .navbar {
+        margin: 10px;
+        min-height: 75px;
+    }
+    
+    .navbar.scrolled {
+        margin: 0;
+    }
+    
+    .container_navbar {
+        padding: 0 0.5rem;
+    }
+    
+    .navbar .navbar_brand {
+        font-size: 1.3rem;
+    }
+    
+    .offcanvas {
+        max-width: 260px;
+    }
+
+    .nav-item {
+        font-size: 13px;
+    }
+    
+    .nav-link {
+        padding: 0.7rem 1rem;
+        font-size: 1rem;
+    }
+
+    .nav-link::after{
+        bottom: 5px;
+        left: 1px;
+        height: 1.5px;
+    }
+    
+    .offcanvas-title {
+        font-size: 18px !important;
+        font-weight: 450;
+    }
+    
+    .auth-button {
+        padding: 0.4rem 0.9rem;
+        font-size: 0.775rem;
+    }
+    
+    .user-icon-button img {
+        width: 36px;
+        height: 36px;
+    }
+    
+    .icon_navbar {
+        font-size: 22px;
+    }
+    
+    .nav-actions {
+        gap: 0.75rem;
+    }
+
+    .icon_close {
+        font-size: 14px !important;
+    }
+
+    .offcanvas-title{
+        margin-left: 20px;
+        font-size: 18px;
+    }
+}
+
+/* Refinements to existing mobile styles */
 @media(max-width: 480px) {
     .navbar {
         margin: 8px;
@@ -379,16 +482,16 @@ body {
         max-width: 250px;
     }
 
-    .offcanvas-body{
-        margin-left: 10px;
+    .offcanvas-body {
+        margin-left: 20px;
         padding-top: 0.5rem;
     }
 
-    .nav-item{
+    .nav-item {
         font-size: 13px;
     }
 
-    .icon_close{
+    .icon_close {
         font-size: 12px !important;
     }
 
