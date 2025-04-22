@@ -19,6 +19,7 @@
 .Main_description_AboutSarawak {
     font-size: 18px;
     text-align: center;
+    margin-top: 2rem;
 }
 
 .first-des_AboutSarawak {
@@ -26,6 +27,8 @@
     align-items: center;
     justify-content: space-between;
     margin-top: 4.5rem;
+    gap: 3rem;
+    position: relative;
 }
 
 .des-text_AboutSarawak {
@@ -37,6 +40,22 @@
 .des-text_AboutSarawak h2 {
     color: #CC8C18;
     padding-bottom: 1rem;
+    position: relative;
+}
+
+.des-text_AboutSarawak h2::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background-color: #CC8C18;
+    transition: width 0.3s ease;
+}
+
+.des-text_AboutSarawak:hover h2::after {
+    width: 100px;
 }
 
 .first-des_AboutSarawak .des-text_AboutSarawak .location_AboutSarawak {
@@ -45,7 +64,8 @@
 
 .first-des_AboutSarawak .des-text_AboutSarawak .location_description_AboutSarawak {
     font-size: 18px;
-    margin-top: 35px;
+    margin-top: 20px;
+    line-height: 1.6;
 }
 
 .image_AboutSarawak {
@@ -54,15 +74,21 @@
     display: flex;
     justify-content: space-between;
     perspective: 1000px;
+    gap: 15px;
 }
 
 .image_AboutSarawak img {
     width: 49%;
     height: 350px;
     object-fit: cover;
-    border-radius: 6px;
-    box-shadow: -1px 1px 62px -18px rgba(0, 0, 0, 0.19);
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.image_AboutSarawak img:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
 }
 
 .image_AboutSarawak img:nth-child(2) {
@@ -71,6 +97,42 @@
     right: 0;
 }
 
+/* 991px Media Query */
+@media screen and (max-width: 991px) {
+    .destination_AboutSarawak {
+        margin: 8rem 4rem;
+    }
+
+    .des-text_AboutSarawak {
+        width: 35%;
+    }
+
+    .des-text_AboutSarawak h2{
+        font-size: 25px;
+    }
+
+    .image_AboutSarawak {
+        width: 60%;
+    }
+
+    .image_AboutSarawak img {
+        height: 280px;
+    }
+
+    .first-des_AboutSarawak {
+        gap: 2rem;
+    }
+
+    .Main_description_AboutSarawak {
+        margin-top: 1.5rem;
+    }
+
+    .location_description_AboutSarawak{
+        font-size: 15px !important;
+    }
+}
+
+/* 768px Media Query */
 @media screen and (max-width: 768px) {
     .destination_AboutSarawak {
         margin: 9rem 2rem;
@@ -99,9 +161,10 @@
     }
 }
 
+/* 480px Media Query */
 @media screen and (max-width: 480px) {
     .destination_AboutSarawak {
-        margin: 9.5rem 1rem;
+        margin: 6rem 1.5rem;
     }
 
     .destination_AboutSarawak h1 {
@@ -109,7 +172,7 @@
     }
 
     .Main_description_AboutSarawak {
-        margin-top: 60px;
+        margin-top: 1.5rem;
         font-size: 16px;
     }
 
@@ -118,40 +181,31 @@
     }
 
     .first-des_AboutSarawak {
-        flex-direction: column-reverse;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-    }
-
-    .des-text_AboutSarawak {
-        width: 100%;
+        margin-top: 2.5rem;
+        gap: 1.5rem;
     }
 
     .des-text_AboutSarawak h2 {
         font-size: 1.5rem;
-        padding-bottom: 0.5rem;
-        text-align: center;
+        padding-bottom: 0.75rem;
     }
 
     .first-des_AboutSarawak .des-text_AboutSarawak .location_description_AboutSarawak {
-        font-size: 14px;
-        margin-top: 10px;
+        font-size: 15px;
+        margin-top: 15px;
         line-height: 1.5;
     }
 
     .image_AboutSarawak {
-        width: 100%;
-        margin: 1rem 0;
-        height: auto;
         flex-direction: column;
-        position: static;
+        height: auto;
+        gap: 15px;
     }
 
     .image_AboutSarawak img {
         width: 100%;
-        height: 180px;
-        margin-bottom: 1rem;
-        position: static;
+        height: 200px;
+        margin-bottom: 0;
     }
 
     .image_AboutSarawak img:nth-child(2) {
@@ -161,6 +215,6 @@
     }
     
     .first-des_AboutSarawak + .first-des_AboutSarawak {
-        margin-top: 2rem;
+        margin-top: 3rem;
     }
 }
