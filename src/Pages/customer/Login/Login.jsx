@@ -7,7 +7,7 @@ import video from '../../../public/Sarawak_2.mp4';
 import logo from '../../../public/Sarawak_icon.png';
 
 // Import Icons
-import { FaMailBulk, FaUserCircle } from 'react-icons/fa';
+import { FaMailBulk,FaUserCircle } from 'react-icons/fa';
 import { RiLockPasswordFill } from 'react-icons/ri';
 import { IoEyeSharp } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa";
@@ -22,94 +22,75 @@ import { useGoogleLogin } from '@react-oauth/google';
 // Import Toast
 import Toast from '../../../Component/Toast/Toast';
 
-const MAX_ATTEMPTS = 5;
-
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [email, setEmail] = useState('');
+  const navigate = useNavigate();
+
+  // Toast Function
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const navigate = useNavigate();
-
-  const displayToast = (type, message) => {
-    setToastType(type);
-    setToastMessage(message);
-    setShowToast(true);
-    setTimeout(() => setShowToast(false), 5000);
-  };
-
-  const togglePasswordVisibility = () => {
-    setShowPassword((prev) => !prev);
-  };
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [email, setEmail] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const userData = { username, password };
-    const loginAttempts = parseInt(localStorage.getItem('loginAttempts') || '0');
-    const isSuspended = localStorage.getItem('accountSuspended') === 'true';
-
-    if (isSuspended) {
-      displayToast('error', 'Your account has been suspended due to too many failed login attempts.');
-      return;
-    }
 
     try {
       const response = await loginUser(userData);
       const data = await response.json();
 
       if (response.ok && data.success) {
-        if (data.uactivation === 'Inactive') {
-          displayToast('error', 'Your account is inactive.');
-          return;
-        }
 
-        // Reset attempts on success
-        localStorage.removeItem('loginAttempts');
-        localStorage.removeItem('accountSuspended');
-
+        // Save data to localStorage
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('username', username);
         localStorage.setItem('usergroup', data.usergroup);
         localStorage.setItem('userid', data.userid);
         localStorage.setItem('uactivation', data.uactivation);
+        //store password
         localStorage.setItem('plainPassword', password);
 
-        displayToast('success', 'Login successful! Redirecting...');
+        // Logging for verification
+        console.log('User Group:', data.usergroup);
+        console.log('User Activation:', data.uactivation);
 
-        setTimeout(() => {
-          switch (data.usergroup) {
-            case 'Customer':
-              navigate('/home');
-              break;
-            case 'Owner':
-              navigate('/owner_dashboard');
-              break;
-            case 'Moderator':
-              navigate('/moderator_dashboard');
-              break;
-            case 'Administrator':
-              navigate('/administrator_dashboard');
-              break;
-            default:
-              displayToast('error', 'Invalid user group.');
-          }
-        }, 2000);
-      } else {
-        const newAttempts = loginAttempts + 1;
-        localStorage.setItem('loginAttempts', newAttempts.toString());
-
-        if (newAttempts >= MAX_ATTEMPTS) {
-          localStorage.setItem('accountSuspended', 'true');
-          displayToast('error', 'Too many failed attempts. Your account is now suspended.');
-        } else {
-          displayToast('error', data.message || 'Invalid username or password.');
+        // Show toast and navigate after a delay
+        if (data.uactivation === 'Inactive') {
+          displayToast('error', 'Your account is inactive.');
+        } 
+        
+        else if (data.usergroup === 'Customer') {
+          displayToast('success', 'Login successful! Redirecting...');
+          setTimeout(() => navigate('/home'), 2000); 
+        } 
+        
+        else if (data.usergroup === 'Owner') {
+          displayToast('success', 'Login successful! Redirecting...');
+          setTimeout(() => navigate('/owner_dashboard'), 2000); 
+        } 
+        
+        else if (data.usergroup === 'Moderator') {
+          displayToast('success', 'Login successful! Redirecting...');
+          setTimeout(() => navigate('/moderator_dashboard'), 2000); 
+        } 
+        
+        else if (data.usergroup === 'Administrator') {
+          displayToast('success', 'Login successful! Redirecting...');
+          setTimeout(() => navigate('/administrator_dashboard'), 2000); 
+        } 
+        
+        else {
+          displayToast('error', 'Invalid user group.');
         }
+      } else {
+        // Handle failed login attempt
+        displayToast('error', data.message || 'Invalid username or password.');
       }
     } catch (error) {
       console.error('Error during login:', error);
@@ -119,14 +100,30 @@ const Login = () => {
 
   const handleForgotPassword = async (e) => {
     e.preventDefault();
+    
     try {
       const data = await forgotPassword(email);
-      displayToast('success', 'New password has been sent to your email.');
+
+      displayToast('success', 'New password has been sent to your email');
       setShowForgotPassword(false);
       setEmail('');
     } catch (error) {
-      displayToast('error', error.message || 'Reset password failed.');
+      displayToast('error', error.message || 'Reset password failed');
     }
+  };
+
+  // Toast Display Function
+  const displayToast = (type, message) => {
+    setToastType(type);
+    setToastMessage(message);
+    setShowToast(true);
+
+    setTimeout(() => setShowToast(false), 5000);
+  };
+
+  //Password Visability
+  const togglePasswordVisibility = () => {
+    setShowPassword((prev) => !prev);
   };
 
   const googleLoginHandler = useGoogleLogin({
@@ -134,15 +131,11 @@ const Login = () => {
     onSuccess: async (tokenResponse) => {
       console.log("Google Login Success:", tokenResponse);
 
+      // Store token in localStorage
       localStorage.setItem("googleAccessToken", tokenResponse.access_token);
 
       try {
         const data = await googleLogin(tokenResponse.access_token);
-
-        if (data.uactivation === 'Inactive') {
-          displayToast('error', 'Your account is inactive.');
-          return;
-        }
 
         localStorage.setItem("isLoggedIn", "true");
         localStorage.setItem("userid", data.userid);
@@ -152,32 +145,29 @@ const Login = () => {
 
         displayToast("success", "Login successful! Redirecting...");
 
-        setTimeout(() => {
-          switch (data.usergroup) {
-            case 'Customer':
-              navigate('/home');
-              break;
-            case 'Owner':
-              navigate('/owner_dashboard');
-              break;
-            case 'Moderator':
-              navigate('/moderator_dashboard');
-              break;
-            case 'Administrator':
-              navigate('/administrator_dashboard');
-              break;
-            default:
-              displayToast('error', 'Invalid User Group.');
-          }
-        }, 2000);
+        if (data.uactivation === 'Inactive') {
+          displayToast('error', 'Your account is inactive.');
+        } else if (data.usergroup === 'Customer') {
+          setTimeout(() => navigate('/home'), 2000);
+        } else if (data.usergroup === 'Owner') {
+          setTimeout(() => navigate('/owner_dashboard'), 2000);
+        } else if (data.usergroup === 'Moderator') {
+          setTimeout(() => navigate('/moderator_dashboard'), 2000);
+        } else if (data.usergroup === 'Administrator') {
+          setTimeout(() => navigate('/administrator_dashboard'), 2000);
+        } else {
+          displayToast('error', 'Invalid User Group.');
+        }
       } catch (error) {
         displayToast("error", error.message || "An unexpected error occurred. Please try again.");
       }
     }
   });
+  
 
   return (
     <div className="loginPage flex">
+      {/* Display Toast */}
       {showToast && <Toast type={toastType} message={toastMessage} />}
 
       <div className="container flex">
@@ -208,25 +198,36 @@ const Login = () => {
           </div>
 
           {showForgotPassword ? (
-            <form onSubmit={handleForgotPassword} className="form grid">
-              <div className="inputDiv">
-                <label htmlFor="email">Email</label>
-                <div className="input flex">
-                  <FaMailBulk className="icon" />
-                  <input
-                    type="email"
-                    id="email"
-                    placeholder="Enter Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
+              <form onSubmit={handleForgotPassword} className="form grid">
+                <div className="inputDiv">
+                  <label htmlFor="email">Email</label>
+                  <div className="input flex">
+                    <FaMailBulk className="icon" />
+                    <input
+                      type="email"
+                      id="email"
+                      placeholder="Enter Email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
                 </div>
-              </div>
-              <br />
-              <button type="submit" className="btn">Send New Password</button>
-              <button type="button" className="btn" onClick={() => setShowForgotPassword(false)}>Back To Login</button>
-            </form>
+
+                <br />
+
+                <button type="submit" className="btn">
+                  Send New Password
+                </button>
+
+                <button 
+                  type="button" 
+                  className="btn"
+                  onClick={() => setShowForgotPassword(false)}
+                >
+                  Back To Login
+                </button>
+              </form>
           ) : (
             <form onSubmit={handleSubmit} className="form grid">
               <div className="inputDiv">
@@ -257,9 +258,13 @@ const Login = () => {
                     required
                   />
                   {showPassword ? (
-                    <IoEyeSharp className="icon_eye" onClick={togglePasswordVisibility} />
+                   <IoEyeSharp 
+                    className="icon_eye" 
+                    onClick={togglePasswordVisibility} />
                   ) : (
-                    <FaEyeSlash className="icon_eye" onClick={togglePasswordVisibility} />
+                   <FaEyeSlash
+                    className="icon_eye" 
+                    onClick={togglePasswordVisibility} />
                   )}
                 </div>
               </div>
@@ -267,22 +272,32 @@ const Login = () => {
               <span className="forgotpassword">
                 Forgot Password? <Link onClick={() => setShowForgotPassword(true)}>Click Here</Link>
               </span>
-              <br />
-              <button type="submit" className="btn"><span>Login</span></button>
-              <button onClick={() => navigate('/register')} className="btn_responsive"><span>Sign Up</span></button>
+
+              <br/>
+              
+              <button type="submit" className="btn">
+                <span>Login</span>
+              </button>
+
+              <button onClick={() => navigate('/register')} className="btn_responsive">
+                <span>Sign Up</span>
+              </button>
+
               <div className="divider">Or</div>
 
-              <div className="container_icon">
-                <span className="social_button">
-                  <FcGoogle className="icon_google" onClick={() => googleLoginHandler()} />
-                </span>
-                <span className="social_button">
-                  <FaFacebook className='icon_facebook' />
-                </span>
-                <span className="social_button">
-                  <AiFillInstagram className='icon_insta' />
-                </span>
-              </div>
+            <div class="container_icon">
+              <span class="social_button">
+                <FcGoogle class="icon_google" onClick={() => googleLoginHandler()} />
+              </span>
+
+              <span class="social_button">
+                <FaFacebook className='icon_facebook'/>
+              </span>
+              
+              <span class="social_button">
+                <AiFillInstagram className='icon_insta'/>
+              </span>
+            </div>
             </form>
           )}
         </div>
