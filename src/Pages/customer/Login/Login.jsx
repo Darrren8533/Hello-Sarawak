@@ -7,7 +7,7 @@ import video from '../../../public/Sarawak_2.mp4';
 import logo from '../../../public/Sarawak_icon.png';
 
 // Import Icons
-import { FaMailBulk,FaUserCircle } from 'react-icons/fa';
+import { FaMailBulk, FaUserCircle } from 'react-icons/fa';
 import { RiLockPasswordFill } from 'react-icons/ri';
 import { IoEyeSharp } from "react-icons/io5";
 import { FaEyeSlash } from "react-icons/fa";
@@ -46,6 +46,8 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok && data.success) {
+        // Reset login attempts on successful login
+        localStorage.removeItem(`loginAttempts_${username}`);
 
         // Save data to localStorage
         localStorage.setItem('isLoggedIn', 'true');
@@ -53,7 +55,6 @@ const Login = () => {
         localStorage.setItem('usergroup', data.usergroup);
         localStorage.setItem('userid', data.userid);
         localStorage.setItem('uactivation', data.uactivation);
-        //store password
         localStorage.setItem('plainPassword', password);
 
         // Logging for verification
@@ -63,34 +64,36 @@ const Login = () => {
         // Show toast and navigate after a delay
         if (data.uactivation === 'Inactive') {
           displayToast('error', 'Your account is inactive.');
-        } 
-        
-        else if (data.usergroup === 'Customer') {
+        } else if (data.usergroup === 'Customer') {
           displayToast('success', 'Login successful! Redirecting...');
-          setTimeout(() => navigate('/home'), 2000); 
-        } 
-        
-        else if (data.usergroup === 'Owner') {
+          setTimeout(() => navigate('/home'), 2000);
+        } else if (data.usergroup === 'Owner') {
           displayToast('success', 'Login successful! Redirecting...');
-          setTimeout(() => navigate('/owner_dashboard'), 2000); 
-        } 
-        
-        else if (data.usergroup === 'Moderator') {
+          setTimeout(() => navigate('/owner_dashboard'), 2000);
+        } else if (data.usergroup === 'Moderator') {
           displayToast('success', 'Login successful! Redirecting...');
-          setTimeout(() => navigate('/moderator_dashboard'), 2000); 
-        } 
-        
-        else if (data.usergroup === 'Administrator') {
+          setTimeout(() => navigate('/moderator_dashboard'), 2000);
+        } else if (data.usergroup === 'Administrator') {
           displayToast('success', 'Login successful! Redirecting...');
-          setTimeout(() => navigate('/administrator_dashboard'), 2000); 
-        } 
-        
-        else {
+          setTimeout(() => navigate('/administrator_dashboard'), 2000);
+        } else {
           displayToast('error', 'Invalid user group.');
         }
       } else {
-        // Handle failed login attempt
-        displayToast('error', data.message || 'Invalid username or password.');
+        // Increment failed login attempts
+        let attempts = parseInt(localStorage.getItem(`loginAttempts_${username}`)) || 0;
+        attempts += 1;
+        localStorage.setItem(`loginAttempts_${username}`, attempts);
+
+        if (attempts > 5) {
+          // Set uactivation to Inactive in localStorage
+          localStorage.setItem('uactivation', 'Inactive');
+          localStorage.removeItem(`loginAttempts_${username}`);
+          displayToast('error', 'Account has been deactivated due to too many failed login attempts.');
+        } else {
+          // Handle failed login attempt
+          displayToast('error', data.message || `Invalid username or password. ${6 - attempts} attempts remaining.`);
+        }
       }
     } catch (error) {
       console.error('Error during login:', error);
@@ -121,7 +124,7 @@ const Login = () => {
     setTimeout(() => setShowToast(false), 5000);
   };
 
-  //Password Visability
+  // Password Visibility
   const togglePasswordVisibility = () => {
     setShowPassword((prev) => !prev);
   };
@@ -143,6 +146,9 @@ const Login = () => {
         localStorage.setItem("usergroup", data.usergroup);
         localStorage.setItem("uimage", data.uimage);
 
+        // Reset login attempts on successful Google login
+        localStorage.removeItem(`loginAttempts_${data.username}`);
+
         displayToast("success", "Login successful! Redirecting...");
 
         if (data.uactivation === 'Inactive') {
@@ -163,7 +169,6 @@ const Login = () => {
       }
     }
   });
-  
 
   return (
     <div className="loginPage flex">
@@ -285,19 +290,19 @@ const Login = () => {
 
               <div className="divider">Or</div>
 
-            <div class="container_icon">
-              <span class="social_button">
-                <FcGoogle class="icon_google" onClick={() => googleLoginHandler()} />
-              </span>
+              <div className="container_icon">
+                <span className="social_button">
+                  <FcGoogle className="icon_google" onClick={() => googleLoginHandler()} />
+                </span>
 
-              <span class="social_button">
-                <FaFacebook className='icon_facebook'/>
-              </span>
-              
-              <span class="social_button">
-                <AiFillInstagram className='icon_insta'/>
-              </span>
-            </div>
+                <span className="social_button">
+                  <FaFacebook className='icon_facebook'/>
+                </span>
+                
+                <span className="social_button">
+                  <AiFillInstagram className='icon_insta'/>
+                </span>
+              </div>
             </form>
           )}
         </div>
