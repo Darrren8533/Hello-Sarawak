@@ -39,6 +39,13 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // Check if the account is already deactivated
+    const storedActivation = localStorage.getItem('uactivation');
+    if (storedActivation === 'Inactive') {
+      displayToast('error', 'Account has been deactivated due to too many failed login attempts.');
+      return;
+    }
+
     const userData = { username, password };
 
     try {
@@ -46,9 +53,7 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        // Reset login attempts on successful login
-        localStorage.removeItem(`loginAttempts_${username}`);
-
+        // Successful login
         // Save data to localStorage
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('username', username);
@@ -86,7 +91,7 @@ const Login = () => {
         localStorage.setItem(`loginAttempts_${username}`, attempts);
 
         if (attempts > 5) {
-          // Set uactivation to Inactive in localStorage
+          // Set uactivation to Inactive in localStorage and clear attempts
           localStorage.setItem('uactivation', 'Inactive');
           localStorage.removeItem(`loginAttempts_${username}`);
           displayToast('error', 'Account has been deactivated due to too many failed login attempts.');
@@ -134,6 +139,13 @@ const Login = () => {
     onSuccess: async (tokenResponse) => {
       console.log("Google Login Success:", tokenResponse);
 
+      // Check if the account is already deactivated
+      const storedActivation = localStorage.getItem('uactivation');
+      if (storedActivation === 'Inactive') {
+        displayToast('error', 'Account has been deactivated due to too many failed login attempts.');
+        return;
+      }
+
       // Store token in localStorage
       localStorage.setItem("googleAccessToken", tokenResponse.access_token);
 
@@ -145,9 +157,6 @@ const Login = () => {
         localStorage.setItem("username", data.username);
         localStorage.setItem("usergroup", data.usergroup);
         localStorage.setItem("uimage", data.uimage);
-
-        // Reset login attempts on successful Google login
-        localStorage.removeItem(`loginAttempts_${data.username}`);
 
         displayToast("success", "Login successful! Redirecting...");
 
