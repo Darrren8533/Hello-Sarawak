@@ -15,6 +15,7 @@ function Navbar() {
     const location = useLocation();
     const { isLoggedIn, userAvatar, userID, logout, updateAvatar } = useAuth();
     const [isScrolled, setIsScrolled] = useState(false);
+    const [scrollPosition, setScrollPosition] = useState(0);
     
     // React Query for user data
     const { data: userData, isLoading: isUserLoading } = useQuery({
@@ -43,23 +44,38 @@ function Navbar() {
         if (!offcanvasElement) return;
       
         const handleShow = () => {
-          if (window.innerWidth <= 480) {
+            // Storing Scroll Position
+            const currentPosition = window.pageYOffset;
+            setScrollPosition(currentPosition);
+            
+            // Add No Scroll
             document.body.classList.add('no-scroll');
-          }
+            
+            document.body.style.top = `-${currentPosition}px`;
+            document.body.style.position = 'fixed';
+            document.body.style.width = '100%';
         };
       
+        //Remove No Scroll When Close The Menu
         const handleHide = () => {
-          document.body.classList.remove('no-scroll');
+            const savedPosition = scrollPosition;
+            
+            document.body.classList.remove('no-scroll');
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.width = '';
+            
+            window.scrollTo(0, savedPosition);
         };
       
         offcanvasElement.addEventListener('show.bs.offcanvas', handleShow);
         offcanvasElement.addEventListener('hide.bs.offcanvas', handleHide);
       
         return () => {
-          offcanvasElement.removeEventListener('show.bs.offcanvas', handleShow);
-          offcanvasElement.removeEventListener('hide.bs.offcanvas', handleHide);
+            offcanvasElement.removeEventListener('show.bs.offcanvas', handleShow);
+            offcanvasElement.removeEventListener('hide.bs.offcanvas', handleHide);
         };
-      }, []);
+    }, [scrollPosition]);
       
     useEffect(() => {
         const initOffcanvas = () => {
