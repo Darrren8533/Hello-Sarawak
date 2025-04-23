@@ -333,12 +333,12 @@ body.no-scroll {
     
     .offcanvas-body {
         padding-top: 1rem;
-        margin-left: 35px;
+        margin-left: 22px;
     }
     
     .navbar-nav {
         flex-direction: column;
-        gap: 25px;
+        gap: 12px;
     }
     
     .nav-link {
