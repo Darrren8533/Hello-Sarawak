@@ -173,7 +173,7 @@ function Navbar() {
                 />
             </Helmet>
 
-            <nav className={`navbar navbar-expand-lg fixed-top}`}>
+            <nav className={`navbar navbar-expand-lg fixed-top`}>
                 <div className="container_navbar">
                     <Link to="/" className="navbar-brand-link">
                         <h1 className="navbar_brand">Hello Sarawak</h1>
