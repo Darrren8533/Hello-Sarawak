@@ -22,6 +22,12 @@ body {
     overflow-x: hidden;
 }
 
+/* Scroll lock styles */
+body.no-scroll {
+    overflow: hidden;
+    /* Fixed position will be added in JS */
+}
+
 /* Navbar Base */
 .navbar {
     background-color: var(--primary);
@@ -41,11 +47,6 @@ body {
     backdrop-filter: blur(10px);
     box-shadow: var(--shadow);
 }
-
-.no-scroll {
-    overflow: hidden;
-    height: 100vh;
-}  
 
 .container_navbar {
     display: flex;
@@ -332,12 +333,12 @@ body {
     
     .offcanvas-body {
         padding-top: 1rem;
-        margin-left: 25px;
+        margin-left: 35px;
     }
     
     .navbar-nav {
         flex-direction: column;
-        gap: 5px;
+        gap: 25px;
     }
     
     .nav-link {
