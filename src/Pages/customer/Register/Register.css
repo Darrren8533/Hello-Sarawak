@@ -108,6 +108,7 @@ video {
   justify-content: space-between;
   border-radius: 10px;
   background: hsl(0, 0%, 91%);
+  max-width: 1600px;
 }
 
 .registerPage .container .videoDiv {
@@ -327,6 +328,7 @@ video {
 }
 
 @media (max-width: 768px) {
+
   .registerPage {
     height: 100%;
     min-height: 100vh;
@@ -358,6 +360,7 @@ video {
     flex-basis: 100%;
     padding: 1.2rem;
     width: 100%;
+    max-width: 400px;
     max-height: none;
     overflow-y: visible;
   }
@@ -378,6 +381,10 @@ video {
 }
 
 @media (max-width: 480px) {
+
+  .registerPage .container .formDiv {
+    max-width: none !important;
+  }
 
   .registerPage .container .formDiv .headerDiv img {
     width: 100px;
