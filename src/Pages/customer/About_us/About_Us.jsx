@@ -26,7 +26,7 @@ import { MdAttachMoney } from "react-icons/md";
 
 const About_Us = () => {
   return (
-    <div className="about-us-wrapper">
+    <div className="About_Us_Container_Main">
       <AuthProvider>
         <Navbar />
 
