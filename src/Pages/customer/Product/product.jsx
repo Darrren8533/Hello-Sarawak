@@ -8,8 +8,8 @@ import Footer from '../../../Component/Footer/footer';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
 import Toast from '../../../Component/Toast/Toast';
 import ImageSlider from '../../../Component/ImageSlider/ImageSlider';
-import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 import TawkMessenger from '../../../Component/TawkMessenger/TawkMessenger';
+import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 
 // Import API
 import { fetchProduct } from '../../../../Api/api';
@@ -341,22 +341,6 @@ const Product = () => {
     };
   };
 
-  const renderStars = (rating) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-    const stars = [];
-
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(<FaStar key={i} color="#FFD700" />);
-    }
-
-    if (hasHalfStar) {
-      stars.push(<FaStarHalfAlt key="half" color="#FFD700" />);
-    }
-
-    return stars;
-  };
-
   const renderSearchSection = () => {
     return (
       <section className="home" id="home">
@@ -531,14 +515,6 @@ const Product = () => {
                       </button>
                     </div>
                   </div>
-                  <div>
-                    <button 
-                      className="check-button"
-                      onClick={handleCheckAvailability}
-                    >
-                      Check Availability
-                    </button>
-                  </div>
                 </div>
               )}
             </div>
@@ -612,7 +588,6 @@ const Product = () => {
     );
   };
 
-  // 添加页面滚动监听
   useEffect(() => {
     const handleScroll = () => {
       if (isLoadingMore || !hasMore) return;
@@ -620,7 +595,6 @@ const Product = () => {
       const scrollPosition = window.innerHeight + window.pageYOffset;
       const documentHeight = document.documentElement.offsetHeight;
       
-      // 如果滚动到页面底部
       if (documentHeight - scrollPosition < 50) {
         setIsLoadingMore(true);
         loadMoreProperties();
@@ -633,119 +607,120 @@ const Product = () => {
 
   return (
     <div>
-      <AuthProvider>
-      <Navbar />
-      <br /><br /><br />
-  
-      {renderSearchSection()}
-  
-      <div className="property-container_for_product">
-        <h2>Available Properties</h2>
-  
-        {isLoading ? (
-          <div className="scrollable-container_for_product">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
-              <SkeletonPropertyCard key={`skeleton-${index}`} />
-            ))}
+      <div className="Product_Main_Container">
+        <AuthProvider>
+        <Navbar />
+        <br /><br /><br />
+    
+        <div className="property-container_for_product">
+        {renderSearchSection()}
+          <h2>Available Properties</h2>
+    
+          {isLoading ? (
+            <div className="scrollable-container_for_product">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+                <SkeletonPropertyCard key={`skeleton-${index}`} />
+              ))}
+            </div>
+          ) : (
+            <div className="scrollable-container_for_product">
+              {properties.length > 0 ? (
+                properties.map((property, index) => {
+                  if (properties.length === index + 1) {
+                    return (
+                      <div 
+                        ref={lastPropertyElementRef}
+                        className="tour-property-item" 
+                        key={property.propertyid} 
+                        onClick={() => handleViewDetails(property)}
+                      > 
+                        <div className="tour-property-image-box">
+                          {property.propertyimage && property.propertyimage.length > 0 ? (
+                            <ImageSlider 
+                              images={property.propertyimage}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }} 
+                            />
+                          ) : (
+                            <p>No images available</p>
+                          )}
+                        </div>
+                        <div className="tour-property-info">
+                          <div className="property-location">
+                            <h4>{property.propertyaddress}</h4>
+                            <div className="tour-property-rating">
+                              <span className="rating-number">{rating}</span>
+                              <FaStar />
+                            </div>
+                          </div>
+                          <span className="property-cluster">{property.clustername}</span>
+                          <div className="property-details-row">
+                            <div className="property-price">
+                              <span className="price-amount">${property.rateamount}</span>
+                              <span className="price-period">/night</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div 
+                        className="tour-property-item" 
+                        key={property.propertyid} 
+                        onClick={() => handleViewDetails(property)}
+                      > 
+                        <div className="tour-property-image-box">
+                          {property.propertyimage && property.propertyimage.length > 0 ? (
+                            <ImageSlider 
+                              images={property.propertyimage}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                              }} 
+                            />
+                          ) : (
+                            <p>No images available</p>
+                          )}
+                        </div>
+                        <div className="tour-property-info">
+                          <div className="property-location">
+                            <h4>{property.propertyaddress}</h4>
+                            <div className="tour-property-rating">
+                              <span className="rating-number">{rating}</span>
+                              <FaStar />
+                            </div>
+                          </div>
+                          <span className="property-cluster">{property.clustername}</span>
+                          <div className="property-details-row">
+                            <div className="property-price">
+                              <span className="price-amount">${property.rateamount}</span>
+                              <span className="price-period">/night</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+                })
+              ) : (
+                <p className="no-properties-message">No properties available.</p>
+              )}
+              
+              {isLoadingMore && hasMore && [1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+                <SkeletonPropertyCard key={`loading-more-skeleton-${index}`} />
+              ))}
+            </div>
+          )}
           </div>
-        ) : (
-          <div className="scrollable-container_for_product">
-            {properties.length > 0 ? (
-              properties.map((property, index) => {
-                if (properties.length === index + 1) {
-                  return (
-                    <div 
-                      ref={lastPropertyElementRef}
-                      className="tour-property-item" 
-                      key={property.propertyid} 
-                      onClick={() => handleViewDetails(property)}
-                    > 
-                      <div className="tour-property-image-box">
-                        {property.propertyimage && property.propertyimage.length > 0 ? (
-                          <ImageSlider 
-                            images={property.propertyimage}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                            }} 
-                          />
-                        ) : (
-                          <p>No images available</p>
-                        )}
-                      </div>
-                      <div className="tour-property-info">
-                        <div className="property-location">
-                          <h4>{property.propertyaddress}</h4>
-                          <div className="tour-property-rating">
-                            <span className="rating-number">{rating}</span>
-                            <FaStar />
-                          </div>
-                        </div>
-                        <span className="property-cluster">{property.clustername}</span>
-                        <div className="property-details-row">
-                          <div className="property-price">
-                            <span className="price-amount">${property.rateamount}</span>
-                            <span className="price-period">/night</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                } else {
-                  return (
-                    <div 
-                      className="tour-property-item" 
-                      key={property.propertyid} 
-                      onClick={() => handleViewDetails(property)}
-                    > 
-                      <div className="tour-property-image-box">
-                        {property.propertyimage && property.propertyimage.length > 0 ? (
-                          <ImageSlider 
-                            images={property.propertyimage}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                            }} 
-                          />
-                        ) : (
-                          <p>No images available</p>
-                        )}
-                      </div>
-                      <div className="tour-property-info">
-                        <div className="property-location">
-                          <h4>{property.propertyaddress}</h4>
-                          <div className="tour-property-rating">
-                            <span className="rating-number">{rating}</span>
-                            <FaStar />
-                          </div>
-                        </div>
-                        <span className="property-cluster">{property.clustername}</span>
-                        <div className="property-details-row">
-                          <div className="property-price">
-                            <span className="price-amount">${property.rateamount}</span>
-                            <span className="price-period">/night</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }
-              })
-            ) : (
-              <p className="no-properties-message">No properties available.</p>
-            )}
-            
-            {isLoadingMore && hasMore && [1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
-              <SkeletonPropertyCard key={`loading-more-skeleton-${index}`} />
-            ))}
-          </div>
-        )}
-        </div>
-  
-        {showToast && <Toast type={toastType} message={toastMessage} />}
-        <br /><br /><br /><br /><br /><br />
+    
+          {showToast && <Toast type={toastType} message={toastMessage} />}
+          <br /><br /><br /><br /><br /><br />
         <Back_To_Top_Button />
         <TawkMessenger />
         <Footer />
         </AuthProvider>
+        </div>
       </div>
     );
 };
