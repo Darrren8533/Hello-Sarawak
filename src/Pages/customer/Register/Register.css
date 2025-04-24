@@ -327,7 +327,7 @@ video {
   width: 100%;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 950px) {
 
   .registerPage {
     height: 100%;
