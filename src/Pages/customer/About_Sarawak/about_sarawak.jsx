@@ -77,36 +77,40 @@ const About_Sarawak = () => {
 
   return (
     <div>
-      <AuthProvider>
-        <Navbar />
+      <div className='About_Sarawak_Container'>
 
-        <div className='destination_AboutSarawak'>
-          <h1>Place To Visit</h1>
+        <AuthProvider>
+          <Navbar />
 
-          <Sarawak_Map />
+          <div className='destination_AboutSarawak'>
+            <h1>Place To Visit</h1>
 
-          <div className='Main_description_AboutSarawak'>
-            <h1>About Sarawak</h1>
-            <p>Adventure, Culture and Nature in One</p>
+            <Sarawak_Map />
+
+            <div className='Main_description_AboutSarawak'>
+              <h1>About Sarawak</h1>
+              <p>Adventure, Culture and Nature in One</p>
+            </div>
+
+            {sections.map((section, index) => (
+              <React.Fragment key={index}>
+                <Section
+                  title={section.title}
+                  description={section.description}
+                  imgLeft={section.imgLeft}
+                  imgRight={section.imgRight}
+                />
+                {index < sections.length - 1 && <div className="section-divider"></div>}
+              </React.Fragment>
+            ))}
           </div>
 
-          {sections.map((section, index) => (
-            <React.Fragment key={index}>
-              <Section
-                title={section.title}
-                description={section.description}
-                imgLeft={section.imgLeft}
-                imgRight={section.imgRight}
-              />
-              {index < sections.length - 1 && <div className="section-divider"></div>}
-            </React.Fragment>
-          ))}
-        </div>
+              <Back_To_Top_Button />
+            <Footer />
+          <TawkMessenger />
+        </AuthProvider>
 
-        <Back_To_Top_Button />
-        <Footer />
-        <TawkMessenger />
-      </AuthProvider>
+      </div>
     </div>
   );
 };
