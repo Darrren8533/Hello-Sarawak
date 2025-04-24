@@ -109,6 +109,7 @@ video {
   border-radius: 10px;
   background: hsl(0, 0%, 91%);
   max-width: 1600px;
+  max-height: 1100px;
 }
 
 .registerPage .container .videoDiv {
