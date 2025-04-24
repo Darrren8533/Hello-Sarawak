@@ -25,7 +25,6 @@ body {
 /* Scroll lock styles */
 body.no-scroll {
     overflow: hidden;
-    /* Fixed position will be added in JS */
 }
 
 /* Navbar Base */
@@ -33,10 +32,10 @@ body.no-scroll {
     background-color: var(--primary);
     margin: 15px;
     border-radius: 16px;
-    padding: 0.75rem 1rem;
     box-shadow: var(--shadow);
     transition: var(--transition);
     height: auto;
+    padding: 0 20px !important;
     min-height: 80px;
 }
 
@@ -49,13 +48,11 @@ body.no-scroll {
 }
 
 .container_navbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    max-width: 1500px;
-    margin: 0 auto;
-    padding: 0 1rem;
+  width: 100%;
+  max-width: 1800px;
+  position: fixed;
+  top: 0;
+  z-index: 1050;
 }
 
 .navbar-brand-link {
