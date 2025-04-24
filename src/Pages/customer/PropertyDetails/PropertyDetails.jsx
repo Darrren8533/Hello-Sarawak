@@ -282,8 +282,8 @@ const PropertyDetails = () => {
   return (
     <div>
       <div className="Property_Details_Main_Container">
-      <Navbar />
         <AuthProvider>
+        <Navbar />
         <div className="property-details-main-container">
           {!showAllPhotos && !showBookingForm}
           <div className="Main_Image_gallery_container">
