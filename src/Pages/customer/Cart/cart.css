@@ -18,6 +18,14 @@
   --transition-speed: 0.2s;
 }
 
+.Cart_Container_Main{
+  margin: 0 auto;
+  max-width: 1800px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
 .reservation-container {
   width: 100%;
   max-width: 1200px;
