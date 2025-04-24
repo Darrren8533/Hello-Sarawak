@@ -5,6 +5,7 @@
     width: 100%;
     height: auto;
     position: relative;
+    background-color: aqua;
 }
 
 .map-container_sarawak {
@@ -88,7 +89,6 @@
     .main-container-map {
         height: auto;
         min-height: 90vh;
-        justify-content: space-between;
     }
     
     .map-container_sarawak {
