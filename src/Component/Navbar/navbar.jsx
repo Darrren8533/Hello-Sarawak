@@ -173,8 +173,8 @@ function Navbar() {
                 />
             </Helmet>
 
-            <nav className={`navbar navbar-expand-lg fixed-top`}>
-                <div className="container_navbar">
+            <div className="container_navbar">
+                <nav className="navbar navbar-expand-lg">
                     <Link to="/" className="navbar-brand-link">
                         <h1 className="navbar_brand">Hello Sarawak</h1>
                     </Link>
@@ -314,8 +314,8 @@ function Navbar() {
                             <FaBars className="icon_navbar"/>
                         </button>
                     </div>
-                </div>
-            </nav>
+                </nav>
+            </div>
         </div>
     );
 }
