@@ -7,8 +7,12 @@
     font-family: "Poppins", sans-serif;
 }
 
-.about-us-wrapper {
-    overflow-x: hidden;
+.About_Us_Container_Main{
+    margin: 0 auto;
+    max-width: 1800px;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
 }
 
 /* Hero Section */
@@ -31,7 +35,8 @@
 }
 
 .hero-section .container_hero {
-    height: 78vh;
+    height: 75vh;
+    max-height: 800px;
     z-index: 1;
     position: relative;
     display: flex;
@@ -99,13 +104,13 @@
 
 .about_us-image {
     flex: 1;
-    min-width: 300px;
-    overflow: hidden;
+    width: 450px;
+    height: auto;
 }
 
 .about_us-image img {
     width: 100%;
-    height: 50vh;
+    height: 400px;
     display: block;
     transition: 0.5s ease;
     border-radius: 20px;
@@ -306,8 +311,8 @@
     }
 }
 
-/* 991px Media Query*/
-@media screen and (max-width: 991px) {
+/* 1000px Media Query*/
+@media screen and (max-width: 1000px) {
     .hero-section h1 {
         font-size: 2.8rem;
     }
@@ -347,6 +352,10 @@
     .buttons_about_us button {
         padding: 10px 20px;
         font-size: 0.85rem;
+    }
+
+    .about_us-image img {
+        height: 380px;
     }
 }
 
