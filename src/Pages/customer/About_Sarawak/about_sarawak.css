@@ -7,6 +7,14 @@
     font-family: "Poppins", sans-serif;
 }
 
+.About_Sarawak_Container{
+    margin: 0 auto;
+    max-width: 1850px;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
 .destination_AboutSarawak {
     margin: 10rem 6rem;
 }
@@ -19,7 +27,7 @@
 .Main_description_AboutSarawak {
     font-size: 18px;
     text-align: center;
-    margin-top: 2rem;
+    margin-top: 7rem;
 }
 
 .first-des_AboutSarawak {
