@@ -8,17 +8,22 @@ import Footer from '../../../Component/Footer/footer';
 import Back_To_Top_Button from '../../../Component/Back_To_Top_Button/Back_To_Top_Button';
 import Toast from '../../../Component/Toast/Toast';
 import ImageSlider from '../../../Component/ImageSlider/ImageSlider';
-import TawkMessenger from '../../../Component/TawkMessenger/TawkMessenger';
 import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
+import TawkMessenger from '../../../Component/TawkMessenger/TawkMessenger';
 
 // Import API
 import { fetchProduct } from '../../../../Api/api';
 
 // Import React Icons and CSS
-import { FaStar, FaStarHalfAlt, FaSearch } from 'react-icons/fa';
+import { FaStar, FaStarHalfAlt, FaSearch, FaFilter, FaSortAmountDown, FaSortAmountDownAlt } from 'react-icons/fa';
 import { HiUsers} from "react-icons/hi2";
 import { CiCalendarDate } from "react-icons/ci";
-import { IoLocationSharp } from "react-icons/io5";
+import { IoLocationSharp, IoCloseOutline } from "react-icons/io5";
+import { FaWifi, FaUtensils, FaSnowflake, FaWind, FaDesktop, FaTv, FaBuilding } from "react-icons/fa";
+import { GiWashingMachine, GiClothesline, GiPoolDive, GiHotSurface } from "react-icons/gi";
+import { MdLocationOn, MdOutlineKingBed, MdFireplace, MdSmokingRooms, MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
+import { FaParking, FaCar, FaChargingStation, FaBaby, FaDumbbell, FaCoffee } from "react-icons/fa";
+import { BsHouseDoor, BsBuilding, BsHouse } from "react-icons/bs";
 import './product.css';
 
 // Create a client
@@ -51,6 +56,13 @@ const Product = () => {
   const [allProperties, setAllProperties] = useState([]);
   const [loadedPropertyIds, setLoadedPropertyIds] = useState(new Set());
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
+  const [sortOrder, setSortOrder] = useState("none"); // "none", "asc", "desc"
+  const [selectedFacilities, setSelectedFacilities] = useState([]);
+  const [showMoreAmenities, setShowMoreAmenities] = useState(false);
+  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState([]);
+  const [showPropertyTypes, setShowPropertyTypes] = useState(false);
   const observer = useRef();
 
   const clusters = [
@@ -79,6 +91,53 @@ const Product = () => {
     "Saratok",
     "Selangau",
     "Tebedu",
+  ];
+  
+  const facilities = [
+    "Wi-Fi", 
+    "Kitchen", 
+    "Washer", 
+    "Dryer", 
+    "Air conditioning", 
+    "Heating",
+    "Dedicated workspace", 
+    "TV"
+  ];
+  
+  const features = [
+    "Pool",
+    "Hot tub",
+    "Free parking",
+    "EV charger",
+    "Crib",
+    "King bed",
+    "Gym",
+    "BBQ grill",
+    "Breakfast",
+    "Indoor fireplace",
+    "Smoking allowed"
+  ];
+  
+  const locations = [
+    "Beachfront",
+    "Waterfront",
+    "Ski-in/ski-out",
+    "Desert",
+    "Countryside"
+  ];
+  
+  const safety = [
+    "Smoke alarm",
+    "Carbon monoxide alarm",
+    "Fire extinguisher",
+    "First aid kit"
+  ];
+  
+  const propertyTypes = [
+    "House",
+    "Apartment",
+    "Guesthouse",
+    "Hotel"
   ];
   
   const lastPropertyElementRef = useCallback(node => {
@@ -270,18 +329,47 @@ const Product = () => {
         queryFn: fetchProduct
       });
   
-      const availableProperties = fetchedProps.filter((property) => {
+      let availableProperties = fetchedProps.filter((property) => {
         const existingCheckin = new Date(property.checkindatetime);
         const existingCheckout = new Date(property.checkoutdatetime);
+        const propertyPrice = parseFloat(property.rateamount);
+
+        // Filter by price range if set
+        if (propertyPrice < priceRange.min || propertyPrice > priceRange.max) return false;
 
         if (property.propertyguestpaxno < totalGuests) return false;
         
         if (checkIn < existingCheckout && checkOut > existingCheckin) return false; 
         
-        if (property.clustername !== selectedCluster) return false;
-  
+        if (selectedCluster && property.clustername !== selectedCluster) return false;
+        
+        // Filter by selected property types
+        if (selectedPropertyTypes.length > 0 && !selectedPropertyTypes.includes(property.categoryname)) {
+          return false;
+        }
+        
+        // Filter by selected facilities
+        if (selectedFacilities.length > 0) {
+          const propertyFacilities = property.facilities ? 
+            property.facilities.split(',').map(facility => facility.trim()) : [];
+          
+          // Check if property has all selected facilities
+          for (const facility of selectedFacilities) {
+            if (!propertyFacilities.includes(facility)) {
+              return false;
+            }
+          }
+        }
+
         return true; 
       });
+      
+      // Sort by price if requested
+      if (sortOrder === "asc") {
+        availableProperties.sort((a, b) => parseFloat(a.rateamount) - parseFloat(b.rateamount));
+      } else if (sortOrder === "desc") {
+        availableProperties.sort((a, b) => parseFloat(b.rateamount) - parseFloat(a.rateamount));
+      }
   
       if (availableProperties.length === 0) {
         displayToast('error', 'No available properties match your criteria');
@@ -305,12 +393,457 @@ const Product = () => {
       setHasMore(availableProperties.length > 8);
       setIsLoadingMore(false);
       
+      // Close the filter overlay when search is complete
+      setShowFilters(false);
+      
     } catch (error) {
       console.error('Error filtering properties:', error);
       displayToast('error', 'Failed to filter properties');
     }
-  };  
+  };
+
+  // Toggle sort order
+  const toggleSortOrder = () => {
+    setSortOrder(prev => {
+      if (prev === "none") return "asc";
+      if (prev === "asc") return "desc";
+      return "none";
+    });
+  };
   
+  // Handle price range change
+  const handlePriceRangeChange = (e) => {
+    const { name, value } = e.target;
+    const numValue = parseInt(value, 10);
+    
+    setPriceRange(prev => {
+      // 确保最小值不会大于最大值，最大值不会小于最小值
+      if (name === 'min' && numValue > prev.max) {
+        return prev;
+      }
+      if (name === 'max' && numValue < prev.min) {
+        return prev;
+      }
+      
+      const newRange = {
+        ...prev,
+        [name]: numValue
+      };
+      
+      // 更新滑块样式
+      updateRangeSliderStyle(newRange);
+      
+      return newRange;
+    });
+  };
+  
+  // 更新滑块之间的颜色
+  const updateRangeSliderStyle = (range) => {
+    const sliderContainer = document.querySelector('.range-slider-container');
+    if (!sliderContainer) return;
+    
+    const min = 0;
+    const max = 1000;
+    const rangeWidth = max - min;
+    
+    // 计算左侧和右侧的百分比
+    const leftPercent = ((range.min - min) / rangeWidth) * 100;
+    const rightPercent = 100 - ((range.max - min) / rangeWidth) * 100;
+    
+    // 设置CSS变量
+    sliderContainer.style.setProperty('--left-percent', `${leftPercent}%`);
+    sliderContainer.style.setProperty('--right-percent', `${rightPercent}%`);
+  };
+  
+  // 监听价格范围变化并更新样式
+  useEffect(() => {
+    updateRangeSliderStyle(priceRange);
+  }, [priceRange.min, priceRange.max]);
+  
+  // 初始化滑块样式和事件
+  useEffect(() => {
+    // 为滑块容器添加点击事件，实现点击轨道移动最近滑块的功能
+    const sliderContainer = document.querySelector('.range-slider-container');
+    const sliderTrack = document.querySelector('.range-slider-track');
+    if (!sliderContainer || !sliderTrack) return;
+    
+    const handleTrackClick = (e) => {
+      // 阻止事件冒泡，防止其他元素捕获事件
+      e.stopPropagation();
+      
+      const containerRect = sliderContainer.getBoundingClientRect();
+      const clickPosition = e.clientX - containerRect.left;
+      const clickPercent = (clickPosition / containerRect.width) * 100;
+      
+      // 计算点击位置对应的值
+      const min = 0;
+      const max = 1000;
+      const clickValue = Math.round((clickPercent / 100) * (max - min) + min);
+      
+      // 确定移动哪个滑块（距离点击位置最近的滑块）
+      const distToMin = Math.abs(clickValue - priceRange.min);
+      const distToMax = Math.abs(clickValue - priceRange.max);
+      
+      if (distToMin <= distToMax) {
+        // 移动最小值滑块
+        setPriceRange(prev => {
+          const newMin = Math.min(clickValue, prev.max);
+          return { ...prev, min: newMin };
+        });
+      } else {
+        // 移动最大值滑块
+        setPriceRange(prev => {
+          const newMax = Math.max(clickValue, prev.min);
+          return { ...prev, max: newMax };
+        });
+      }
+    };
+    
+    sliderTrack.addEventListener('click', handleTrackClick);
+    
+    return () => {
+      sliderTrack.removeEventListener('click', handleTrackClick);
+    };
+  }, [priceRange]);
+  
+  // 计算价格分布来生成柱状图
+  const generatePriceHistogram = () => {
+    if (!allProperties || allProperties.length === 0) return null;
+    
+    // 获取所有价格
+    const prices = allProperties.map(prop => parseFloat(prop.rateamount));
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices) || 1000; // 防止没有价格时出错
+    
+    // 创建价格区间
+    const numBins = 30;
+    const binSize = (maxPrice - minPrice) / numBins || 100; // 防止除以零
+    const bins = Array(numBins).fill(0);
+    
+    // 填充直方图数据
+    prices.forEach(price => {
+      const binIndex = Math.min(Math.floor((price - minPrice) / binSize), numBins - 1);
+      bins[binIndex]++;
+    });
+    
+    // 找出最高频率以标准化高度
+    const maxFreq = Math.max(...bins) || 1; // 防止除以零
+    
+    return (
+      <div className="price-histogram">
+        {bins.map((count, i) => {
+          const height = count > 0 ? Math.max(5, (count / maxFreq) * 50) : 1;
+          const binPrice = minPrice + i * binSize;
+          const isInRange = (binPrice >= priceRange.min) && (binPrice <= priceRange.max);
+          
+          return (
+            <div 
+              key={i} 
+              className={`histogram-bar ${isInRange ? 'in-range' : 'out-range'}`}
+              style={{ height: `${height}px` }}
+            />
+          );
+        })}
+      </div>
+    );
+  };
+  
+  // Filter overlay component
+  const FilterOverlay = () => {
+    if (!showFilters) return null;
+    
+    // 更新滑块输入处理
+    const handleRangeInputChange = (e) => {
+      const { name, value } = e.target;
+      handlePriceRangeChange(e);
+    };
+    
+    // Handle facility selection
+    const toggleFacility = (facility) => {
+      setSelectedFacilities(prev => 
+        prev.includes(facility) 
+          ? prev.filter(f => f !== facility) 
+          : [...prev, facility]
+      );
+    };
+
+    // Toggle show more amenities
+    const toggleShowMoreAmenities = () => {
+      setShowMoreAmenities(!showMoreAmenities);
+    };
+    
+    // Toggle property type dropdown
+    const togglePropertyTypes = () => {
+      setShowPropertyTypes(!showPropertyTypes);
+    };
+    
+    // Handle property type selection
+    const togglePropertyType = (type) => {
+      setSelectedPropertyTypes(prev => 
+        prev.includes(type) 
+          ? prev.filter(t => t !== type) 
+          : [...prev, type]
+      );
+    };
+    
+    // Render amenity items with proper icons
+    const renderAmenityItems = (items) => {
+      return items.map((item) => (
+        <div 
+          key={item}
+          className={`amenity-item ${selectedFacilities.includes(item) ? 'selected' : ''}`}
+          onClick={() => toggleFacility(item)}
+        >
+          <span className="amenity-icon">
+            {/* Essentials */}
+            {item === "Wi-Fi" && <FaWifi />}
+            {item === "Kitchen" && <FaUtensils />}
+            {item === "Washer" && <GiWashingMachine />}
+            {item === "Dryer" && <GiClothesline />}
+            {item === "Air conditioning" && <FaSnowflake />}
+            {item === "Heating" && <FaWind />}
+            {item === "Dedicated workspace" && <FaDesktop />}
+            {item === "TV" && <FaTv />}
+            
+            {/* Features */}
+            {item === "Pool" && <GiPoolDive />}
+            {item === "Hot tub" && <GiHotSurface />}
+            {item === "Free parking" && <FaParking />}
+            {item === "EV charger" && <FaChargingStation />}
+            {item === "Crib" && <FaBaby />}
+            {item === "King bed" && <MdOutlineKingBed />}
+            {item === "Gym" && <FaDumbbell />}
+            {item === "Breakfast" && <FaCoffee />}
+            {item === "Indoor fireplace" && <MdFireplace />}
+            {item === "Smoking allowed" && <MdSmokingRooms />}
+            
+            {/* Location */}
+            {["Beachfront", "Waterfront", "Ski-in/ski-out", "Desert", "Countryside"].includes(item) && <MdLocationOn />}
+            
+            {/* Safety */}
+            {["Smoke alarm", "Carbon monoxide alarm", "Fire extinguisher", "First aid kit"].includes(item) && <FaCar />}
+          </span>
+          <span className="amenity-text">{item}</span>
+        </div>
+      ));
+    };
+    
+    return (
+      <div className="filter-overlay">
+        <div className="filter-overlay-content">
+          <div className="filter-header">
+            <h3>Filters</h3>
+            <button 
+              className="cls-button"
+              onClick={() => setShowFilters(false)}
+            >
+              <IoCloseOutline size={24} />
+            </button>
+          </div>
+          
+          <div className="filter-section">
+            <h4>Price range</h4>
+            <p className="price-subtitle">Trip price, includes all fees</p>
+            
+            {/* 价格分布直方图 */}
+            <div className="price-range-visual">
+              {generatePriceHistogram()}
+              
+              <div className="range-slider-container">
+                <div className="range-slider-track"></div>
+                <div className="slider-boundary min-boundary">
+                  <span className="boundary-dot"></span>
+                </div>
+                <div className="slider-boundary max-boundary">
+                  <span className="boundary-dot"></span>
+                </div>
+                <input
+                  type="range"
+                  name="min"
+                  min={0}
+                  max={1000}
+                  step={10}
+                  value={priceRange.min}
+                  onChange={handleRangeInputChange}
+                  className="range-slider min-slider"
+                />
+                <input
+                  type="range"
+                  name="max"
+                  min={0}
+                  max={1000}
+                  step={10}
+                  value={priceRange.max}
+                  onChange={handleRangeInputChange}
+                  className="range-slider max-slider"
+                />
+              </div>
+            </div>
+            
+            {/* 显示选择的价格范围 */}
+            <div className="price-range-inputs">
+              <div className="price-input-group">
+                <label>Minimum</label>
+                <div className="currency-input">
+                  <span className="currency-symbol">RM</span>
+                  <input
+                    type="number"
+                    name="min"
+                    value={priceRange.min}
+                    onChange={handlePriceRangeChange}
+                    min="0"
+                    step="10"
+                  />
+                </div>
+              </div>
+              <div className="price-input-group">
+                <label>Maximum</label>
+                <div className="currency-input">
+                  <span className="currency-symbol">RM</span>
+                  <input
+                    type="number"
+                    name="max"
+                    value={priceRange.max}
+                    onChange={handlePriceRangeChange}
+                    min="0"
+                    step="10"
+                  />
+                  {priceRange.max >= 1000 && <span className="plus-symbol">+</span>}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="filter-section">
+            <h4>Sort by Price</h4>
+            <div className="sort-options">
+              <button 
+                className={`sort-button ${sortOrder === 'none' ? 'active' : ''}`}
+                onClick={() => setSortOrder('none')}
+              >
+                None
+              </button>
+              <button 
+                className={`sort-button ${sortOrder === 'asc' ? 'active' : ''}`}
+                onClick={() => setSortOrder('asc')}
+              >
+                <FaSortAmountDown /> Low to High
+              </button>
+              <button 
+                className={`sort-button ${sortOrder === 'desc' ? 'active' : ''}`}
+                onClick={() => setSortOrder('desc')}
+              >
+                <FaSortAmountDownAlt /> High to Low
+              </button>
+            </div>
+          </div>
+          
+          {/* Amenities section */}
+          <div className="filter-section">
+            <h4>Amenities</h4>
+            <div className="essentials-section">
+              <h5>Essentials</h5>
+              <div className="amenities-grid">
+                {renderAmenityItems(facilities)}
+              </div>
+            </div>
+            
+            {/* Show more button */}
+            {!showMoreAmenities && (
+              <button className="show-more-button" onClick={toggleShowMoreAmenities}>
+                Show more <MdKeyboardArrowDown />
+              </button>
+            )}
+            
+            {/* Expanded sections */}
+            {showMoreAmenities && (
+              <>
+                <div className="features-section">
+                  <h5>Features</h5>
+                  <div className="amenities-grid">
+                    {renderAmenityItems(features)}
+                  </div>
+                </div>
+                
+                <div className="location-section">
+                  <h5>Location</h5>
+                  <div className="amenities-grid">
+                    {renderAmenityItems(locations)}
+                  </div>
+                </div>
+                
+                <div className="safety-section">
+                  <h5>Safety</h5>
+                  <div className="amenities-grid">
+                    {renderAmenityItems(safety)}
+                  </div>
+                </div>
+                
+                <button className="show-less-button" onClick={toggleShowMoreAmenities}>
+                  Show less <MdKeyboardArrowUp />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Property Type Section */}
+          <div className="filter-section">
+            <div 
+              className={`property-type-header ${showPropertyTypes ? 'active' : ''}`}
+              onClick={togglePropertyTypes}
+            >
+              <h4>Property type</h4>
+              <span className="property-type-icon">
+                {showPropertyTypes ? <MdKeyboardArrowUp /> : <MdKeyboardArrowDown />}
+              </span>
+            </div>
+            
+            {showPropertyTypes && (
+              <div className="property-type-grid">
+                {propertyTypes.map(type => (
+                  <div 
+                    key={type}
+                    className={`property-type-item ${selectedPropertyTypes.includes(type) ? 'selected' : ''}`}
+                    onClick={() => togglePropertyType(type)}
+                  >
+                    <div className="property-type-icon">
+                      {type === "House" && <BsHouseDoor />}
+                      {type === "Apartment" && <BsBuilding />}
+                      {type === "Guesthouse" && <BsHouse />}
+                      {type === "Hotel" && <FaBuilding />}
+                    </div>
+                    <span>{type}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          <div className="filter-actions">
+            <button 
+              className="reset-button"
+              onClick={() => {
+                setPriceRange({ min: 0, max: 1000 });
+                setSortOrder('none');
+                setSelectedFacilities([]);
+                setSelectedPropertyTypes([]);
+                updateRangeSliderStyle({ min: 0, max: 1000 });
+              }}
+            >
+              Reset Filters
+            </button>
+            <button 
+              className="apply-button"
+              onClick={handleCheckAvailability}
+            >
+              Apply Filters
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const handleTabClick = (tab) => {
     setActiveTab(activeTab === tab ? null : tab);
   };
@@ -339,6 +872,22 @@ const Product = () => {
       left: `${ref.offsetLeft}px`,
       width: isMobile ? '90%' : `${Math.max(280, rect.width)}px`
     };
+  };
+
+  const renderStars = (rating) => {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 !== 0;
+    const stars = [];
+
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<FaStar key={i} color="#FFD700" />);
+    }
+
+    if (hasHalfStar) {
+      stars.push(<FaStarHalfAlt key="half" color="#FFD700" />);
+    }
+
+    return stars;
   };
 
   const renderSearchSection = () => {
@@ -420,6 +969,22 @@ const Product = () => {
                 <FaSearch className='Check_icon'/>
               </button>
             </div>
+          </div>
+          
+          {/* Filter button */}
+          <div className="filter-button-container">
+            <button 
+              className="filter-button"
+              onClick={() => setShowFilters(true)}
+            >
+              <FaFilter /> Filters
+            </button>
+            
+            {sortOrder !== 'none' && (
+              <div className="sort-indicator">
+                {sortOrder === 'asc' ? 'Price: Low to High' : 'Price: High to Low'}
+              </div>
+            )}
           </div>
           
           {/* Conditional expanded panel based on active tab */}
@@ -515,10 +1080,21 @@ const Product = () => {
                       </button>
                     </div>
                   </div>
+                  <div>
+                    <button 
+                      className="check-button"
+                      onClick={handleCheckAvailability}
+                    >
+                      Check Availability
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
           )}
+          
+          {/* Filter overlay */}
+          <FilterOverlay />
         </div>
       </section>
     );
@@ -588,6 +1164,7 @@ const Product = () => {
     );
   };
 
+  // 添加页面滚动监听
   useEffect(() => {
     const handleScroll = () => {
       if (isLoadingMore || !hasMore) return;
@@ -595,6 +1172,7 @@ const Product = () => {
       const scrollPosition = window.innerHeight + window.pageYOffset;
       const documentHeight = document.documentElement.offsetHeight;
       
+      // 如果滚动到页面底部
       if (documentHeight - scrollPosition < 50) {
         setIsLoadingMore(true);
         loadMoreProperties();
@@ -607,120 +1185,119 @@ const Product = () => {
 
   return (
     <div>
-      <div className="Product_Main_Container">
-        <AuthProvider>
-        <Navbar />
-        <br /><br /><br />
-    
-        <div className="property-container_for_product">
-        {renderSearchSection()}
-          <h2>Available Properties</h2>
-    
-          {isLoading ? (
-            <div className="scrollable-container_for_product">
-              {[1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
-                <SkeletonPropertyCard key={`skeleton-${index}`} />
-              ))}
-            </div>
-          ) : (
-            <div className="scrollable-container_for_product">
-              {properties.length > 0 ? (
-                properties.map((property, index) => {
-                  if (properties.length === index + 1) {
-                    return (
-                      <div 
-                        ref={lastPropertyElementRef}
-                        className="tour-property-item" 
-                        key={property.propertyid} 
-                        onClick={() => handleViewDetails(property)}
-                      > 
-                        <div className="tour-property-image-box">
-                          {property.propertyimage && property.propertyimage.length > 0 ? (
-                            <ImageSlider 
-                              images={property.propertyimage}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                              }} 
-                            />
-                          ) : (
-                            <p>No images available</p>
-                          )}
-                        </div>
-                        <div className="tour-property-info">
-                          <div className="property-location">
-                            <h4>{property.propertyaddress}</h4>
-                            <div className="tour-property-rating">
-                              <span className="rating-number">{rating}</span>
-                              <FaStar />
-                            </div>
-                          </div>
-                          <span className="property-cluster">{property.clustername}</span>
-                          <div className="property-details-row">
-                            <div className="property-price">
-                              <span className="price-amount">${property.rateamount}</span>
-                              <span className="price-period">/night</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  } else {
-                    return (
-                      <div 
-                        className="tour-property-item" 
-                        key={property.propertyid} 
-                        onClick={() => handleViewDetails(property)}
-                      > 
-                        <div className="tour-property-image-box">
-                          {property.propertyimage && property.propertyimage.length > 0 ? (
-                            <ImageSlider 
-                              images={property.propertyimage}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                              }} 
-                            />
-                          ) : (
-                            <p>No images available</p>
-                          )}
-                        </div>
-                        <div className="tour-property-info">
-                          <div className="property-location">
-                            <h4>{property.propertyaddress}</h4>
-                            <div className="tour-property-rating">
-                              <span className="rating-number">{rating}</span>
-                              <FaStar />
-                            </div>
-                          </div>
-                          <span className="property-cluster">{property.clustername}</span>
-                          <div className="property-details-row">
-                            <div className="property-price">
-                              <span className="price-amount">${property.rateamount}</span>
-                              <span className="price-period">/night</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  }
-                })
-              ) : (
-                <p className="no-properties-message">No properties available.</p>
-              )}
-              
-              {isLoadingMore && hasMore && [1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
-                <SkeletonPropertyCard key={`loading-more-skeleton-${index}`} />
-              ))}
-            </div>
-          )}
+      <AuthProvider>
+      {!showFilters && <Navbar />}
+      <br /><br /><br />
+  
+      {renderSearchSection()}
+  
+      <div className="property-container_for_product">
+        <h2>Available Properties</h2>
+  
+        {isLoading ? (
+          <div className="scrollable-container_for_product">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+              <SkeletonPropertyCard key={`skeleton-${index}`} />
+            ))}
           </div>
-    
-          {showToast && <Toast type={toastType} message={toastMessage} />}
-          <br /><br /><br /><br /><br /><br />
+        ) : (
+          <div className="scrollable-container_for_product">
+            {properties.length > 0 ? (
+              properties.map((property, index) => {
+                if (properties.length === index + 1) {
+                  return (
+                    <div 
+                      ref={lastPropertyElementRef}
+                      className="tour-property-item" 
+                      key={property.propertyid} 
+                      onClick={() => handleViewDetails(property)}
+                    > 
+                      <div className="tour-property-image-box">
+                        {property.propertyimage && property.propertyimage.length > 0 ? (
+                          <ImageSlider 
+                            images={property.propertyimage}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }} 
+                          />
+                        ) : (
+                          <p>No images available</p>
+                        )}
+                      </div>
+                      <div className="tour-property-info">
+                        <div className="property-location">
+                          <h4>{property.propertyaddress}</h4>
+                          <div className="tour-property-rating">
+                            <span className="rating-number">{rating}</span>
+                            <FaStar />
+                          </div>
+                        </div>
+                        <span className="property-cluster">{property.clustername}</span>
+                        <div className="property-details-row">
+                          <div className="property-price">
+                            <span className="price-amount">${property.rateamount}</span>
+                            <span className="price-period">/night</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div 
+                      className="tour-property-item" 
+                      key={property.propertyid} 
+                      onClick={() => handleViewDetails(property)}
+                    > 
+                      <div className="tour-property-image-box">
+                        {property.propertyimage && property.propertyimage.length > 0 ? (
+                          <ImageSlider 
+                            images={property.propertyimage}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }} 
+                          />
+                        ) : (
+                          <p>No images available</p>
+                        )}
+                      </div>
+                      <div className="tour-property-info">
+                        <div className="property-location">
+                          <h4>{property.propertyaddress}</h4>
+                          <div className="tour-property-rating">
+                            <span className="rating-number">{rating}</span>
+                            <FaStar />
+                          </div>
+                        </div>
+                        <span className="property-cluster">{property.clustername}</span>
+                        <div className="property-details-row">
+                          <div className="property-price">
+                            <span className="price-amount">${property.rateamount}</span>
+                            <span className="price-period">/night</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+              })
+            ) : (
+              <p className="no-properties-message">No properties available.</p>
+            )}
+            
+            {isLoadingMore && hasMore && [1, 2, 3, 4, 5, 6, 7, 8].map((index) => (
+              <SkeletonPropertyCard key={`loading-more-skeleton-${index}`} />
+            ))}
+          </div>
+        )}
+        </div>
+  
+        {showToast && <Toast type={toastType} message={toastMessage} />}
+        <br /><br /><br /><br /><br /><br />
         <Back_To_Top_Button />
         <TawkMessenger />
         <Footer />
         </AuthProvider>
-        </div>
       </div>
     );
 };
