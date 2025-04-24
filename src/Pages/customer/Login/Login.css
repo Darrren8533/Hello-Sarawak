@@ -129,7 +129,7 @@ video {
 }
 
 .loginPage .container {
-  height: 100vh;
+  height: 100%;
   width: 100%;
   overflow: auto;
   margin: auto;
@@ -138,6 +138,7 @@ video {
   background: rgb(232, 232, 232);
   align-items: center;
   max-width: 1600px;
+  max-height: 1100px;
 }
 
 .loginPage .container .videoDiv {
@@ -389,14 +390,16 @@ video {
   right: 0;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 950px) {
   .loginPage .container {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding-top: 80px;
+    padding-top: 40px;
     width: 100%;
-    height: 100vh;
+    height: 100%;
+    max-width: 900px;
+    max-height: 800px;
   }
 
   .btn_responsive {
@@ -460,9 +463,11 @@ video {
   }
   
   .loginPage .container {
-    padding-top: 40px;
-    height: 100vh;
+    padding-top: 100px;
+    height: 100%;
     width: 100%;
+    max-width: 900px;
+    max-height: 800px;
   }
   
   .loginPage .container .formDiv {
@@ -495,7 +500,7 @@ video {
   }
   
   .loginPage .container .formDiv .form .inputDiv input {
-    width: 170px;
+    width: 120px;
     font-size: 14px;
   }
   
