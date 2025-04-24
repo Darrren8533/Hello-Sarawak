@@ -4,10 +4,19 @@
   box-sizing: border-box;
 }
 
+.Product_Main_Container{
+  margin: 0 auto;
+  max-width: 1800px;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
 .home .container_for_product {
-  max-width: 90%;
-  margin: 85px auto 5px;
+  width: 100%;
+  margin-top: 60px;
   position: relative;
+  padding-bottom: 30px;
 }
 
 .search-bar {
@@ -433,95 +442,23 @@
   margin-top: 10px;
 }
 
-@media (max-width: 768px) {
-  .home .container_for_product {
-    max-width: 100%;
-    padding: 15px;
-    margin-top: 20px;
-  }
-
-  .search-bar {
-    flex-wrap: wrap;
-    border-radius: 16px;
-    padding: 12px;
-  }
-
-  .search-segment {
-    flex-basis: 48%;
-    margin-bottom: 8px;
-  }
-
-  .search-divider {
-    display: none;
-  }
-
-  .expanded-panel {
-    left: 0 !important;
-    right: 0 !important;
-    width: auto !important;
-    max-width: none;
-    border-radius: 12px;
-  }
-
-  .scrollable-container_for_product {
-    grid-template-columns: 1fr;
-  }
-
-  .tour-property-image-box {
-    height: 250px;
-  }
-
-  .tour-property-info{
-    padding: 16px;
-  }
+.property-amenities {
+  display: flex;
+  gap: 15px;
+  margin: 8px 0;
+  font-size: 14px;
+  color: #555;
 }
 
-@media (max-width: 640px) {
-  .cluster-selector-header {
-    padding: 10px 14px;
-  }
-  
-  .cluster-label {
-    font-size: 0.9rem;
-  }
-  
-  .cluster-options {
-    max-height: 250px;
-  }
+.amenity-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
-@media (max-width: 480px) {
-  .home .container_for_product {
-    padding: 10px;
-    margin-top: 60px;
-  }
-
-  .search-bar {
-    flex-direction: column;
-    border-radius: 12px;
-  }
-
-  .search-segment {
-    width: 100%;
-    margin-bottom: 8px;
-    border-radius: 8px;
-  }
-
-  .search-button {
-    margin-left: auto;
-  }
-
-  .expanded-panel {
-    width: 100% !important;
-  }
-
-  .destinations-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .tour-property-image-box {
-    height: 200px;
-  }
+.amenity-icon {
+  font-size: 16px;
+  color: #666;
 }
 
 .cluster-selector {
@@ -608,5 +545,140 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (max-width: 1032px) {
+  .search-label {
+    font-size: 12px;
+  }
+
+  .search-value {
+    font-size: 13px;
+  }
+
+  .Check_icon{
+    font-size: 14px;
+  }
+
+  .property-container_for_product h2{
+     font-size: 22px;
+  }
+}
+
+@media (max-width: 940px) {
+  .search-label {
+    font-size: 12px;
+  }
+
+  .search-value {
+    font-size: 11px;
+  }
+
+  .Check_icon{
+    font-size: 11px;
+  }
+
+  .property-container_for_product h2{
+     font-size: 22px;
+  }
+}
+
+@media (max-width: 860px) {
+  .home .container_for_product {
+    max-width: 100%;
+    padding: 15px;
+    margin-top: 20px;
+  }
+
+  .search-bar {
+    flex-wrap: wrap;
+    border-radius: 16px;
+    padding: 12px;
+  }
+
+  .search-segment {
+    flex-basis: 48%;
+    margin-bottom: 8px;
+  }
+
+  .search-divider {
+    display: none;
+  }
+
+  .expanded-panel {
+    left: 0 !important;
+    right: 0 !important;
+    width: auto !important;
+    max-width: none;
+    border-radius: 12px;
+  }
+
+  .scrollable-container_for_product {
+    grid-template-columns: 1fr;
+  }
+
+  .tour-property-image-box {
+    height: 250px;
+  }
+
+  .tour-property-info{
+    padding: 16px;
+  }
+
+  .property-container_for_product h2{
+    margin-top: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .cluster-selector-header {
+    padding: 10px 14px;
+  }
+  
+  .cluster-label {
+    font-size: 0.9rem;
+  }
+  
+  .cluster-options {
+    max-height: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home .container_for_product {
+    padding: 10px;
+    margin-top: 10px;
+  }
+
+  .search-bar {
+    flex-direction: column;
+    border-radius: 12px;
+  }
+
+  .search-segment {
+    width: 100%;
+    margin-bottom: 8px;
+    border-radius: 8px;
+  }
+
+  .search-button {
+    margin-left: auto;
+  }
+
+  .expanded-panel {
+    width: 100% !important;
+  }
+
+  .destinations-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .tour-property-image-box {
+    height: 200px;
+  }
+
+  .property-container_for_product h2{
+    margin-top: 15px;
   }
 }
