@@ -566,7 +566,7 @@
   }
 }
 
-@media (max-width: 940px) {
+@media (max-width: 990px) {
   .search-label {
     font-size: 12px;
   }
@@ -584,7 +584,7 @@
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 768px) {
   .home .container_for_product {
     max-width: 100%;
     padding: 15px;
@@ -628,20 +628,6 @@
 
   .property-container_for_product h2{
     margin-top: 20px;
-  }
-}
-
-@media (max-width: 640px) {
-  .cluster-selector-header {
-    padding: 10px 14px;
-  }
-  
-  .cluster-label {
-    font-size: 0.9rem;
-  }
-  
-  .cluster-options {
-    max-height: 250px;
   }
 }
 
