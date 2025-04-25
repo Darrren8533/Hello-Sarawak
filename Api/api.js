@@ -970,7 +970,7 @@ export const auditTrails = async (userid) => {
       },
     });
 
-    if(!response) {
+    if(!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Failed to fetch audit trails');
     }
