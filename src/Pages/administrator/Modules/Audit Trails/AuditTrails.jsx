@@ -31,8 +31,8 @@ const AuditTrails = () => {
       }
     };
 
-    fetchAuditTrails();
-  }, []);
+    fetchAuditTrails(userid);
+  }, [userid]);
 
   const handleApplyFilters = () => {
     setAppliedFilters({ actionType: selectedActionType });
