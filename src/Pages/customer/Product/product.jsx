@@ -10,6 +10,7 @@ import Toast from '../../../Component/Toast/Toast';
 import ImageSlider from '../../../Component/ImageSlider/ImageSlider';
 import TawkMessenger from '../../../Component/TawkMessenger/TawkMessenger';
 import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
+import Sorting from '../../../Component/Sorting/Sorting';
 
 // Import API
 import { fetchProduct } from '../../../../Api/api';
@@ -51,6 +52,12 @@ const Product = () => {
   const [allProperties, setAllProperties] = useState([]);
   const [loadedPropertyIds, setLoadedPropertyIds] = useState(new Set());
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
+  const [sortOrder, setSortOrder] = useState("none"); // "none", "asc", "desc"
+  const [selectedFacilities, setSelectedFacilities] = useState([]);
+  const [selectedPropertyTypes, setSelectedPropertyTypes] = useState([]);
+  const [selectedBookingOptions, setSelectedBookingOptions] = useState([]);
   const observer = useRef();
 
   const clusters = [
@@ -270,18 +277,47 @@ const Product = () => {
         queryFn: fetchProduct
       });
   
-      const availableProperties = fetchedProps.filter((property) => {
+      let availableProperties = fetchedProps.filter((property) => {
         const existingCheckin = new Date(property.checkindatetime);
         const existingCheckout = new Date(property.checkoutdatetime);
+        const propertyPrice = parseFloat(property.rateamount);
+
+        // Filter by price range if set
+        if (propertyPrice < priceRange.min || propertyPrice > priceRange.max) return false;
 
         if (property.propertyguestpaxno < totalGuests) return false;
         
         if (checkIn < existingCheckout && checkOut > existingCheckin) return false; 
         
-        if (property.clustername !== selectedCluster) return false;
-  
+        if (selectedCluster && property.clustername !== selectedCluster) return false;
+        
+        // Filter by selected property types
+        if (selectedPropertyTypes.length > 0 && !selectedPropertyTypes.includes(property.categoryname)) {
+          return false;
+        }
+        
+        // Filter by selected facilities
+        if (selectedFacilities.length > 0) {
+          const propertyFacilities = property.facilities ? 
+            property.facilities.split(',').map(facility => facility.trim()) : [];
+          
+          // Check if property has all selected facilities
+          for (const facility of selectedFacilities) {
+            if (!propertyFacilities.includes(facility)) {
+              return false;
+            }
+          }
+        }
+
         return true; 
       });
+      
+      // Sort by price if requested
+      if (sortOrder === "asc") {
+        availableProperties.sort((a, b) => parseFloat(a.rateamount) - parseFloat(b.rateamount));
+      } else if (sortOrder === "desc") {
+        availableProperties.sort((a, b) => parseFloat(b.rateamount) - parseFloat(a.rateamount));
+      }
   
       if (availableProperties.length === 0) {
         displayToast('error', 'No available properties match your criteria');
@@ -304,6 +340,9 @@ const Product = () => {
       setPage(2);
       setHasMore(availableProperties.length > 8);
       setIsLoadingMore(false);
+      
+      // Close the filter overlay when search is complete
+      setShowFilters(false);
       
     } catch (error) {
       console.error('Error filtering properties:', error);
@@ -609,12 +648,29 @@ const Product = () => {
     <div>
       <div className="Product_Main_Container">
         <AuthProvider>
-        <Navbar />
+        {!showFilters && <Navbar />}
         <br /><br /><br />
     
         <div className="property-container_for_product">
-        {renderSearchSection()}
-          <h2>Available Properties</h2>
+          {renderSearchSection()}
+          <div className="header-container">
+            <h2>Available Properties</h2>
+            <Sorting
+            showFilters={showFilters}
+            setShowFilters={setShowFilters}
+            priceRange={priceRange}
+            setPriceRange={setPriceRange}
+            sortOrder={sortOrder}
+            setSortOrder={setSortOrder}
+            selectedFacilities={selectedFacilities}
+            setSelectedFacilities={setSelectedFacilities}
+            selectedPropertyTypes={selectedPropertyTypes}
+            setSelectedPropertyTypes={setSelectedPropertyTypes}
+            selectedBookingOptions ={selectedBookingOptions }
+            setSelectedBookingOptions={setSelectedBookingOptions}
+            handleCheckAvailability={handleCheckAvailability}
+          />
+          </div>
     
           {isLoading ? (
             <div className="scrollable-container_for_product">
