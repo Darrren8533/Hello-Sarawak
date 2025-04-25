@@ -348,208 +348,210 @@ const Sorting = ({
             </button>
           </div>
           
-          <div className="filter-section">
-            <h4>Price range</h4>
-            <p className="price-subtitle">Trip price, includes all fees</p>
-            
-            {/* 价格分布直方图 */}
-            <div className="price-range-visual">
-              {generatePriceHistogram()}
+          <div className="filter-content-scrollable">
+            <div className="filter-price-section">
+              <h4>Price range</h4>
+              <p className="price-subtitle">Trip price, includes all fees</p>
               
-              <div className="range-slider-container">
-                <div className="range-slider-track"></div>
-                <div className="slider-boundary min-boundary">
-                  <span className="boundary-dot"></span>
-                </div>
-                <div className="slider-boundary max-boundary">
-                  <span className="boundary-dot"></span>
-                </div>
-                <input
-                  type="range"
-                  name="min"
-                  min={0}
-                  max={1000}
-                  step={10}
-                  value={priceRange.min}
-                  onChange={handleRangeInputChange}
-                  className="range-slider min-slider"
-                />
-                <input
-                  type="range"
-                  name="max"
-                  min={0}
-                  max={1000}
-                  step={10}
-                  value={priceRange.max}
-                  onChange={handleRangeInputChange}
-                  className="range-slider max-slider"
-                />
-              </div>
-            </div>
-            
-            <div className="price-range-inputs">
-              <div className="price-input-group">
-                <label>Minimum</label>
-                <div className="currency-input">
-                  <span className="currency-symbol">RM</span>
+              {/* 价格分布直方图 */}
+              <div className="price-range-visual">
+                {generatePriceHistogram()}
+                
+                <div className="range-slider-container">
+                  <div className="range-slider-track"></div>
+                  <div className="slider-boundary min-boundary">
+                    <span className="boundary-dot"></span>
+                  </div>
+                  <div className="slider-boundary max-boundary">
+                    <span className="boundary-dot"></span>
+                  </div>
                   <input
-                    type="number"
+                    type="range"
                     name="min"
+                    min={0}
+                    max={1000}
+                    step={10}
                     value={priceRange.min}
-                    onChange={handlePriceRangeChange}
-                    min="0"
-                    step="10"
+                    onChange={handleRangeInputChange}
+                    className="range-slider min-slider"
                   />
-                </div>
-              </div>
-              <div className="price-input-group">
-                <label>Maximum</label>
-                <div className="currency-input">
-                  <span className="currency-symbol">RM</span>
                   <input
-                    type="number"
+                    type="range"
                     name="max"
+                    min={0}
+                    max={1000}
+                    step={10}
                     value={priceRange.max}
-                    onChange={handlePriceRangeChange}
-                    min="0"
-                    step="100"
+                    onChange={handleRangeInputChange}
+                    className="range-slider max-slider"
                   />
-                  {priceRange.max >= 1000 && <span className="plus-symbol">+</span>}
+                </div>
+              </div>
+              
+              <div className="price-range-inputs">
+                <div className="price-input-group">
+                  <label>Minimum</label>
+                  <div className="currency-input">
+                    <span className="currency-symbol">RM</span>
+                    <input
+                      type="number"
+                      name="min"
+                      value={priceRange.min}
+                      onChange={handlePriceRangeChange}
+                      min="0"
+                      step="10"
+                    />
+                  </div>
+                </div>
+                <div className="price-input-group">
+                  <label>Maximum</label>
+                  <div className="currency-input">
+                    <span className="currency-symbol">RM</span>
+                    <input
+                      type="number"
+                      name="max"
+                      value={priceRange.max}
+                      onChange={handlePriceRangeChange}
+                      min="0"
+                      step="100"
+                    />
+                    {priceRange.max >= 1000 && <span className="plus-symbol">+</span>}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-          
-          <div className="filter-section">
-            <h4>Sort by Price</h4>
-            <div className="sort-options">
-              <button 
-                className={`sort-button ${sortOrder === 'none' ? 'active' : ''}`}
-                onClick={() => setSortOrder('none')}
-              >
-                None
-              </button>
-              <button 
-                className={`sort-button ${sortOrder === 'asc' ? 'active' : ''}`}
-                onClick={() => setSortOrder('asc')}
-              >
-                <FaSortAmountDown /> Low to High
-              </button>
-              <button 
-                className={`sort-button ${sortOrder === 'desc' ? 'active' : ''}`}
-                onClick={() => setSortOrder('desc')}
-              >
-                <FaSortAmountDownAlt /> High to Low
-              </button>
-            </div>
-          </div>
-          
-          <div className="filter-section">
-            <h4>Facilities</h4>
-            <div className="essentials-section">
-              <h5>Essentials</h5>
-              <div className="amenities-grid">
-                {renderAmenityItems(facilities)}
-              </div>
-            </div>
             
-            {!showMoreAmenities && (
-              <button className="show-more-button" onClick={toggleShowMoreAmenities}>
-                Show more <MdKeyboardArrowDown />
-              </button>
-            )}
-            
-            {showMoreAmenities && (
-              <>
-                <div className="features-section">
-                  <h5>Features</h5>
-                  <div className="amenities-grid">
-                    {renderAmenityItems(features)}
-                  </div>
-                </div>
-                
-                <div className="location-section">
-                  <h5>Location</h5>
-                  <div className="amenities-grid">
-                    {renderAmenityItems(locations)}
-                  </div>
-                </div>
-                
-                <div className="safety-section">
-                  <h5>Safety</h5>
-                  <div className="amenities-grid">
-                    {renderAmenityItems(safety)}
-                  </div>
-                </div>
-                
-                <button className="show-less-button" onClick={toggleShowMoreAmenities}>
-                  Show less <MdKeyboardArrowUp />
+            <div className="filter-section">
+              <h4>Sort by Price</h4>
+              <div className="sort-options">
+                <button 
+                  className={`sort-button ${sortOrder === 'none' ? 'active' : ''}`}
+                  onClick={() => setSortOrder('none')}
+                >
+                  None
                 </button>
-              </>
-            )}
-          </div>
-          
-          <div className="filter-section">
-            <div 
-              className={`property-type-header ${showBookingOptions ? 'active' : ''}`}
-              onClick={toggleBookingOptions}
-            >
-              <h4>Booking options</h4>
-              <span className="property-type-icon">
-                {showBookingOptions ? <MdKeyboardArrowUp /> : <MdKeyboardArrowDown />}
-              </span>
+                <button 
+                  className={`sort-button ${sortOrder === 'asc' ? 'active' : ''}`}
+                  onClick={() => setSortOrder('asc')}
+                >
+                  <FaSortAmountDown /> Low to High
+                </button>
+                <button 
+                  className={`sort-button ${sortOrder === 'desc' ? 'active' : ''}`}
+                  onClick={() => setSortOrder('desc')}
+                >
+                  <FaSortAmountDownAlt /> High to Low
+                </button>
+              </div>
             </div>
             
-            {showBookingOptions && (
-              <div className="property-type-grid">
-                {bookingOptions.map(type => (
-                  <div 
-                    key={type}
-                    className={`property-type-item ${selectedBookingOptions.includes(type) ? 'selected' : ''}`}
-                    onClick={() => toggleBookingOption(type)}
-                  >
-                    <div className="property-type-icon">
-                      {type === "Instant Book" && <SiLightning/>}
-                      {type === "Self check-in" && <FaKey />}
-                      {type === "Pets Allowed" && <TbPawFilled/>}
-                    </div>
-                    <span>{type}</span>
-                  </div>
-                ))}
+            <div className="filter-section">
+              <h4>Facilities</h4>
+              <div className="essentials-section">
+                <h5>Essentials</h5>
+                <div className="amenities-grid">
+                  {renderAmenityItems(facilities)}
+                </div>
               </div>
-            )}
-          </div>
+              
+              {!showMoreAmenities && (
+                <button className="show-more-button" onClick={toggleShowMoreAmenities}>
+                  Show more <MdKeyboardArrowDown />
+                </button>
+              )}
+              
+              {showMoreAmenities && (
+                <>
+                  <div className="features-section">
+                    <h5>Features</h5>
+                    <div className="amenities-grid">
+                      {renderAmenityItems(features)}
+                    </div>
+                  </div>
+                  
+                  <div className="location-section">
+                    <h5>Location</h5>
+                    <div className="amenities-grid">
+                      {renderAmenityItems(locations)}
+                    </div>
+                  </div>
+                  
+                  <div className="safety-section">
+                    <h5>Safety</h5>
+                    <div className="amenities-grid">
+                      {renderAmenityItems(safety)}
+                    </div>
+                  </div>
+                  
+                  <button className="show-less-button" onClick={toggleShowMoreAmenities}>
+                    Show less <MdKeyboardArrowUp />
+                  </button>
+                </>
+              )}
+            </div>
+            
+            <div className="filter-section">
+              <div 
+                className={`property-type-header ${showBookingOptions ? 'active' : ''}`}
+                onClick={toggleBookingOptions}
+              >
+                <h4>Booking options</h4>
+                <span className="property-type-icon">
+                  {showBookingOptions ? <MdKeyboardArrowUp /> : <MdKeyboardArrowDown />}
+                </span>
+              </div>
+              
+              {showBookingOptions && (
+                <div className="property-type-grid">
+                  {bookingOptions.map(type => (
+                    <div 
+                      key={type}
+                      className={`property-type-item ${selectedBookingOptions.includes(type) ? 'selected' : ''}`}
+                      onClick={() => toggleBookingOption(type)}
+                    >
+                      <div className="property-type-icon">
+                        {type === "Instant Book" && <SiLightning/>}
+                        {type === "Self check-in" && <FaKey />}
+                        {type === "Pets Allowed" && <TbPawFilled/>}
+                      </div>
+                      <span>{type}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
-          <div className="filter-section">
-            <div 
-              className={`property-type-header ${showPropertyTypes ? 'active' : ''}`}
-              onClick={togglePropertyTypes}
-            >
-              <h4>Property type</h4>
-              <span className="property-type-icon">
-                {showPropertyTypes ? <MdKeyboardArrowUp /> : <MdKeyboardArrowDown />}
-              </span>
-            </div>
-            
-            {showPropertyTypes && (
-              <div className="property-type-grid">
-                {propertyTypes.map(type => (
-                  <div 
-                    key={type}
-                    className={`property-type-item ${selectedPropertyTypes.includes(type) ? 'selected' : ''}`}
-                    onClick={() => togglePropertyType(type)}
-                  >
-                    <div className="property-type-icon">
-                      {type === "House" && <BsHouseDoor />}
-                      {type === "Apartment" && <BsBuilding />}
-                      {type === "Guesthouse" && <BsHouse />}
-                      {type === "Hotel" && <FaBuilding />}
-                    </div>
-                    <span>{type}</span>
-                  </div>
-                ))}
+            <div className="filter-section">
+              <div 
+                className={`property-type-header ${showPropertyTypes ? 'active' : ''}`}
+                onClick={togglePropertyTypes}
+              >
+                <h4>Property type</h4>
+                <span className="property-type-icon">
+                  {showPropertyTypes ? <MdKeyboardArrowUp /> : <MdKeyboardArrowDown />}
+                </span>
               </div>
-            )}
+              
+              {showPropertyTypes && (
+                <div className="property-type-grid">
+                  {propertyTypes.map(type => (
+                    <div 
+                      key={type}
+                      className={`property-type-item ${selectedPropertyTypes.includes(type) ? 'selected' : ''}`}
+                      onClick={() => togglePropertyType(type)}
+                    >
+                      <div className="property-type-icon">
+                        {type === "House" && <BsHouseDoor />}
+                        {type === "Apartment" && <BsBuilding />}
+                        {type === "Guesthouse" && <BsHouse />}
+                        {type === "Hotel" && <FaBuilding />}
+                      </div>
+                      <span>{type}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
           
           <div className="filter-actions">
