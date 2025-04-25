@@ -13,7 +13,7 @@ import '../../../../Component/Filter/Filter.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 
 const AuditTrails = () => {
-  const [auditTrails, setAuditTrails] = useState([]);
+  const [auditTrailsLog, setAuditTrailsLog] = useState([]);
   const [searchKey, setSearchKey] = useState('');
   const [selectedActionType, setSelectedActionType] = useState('All');
   const [appliedFilters, setAppliedFilters] = useState({ actionType: 'All' });
@@ -25,7 +25,7 @@ const AuditTrails = () => {
     const fetchAuditTrails = async (userid) => {
       try {
         const auditTrailData = await auditTrails(userid);
-        setAuditTrails(auditTrailData || []);
+        setAuditTrailsLog(auditTrailData || []);
       } catch (error) {
         console.error('Failed to fetch Audit Trails Logs:', error);
       }
@@ -65,7 +65,7 @@ const AuditTrails = () => {
     userid: 'User ID',
   };
 
-  const filteredLogs = auditTrails.filter((log) => {
+  const filteredLogs = auditTrailsLog.filter((log) => {
     const searchInFields = `${log.userid} ${log.entityid} ${log.actiontype}`
       .toLowerCase()
       .includes(searchKey.toLowerCase());
