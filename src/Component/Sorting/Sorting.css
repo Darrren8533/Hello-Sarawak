@@ -45,9 +45,9 @@
   z-index: 1000;
   display: flex;
   justify-content: center;
-  overflow-y: auto;
   animation: slideIn 0.3s ease-out;
   background-color: rgba(0, 0, 0, 0.5); 
+  overflow: hidden;
 }
 
 @keyframes slideIn {
@@ -65,31 +65,39 @@
   max-width: 800px;
   height: 80%;
   padding: 0;
-  overflow-y: auto;
   margin-top: 80px;
   border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.filter-content-scrollable {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 0 20px 0;
 }
 
 /* Webkit browsers */
-.filter-overlay-content::-webkit-scrollbar {
+.filter-content-scrollable::-webkit-scrollbar {
   width: 6px;
 }
 
-.filter-overlay-content::-webkit-scrollbar-track {
+.filter-content-scrollable::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.filter-overlay-content::-webkit-scrollbar-thumb {
+.filter-content-scrollable::-webkit-scrollbar-thumb {
   background: #ccc;
   border-radius: 10px;
 }
 
-.filter-overlay-content::-webkit-scrollbar-thumb:hover {
+.filter-content-scrollable::-webkit-scrollbar-thumb:hover {
   background: #999;
 }
 
 /* Firefox */
-.filter-overlay-content {
+.filter-content-scrollable {
   scrollbar-width: thin;
   scrollbar-color: #ccc transparent;
 }
@@ -105,6 +113,7 @@
   z-index: 10;
   border-bottom: none;
   box-shadow: none;
+  border-bottom: 1px solid #ddd;
 }
 
 .filter-header h3 {
@@ -132,9 +141,23 @@
 .filter-section {
   margin-bottom: 24px;
   padding: 24px;
+  border-top: 1px solid #ddd;
+  padding-top: 24px;
 }
 
 .filter-section h4 {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #222;
+}
+
+.filter-price-section {
+  margin-bottom: 24px;
+  padding: 24px;
+}
+
+.filter-price-section h4 {
   margin: 0 0 8px 0;
   font-size: 18px;
   font-weight: 600;
@@ -484,7 +507,8 @@
   background-color: white;
   z-index: 10;
   border-bottom: none;
-  box-shadow: none;
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.05);
+  border-top: 1px solid #ddd;
 }
 
 .reset-button, .apply-button {
@@ -525,10 +549,6 @@
   padding: 8px 0;
   transition: all 0.2s;
   border-radius: 8px;
-}
-
-.property-type-header:hover {
-  background-color: #f9f9f9;
 }
 
 .property-type-header.active h4 {
