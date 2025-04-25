@@ -3,7 +3,12 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { IoIosArrowBack, IoIosArrowForward, IoIosBed } from "react-icons/io";
 import { IoMdClose } from "react-icons/io";
 import { IoReturnUpBackOutline } from "react-icons/io5";
-import { FaStar, FaUser, FaWifi, FaParking, FaSwimmingPool, FaHotTub, FaTv, FaUtensils, FaSnowflake, FaPaw, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaLock, FaBell, FaMapMarkerAlt, FaTree, FaMountain, FaCity } from "react-icons/fa";
+import { GiWashingMachine, GiClothesline, GiDesert  } from "react-icons/gi";
+import { PiSecurityCamera } from "react-icons/pi";
+import { SiLightning } from "react-icons/si";
+import { TbPawFilled, TbPawOff } from "react-icons/tb";
+import { MdLandscape, MdOutlineKingBed, MdFireplace, MdSmokingRooms, MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
+import { FaWifi, FaDesktop, FaDumbbell, FaWater, FaSkiing, FaChargingStation, FaParking, FaSwimmingPool, FaTv, FaUtensils, FaSnowflake, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaBell, FaTree, FaCity } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 import Navbar from '../../../Component/Navbar/navbar';
@@ -14,32 +19,45 @@ import { createReservation, requestBooking, getCoordinates, fetchUserData } from
 
 const facilities = [
     { name: "Wi-Fi", icon: <FaWifi className="facilities-icon"/> },
-    { name: "Parking", icon: <FaParking className="facilities-icon"/> },
-    { name: "Swimming Pool", icon: <FaSwimmingPool className="facilities-icon"/> },
-    { name: "Hot Tub", icon: <FaHotTub className="facilities-icon"/> },
-    { name: "TV", icon: <FaTv className="facilities-icon"/> },
     { name: "Kitchen", icon: <FaUtensils className="facilities-icon"/> },
-    { name: "Air Conditioning", icon: <FaSnowflake className="facilities-icon"/> },
-    { name: "Pets Allowed", icon: <FaPaw className="facilities-icon"/> },
+    { name: "Washer", icon: <GiWashingMachine className="facilities-icon"/> },
+    { name: "Dryer", icon: <GiClothesline className="facilities-icon"nowflake /> },
+    { name: "Heating", icon: <FaWind className="facilities-icon"/> },
+    { name: "Dedicated workspace", icon: <FaDesktop className="facilities-icon"/> },
+    { name: "TV", icon: <FaTv className="facilities-icon"/> },
+    { name: "Ceiling Fan", icon: <FaFan className="facilities-icon"/> },
+
+    { name: "Free Parking", icon: <FaParking className="facilities-icon"/> },
+    { name: "Swimming Pool", icon: <FaSwimmingPool className="facilities-icon"/> },
+    { name: "Bathtub", icon: <FaBath className="facilities-icon"/> },
+    { name: "Shower", icon: <FaShower className="facilities-icon"/> },
+    { name: "EV charger", icon: <FaChargingStation className="facilities-icon"/> },
+    { name: "Baby Crib", icon: <FaBabyCarriage className="facilities-icon"/> },
+    { name: "King bed", icon: <MdOutlineKingBed className="facilities-icon"/> },
+    { name: "Gym", icon: <FaDumbbell className="facilities-icon"/> },
+    { name: "Breakfast", icon: <FaCoffee className="facilities-icon"/> },
+    { name: "Indoor fireplace", icon: <MdFireplace className="facilities-icon"/> },
+    { name: "Smoking allowed", icon: <MdSmokingRooms className="facilities-icon"/> },
     { name: "No Smoking", icon: <FaSmokingBan className="facilities-icon"/> },
+
+    { name: "City View", icon: <FaCity className="facilities-icon"/> },
+    { name: "Garden", icon: <FaTree className="facilities-icon"/> },
+    { name: "Bicycle Rental", icon: <FaBicycle className="facilities-icon"/> },
+    { name: "Beachfront", icon: <FaUmbrellaBeach className="facilities-icon"/> },
+    { name: "Waterfront", icon: <FaWater className="facilities-icon"/> },
+    { name: "Countryside", icon: <MdLandscape className="facilities-icon"/> },
+    { name: "Ski-in/ski-out", icon: <FaSkiing className="facilities-icon"/> },
+    { name: "Desert", icon: <GiDesert className="facilities-icon"/> },
+    
+    { name: "Security Alarm", icon: <FaBell className="facilities-icon"/> },
     { name: "Fire Extinguisher", icon: <FaFireExtinguisher className="facilities-icon"/> },
     { name: "First Aid Kit", icon: <FaFirstAid className="facilities-icon"/> },
-    { name: "Shower", icon: <FaShower className="facilities-icon"/> },
-    { name: "Coffee Maker", icon: <FaCoffee className="facilities-icon"/> },
-    { name: "Beach Access", icon: <FaUmbrellaBeach className="facilities-icon"/> },
-    { name: "Bathtub", icon: <FaBath className="facilities-icon"/> },
-    { name: "Heating", icon: <FaWind className="facilities-icon"/> },
-    { name: "Ceiling Fan", icon: <FaFan className="facilities-icon"/> },
-    { name: "Free Parking", icon: <FaCar className="facilities-icon"/> },
-    { name: "Bicycle Rental", icon: <FaBicycle className="facilities-icon"/> },
-    { name: "Baby Crib", icon: <FaBabyCarriage className="facilities-icon"/> },
-    { name: "Keyless Entry", icon: <FaKey className="facilities-icon"/> },
-    { name: "Safe", icon: <FaLock className="facilities-icon"/> },
-    { name: "Security Alarm", icon: <FaBell className="facilities-icon"/> },
-    { name: "Nearby Attractions", icon: <FaMapMarkerAlt className="facilities-icon"/> },
-    { name: "Garden", icon: <FaTree className="facilities-icon"/> },
-    { name: "Mountain View", icon: <FaMountain className="facilities-icon"/> },
-    { name: "City View", icon: <FaCity className="facilities-icon"/> },
+    { name: "Security Camera", icon: <PiSecurityCamera className="facilities-icon"/> },
+
+    { name: "Instant booking", icon: <SiLightning className="facilities-icon"/> },
+    { name: "Self check-in", icon: <FaKey className="facilities-icon"/> },
+    { name: "Pets Allowed", icon: <TbPawFilled className="facilities-icon"/> },
+    { name: "No Pets", icon: <TbPawOff className="facilities-icon"/> }
 ];
 
 const PropertyDetails = () => {
