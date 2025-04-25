@@ -1,6 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
-import { FaWifi, FaParking, FaSwimmingPool, FaHotTub, FaTv, FaUtensils, FaSnowflake, FaPaw, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaLock, FaBell, FaMapMarkerAlt, FaTree, FaMountain, FaCity } from "react-icons/fa";
+import { GiWashingMachine, GiClothesline, GiDesert  } from "react-icons/gi";
+import { PiSecurityCamera } from "react-icons/pi";
+import { SiLightning } from "react-icons/si";
+import { TbPawFilled, TbPawOff } from "react-icons/tb";
+import { MdLandscape, MdOutlineKingBed, MdFireplace, MdSmokingRooms, MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
+import { FaWifi, FaDesktop, FaDumbbell, FaWater, FaSkiing, FaChargingStation, FaParking, FaSwimmingPool, FaTv, FaUtensils, FaSnowflake, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaBell, FaTree, FaCity } from "react-icons/fa";
 import { propertiesListing, updateProperty, propertyListingRequest } from "../../../Api/api";
 import Toast from "../Toast/Toast";
 import "./PropertyForm.css";
@@ -54,32 +59,46 @@ const resizeImage = (file, maxWidth, maxHeight) => {
 const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const predefinedFacilities = [
         { name: "Wi-Fi", icon: <FaWifi /> },
-        { name: "Parking", icon: <FaParking /> },
-        { name: "Swimming Pool", icon: <FaSwimmingPool /> },
-        { name: "Hot Tub", icon: <FaHotTub /> },
-        { name: "TV", icon: <FaTv /> },
         { name: "Kitchen", icon: <FaUtensils /> },
+        { name: "Washer", icon: <GiWashingMachine /> },
+        { name: "Dryer", icon: <GiClothesline /> },
         { name: "Air Conditioning", icon: <FaSnowflake /> },
-        { name: "Pets Allowed", icon: <FaPaw /> },
+        { name: "Heating", icon: <FaWind /> },
+        { name: "Dedicated workspace", icon: <FaDesktop /> },
+        { name: "TV", icon: <FaTv /> },
+        { name: "Ceiling Fan", icon: <FaFan /> },
+
+        { name: "Free Parking", icon: <FaParking /> },
+        { name: "Swimming Pool", icon: <FaSwimmingPool /> },
+        { name: "Bathtub", icon: <FaBath /> },
+        { name: "Shower", icon: <FaShower /> },
+        { name: "EV charger", icon: <FaChargingStation /> },
+        { name: "Baby Crib", icon: <FaBabyCarriage /> },
+        { name: "King bed", icon: <MdOutlineKingBed /> },
+        { name: "Gym", icon: <FaDumbbell /> },
+        { name: "Breakfast", icon: <FaCoffee /> },
+        { name: "Indoor fireplace", icon: <MdFireplace /> },
+        { name: "Smoking allowed", icon: <MdSmokingRooms /> },
         { name: "No Smoking", icon: <FaSmokingBan /> },
+
+        { name: "City View", icon: <FaCity /> },
+        { name: "Garden", icon: <FaTree /> },
+        { name: "Bicycle Rental", icon: <FaBicycle /> },
+        { name: "Beachfront", icon: <FaUmbrellaBeach /> },
+        { name: "Waterfront", icon: <FaWater /> },
+        { name: "Countryside", icon: <MdLandscape /> },
+        { name: "Ski-in/ski-out", icon: <FaSkiing /> },
+        { name: "Desert", icon: <GiDesert /> },
+        
+        { name: "Security Alarm", icon: <FaBell /> },
         { name: "Fire Extinguisher", icon: <FaFireExtinguisher /> },
         { name: "First Aid Kit", icon: <FaFirstAid /> },
-        { name: "Shower", icon: <FaShower /> },
-        { name: "Coffee Maker", icon: <FaCoffee /> },
-        { name: "Beach Access", icon: <FaUmbrellaBeach /> },
-        { name: "Bathtub", icon: <FaBath /> },
-        { name: "Heating", icon: <FaWind /> },
-        { name: "Ceiling Fan", icon: <FaFan /> },
-        { name: "Free Parking", icon: <FaCar /> },
-        { name: "Bicycle Rental", icon: <FaBicycle /> },
-        { name: "Baby Crib", icon: <FaBabyCarriage /> },
-        { name: "Keyless Entry", icon: <FaKey /> },
-        { name: "Safe", icon: <FaLock /> },
-        { name: "Security Alarm", icon: <FaBell /> },
-        { name: "Nearby Attractions", icon: <FaMapMarkerAlt /> },
-        { name: "Garden", icon: <FaTree /> },
-        { name: "Mountain View", icon: <FaMountain /> },
-        { name: "City View", icon: <FaCity /> }
+        { name: "Security Camera", icon: <PiSecurityCamera /> },
+
+        { name: "Instant booking", icon: <SiLightning /> },
+        { name: "Self check-in", icon: <FaKey /> },
+        { name: "Pets Allowed", icon: <TbPawFilled /> },
+        { name: "No Pets", icon: <TbPawOff /> },
     ];
 
     const clusters = [
@@ -257,7 +276,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         });
     };
 
-   const handleSubmit = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (formData.propertyImage.length < 5) {
             setToastMessage("Please upload at least 5 images");
@@ -265,13 +284,6 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             setShowToast(true);
             return;
         }
-        if (formData.propertyImage.length > 10) {
-            setToastMessage("You cannot upload more than 10 images");
-            setToastType("error");
-            setShowToast(true);
-            return;
-        }
-
 
         const data = new FormData();
         data.append("username", formData.username);
