@@ -62,8 +62,8 @@ const AuditTrails = () => {
     timestamp: 'Timestamp',
     action: 'Action',
     actiontype: 'Action Type',
-    userid: 'User ID',
-    username: 'Username',
+    creatorid: 'Creator ID',
+    createdby: 'Created By',
   };
 
   const filteredLogs = auditTrailsLog.filter((log) => {
@@ -81,8 +81,8 @@ const AuditTrails = () => {
   const handleAction = (action, log) => {
     if (action === 'view') {
       const essentialFields = {
-        userid: log.userid || 'N/A',
-        username: log.username || 'N/A',
+        creatorid: log.userid || 'N/A',
+        createdby: log.username || 'N/A',
         entityid: log.entityid || 'N/A',
         entitytype: log.entitytype || 'N/A',
         timestamp: log.timestamp || 'N/A',
