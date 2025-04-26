@@ -75,10 +75,7 @@ const Moderators = () => {
   });
 
   const removeMutation = useMutation({
-    mutationFn: (moderatorId) => {
-      const creatorid = localStorage.getItem("userid"); 
-      return removeUser(moderatorId, creatorid);   
-    },
+    mutationFn: (moderatorId) => removeUser(moderatorId),
     onSuccess: (_, moderatorId) => {
       queryClient.invalidateQueries(['moderators']);
       const moderator = moderators.find(m => m.userid === moderatorId);
