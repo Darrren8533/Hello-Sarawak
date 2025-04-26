@@ -316,8 +316,11 @@ export const updateUser = async (userData, userid) => {
 
 // Remove User
 export const removeUser = async (userid) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
   try {
-    const response = await fetch(`${API_URL}/users/removeUser/${userid}`, {
+    const response = await fetch(`${API_URL}/users/removeUser/${userid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
       method: 'DELETE',
     });
 
