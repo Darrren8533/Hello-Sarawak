@@ -82,7 +82,7 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
             usergroup: "Moderator",
             uactivation: "Active",
             userid,
-            username,
+            creatorUsername,
         };
 
         try {
