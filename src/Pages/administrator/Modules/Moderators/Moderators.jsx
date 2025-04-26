@@ -75,7 +75,10 @@ const Moderators = () => {
   });
 
   const removeMutation = useMutation({
-    mutationFn: (moderatorId) => removeUser(moderatorId),
+    mutationFn: (moderatorId) => {
+      const creatorid = localStorage.getItem("userid"); 
+      return removeUser(moderatorId, creatorid);   
+    },
     onSuccess: (_, moderatorId) => {
       queryClient.invalidateQueries(['moderators']);
       const moderator = moderators.find(m => m.userid === moderatorId);
@@ -92,7 +95,6 @@ const Moderators = () => {
       setModeratorToDelete(null);
     },
   });
-
 
   useEffect(() => {
     applyFilters();
