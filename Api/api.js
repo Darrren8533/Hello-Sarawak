@@ -358,8 +358,11 @@ export const suspendUser = async (userid) => {
 
 // Activate User
 export const activateUser = async (userid) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
   try {
-    const response = await fetch(`${API_URL}/users/activateUser/${userid}`, {
+    const response = await fetch(`${API_URL}/users/activateUser/${userid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
       method: 'PUT',
     });
 
