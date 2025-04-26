@@ -63,7 +63,7 @@ const AuditTrails = () => {
     action: 'Action',
     actiontype: 'Action Type',
     creatorid: 'Creator ID',
-    actionedby: 'Created By',
+    actionedby: 'Actioned By',
   };
 
   const filteredLogs = auditTrailsLog.filter((log) => {
