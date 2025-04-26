@@ -88,7 +88,7 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
             if (initialData) {
                 response = await updateUser(userData, initialData.userid);
             } else {
-                response = await createModerator(userData, userid);
+                response = await createModerator(userData);
             }
 
             if (response && response.message) {
