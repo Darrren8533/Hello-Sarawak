@@ -67,7 +67,7 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
         }
 
         const userid = localStorage.getItem("userid");
-        const username = localStorage.getItem("username");
+        const creatorUsername = localStorage.getItem("username");
 
         const userData = {
             firstName,
