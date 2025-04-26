@@ -337,8 +337,11 @@ export const removeUser = async (userid) => {
 
 // Suspend User
 export const suspendUser = async (userid) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
   try {
-    const response = await fetch(`${API_URL}/users/suspendUser/${userid}`, {
+    const response = await fetch(`${API_URL}/users/suspendUser/${userid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
       method: 'PUT',
     });
 
