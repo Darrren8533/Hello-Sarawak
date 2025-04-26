@@ -66,6 +66,8 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
             return;
         }
 
+        const userid = localStorage.getItem("userid");
+
         const userData = {
             firstName,
             lastName,
@@ -78,6 +80,7 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
             title,
             usergroup: "Moderator",
             uactivation: "Active",
+            userid,
         };
 
         try {
@@ -85,7 +88,7 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
             if (initialData) {
                 response = await updateUser(userData, initialData.userid);
             } else {
-                response = await createModerator(userData);
+                response = await createModerator(userData, userid);
             }
 
             if (response && response.message) {
