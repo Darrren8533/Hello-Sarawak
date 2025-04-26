@@ -97,7 +97,7 @@ const AuditTrails = () => {
 
   const columns = [
     {
-      header: 'Entity Info',
+      header: 'Entity[Entity ID]',
       accessor: 'entityInfo',
       render: (log) => `${log.entitytype}[${log.entityid}]`,
     },
