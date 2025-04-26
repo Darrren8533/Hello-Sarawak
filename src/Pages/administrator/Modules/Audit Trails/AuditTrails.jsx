@@ -81,6 +81,7 @@ const AuditTrails = () => {
     if (action === 'view') {
       const essentialFields = {
         userid: log.userid || 'N/A',
+        username: log.username || 'N/A',
         entityid: log.entityid || 'N/A',
         entitytype: log.entitytype || 'N/A',
         timestamp: log.timestamp || 'N/A',
@@ -102,7 +103,7 @@ const AuditTrails = () => {
       render: (log) => `${log.entitytype}[${log.entityid}]`,
     },
     { header: 'Action', accessor: 'action' },
-    { header: 'User ID', accessor: 'userid' },
+    { header: 'Username', accessor: 'username' },
     { header: 'Timestamp', accessor: 'timestamp' },
     {
       header: 'Actions',
