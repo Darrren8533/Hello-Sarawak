@@ -432,8 +432,11 @@ export const requestBooking = async (reservationid) => {
 
 // Booking Accepted Notification
 export const acceptBooking = async (reservationid) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
   try {
-    const response = await fetch(`${API_URL}/accept_booking/${reservationid}`, {
+    const response = await fetch(`${API_URL}/accept_booking/${reservationid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
