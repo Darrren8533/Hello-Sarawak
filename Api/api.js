@@ -175,8 +175,11 @@ export const updatePropertyStatus = async (propertyid, status) => {
 
 // Delete Property
 export const deleteProperty = async (propertyid) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
   try {
-    const response = await fetch(`${API_URL}/removePropertiesListing/${propertyid}`, {
+    const response = await fetch(`${API_URL}/removePropertiesListing/${propertyid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
       method: 'DELETE',
     });
 
