@@ -152,8 +152,11 @@ export const updateProperty = async (propertyData, propertyid) => {
 
 // Update property status
 export const updatePropertyStatus = async (propertyid, status) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
   try {
-    const response = await fetch(`${API_URL}/updatePropertyStatus/${propertyid}`, {
+    const response = await fetch(`${API_URL}/updatePropertyStatus/${propertyid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ propertyStatus: status }),
