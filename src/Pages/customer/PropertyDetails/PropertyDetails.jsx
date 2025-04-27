@@ -301,9 +301,8 @@ const PropertyDetails = () => {
     <div>
       <div className="Property_Details_Main_Container">
         <AuthProvider>
-        <Navbar />
+        {!showAllPhotos && !showBookingForm && <Navbar />}
         <div className="property-details-main-container">
-          {!showAllPhotos && !showBookingForm}
           <div className="Main_Image_gallery_container">
             <div className="Image_gallery_card_1">
               <img 
@@ -798,8 +797,7 @@ const PropertyDetails = () => {
                       </div>
                     </div>
                   </div>
-
-                  {/*
+                  
                   <div className="booking-right">
                     <div className="property-card">
                       <img 
@@ -831,7 +829,6 @@ const PropertyDetails = () => {
                       </div>
                     )}
                   </div>
-                  */}
                 </div>
               </div>
             </div>
