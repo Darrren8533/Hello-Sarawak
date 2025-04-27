@@ -312,11 +312,17 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             let response;
             if (initialData) {
                 const propertyid = initialData.propertyid || initialData.propertyID;
-                response = await updateProperty(data, propertyid);
+                const response = await updateProperty(data, propertyid);
             } else {
-                response = await propertiesListing(data);
-                const { propertyID } = response;
-                await propertyListingRequest(propertyID);
+                const usergroup = localStorage.getItem("usergroup");
+
+                if (usergroup === "Administrator") {
+                    const response = await propertiesListing(data);
+                } else if (usergroup === "Moderator") {
+                    const response = await propertiesListing(data);
+                    const { propertyid } = response;
+                    await propertyListingRequest(propertyid);
+                }
             }
 
             if (response && response.message) {
