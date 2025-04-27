@@ -19,6 +19,7 @@ const Contact = () => {
   });
 
   const [status, setStatus] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -27,14 +28,22 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
-    
+    setIsSubmitting(true);
+    setStatus('');
+
     try {
       const result = await sendContactEmail(formData);
-      setStatus(result.message);
+    
+      if (result.message && result.message.toLowerCase().includes('success')) {
+        setStatus('Message sent successfully!');
+        setFormData({ name: '', email: '', message: '' });
+      } else {
+        setStatus('Failed to send message.');
+      }
     } catch (error) {
       setStatus('Failed to send message. Please try again later.');
-      console.error('Error sending message:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
