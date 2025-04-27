@@ -125,13 +125,17 @@ export const fetchPropertiesListingTable = async () => {
 
 // Update Property
 export const updateProperty = async (propertyData, propertyid) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
   if (!propertyid || propertyid === 'undefined') {
-    throw new Error('property id invalid');
+    throw new Error('propertyid invalid');
   }
+  
   try {
-    const response = await fetch(`${API_URL}/propertiesListing/${propertyid}`, {
+    const response = await fetch(`${API_URL}/propertiesListing/${propertyid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
       method: 'PUT',
-      body: propertyData, // Ensure this is FormData to handle images properly
+      body: propertyData, 
     });
 
     if (!response.ok) {
