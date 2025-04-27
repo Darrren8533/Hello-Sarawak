@@ -457,8 +457,11 @@ export const acceptBooking = async (reservationid) => {
 
 // Suggest New Room
 export const suggestNewRoom = async (propertyid, reservationid) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
   try {
-    const response = await fetch(`${API_URL}/suggestNewRoom/${propertyid}/${reservationid}`, {
+    const response = await fetch(`${API_URL}/suggestNewRoom/${propertyid}/${reservationid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -479,8 +482,11 @@ export const suggestNewRoom = async (propertyid, reservationid) => {
 
 // Property Listing Request Notification
 export const propertyListingRequest = async (propertyid) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
   try {
-    const response = await fetch(`${API_URL}/propertyListingRequest/${propertyid}`, {
+    const response = await fetch(`${API_URL}/propertyListingRequest/${propertyid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
