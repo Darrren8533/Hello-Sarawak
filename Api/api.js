@@ -407,11 +407,8 @@ export const sendContactEmail = async (emailData) => {
 
 // Booking Request Notification
 export const requestBooking = async (reservationid) => {
-  const creatorid = localStorage.getItem("userid");
-  const creatorUsername = localStorage.getItem("username");
-  
   try {
-    const response = await fetch(`${API_URL}/requestBooking/${reservationid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
+    const response = await fetch(`${API_URL}/requestBooking/${reservationid}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
