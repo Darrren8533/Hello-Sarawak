@@ -8,6 +8,9 @@ import { FaPhoneAlt } from "react-icons/fa";
 //Import Css
 import './contact_us.css';
 
+// Import API Function
+import { sendContactEmail } from '../../../Api/api';
+
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -27,20 +30,8 @@ const Contact = () => {
     console.log(formData);
     
     try {
-      const response = await fetch('https://cams-backend.vercel.app/contact_us', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const result = await response.json();
-      setStatus(result.message); // set status based on response message
-
-      if (response.ok) {
-        setFormData({ name: '', email: '', message: '' });
-      }
+      const result = await sendContactEmail(formData);
+      setStatus(result.message);
     } catch (error) {
       setStatus('Failed to send message. Please try again later.');
       console.error('Error sending message:', error);
