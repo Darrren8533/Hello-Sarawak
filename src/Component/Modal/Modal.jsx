@@ -109,12 +109,6 @@ const Modal = ({ isOpen, title, data, labels = {}, onClose }) => {
             )}
           </div>
         </div>
-
-        <div className="modal-footer">
-          <button className="close-button" onClick={onClose}>
-            Close
-          </button>
-        </div>
       </div>
     </div>
   );
