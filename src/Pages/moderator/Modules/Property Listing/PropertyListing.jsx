@@ -218,20 +218,29 @@ const PropertyListing = () => {
         username: "Operator Name"
     };
 
-    const filteredProperties = properties.filter(
-        (property) => (
-            (property.propertyid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-            (property.propertyaddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-            (property.clustername?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-            (property.rateamount?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-            (property.propertystatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
-        )
-    );
+    const username = localStorage.getItem('username');
+    const usergroup = localStorage.getItem('usergroup');
+
+    const filteredProperties = properties.filter((property) => {
+
+        if (usergroup === 'Moderator' && property.username !== username) {
+            return false;
+        }
+
+        const statusMatch =
+            appliedFilters.status === 'All' ||
+            (property.propertystatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase();
+
+        const searchInFields =
+            `${property.propertyid} ${property.propertyaddress} ${property.clustername} ${property.rateamount} ${property.propertystatus}`
+                .toLowerCase()
+                .includes(searchKey.toLowerCase());
+
+        return statusMatch && searchInFields;
+    });
 
     const propertyDropdownItems = (property, username, usergroup) => {
-    const isOwner = property.username === username; 
     const isModerator = usergroup === 'Moderator';
-    const isAdmin = usergroup === 'Administrator';
 
     const { propertystatus } = property;
 
@@ -260,9 +269,6 @@ const PropertyListing = () => {
 };
 
     
-const username = localStorage.getItem('username');
-const usergroup = localStorage.getItem('usergroup'); 
-
 const columns = [
     { header: 'ID', accessor: 'propertyid' },
     {
