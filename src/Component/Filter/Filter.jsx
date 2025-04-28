@@ -3,7 +3,7 @@ import '../../Component/Filter/Filter.css';
 
 const Filter = ({ filters, onApplyFilters }) => {
     return (
-        <div className="filter-container">
+        <div className="filter-layout">
             <div className="filters">
                 {filters.map((filter, index) => (
                     <div className="filter-item" key={index}>
