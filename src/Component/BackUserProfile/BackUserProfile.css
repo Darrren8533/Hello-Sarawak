@@ -1,4 +1,4 @@
-/* Core styling for profile page */
+
 .back-profile-container {
     display: flex;
     justify-content: center;
@@ -14,7 +14,6 @@
     width: 100%;
   }
   
-  /* Left Column - Profile Card */
   .back-profile-left-column {
     flex: none;
     width: 350px;
@@ -314,7 +313,7 @@
     transform: translateY(1px);
   }
   
-  /* Responsive Design */
+
   @media screen and (max-width: 992px) {
     .back-profile-grid {
       gap: 24px;
