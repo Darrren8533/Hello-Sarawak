@@ -4,12 +4,9 @@ import Sidebar from '../../Component/Sidebar/Sidebar';
 import Dashboard from './Modules/Dashboard/Dashboard';
 import Customers from './Modules/Customers/Customers';
 import Operators from './Modules/Operators/Operators';
-import Owners from './Modules/Owners/Owners';
 import PropertyListing from './Modules/Property Listing/PropertyListing';
 import Reservations from './Modules/Reservations/Reservations';
 import Finances from './Modules/Finances/Finances';
-import Analytics from './Modules/Analytics/Analytics';
-import CommunicationHub from './Modules/Communication Hub/CommunicationHub';
 import AuditTrails from './Modules/Audit Trails/AuditTrails';
 import Profile from './Modules/Profile/Profile';
 import NoAccess from '../../Component/NoAccess/NoAccess';
@@ -57,12 +54,9 @@ import '../../Component/MainContent/MainContent.css';
     { path: '/owner_dashboard/dashboard', label: 'Dashboard', icon: <FiHome /> },
     { path: '/owner_dashboard/customers', label: 'Customers', icon: <FiUsers /> },
     { path: '/owner_dashboard/operators', label: 'Admin/Moderator', icon: <FaUserTie /> },
-    { path: '/owner_dashboard/owners', label: 'Owners', icon: <RiAdminLine /> },
     { path: '/owner_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel /> },
     { path: '/owner_dashboard/reservations', label: 'Reservations', icon: <FiCalendar /> },
     { path: '/owner_dashboard/finances', label: 'Finances', icon: <FiCreditCard /> },
-    { path: '/owner_dashboard/analytics', label: 'Analytics', icon: <FiBarChart /> },
-    { path: '/owner_dashboard/communication-hub', label: 'Communication Hub', icon: <FiMessageSquare /> },
     { path: '/owner_dashboard/audit-trails', label: 'Audit Trails', icon: <FiFileText /> },
     { path: '/owner_dashboard/profile', label: 'Profile', icon: <FiUsers /> },
   ];
@@ -87,12 +81,9 @@ import '../../Component/MainContent/MainContent.css';
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="customers" element={<Customers />} />
           <Route path="operators" element={<Operators />} />
-          <Route path="owners" element={<Owners />} />
           <Route path="property-listing" element={<PropertyListing />} />
           <Route path="reservations" element={<Reservations />} />
           <Route path="finances" element={<Finances />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="communication-hub" element={<CommunicationHub />} />
           <Route path="audit-trails" element={<AuditTrails />} />
           <Route path="profile" element={<Profile />} />
           {/* Catch-all for undefined routes */}
