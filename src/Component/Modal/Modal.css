@@ -27,32 +27,19 @@
   animation: modal-appear 0.3s ease-out;
 }
 
-@keyframes modal-appear {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Modal Header */
 .modal-header {
-  padding: 18px 24px;
-  border-bottom: 1px solid #f0f0f0;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  background-color: #fafafa;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .modal-title {
-  margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: #2d3748;
+  color: #2c3e50;
+  margin: 0;
 }
 
 .modal-close-icon {
@@ -73,7 +60,7 @@
   color: #4a5568;
 }
 
-/* Modal Body */
+
 .modal-body {
   padding: 24px;
   overflow-y: auto;
@@ -101,7 +88,6 @@
   transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-/* Add a fade effect for image transitions */
 .gallery-image.fade-out {
   opacity: 0;
   transform: scale(0.98);
@@ -170,7 +156,7 @@
   margin-bottom: 24px;
 }
 
-/* Data Display */
+
 .data-container {
   display: grid;
   gap: 16px;
@@ -200,30 +186,6 @@
   font-size: 15px;
   line-height: 1.4;
   overflow-wrap: break-word;
-}
-
-/* Modal Footer */
-.modal-footer {
-  padding: 16px 24px;
-  border-top: 1px solid #f0f0f0;
-  background-color: #fafafa;
-}
-
-.close-button {
-  width: 100%;
-  padding: 10px 16px;
-  background-color: #3182ce;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.close-button:hover {
-  background-color: #2b6cb0;
 }
 
 /* Responsive Adjustments */
