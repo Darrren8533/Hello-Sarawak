@@ -33,8 +33,8 @@ const PropertyListing = () => {
     
     // Use React Query to fetch properties
     const { data, isLoading, error } = useQuery({
-        queryKey: ['properties', page, pageSize, appliedFilters],
-        queryFn: () => fetchPropertiesListingTable(page, pageSize, appliedFilters.status !== 'All' ? appliedFilters.status : undefined),
+        queryKey: ['properties'],
+        queryFn: () => fetchPropertiesListingTable(),
         select: (data) => ({
             properties: (data?.properties || []).filter(property => property.propertyid !== undefined),
             totalCount: data?.totalCount || 0
@@ -224,15 +224,20 @@ const PropertyListing = () => {
         username: "Operator Name"
     };
 
-    const filteredProperties = properties.filter(
-        (property) => (
-            (property.propertyid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-            (property.propertyaddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-            (property.clustername?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-            (property.rateamount?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-            (property.propertystatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
-        )
-    );
+    const filteredProperties = properties.filter((property) => {
+
+        const statusMatch =
+            appliedFilters.status === 'All' ||
+            (property.propertystatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase();
+
+
+        const searchInFields =
+            `${property.propertyid} ${property.propertyaddress} ${property.clustername} ${property.rateamount} ${property.propertystatus}`
+                .toLowerCase()
+                .includes(searchKey.toLowerCase());
+
+        return statusMatch && searchInFields;
+    });
 
     const propertyDropdownItems = (property, username, usergroup) => {
     const isOwner = property.username === username; 
@@ -264,7 +269,7 @@ const PropertyListing = () => {
         if (!isOwner) {
             // Admin managing moderator's property
             if (property.username !== username && property.username.includes('admin')) {
-                // Current admin cannot reject or manage another admin's property
+                
                 return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
             }
             if (propertystatus === 'Pending') {
@@ -303,7 +308,6 @@ const PropertyListing = () => {
         }
     }
 
-    // Default: View only
     return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
 };
 
@@ -397,7 +401,7 @@ const columns = [
                 rowKey="propertyid"
                 currentPage={page}
                 pageSize={pageSize}
-                totalCount={totalCount}
+                totalCount={filteredProperties.length}
                 onPageChange={handlePageChange}
                 onPageSizeChange={handlePageSizeChange}
             />
