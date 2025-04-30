@@ -93,6 +93,7 @@ body {
     justify-content: space-between;
     width: 100%;
     margin-top: 20px;
+    padding-bottom: 30px;
 }
 
 .Description_container{
@@ -109,7 +110,7 @@ body {
     max-width: 1000px;
     width: 100%;
     text-align: left;
-    padding-bottom: 25px;
+    padding-bottom: 5px;
 }
 
 .second_container{
@@ -1463,7 +1464,7 @@ body {
     background-color: white;
     padding: 16px 16px;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    z-index: 999;
+    z-index: 1000;
     border-top: 1px solid #eee;
 }
   
@@ -1508,11 +1509,9 @@ body {
 .mobile-slideshow {
   display: none;
   position: relative;
-  width: 100vw; 
+  width: 100%; 
   height: 300px;
   overflow: hidden;
-  margin-left: -12px; 
-  margin-right: -12px;
 }
 
 .mobile-slideshow .slide {
@@ -1633,343 +1632,381 @@ body {
     background-color: #fff8f9;
 }
 
+@media screen and (min-width: 990px) {
+    .property-details-main-container{
+        width: 95%;
+    }
+}
+
+/* Media query for screens up to 990px */
+@media screen and (max-width: 990px) {
+    .property-details-main-container{
+        width: 95%;
+        padding: 0 15px
+    }
+
+    .Image_gallery_card_1, 
+    .Image_gallery_card_2 {
+        width: 100%;
+    }
+
+    .main_gallery_image {
+        height: 400px;
+    }
+    
+    .second_gallery_image {
+        height: 198px;
+    }
+
+    .second_container {
+        display: none; 
+    }
+
+    /* Show the mobile booking bar */
+    .mobile-booking-bar {
+        display: block;
+    }
+    
+    .description-overlay-content {
+        width: 90%;
+        max-width: 90%;
+    }
+}
+
 @media (max-width: 768px) {
 
-.property-details-main-container {
-    width: 92%;
-    margin-top: 30px;
-}
-  
-.Main_Image_gallery_container {
-    margin-top: 100px;
-    flex-direction: column;
-    gap: 10px;
-}
-  
-.Image_gallery_card_1, 
-.Image_gallery_card_2 {
-    width: 100%;
-}
-  
-.main_gallery_image {
-    height: 400px;
-}
-  
-.second_gallery_image {
-    height: 200px;
-}
-  
-.Image_gallery_container {
-    flex-direction: row;
-    gap: 10px;
-}
-  
-.Description_container {
-    flex-direction: column;
-      gap: 20px;
-}
-  
-.first_container {
-    width: 100%;
-    padding: 0 5px;
-}
-  
-.second_container {
-    display: none; 
-}
-  
-.sub_details {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-  
-.profile_section {
-    margin-left: 0;
-    margin-top: 10px;
-}
-  
-.facilities-details {
-    grid-template-columns: 1fr 1fr;
-}
-  
-/* Booking Form Modal */
-.booking-content {
-    flex-direction: column;
-}
-  
-.booking-left,
-.booking-right {
-    flex: 1;
-    width: 100%;
-}
-  
-.form-grid {
-    grid-template-columns: 1fr;
-}
-  
-/* Show the mobile booking bar */
-.mobile-booking-bar {
-    display: block;
-}
-  
-.description-overlay-content {
-    width: 90%;
-    max-width: 90%;
-}
-  
-/* Mobile slideshow for property images */
-.Main_Image_gallery_container {
-    display: none;
-}
-  
-.mobile-slideshow {
-    display: block;
-    margin-top: 80px;
-}
-  
-/* Photos overlay adjustments */
-.photos-grid {
-    flex-direction: column;
-}
-  
-.photos-container {
-    padding: 0 20px;
-}
-  
-.photo-section img {
-    width: 100%;
-    height: 300px;
-}
-  
-.fullscreen-image {
-    height: auto;
-    max-height: 80vh;
-}
+    .property-details-main-container {
+        width: 100%;
+        margin-top: 30px;
+    }
+    
+    .Main_Image_gallery_container {
+        margin-top: 100px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .Image_gallery_container {
+        flex-direction: row;
+        gap: 10px;
+    }
+    
+    .Description_container {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .first_container {
+        width: 95%;
+        padding: 0 10px;
+        padding-bottom: 55px;
+    }
+    
+    .second_container {
+        display: none; 
+    }
+    
+    .sub_details {
+        margin-top: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .profile_section {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+    
+    .facilities-details {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    /* Booking Form Modal */
+    .booking-content {
+        flex-direction: column;
+    }
+    
+    .booking-left,
+    .booking-right {
+        flex: 1;
+        width: 100%;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Show the mobile booking bar */
+    .mobile-booking-bar {
+        display: block;
+    }
+    
+    .description-overlay-content {
+        width: 90%;
+        max-width: 90%;
+    }
+    
+    /* Mobile slideshow for property images */
+    .Main_Image_gallery_container {
+        display: none;
+    }
+    
+    .mobile-slideshow {
+        display: block;
+        margin-top: 80px;
+        height: 380px;
+    }
+    
+    /* Photos overlay adjustments */
+    .photos-grid {
+        flex-direction: column;
+    }
+    
+    .photos-container {
+        padding: 0 20px;
+    }
+    
+    .photo-section img {
+        width: 100%;
+        height: 300px;
+    }
+    
+    .fullscreen-image {
+        height: auto;
+        max-height: 80vh;
+    }
 }
   
 /* Mobile Responsive Design (max-width: 480px) */
 @media (max-width: 480px) {
-.property-details-main-container {
-    width: 94%;
-    margin-top: 20px;
-}
-  
-.Main_Image_gallery_container {
-    margin-top: 70px;
-}
-  
-.main_gallery_image {
-    height: 300px;
-}
-  
-.second_gallery_image {
-    height: 150px;
-}
-  
-.Room_name {
-    font-size: 22px;
-}
-  
-.Room_location {
-    margin-top: 8px;
-}
-  
-.Room_location p {
-    font-size: 15px;
-}
-  
-.facilities-details {
-    grid-template-columns: 1fr;
-    gap: 10px;
-}
-  
-.Location_Main_Container iframe {
-    height: 300px;
-}
-  
-/* Mobile booking bar with smaller padding */
-.mobile-booking-bar {
-    padding: 10px 12px;
-}
-  
-.mobile-price-info h3 {
-    font-size: 16px;
-}
-  
-.mobile-price-info span {
-    font-size: 12px;
-}
-  
-.mobile-book-now-btn {
-    padding: 8px 12px;
-    font-size: 13px;
-}
-  
-/* Fullscreen photo view adjustments */
-.fullscreen-content {
-    padding: 0;
-}
-  
-.nav-btn {
-    padding: 10px;
-}
-  
-/* Booking form modal adjustments */
-.booking-modal {
-    height: 95vh;
-    width: 100%;
-    border-radius: 0;
-    max-width: 100%;
-}
-  
-.booking-header {
-    padding: 15px;
-}
-  
-.booking-content {
-    padding: 15px;
-}
-  
-/* Photos view adjustments */
-.photos-header {
-    height: 50px;
-    padding: 0 5px;
-}
-  
-.photos-container {
-    padding: 0 10px;
-}
-  
-.photo-section img {
-    height: 250px;
-}
-  
-/* Overlay content adjustments */
-.description-overlay-content,
-.facilities-overlay-content {
-    width: 95%;
-    max-width: 95%;
-    margin-top: 120px;
-}
 
-.back-button{
-    font-size: 18px;
-}
+    .first_container {
+        width: 100%;
+        padding: 0;
+    }
 
-.icon_location_room{
-    font-size: 13px;
-}
+    .Details_container{
+    padding: 0 12px;
+    }
 
-.icon_bed_room{
-    font-size: 13px;
-}
+    .property-details-main-container {
+        width: 100%;
+    }
+    
+    .Main_Image_gallery_container {
+        margin-top: 70px;
+    }
+    
+    .main_gallery_image {
+        height: 300px;
+    }
+    
+    .second_gallery_image {
+        height: 150px;
+    }
+    
+    .Room_name {
+        font-size: 22px;
+    }
+    
+    .Room_location {
+        margin-top: 8px;
+    }
+    
+    .Room_location p {
+        font-size: 15px;
+    }
+    
+    .facilities-details {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .Location_Main_Container iframe {
+        height: 300px;
+    }
+    
+    /* Mobile booking bar with smaller padding */
+    .mobile-booking-bar {
+        padding: 10px 12px;
+    }
+    
+    .mobile-price-info h3 {
+        font-size: 16px;
+    }
+    
+    .mobile-price-info span {
+        font-size: 12px;
+    }
+    
+    .mobile-book-now-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    /* Fullscreen photo view adjustments */
+    .fullscreen-content {
+        padding: 0;
+    }
+    
+    .nav-btn {
+        padding: 10px;
+    }
+    
+    /* Booking form modal adjustments */
+    .booking-modal {
+        height: 95vh;
+        width: 100%;
+        border-radius: 0;
+        max-width: 100%;
+    }
+    
+    .booking-header {
+        padding: 15px;
+    }
+    
+    .booking-content {
+        padding: 15px;
+    }
+    
+    /* Photos view adjustments */
+    .photos-header {
+        height: 50px;
+        padding: 0 5px;
+    }
+    
+    .photos-container {
+        padding: 0 10px;
+    }
+    
+    .photo-section img {
+        height: 250px;
+    }
+    
+    /* Overlay content adjustments */
+    .description-overlay-content,
+    .facilities-overlay-content {
+        width: 95%;
+        max-width: 95%;
+        margin-top: 120px;
+    }
 
-.icon_guest_room{
-    font-size: 13px;
-}
+    .back-button{
+        font-size: 18px;
+    }
 
-.Room_location p{
-    font-size: 14px; 
-}
+    .icon_location_room{
+        font-size: 13px;
+    }
 
-.Rating_score{
-    font-size: 15px;
-}
+    .icon_bed_room{
+        font-size: 13px;
+    }
 
-.icon_star{
-    font-size: 14px;
-}
+    .icon_guest_room{
+        font-size: 13px;
+    }
 
-.admin_profile{
-    width: 30px;
-    height: 30px;
-}
+    .Room_location p{
+        font-size: 14px; 
+    }
 
-.admin_name{
-    font-size: 14px;
-}
+    .Rating_score{
+        font-size: 15px;
+    }
 
-.profile_card_property{
-    margin: auto;
-    padding: 0;
-    display: none;
-}
+    .icon_star{
+        font-size: 14px;
+    }
 
-.About_text{
-    font-size: 18px;
-}
+    .admin_profile{
+        width: 30px;
+        height: 30px;
+    }
 
-.Room_description{
-    font-size: 13px;
-}
+    .admin_name{
+        font-size: 14px;
+    }
 
-.More_button {
-    font-size: 12px;
-    width: 85px;
-    height: 35px;
-}
+    .profile_card_property{
+        margin: auto;
+        padding: 0;
+        display: none;
+    }
 
-.Facilities_Main_Container{
-    border: none;
-    padding: 0;
-    box-shadow: none;
-    display: block;
-}
+    .About_text{
+        font-size: 18px;
+    }
 
-.facilities-details {
-    gap: 25px;
-}
+    .Room_description{
+        font-size: 13px;
+    }
 
-.facilities-item span{
-    font-size: 13px;
-}
+    .More_button {
+        font-size: 12px;
+        width: 85px;
+        height: 35px;
+    }
 
-.Facilities_text{
-    font-size: 20px;
-}
+    .Facilities_Main_Container{
+        border: none;
+        padding: 0;
+        box-shadow: none;
+        display: block;
+    }
 
-.Location_Main_Container{
-    border: none;
-    padding: 0;
-    padding-bottom: 45px;
-    box-shadow: none;
-}
+    .facilities-details {
+        gap: 25px;
+    }
 
-.show-more-btn{
-    font-size: 13px;
-}
+    .facilities-item span{
+        font-size: 13px;
+    }
 
-.facility-icon{
-    font-size: 12px;
-}
+    .Facilities_text{
+        font-size: 20px;
+    }
 
-.facility-name{
-    font-size: 12px;
-}
+    .Location_Main_Container{
+        border: none;
+        padding: 0;
+        box-shadow: none;
+    }
 
-.facilities-grid{
-    padding-bottom: 20px;
-    margin-bottom: 20px;
-}
+    .show-more-btn{
+        font-size: 13px;
+    }
 
-.booking-header {
-    margin-top: 10px;
-}
+    .facility-icon{
+        font-size: 12px;
+    }
 
-.trip-section h2 {
-    font-size: 16px;
-}
+    .facility-name{
+        font-size: 12px;
+    }
 
-.section-header h3{
-    font-size: 13px;
-}
+    .facilities-grid{
+        padding-bottom: 20px;
+        margin-bottom: 20px;
+    }
 
-.edit-button{
-    font-size: 12px;
-}
+    .booking-header {
+        margin-top: 10px;
+    }
 
-.guest-details-section h2{
-    font-size: 16px;
-}
+    .trip-section h2 {
+        font-size: 16px;
+    }
+
+    .section-header h3{
+        font-size: 13px;
+    }
+
+    .edit-button{
+        font-size: 12px;
+    }
+
+    .guest-details-section h2{
+        font-size: 16px;
+    }
 }
