@@ -1678,6 +1678,7 @@ body {
     .property-details-main-container {
         width: 100%;
         margin-top: 30px;
+        padding: 0;
     }
     
     .Main_Image_gallery_container {
