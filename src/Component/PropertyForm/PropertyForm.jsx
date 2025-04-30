@@ -5,7 +5,7 @@ import { PiSecurityCamera } from "react-icons/pi";
 import { SiLightning } from "react-icons/si";
 import { TbPawFilled, TbPawOff } from "react-icons/tb";
 import { MdLandscape, MdOutlineKingBed, MdFireplace, MdSmokingRooms, MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
-import { FaWifi, FaDesktop, FaDumbbell, FaWater, FaSkiing, FaChargingStation, FaParking, FaSwimmingPool, FaTv, FaUtensils, FaSnowflake, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaBell, FaTree, FaCity } from "react-icons/fa";
+import { FaWifi, FaDesktop, FaDumbbell, FaWater, FaSkiing, FaChargingStation, FaParking, FaSwimmingPool, FaTv, FaUtensils, FaSnowflake, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaBicycle, FaBabyCarriage, FaKey, FaBell, FaTree, FaCity } from "react-icons/fa";
 import { propertiesListing, updateProperty, propertyListingRequest } from "../../../Api/api";
 import Toast from "../Toast/Toast";
 import "./PropertyForm.css";
@@ -66,7 +66,6 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         { name: "Heating", icon: <FaWind /> },
         { name: "Dedicated workspace", icon: <FaDesktop /> },
         { name: "TV", icon: <FaTv /> },
-        { name: "Ceiling Fan", icon: <FaFan /> },
 
         { name: "Free Parking", icon: <FaParking /> },
         { name: "Swimming Pool", icon: <FaSwimmingPool /> },
@@ -134,11 +133,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         "Hotel",
         "Inn",
         "Guesthouse",
-        "Villa",
         "Apartment",
-        "Cabin",
-        "Farm Stay",
-        "Cottage",
         "Hostel"
     ];
 
