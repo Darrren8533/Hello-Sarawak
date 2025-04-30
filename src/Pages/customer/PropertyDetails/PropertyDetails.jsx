@@ -7,8 +7,8 @@ import { GiWashingMachine, GiClothesline, GiDesert  } from "react-icons/gi";
 import { PiSecurityCamera } from "react-icons/pi";
 import { SiLightning } from "react-icons/si";
 import { TbPawFilled, TbPawOff } from "react-icons/tb";
-import { MdLandscape, MdOutlineKingBed, MdFireplace, MdSmokingRooms, MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
-import { FaStar, FaWifi, FaDesktop, FaDumbbell, FaWater, FaSkiing, FaChargingStation, FaParking, FaSwimmingPool, FaTv, FaUtensils, FaSnowflake, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaFan, FaCar, FaBicycle, FaBabyCarriage, FaKey, FaBell, FaTree, FaCity, FaMapMarkerAlt, FaUser } from "react-icons/fa";
+import { MdLandscape, MdOutlineKingBed, MdFireplace, MdSmokingRooms } from "react-icons/md";
+import { FaWifi, FaDesktop, FaDumbbell, FaWater, FaSkiing, FaChargingStation, FaParking, FaSwimmingPool, FaTv, FaUtensils, FaSnowflake, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaBicycle, FaBabyCarriage, FaKey, FaBell, FaTree, FaCity } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 import Navbar from '../../../Component/Navbar/navbar';
@@ -22,10 +22,10 @@ const facilities = [
     { name: "Kitchen", icon: <FaUtensils className="facilities-icon"/> },
     { name: "Washer", icon: <GiWashingMachine className="facilities-icon"/> },
     { name: "Dryer", icon: <GiClothesline className="facilities-icon"nowflake /> },
+    { name: "Air Conditioning", icon: <FaSnowflake className="facilities-icon"/> },
     { name: "Heating", icon: <FaWind className="facilities-icon"/> },
     { name: "Dedicated workspace", icon: <FaDesktop className="facilities-icon"/> },
     { name: "TV", icon: <FaTv className="facilities-icon"/> },
-    { name: "Ceiling Fan", icon: <FaFan className="facilities-icon"/> },
 
     { name: "Free Parking", icon: <FaParking className="facilities-icon"/> },
     { name: "Swimming Pool", icon: <FaSwimmingPool className="facilities-icon"/> },
@@ -111,6 +111,16 @@ const PropertyDetails = () => {
     fetchCoordinates();
   }, [propertyDetails]);
 
+  useEffect(() => {
+    const currentLocationKey = location.key;
+    const previousLocationKey = localStorage.getItem('previousLocationKey');
+    
+    if (currentLocationKey !== previousLocationKey) {
+      localStorage.setItem('previousLocationKey', currentLocationKey);
+      window.location.reload();
+    }
+  }, [location.key]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setBookingData((prev) => {
@@ -171,38 +181,6 @@ const PropertyDetails = () => {
       }
     }
   };
-
-  useEffect(() => {
-    const currentLocationKey = location.key;
-    localStorage.setItem('previousLocationKey', currentLocationKey);
-    
-    if (window.Tawk_API && window.Tawk_API.hideWidget) {
-      if (window.innerWidth <= 768) {
-        window.Tawk_API.hideWidget();
-      } else {
-        window.Tawk_API.showWidget();
-      }
-      
-      const checkVisibility = () => {
-        const mobileBar = document.querySelector('.mobile-booking-bar');
-        if (mobileBar && window.getComputedStyle(mobileBar).display !== 'none') {
-          window.Tawk_API.hideWidget();
-        } else {
-          window.Tawk_API.showWidget();
-        }
-      };
-      
-      window.addEventListener('resize', checkVisibility);
-      
-      return () => {
-        window.removeEventListener('resize', checkVisibility);
-
-        if (window.Tawk_API && window.Tawk_API.showWidget) {
-          window.Tawk_API.showWidget();
-        }
-      };
-    }
-  }, [location.key]);
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -325,6 +303,7 @@ const PropertyDetails = () => {
         <AuthProvider>
         {!showAllPhotos && !showBookingForm && <Navbar />}
         <div className="property-details-main-container">
+          {!showAllPhotos && !showBookingForm}
           <div className="Main_Image_gallery_container">
             <div className="Image_gallery_card_1">
               <img 
@@ -819,6 +798,7 @@ const PropertyDetails = () => {
                       </div>
                     </div>
                   </div>
+
                   
                   <div className="booking-right">
                     <div className="property-card">
