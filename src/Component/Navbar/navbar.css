@@ -30,8 +30,7 @@ body.no-scroll {
 /* Navbar Base */
 .navbar {
     background-color: var(--primary);
-    margin: 15px;
-    border-radius: 16px;
+    margin: 0;
     box-shadow: var(--shadow);
     transition: var(--transition);
     height: auto;
@@ -314,14 +313,7 @@ body.no-scroll {
 }
 
 /* 1069px Media Query  */
-@media(max-width: 1069px) {
-    .navbar {
-        padding: 0.5rem 1rem;
-    }
-    
-    .container_navbar {
-        padding: 0 0.75rem;
-    }
+@media(max-width: 990px) {
     
     .navbar .navbar_brand {
         font-size: 1.375rem;
@@ -335,7 +327,7 @@ body.no-scroll {
     
     .navbar-nav {
         flex-direction: column;
-        gap: 12px;
+        gap: 20px;
     }
     
     .nav-link {
@@ -376,17 +368,13 @@ body.no-scroll {
 
 /* 768px Media Query  */
 @media(max-width: 768px) {
-    .navbar {
-        margin: 10px;
-        min-height: 75px;
+
+    .navbar-nav{
+        gap: 20px;
     }
     
     .navbar.scrolled {
         margin: 0;
-    }
-    
-    .container_navbar {
-        padding: 0 0.5rem;
     }
     
     .navbar .navbar_brand {
@@ -447,14 +435,6 @@ body.no-scroll {
 
 /* 480px Media Query */
 @media(max-width: 480px) {
-    .navbar {
-        margin: 8px;
-        min-height: 70px;
-    }
-
-    .container_navbar {
-        padding: 0 0.5rem;
-    }
     
     .navbar.scrolled {
         margin: 0;
