@@ -9,7 +9,7 @@ import { SiLightning } from "react-icons/si";
 import { TbPawFilled } from "react-icons/tb";
 import { MdLandscape, MdOutlineKingBed, MdFireplace, MdSmokingRooms, MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 import { FaParking, FaChargingStation, FaDumbbell, FaCoffee } from "react-icons/fa";
-import { BsHouseDoor, BsBuilding, BsHouse } from "react-icons/bs";
+import { BsBuilding, BsHouse } from "react-icons/bs";
 import { fetchProduct } from "../../../Api/api";
 import './Sorting.css';
 
@@ -117,10 +117,12 @@ const Sorting = ({
   ];
 
   const propertyTypes = [
-    "House",
     "Apartment",
     "Guesthouse",
-    "Hotel"
+    "Hotel",
+    "Inn",
+    "Hostel",
+    "Resort",
   ];
 
   const bookingOptions= [
@@ -129,7 +131,6 @@ const Sorting = ({
     "Pets Allowed",
   ];
 
-  // 更新滑块输入处理
   const handleRangeInputChange = (e) => {
     const { name, value } = e.target;
     const numValue = parseInt(value, 10);
@@ -161,7 +162,6 @@ const Sorting = ({
     });
   };
 
-  // 更新滑块样式
   const updateRangeSliderStyle = (range) => {
     const sliderContainer = document.querySelector('.range-slider-container');
     if (!sliderContainer) return;
@@ -170,11 +170,9 @@ const Sorting = ({
     const max = 1000;
     const rangeWidth = max - min;
     
-    // 计算左侧和右侧的百分比
     const leftPercent = ((range.min - min) / rangeWidth) * 100;
     const rightPercent = 100 - ((range.max - min) / rangeWidth) * 100;
     
-    // 设置CSS变量
     sliderContainer.style.setProperty('--left-percent', `${leftPercent}%`);
     sliderContainer.style.setProperty('--right-percent', `${rightPercent}%`);
   };
@@ -189,7 +187,7 @@ const Sorting = ({
     const maxPrice = Math.max(...prices);
     
     // Create price bins
-    const numBins = 30;
+    const numBins = 100;
     const binSize = (maxPrice - minPrice) / numBins;
     const bins = Array(numBins).fill(0);
     
@@ -199,7 +197,6 @@ const Sorting = ({
       bins[binIndex]++;
     });
     
-    // 找出最高频率以标准化高度
     const maxFreq = Math.max(...bins);
     
     return (
@@ -353,7 +350,6 @@ const Sorting = ({
               <h4>Price range</h4>
               <p className="price-subtitle">Trip price, includes all fees</p>
               
-              {/* 价格分布直方图 */}
               <div className="price-range-visual">
                 {generatePriceHistogram()}
                 
@@ -398,7 +394,7 @@ const Sorting = ({
                       name="min"
                       value={priceRange.min}
                       onChange={handlePriceRangeChange}
-                      min="0"
+                      min="1"
                       step="10"
                     />
                   </div>
@@ -412,10 +408,9 @@ const Sorting = ({
                       name="max"
                       value={priceRange.max}
                       onChange={handlePriceRangeChange}
-                      min="0"
-                      step="100"
+                      min="1"
+                      step="10"
                     />
-                    {priceRange.max >= 1000 && <span className="plus-symbol">+</span>}
                   </div>
                 </div>
               </div>
@@ -541,10 +536,11 @@ const Sorting = ({
                       onClick={() => togglePropertyType(type)}
                     >
                       <div className="property-type-icon">
-                        {type === "House" && <BsHouseDoor />}
                         {type === "Apartment" && <BsBuilding />}
                         {type === "Guesthouse" && <BsHouse />}
-                        {type === "Hotel" && <FaBuilding />}
+                        {type === "Inn" && <FaBuilding />}
+                        {type === "Hostel" && <FaBuilding />}
+                        {type === "Resort" && <FaBuilding />}
                       </div>
                       <span>{type}</span>
                     </div>
