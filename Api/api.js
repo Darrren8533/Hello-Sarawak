@@ -588,8 +588,6 @@ export const sendSuggestNotification = async (reservationid, selectedOperators) 
 // Store Reservation Data
 export const createReservation = async (reservationData) => {
   const userid = localStorage.getItem('userid');
-  const creatorid = localStorage.getItem("userid");
-  const creatorUsername = localStorage.getItem("username");
   
   try {
     if (!userid) {
@@ -598,7 +596,7 @@ export const createReservation = async (reservationData) => {
 
     const reservationWithuserid = { ...reservationData, userid };
     
-    const response = await fetch(`${API_URL}/reservation/${userid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
+    const response = await fetch(`${API_URL}/reservation/${userid}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
