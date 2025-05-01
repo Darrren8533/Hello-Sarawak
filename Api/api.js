@@ -69,8 +69,10 @@ export const logoutUser = async (userid) => {
 
 // Properties Listing
 export const propertiesListing = async (propertyData) => {
+  const usergroup = localStorage.getItem("usergroup");
+  
   try {
-    const response = await fetch(`${API_URL}/propertiesListing`, {
+    const response = await fetch(`${API_URL}/propertiesListing?usergroup=${usergroup}`, {
       method: 'POST',
       body: propertyData,
     });
@@ -106,8 +108,8 @@ export const fetchProduct = async () => {
 
 // Fetch Properties (Dashboard)
 export const fetchPropertiesListingTable = async () => {
-
   const username = localStorage.getItem('username'); 
+  
   try {
     const response = await fetch(`${API_URL}/propertiesListingTable?username=${username}`);
 
