@@ -587,14 +587,18 @@ export const sendSuggestNotification = async (reservationid, selectedOperators) 
 
 // Store Reservation Data
 export const createReservation = async (reservationData) => {
+  const userid = localStorage.getItem('userid');
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
   try {
-    const userid = localStorage.getItem('userid');
     if (!userid) {
       throw new Error('User not logged in. Please log in to create a reservation.');
     }
 
     const reservationWithuserid = { ...reservationData, userid };
-    const response = await fetch(`${API_URL}/reservation/${userid}`, {
+    
+    const response = await fetch(`${API_URL}/reservation/${userid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
