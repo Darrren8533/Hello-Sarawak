@@ -13,6 +13,7 @@ import { FcGoogle } from "react-icons/fc";
 import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 import Navbar from '../../../Component/Navbar/navbar';
 import Toast from '../../../Component/Toast/Toast';
+import Reviews from '../../../Component/Reviews/Reviews';
 import Footer from '../../../Component/Footer/footer';
 import './PropertyDetails.css';
 import { createReservation, requestBooking, getCoordinates, fetchUserData } from '../../../../Api/api';
@@ -75,6 +76,7 @@ const PropertyDetails = () => {
   const [showAllFacilities, setShowAllFacilities] = useState(false);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [showBookingForm, setShowBookingForm] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
   const [isEditingDates, setIsEditingDates] = useState(false);
   const [totalNights, setTotalNights] = useState(0);
   const [totalprice, settotalprice] = useState(0);
@@ -297,13 +299,152 @@ const PropertyDetails = () => {
     ? `https://www.google.com/maps/embed/v1/place?key=AIzaSyCe27HezKpItahXjMFcWXf3LwFcjI7pZFk&q=${encodeURIComponent(propertyDetails.nearbylocation)}&zoom=14`
     : "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3987.9586177612214!2d110.31007237509338!3d1.749442560160908!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31faff9851a3becb%3A0xf308ff203e894002!2sDamai%20Beach!5e0!3m2!1sen!2smy!4v1731252464570!5m2!1sen!2smy";
 
+  // Effect for showAllFacilities scroll locking
+  useEffect(() => {
+    if (showAllFacilities) {
+      // Save the current scroll position
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      
+      // Add padding to prevent layout shift
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+      
+      return () => {
+        // Restore scroll position
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [showAllFacilities]);
+  
+  // Effect for showDescriptionOverlay scroll locking
+  useEffect(() => {
+    if (showDescriptionOverlay) {
+      // Save the current scroll position
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      
+      // Add padding to prevent layout shift
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+      
+      return () => {
+        // Restore scroll position
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [showDescriptionOverlay]);
+  
+  // Effect for showBookingForm scroll locking
+  useEffect(() => {
+    if (showBookingForm) {
+      // Save the current scroll position
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      
+      // Add padding to prevent layout shift
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+      
+      return () => {
+        // Restore scroll position
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [showBookingForm]);
+  
+  // Effect for showAllPhotos scroll locking
+  useEffect(() => {
+    if (showAllPhotos) {
+      // Save the current scroll position
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      
+      // Add padding to prevent layout shift
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+      
+      return () => {
+        // Restore scroll position
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [showAllPhotos]);
+  
+  // Effect for isFullscreen scroll locking
+  useEffect(() => {
+    if (isFullscreen) {
+      // Save the current scroll position
+      const scrollY = window.scrollY;
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflow = 'hidden';
+      
+      // Add padding to prevent layout shift
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+      
+      return () => {
+        // Restore scroll position
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [isFullscreen]);
+
   return (
     <div>
       <div className="Property_Details_Main_Container">
         <AuthProvider>
-        {!showAllPhotos && !showBookingForm && <Navbar />}
+        {!showAllPhotos && !showBookingForm && !showReviews &&<Navbar />}
         <div className="property-details-main-container">
-          {!showAllPhotos && !showBookingForm}
           <div className="Main_Image_gallery_container">
             <div className="Image_gallery_card_1">
               <img 
@@ -441,8 +582,17 @@ const PropertyDetails = () => {
                       4.8
                     </p>
                     <FaStar className='icon_star'/>
+                    <button className="show-reviews-btn" onClick={() => setShowReviews(true)}>
+                      Show all reviews
+                    </button>
                   </div>
                 </div>
+
+                <Reviews 
+                  isOpen={showReviews} 
+                  onClose={() => setShowReviews(false)} 
+                  propertyId={propertyDetails?.propertyid} 
+                />
 
                 <div className="sub_details">
                   <div className="Room_location">
