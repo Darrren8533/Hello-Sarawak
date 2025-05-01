@@ -532,10 +532,13 @@ export const propertyListingAccept = async (propertyid) => {
   }
 };
 
-// Property Listing Request Notification
+// Property Listing Request Rejected Notification
 export const propertyListingReject = async (propertyid) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
   try {
-    const response = await fetch(`${API_URL}/propertyListingReject/${propertyid}`, {
+    const response = await fetch(`${API_URL}/propertyListingReject/${propertyid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
