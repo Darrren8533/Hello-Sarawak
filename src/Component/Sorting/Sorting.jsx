@@ -48,22 +48,66 @@ const Sorting = ({
     }
   }, []);
 
-  // Hide/show navbar when filter overlay shows
+  // Hide/show navbar when filter overlay shows and lock body scroll
   useEffect(() => {
     const navbar = document.querySelector('.navbar');
-    if (navbar) {
-      if (showFilters) {
+    
+    if (showFilters) {
+      // Hide navbar
+      if (navbar) {
         navbar.style.display = 'none';
-      } else {
+      }
+      
+      // Save the current scroll position and body styles
+      const scrollY = window.scrollY;
+      const originalStyle = {
+        overflow: document.body.style.overflow,
+        position: document.body.style.position,
+        top: document.body.style.top,
+        width: document.body.style.width,
+        paddingRight: document.body.style.paddingRight
+      };
+      
+      // Prevent background scrolling - lock the body in place
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      
+      // Add padding to prevent layout shift
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      if (scrollbarWidth > 0) {
+        document.body.style.paddingRight = `${scrollbarWidth}px`;
+      }
+      
+      // Store original styles for cleanup
+      document.body.dataset.originalStyle = JSON.stringify(originalStyle);
+      document.body.dataset.scrollY = scrollY;
+      
+    } else {
+      // Show navbar
+      if (navbar) {
         navbar.style.display = '';
       }
-    }
-    
-    // Prevent body scrolling when filter overlay is shown
-    if (showFilters) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+      
+      // Restore body styles and scroll position if we have saved data
+      if (document.body.dataset.originalStyle) {
+        const originalStyle = JSON.parse(document.body.dataset.originalStyle);
+        const scrollY = parseFloat(document.body.dataset.scrollY || '0');
+        
+        document.body.style.overflow = originalStyle.overflow || '';
+        document.body.style.position = originalStyle.position || '';
+        document.body.style.top = originalStyle.top || '';
+        document.body.style.width = originalStyle.width || '';
+        document.body.style.paddingRight = originalStyle.paddingRight || '';
+        
+        // Restore scroll position
+        window.scrollTo(0, scrollY);
+        
+        // Clean up data attributes
+        delete document.body.dataset.originalStyle;
+        delete document.body.dataset.scrollY;
+      }
     }
     
     return () => {
@@ -71,7 +115,25 @@ const Sorting = ({
       if (navbar) {
         navbar.style.display = '';
       }
-      document.body.style.overflow = '';
+      
+      // Restore body styles and scroll position if we have saved data
+      if (document.body.dataset.originalStyle) {
+        const originalStyle = JSON.parse(document.body.dataset.originalStyle);
+        const scrollY = parseFloat(document.body.dataset.scrollY || '0');
+        
+        document.body.style.overflow = originalStyle.overflow || '';
+        document.body.style.position = originalStyle.position || '';
+        document.body.style.top = originalStyle.top || '';
+        document.body.style.width = originalStyle.width || '';
+        document.body.style.paddingRight = originalStyle.paddingRight || '';
+        
+        // Restore scroll position
+        window.scrollTo(0, scrollY);
+        
+        // Clean up data attributes
+        delete document.body.dataset.originalStyle;
+        delete document.body.dataset.scrollY;
+      }
     };
   }, [showFilters]);
 
@@ -538,6 +600,7 @@ const Sorting = ({
                       <div className="property-type-icon">
                         {type === "Apartment" && <BsBuilding />}
                         {type === "Guesthouse" && <BsHouse />}
+                        {type === "Hotel" && <BsBuilding />}
                         {type === "Inn" && <FaBuilding />}
                         {type === "Hostel" && <FaBuilding />}
                         {type === "Resort" && <FaBuilding />}
