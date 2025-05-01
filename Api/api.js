@@ -559,8 +559,11 @@ export const propertyListingReject = async (propertyid) => {
 
 // Send Suggest Notification 
 export const sendSuggestNotification = async (reservationid, selectedOperators) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
   try {
-    const response = await fetch(`${API_URL}/sendSuggestNotification/${reservationid}`, {
+    const response = await fetch(`${API_URL}/sendSuggestNotification/${reservationid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
