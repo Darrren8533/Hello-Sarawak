@@ -13,6 +13,7 @@ import { FcGoogle } from "react-icons/fc";
 import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 import Navbar from '../../../Component/Navbar/navbar';
 import Toast from '../../../Component/Toast/Toast';
+import Reviews from '../../../Component/Reviews/Reviews';
 import Footer from '../../../Component/Footer/footer';
 import './PropertyDetails.css';
 import { createReservation, requestBooking, getCoordinates, fetchUserData } from '../../../../Api/api';
@@ -75,6 +76,7 @@ const PropertyDetails = () => {
   const [showAllFacilities, setShowAllFacilities] = useState(false);
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [showBookingForm, setShowBookingForm] = useState(false);
+  const [showReviews, setShowReviews] = useState(false);
   const [isEditingDates, setIsEditingDates] = useState(false);
   const [totalNights, setTotalNights] = useState(0);
   const [totalprice, settotalprice] = useState(0);
@@ -441,7 +443,7 @@ const PropertyDetails = () => {
     <div>
       <div className="Property_Details_Main_Container">
         <AuthProvider>
-        {!showAllPhotos && !showBookingForm && <Navbar />}
+        {!showAllPhotos && !showBookingForm && !showReviews &&<Navbar />}
         <div className="property-details-main-container">
           <div className="Main_Image_gallery_container">
             <div className="Image_gallery_card_1">
@@ -580,8 +582,17 @@ const PropertyDetails = () => {
                       4.8
                     </p>
                     <FaStar className='icon_star'/>
+                    <button className="show-reviews-btn" onClick={() => setShowReviews(true)}>
+                      Show all reviews
+                    </button>
                   </div>
                 </div>
+
+                <Reviews 
+                  isOpen={showReviews} 
+                  onClose={() => setShowReviews(false)} 
+                  propertyId={propertyDetails?.propertyid} 
+                />
 
                 <div className="sub_details">
                   <div className="Room_location">
