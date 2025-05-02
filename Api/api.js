@@ -1026,3 +1026,45 @@ export const auditTrails = async (userid) => {
     throw error;
   }
 };
+
+// Submit a review for a property
+export const submitReview = async (reviewData) => {
+  try {
+    const response = await fetch(`${API_URL}/reviews`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(reviewData),
+    });
+
+    console.log('Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Server error response:', errorData);
+      throw new Error(errorData.message || 'Failed to submit review');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('API error:', error);
+    throw error;
+  }
+};
+
+// Fetch reviews for a specific property
+export const fetchReviews = async (propertyid) => {
+  try {
+    const response = await fetch(`${API_URL}/reviews/${propertyid}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch property reviews');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching property reviews:', error);
+    throw error;
+  }
+};
