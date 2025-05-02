@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { IoMdClose } from "react-icons/io";
 import { FaStar } from "react-icons/fa";
-import { fetchPropertyReviews } from '../../../Api/api';
-import ReviewForm from './ReviewForm';
+import { fetchReviews } from '../../../Api/api';
+import ReviewForm from '../ReviewForm/ReviewForm';
 import './Reviews.css';
 
 const Reviews = ({ isOpen, onClose, propertyId }) => {
@@ -59,7 +59,7 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
   // Fetch reviews for the property
   useEffect(() => {
     if (isOpen && propertyId) {
-      fetchPropertyReviews(propertyId)
+      fetchReviews(propertyId)
         .then(data => {
           if (data.reviews) {
             setReviews(data.reviews);
@@ -108,7 +108,7 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
     // Optionally refresh reviews after submission
     if (propertyId) {
       setIsLoading(true);
-      fetchPropertyReviews(propertyId)
+      fetchReviews(propertyId)
         .then(data => {
           if (data.reviews) {
             setReviews(data.reviews);
