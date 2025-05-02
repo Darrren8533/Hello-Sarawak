@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { IoMdClose } from "react-icons/io";
 import { submitReview } from '../../../Api/api';
-import './Reviews.css';
 
 const ReviewForm = ({ isOpen, onClose, propertyId }) => {
   const [review, setReview] = useState('');
