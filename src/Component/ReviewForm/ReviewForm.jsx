@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { IoMdClose } from "react-icons/io";
+import { FaStar } from "react-icons/fa";
 import { submitReview } from '../../../Api/api';
 
 const ReviewForm = ({ isOpen, onClose, propertyId }) => {
   const [review, setReview] = useState('');
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -55,6 +58,11 @@ const ReviewForm = ({ isOpen, onClose, propertyId }) => {
       return;
     }
     
+    if (rating === 0) {
+      setError('Please select a rating');
+      return;
+    }
+    
     setIsSubmitting(true);
     setError('');
     
@@ -72,7 +80,8 @@ const ReviewForm = ({ isOpen, onClose, propertyId }) => {
       const reviewData = {
         userid: parseInt(userId),
         propertyid: parseInt(propertyId),
-        review: review
+        review: review,
+        rating: rating
       };
       
       // Call the API endpoint to submit the review
@@ -81,6 +90,7 @@ const ReviewForm = ({ isOpen, onClose, propertyId }) => {
       // Success
       setSuccess('Your review has been submitted!');
       setReview('');
+      setRating(0);
       
       // Close the modal after a short delay
       setTimeout(() => {
@@ -108,6 +118,35 @@ const ReviewForm = ({ isOpen, onClose, propertyId }) => {
         
         <div className="filter-content-scrollable">
           <form onSubmit={handleSubmit} className="review-form">
+            
+            <div className="rating-selection">
+              <h4>Rate your experience</h4>
+              <div className="star-rating">
+                {[...Array(5)].map((star, index) => {
+                  const ratingValue = index + 1;
+                  
+                  return (
+                    <label key={index}>
+                      <input 
+                        type="radio" 
+                        name="rating" 
+                        value={ratingValue}
+                        onClick={() => setRating(ratingValue)}
+                        style={{ display: "none" }}
+                      />
+                      <FaStar 
+                        className="star" 
+                        size={24}
+                        color={ratingValue <= (hover || rating) ? "#ffc107" : "#e4e5e9"}
+                        onMouseEnter={() => setHover(ratingValue)}
+                        onMouseLeave={() => setHover(0)}
+                        style={{ cursor: "pointer" }}
+                      />
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
             
             <div className="review-input">
               <h4>Your review</h4>
