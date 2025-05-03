@@ -113,37 +113,37 @@ const PropertyDetails = () => {
     fetchCoordinates();
   }, [propertyDetails]);
 
-useEffect(() => {
-     const currentLocationKey = location.key;
-     localStorage.setItem('previousLocationKey', currentLocationKey);
-     
-     if (window.Tawk_API && window.Tawk_API.hideWidget) {
-       if (window.innerWidth <= 768) {
-         window.Tawk_API.hideWidget();
-       } else {
-         window.Tawk_API.showWidget();
-       }
-       
-       const checkVisibility = () => {
-         const mobileBar = document.querySelector('.mobile-booking-bar');
-         if (mobileBar && window.getComputedStyle(mobileBar).display !== 'none') {
-           window.Tawk_API.hideWidget();
-         } else {
-           window.Tawk_API.showWidget();
-         }
-       };
-       
-       window.addEventListener('resize', checkVisibility);
-       
-       return () => {
-         window.removeEventListener('resize', checkVisibility);
- 
-         if (window.Tawk_API && window.Tawk_API.showWidget) {
-           window.Tawk_API.showWidget();
-         }
-       };
-     }
-   }, [location.key]);
+  useEffect(() => {
+    const currentLocationKey = location.key;
+    localStorage.setItem('previousLocationKey', currentLocationKey);
+    
+    if (window.Tawk_API && window.Tawk_API.hideWidget) {
+      if (window.innerWidth <= 768) {
+        window.Tawk_API.hideWidget();
+      } else {
+        window.Tawk_API.showWidget();
+      }
+      
+      const checkVisibility = () => {
+        const mobileBar = document.querySelector('.mobile-booking-bar');
+        if (mobileBar && window.getComputedStyle(mobileBar).display !== 'none') {
+          window.Tawk_API.hideWidget();
+        } else {
+          window.Tawk_API.showWidget();
+        }
+      };
+      
+      window.addEventListener('resize', checkVisibility);
+      
+      return () => {
+        window.removeEventListener('resize', checkVisibility);
+
+        if (window.Tawk_API && window.Tawk_API.showWidget) {
+          window.Tawk_API.showWidget();
+        }
+      };
+    }
+  }, [location.key]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -601,11 +601,11 @@ useEffect(() => {
                   <h2 className="Room_name">{propertyDetails?.propertyaddress}</h2>
                   <div className='Rating_Container'>
                     <p className="Rating_score">
-                      4.8
+                      {propertyDetails?.rating ? propertyDetails.rating.toFixed(1) : '0.0'}
                     </p>
                     <FaStar className='icon_star'/>
                     <button className="show-reviews-btn" onClick={() => setShowReviews(true)}>
-                      Show all reviews
+                      {propertyDetails?.ratingno || 0} reviews
                     </button>
                   </div>
                 </div>
