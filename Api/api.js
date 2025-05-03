@@ -629,10 +629,10 @@ export const createReservation = async (reservationData) => {
 
 // Fetch all Reservations
 export const fetchReservation = async () => {
+  // Retrieve the username from localStorage
+  const username = localStorage.getItem('username');
+  
   try {
-    // Retrieve the username from localStorage
-    const username = localStorage.getItem('username');
-
     if (!username) {
       throw new Error('Username is not found in localStorage. Please log in.');
     }
@@ -673,41 +673,21 @@ export const updateReservationStatus = async (reservationid, status, userid) => 
 
 //Cart
 export const fetchCart = async () => {
+  const userid = localStorage.getItem('userid');
+  
   try {
-      const userid = localStorage.getItem('userid');
       const response = await fetch(`${API_URL}/cart?userid=${userid}`);
+    
       if (!response.ok) {
           throw new Error('Failed to fetch reservations');
       }
 
       const data = await response.json();
-      console.log('Fetched reservations:', data);
+      
       return data.reservations;
   } catch (error) {
       console.error('API error:', error);
       throw error;
-  }
-};
-
-// Cancel a reservation
-export const cancelReservation = async (reservationid) => {
-  try {
-    const response = await fetch(`${API_URL}/cancelReservation/${reservationid}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to cancel reservation');
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('API error:', error);
-    throw error;
   }
 };
 
