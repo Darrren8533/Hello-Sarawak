@@ -107,44 +107,53 @@ const Login = () => {
     setShowPassword((prev) => !prev);
   };
 
-  const googleLoginHandler = useGoogleLogin({
-    flow: 'implicit',
-    onSuccess: async (tokenResponse) => {
-      console.log("Google Login Success:", tokenResponse);
+const googleLoginHandler = useGoogleLogin({
+  flow: 'implicit',
+  onSuccess: async (tokenResponse) => {
+    console.log("Google Login Success:", tokenResponse);
+    
+    try {
+      // Store token in localStorage
       localStorage.setItem("googleAccessToken", tokenResponse.access_token);
-
-      try {
-        const data = await googleLogin(tokenResponse.access_token);
-
-        if (data.uactivation === 'Inactive') {
-          displayToast('error', 'Your account is inactive.');
-          return;
-        }
-
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userid", data.userid);
-        localStorage.setItem("username", data.username);
-        localStorage.setItem("usergroup", data.usergroup);
-        localStorage.setItem("uimage", data.uimage);
-
-        displayToast("success", "Login successful! Redirecting...");
-
-        if (data.usergroup === 'Customer') {
-          setTimeout(() => navigate('/home'), 2000);
-        } else if (data.usergroup === 'Owner') {
-          setTimeout(() => navigate('/owner_dashboard'), 2000);
-        } else if (data.usergroup === 'Moderator') {
-          setTimeout(() => navigate('/moderator_dashboard'), 2000);
-        } else if (data.usergroup === 'Administrator') {
-          setTimeout(() => navigate('/administrator_dashboard'), 2000);
-        } else {
-          displayToast('error', 'Invalid User Group.');
-        }
-      } catch (error) {
-        displayToast("error", error.message || "An unexpected error occurred. Please try again.");
+      
+      // Pass token to our API
+      const data = await googleLogin(tokenResponse.access_token);
+      
+      if (data.uactivation === 'Inactive') {
+        displayToast('error', 'Your account is inactive.');
+        return;
       }
+      
+      localStorage.setItem("isLoggedIn", "true");
+      localStorage.setItem("userid", data.userid);
+      localStorage.setItem("username", data.username);
+      localStorage.setItem("usergroup", data.usergroup);
+      if (data.uimage) localStorage.setItem("uimage", data.uimage);
+      
+      displayToast("success", "Login successful! Redirecting...");
+      
+      // Redirect based on user group
+      if (data.usergroup === 'Customer') {
+        setTimeout(() => navigate('/home'), 2000);
+      } else if (data.usergroup === 'Owner') {
+        setTimeout(() => navigate('/owner_dashboard'), 2000);
+      } else if (data.usergroup === 'Moderator') {
+        setTimeout(() => navigate('/moderator_dashboard'), 2000);
+      } else if (data.usergroup === 'Administrator') {
+        setTimeout(() => navigate('/administrator_dashboard'), 2000);
+      } else {
+        displayToast('error', 'Invalid User Group.');
+      }
+    } catch (error) {
+      console.error("Google login failed:", error);
+      displayToast("error", error.message || "An unexpected error occurred. Please try again.");
     }
-  });
+  },
+  onError: (errorResponse) => {
+    console.error("Google Sign-In Error:", errorResponse);
+    displayToast("error", "Google sign-in failed. Please try again.");
+  }
+});
 
   return (
     <div className="loginPage flex">
