@@ -971,6 +971,8 @@ export const forgotPassword = async (email) => {
     }
 };
 
+
+//Google Login
 export const googleLogin = async (token) => {
     try {
         console.log("Sending token to backend:", token);
