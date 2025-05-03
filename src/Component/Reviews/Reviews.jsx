@@ -9,10 +9,16 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
   const [sortOption, setSortOption] = useState('Most recent');
   const [reviewFormOpen, setReviewFormOpen] = useState(false);
   const [reviews, setReviews] = useState([]);
+  const [filteredReviews, setFilteredReviews] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [propertyData, setPropertyData] = useState({
+    rating: 0,
+    ratingno: 0
+  });
   const [summary, setSummary] = useState({
-    totalReviews: 0,
+    totalReviews: 0
   });
   
   // Add useEffect to manage body overflow
@@ -54,18 +60,29 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
     }
   }, [isOpen]);
   
-  // Fetch reviews for the property
+  // Fetch reviews and property data for the property
   useEffect(() => {
     if (isOpen && propertyId) {
       fetchReviews(propertyId)
         .then(data => {
+          console.log('Fetched review data:', data);
+          
           if (data.reviews) {
             setReviews(data.reviews);
+            setFilteredReviews(data.reviews);
             
             // Update the summary
             if (data.summary) {
               setSummary(data.summary);
             }
+          }
+          
+          // Extract property rating data
+          if (data.property) {
+            setPropertyData({
+              rating: data.property.rating || 0,
+              ratingno: data.property.ratingno || 0
+            });
           }
         })
         .catch(err => {
@@ -78,23 +95,47 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
     }
   }, [isOpen, propertyId]);
 
+  // Filter reviews when search term changes
+  useEffect(() => {
+    if (searchTerm.trim() === '') {
+      setFilteredReviews(reviews);
+    } else {
+      const term = searchTerm.toLowerCase();
+      const filtered = reviews.filter(review => 
+        review.comment.toLowerCase().includes(term) || 
+        (review.name && review.name.toLowerCase().includes(term))
+      );
+      setFilteredReviews(filtered);
+    }
+  }, [searchTerm, reviews]);
+
   if (!isOpen) return null;
 
   const handleSortChange = (e) => {
     setSortOption(e.target.value);
-    // Here you would re-sort the reviews based on the selected option
-    // For now, we'll just update the state
+    const option = e.target.value;
+    
+    let sorted = [...filteredReviews];
+    
+    if (option === 'Most recent') {
+      sorted = sorted.sort((a, b) => {
+        const dateA = new Date(a.datePosted);
+        const dateB = new Date(b.datePosted);
+        return dateB - dateA;
+      });
+    } else if (option === 'Most past') {
+      sorted = sorted.sort((a, b) => {
+        const dateA = new Date(a.datePosted);
+        const dateB = new Date(b.datePosted);
+        return dateA - dateB;
+      });
+    }
+    
+    setFilteredReviews(sorted);
   };
-
-  const renderRatingBar = (rating, percentage) => {
-    return (
-      <div className="rating-bar-container">
-        <div className="rating-number">{rating}</div>
-        <div className="rating-bar">
-          <div className="rating-bar-fill" style={{ width: `${percentage}%` }}></div>
-        </div>
-      </div>
-    );
+  
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
   };
   
   const handleOpenReviewForm = () => {
@@ -110,10 +151,20 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
         .then(data => {
           if (data.reviews) {
             setReviews(data.reviews);
+            setFilteredReviews(data.reviews);
+            setSearchTerm('');
             
             // Update the summary
             if (data.summary) {
               setSummary(data.summary);
+            }
+            
+            // Extract property rating data
+            if (data.property) {
+              setPropertyData({
+                rating: data.property.rating || 0,
+                ratingno: data.property.ratingno || 0
+              });
             }
           }
         })
@@ -131,44 +182,6 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
   const handleClose = () => {
     onClose();
   };
-  
-  // Use placeholder data if no reviews are available yet
-  const displayReviews = reviews.length > 0 ? reviews : [
-    {
-      id: 1,
-      name: "Ridzuan",
-      avatar: "https://randomuser.me/api/portraits/men/1.jpg",
-      yearsOnPlatform: 5,
-      rating: 5,
-      datePosted: "6 days ago",
-      comment: "Quite and privacy on this place is on top 👍"
-    },
-    {
-      id: 2,
-      name: "MuhdNurAzreen",
-      avatar: "https://randomuser.me/api/portraits/men/2.jpg",
-      yearsOnPlatform: 0,
-      isNew: true,
-      rating: 5,
-      datePosted: "1 week ago",
-      comment: "very helpful"
-    },
-    {
-      id: 3,
-      name: "Sabrina",
-      avatar: "https://randomuser.me/api/portraits/women/1.jpg",
-      yearsOnPlatform: 1,
-      rating: 3,
-      datePosted: "1 week ago",
-      comment: "Seamless check in, free parking, nice pool, the TV in the room was very easy to use and facilities were very convenient and helpful."
-    }
-  ];
-  
-  const renderStars = (rating) => {
-    return [...Array(5)].map((_, i) => (
-      <FaStar key={i} className={i < rating ? "star-filled" : "star-empty"} />
-    ));
-  };
 
   return (
     <>
@@ -185,15 +198,17 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
             <div className="reviews-content">
               <div className="reviews-summary">
                 <div className="reviews-average">
-                  <FaStar className="star-icon" />
-                  <span className="total-reviews">{summary.totalReviews} reviews</span>
+                  <div className="rating-display">
+                    <span className="average-rating">{propertyData.rating.toFixed(1)}</span>
+                    <FaStar className="star-icon" />
+                  </div>
+                  <span className="total-reviews">{propertyData.ratingno} reviews</span>
                 </div>
                 
                 <div className="sort-dropdown">
                   <select value={sortOption} onChange={handleSortChange}>
                     <option value="Most recent">Most recent</option>
-                    <option value="Highest rated">Highest rated</option>
-                    <option value="Lowest rated">Lowest rated</option>
+                    <option value="Most past">Most past</option>
                   </select>
                 </div>
               </div>
@@ -204,6 +219,8 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
                     type="text" 
                     placeholder="Search reviews" 
                     className="reviews-search-input"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
                   />
                 </div>
                 
@@ -219,9 +236,13 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
                 <div className="loading">Loading reviews...</div>
               ) : error ? (
                 <div className="error-message">{error}</div>
+              ) : filteredReviews.length === 0 ? (
+                <div className="no-results">
+                  {searchTerm ? `No reviews found for "${searchTerm}"` : "No reviews yet"}
+                </div>
               ) : (
                 <div className="reviews-list">
-                  {displayReviews.map(review => (
+                  {filteredReviews.map(review => (
                     <div key={review.id} className="review-item">
                       <div className="reviewer-info">
                         <img 
@@ -239,19 +260,11 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
                         />
                         <div className="reviewer-details">
                           <div className="reviewer-name">{review.name}</div>
-                          {review.isNew ? (
-                            <div className="reviewer-status">New user</div>
-                          ) : (
-                            <div className="reviewer-status">{review.yearsOnPlatform} {review.yearsOnPlatform === 1 ? 'year' : 'years'} on platform</div>
-                          )}
+                          <div className="reviewer-status">{review.datePosted}</div>
                         </div>
                       </div>
                       
                       <div className="review-content">
-                        <div className="review-rating">
-                          {review.rating && renderStars(review.rating)}
-                          <span className="review-date">{review.datePosted}</span>
-                        </div>
                         <p className="review-text">{review.comment}</p>
                       </div>
                     </div>
