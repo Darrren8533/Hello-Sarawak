@@ -17,9 +17,6 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
     rating: 0,
     ratingno: 0
   });
-  const [summary, setSummary] = useState({
-    totalReviews: 0
-  });
   
   // Add useEffect to manage body overflow
   useEffect(() => {
@@ -70,11 +67,6 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
           if (data.reviews) {
             setReviews(data.reviews);
             setFilteredReviews(data.reviews);
-            
-            // Update the summary
-            if (data.summary) {
-              setSummary(data.summary);
-            }
           }
           
           // Extract property rating data
@@ -153,19 +145,14 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
             setReviews(data.reviews);
             setFilteredReviews(data.reviews);
             setSearchTerm('');
-            
-            // Update the summary
-            if (data.summary) {
-              setSummary(data.summary);
-            }
-            
-            // Extract property rating data
-            if (data.property) {
-              setPropertyData({
-                rating: data.property.rating || 0,
-                ratingno: data.property.ratingno || 0
-              });
-            }
+          }
+          
+          // Extract property rating data
+          if (data.property) {
+            setPropertyData({
+              rating: data.property.rating || 0,
+              ratingno: data.property.ratingno || 0
+            });
           }
         })
         .catch(err => {
@@ -201,8 +188,8 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
                   <div className="rating-display">
                     <span className="average-rating">{propertyData.rating.toFixed(1)}</span>
                     <FaStar className="star-icon" />
+                    <span className="total-reviews">{propertyData.ratingno} reviews</span>
                   </div>
-                  <span className="total-reviews">{propertyData.ratingno} reviews</span>
                 </div>
                 
                 <div className="sort-dropdown">
