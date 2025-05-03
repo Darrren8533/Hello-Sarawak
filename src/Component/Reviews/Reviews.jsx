@@ -15,8 +15,6 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
     totalReviews: 0,
   });
   
-  console.log('Reviews component: propertyId =', propertyId);
-  
   // Add useEffect to manage body overflow
   useEffect(() => {
     if (isOpen) {
