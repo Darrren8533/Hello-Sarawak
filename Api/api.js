@@ -971,25 +971,26 @@ export const forgotPassword = async (email) => {
     }
 };
 
-// Google Login
 export const googleLogin = async (token) => {
     try {
+        console.log("Sending token to backend:", token);
         const response = await fetch(`${API_URL}/google-login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ token }),
         });
 
-        const data = await response.json();
-
         if (!response.ok) {
-            throw new Error(data.message || "Google Login Failed");
+            const errorData = await response.json();
+            console.error("Server error response:", errorData);
+            throw new Error(errorData.message || "Google Login Failed");
         }
 
+        const data = await response.json();
         return data;
     } catch (error) {
         console.error("Error in Google Login:", error);
-        throw error; 
+        throw error;
     }
 };
 
