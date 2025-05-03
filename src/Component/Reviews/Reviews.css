@@ -81,7 +81,7 @@
 .total-reviews {
   font-size: 24px;
   font-weight: 600;
-  margin-right: 16px;
+  margin-left: 16px;
 }
 
 .learn-how {
@@ -260,6 +260,7 @@
 
 .review-text {
   line-height: 1.5;
+  font-size: 15px;
 }
 
 @media (max-width: 768px) {
