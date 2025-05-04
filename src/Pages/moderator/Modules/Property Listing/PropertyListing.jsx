@@ -10,6 +10,7 @@ import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable'
 import Toast from '../../../../Component/Toast/Toast';
 import Alert from '../../../../Component/Alert/Alert';
 import Loader from '../../../../Component/Loader/Loader';
+import Status from '../../../../Component/Status/Status';
 import { FaEye, FaEdit, FaTrash, FaCheck, FaTimes } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../Property Listing/PropertyListing.css';
@@ -293,9 +294,7 @@ const columns = [
         header: 'Status',
         accessor: 'propertystatus',
         render: (property) => (
-            <span className={`property-status ${(property.propertystatus ?? 'Pending').toLowerCase()}`}>
-                {property.propertystatus || 'Pending'}
-            </span>
+            <Status value={property.propertystatus || 'Pending'} />
         ),
     },
     {
