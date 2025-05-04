@@ -14,6 +14,7 @@ import '../../../../Component/Modal/Modal.css';
 import '../../../../Component/Filter/Filter.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 import './Administrator.css';
+import Status from '../../../../Component/Status/Status';
 
 const Administrators = () => {
   const [searchKey, setSearchKey] = useState('');
@@ -131,9 +132,7 @@ const Administrators = () => {
       header: 'Status',
       accessor: 'uactivation',
       render: (administrator) => (
-        <span className={`status-badge ${administrator.uactivation?.toLowerCase() || 'active'}`}>
-          {administrator.uactivation || 'Active'}
-        </span>
+        <Status value={administrator.uactivation || 'Active'} />
       ),
     },
     {
