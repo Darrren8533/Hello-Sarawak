@@ -25,9 +25,9 @@
   }
   
   .status.inactive {
-    background-color: rgba(108, 117, 125, 0.15);
-    color: #6c757d;
-    border-color: rgba(108, 117, 125, 0.3);
+    background-color: rgba(231, 76, 60, 0.15);
+    color: #e74c3c;
+    border: 1px solid rgba(231, 76, 60, 0.3);
   }
   
   .status.available {
