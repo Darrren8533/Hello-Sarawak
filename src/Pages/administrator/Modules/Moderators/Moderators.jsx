@@ -10,6 +10,7 @@ import ModeratorForm from '../../../../Component/ModeratorForm/ModeratorForm';
 import Toast from '../../../../Component/Toast/Toast';
 import Alert from '../../../../Component/Alert/Alert';
 import Loader from '../../../../Component/Loader/Loader';
+import Status from '../../../../Component/Status/Status';
 import { FaEye, FaBan, FaUser, FaEdit, FaTrash } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -17,6 +18,7 @@ import '../../../../Component/Modal/Modal.css';
 import '../../../../Component/Filter/Filter.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 import '../Moderators/Moderators.css';
+
 
 const Moderators = () => {
   const [filteredModerators, setFilteredModerators] = useState([]);
@@ -244,9 +246,7 @@ const Moderators = () => {
       header: 'Status',
       accessor: 'uactivation',
       render: (moderator) => (
-        <span className={`status-badge ${(moderator.uactivation || 'Active').toLowerCase()}`}>
-          {moderator.uactivation || 'Active'}
-        </span>
+        <Status value={moderator.uactivation || 'Active'} />
       ),
     },
     {
