@@ -4,7 +4,7 @@ import { GiWashingMachine, GiClothesline, GiDesert  } from "react-icons/gi";
 import { PiSecurityCamera } from "react-icons/pi";
 import { SiLightning } from "react-icons/si";
 import { TbPawFilled, TbPawOff } from "react-icons/tb";
-import { MdLandscape, MdOutlineKingBed, MdFireplace, MdSmokingRooms, MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
+import { MdLandscape, MdOutlineKingBed, MdFireplace, MdSmokingRooms} from "react-icons/md";
 import { FaWifi, FaDesktop, FaDumbbell, FaWater, FaSkiing, FaChargingStation, FaParking, FaSwimmingPool, FaTv, FaUtensils, FaSnowflake, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaBicycle, FaBabyCarriage, FaKey, FaBell, FaTree, FaCity } from "react-icons/fa";
 import { propertiesListing, updateProperty, propertyListingRequest } from "../../../Api/api";
 import Toast from "../Toast/Toast";
@@ -471,10 +471,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                                 .filter((facility) => !selectedFacilities.includes(facility.name))
                                 .map((facility) => (
                                     <div
-                                        value={facility.name}
-                                        type="checkbox"
-                                        checked={selectedFacilities.includes(facility.name)}
-                                        onChange={handleChange}   
+                                        key={facility.name} // Added key for React list rendering
                                         className="facility-item"
                                         onClick={() => toggleFacility(facility.name)}
                                     >
@@ -489,7 +486,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                             <div className="Facilities-list">
                                 {selectedFacilities.map((facilityName) => {
                                     const facility = predefinedFacilities.find((f) => f.name === facilityName);
-                                    return (
+                                    return facility ? ( // Ensure facility exists before rendering
                                         <div
                                             key={facilityName}
                                             className="selected-facility-item"
@@ -497,7 +494,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                                         >
                                             {facility.icon} {facilityName}
                                         </div>
-                                    );
+                                    ) : null;
                                 })}
                             </div>
                         </div>
