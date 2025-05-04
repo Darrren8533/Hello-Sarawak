@@ -7,6 +7,7 @@ import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Loader from '../../../../Component/Loader/Loader';
+import Status from '../../../../Component/Status/Status';
 import { FaEye } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -14,7 +15,7 @@ import '../../../../Component/Modal/Modal.css';
 import '../../../../Component/Filter/Filter.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 import './Administrator.css';
-import Status from '../../../../Component/Status/Status';
+
 
 const Administrators = () => {
   const [searchKey, setSearchKey] = useState('');
