@@ -8,6 +8,7 @@ import Filter from '../../../../Component/Filter/Filter';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Toast from '../../../../Component/Toast/Toast';
 import Loader from '../../../../Component/Loader/Loader';
+import Status from '../../../../Component/Status/Status';
 import { FaEye, FaBan, FaUser } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -15,6 +16,7 @@ import '../../../../Component/Modal/Modal.css';
 import '../../../../Component/Filter/Filter.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 import './Customers.css';
+
 
 const Customers = () => {
     const [filteredCustomers, setFilteredCustomers] = useState([]);
@@ -200,9 +202,7 @@ const Customers = () => {
             header: 'Status',
             accessor: 'uactivation',
             render: (customer) => (
-                <span className={`status-badge ${(customer.uactivation || 'Active').toLowerCase()}`}>
-                    {customer.uactivation || 'Active'}
-                </span>
+                <Status value={customer.uactivation || 'Active'} />
             ),
         },
         {
