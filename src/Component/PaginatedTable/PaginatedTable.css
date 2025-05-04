@@ -64,8 +64,12 @@
     font-size: 18px;
     text-align: left;
     table-layout: auto;
-    border-radius: 14px;
+    border-spacing: 0;
+    background: white;
+    border-radius: 16px;
     overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    margin-bottom: 2rem;
     min-width: 600px;
   }
   
@@ -76,7 +80,15 @@
     text-align: left;
   }
   
-  .styled-table th,
+  .styled-table th {
+    background-color: #f8fafc;
+    color: #64748b;
+    font-weight: 600;
+    text-align: left;
+    padding: 12px 20px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
   .styled-table td {
     padding: 12px 20px;
     border-bottom: 1px solid #ddd;
