@@ -8,6 +8,7 @@ import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Toast from '../../../../Component/Toast/Toast';
 import Loader from '../../../../Component/Loader/Loader';
+import Status from '../../../../Component/Status/Status';
 import { FaEye, FaCheck, FaTimes } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -370,9 +371,7 @@ const Reservations = () => {
             header: 'Status',
             accessor: 'reservationstatus',
             render: (reservation) => (
-                <span className={`reservation-status ${reservation.reservationstatus?.toLowerCase()}`}>
-                    {reservation.reservationstatus}
-                </span>
+                <Status value={reservation.reservationstatus} />
             ),
         },
         {
