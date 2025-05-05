@@ -16,6 +16,7 @@ import '../../../../Component/Filter/Filter.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 import '../Operators/Operators.css';
 
+
 const Operators = () => {
   const [operators, setOperators] = useState([]);
   const [searchKey, setSearchKey] = useState('');
@@ -79,7 +80,7 @@ const Operators = () => {
     ucountry: 'Country',
   };
 
-  // Filter logic for both search key and role
+
   const filteredOperators = operators.filter((operator) => {
     const searchInFields =
       `${operator.ufirstname} ${operator.ulastname} ${operator.uemail} ${operator.uphoneno} ${operator.usergroup}`
@@ -106,7 +107,7 @@ const Operators = () => {
       setSelectedOperator(essentialFields);
     } else if (action === 'assignRole') {
       setRoleOperator(operator);
-      setSelectedAssignRole(operator.usergroup || 'Moderator');
+      setSelectedAssignRole(operator.usergroup || 'Moderator'); 
       setShowRoleModal(true);
     }
   };
@@ -246,11 +247,11 @@ const Operators = () => {
         isOpen={showRoleModal}
         user={roleOperator}
         roles={roles}
-        selectedRole={selectedRole}
+        selectedRole={selectedAssignRole} 
         onRoleChange={handleRoleChange}
         onSubmit={handleRoleSubmit}
         onClose={() => setShowRoleModal(false)}
-    />
+      />
     </div>
   );
 };
