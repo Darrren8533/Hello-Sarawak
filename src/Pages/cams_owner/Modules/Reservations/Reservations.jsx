@@ -5,6 +5,7 @@ import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown'
 import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
+import Status from '../../../../Component/Status/Status';
 import { FaEye } from 'react-icons/fa';
 import Toast from '../../../../Component/Toast/Toast';
 import '../../../../Component/MainContent/MainContent.css';
@@ -151,9 +152,7 @@ const Reservations = () => {
             header: 'Status',
             accessor: 'reservationstatus',
             render: (reservation) => (
-                <span className={`status-badge ${(reservation.reservationstatus ?? 'Pending').toLowerCase()}`}>
-                    {reservation.reservationstatus}
-                </span>
+                <Status value={reservation.reservationstatus} />
             ),
         },
         {
