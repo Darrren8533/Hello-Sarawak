@@ -6,6 +6,7 @@ import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Toast from '../../../../Component/Toast/Toast';
+import Role from '../../../../Component/Role/Role';
 import { FaEye, FaBan, FaUserTag } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -194,9 +195,7 @@ const Operators = () => {
       header: 'Role',
       accessor: 'usergroup',
       render: (operator) => (
-        <span className={`role-badge ${operator.usergroup ? operator.usergroup.toLowerCase() : 'operator'}`}>
-          {operator.usergroup || 'Operator'}
-        </span>
+        <Role role={operator.usergroup || 'Operator'} />
       ),
     },
     {
