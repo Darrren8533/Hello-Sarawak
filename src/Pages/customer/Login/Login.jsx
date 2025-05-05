@@ -110,7 +110,6 @@ const Login = () => {
 const googleLoginHandler = useGoogleLogin({
   flow: 'implicit',
   onSuccess: async (tokenResponse) => {
-    console.log("Google Login Success:", tokenResponse);
     
     try {
       // Store token in localStorage
