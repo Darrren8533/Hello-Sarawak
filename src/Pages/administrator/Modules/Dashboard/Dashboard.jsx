@@ -24,8 +24,6 @@ const Dashboard = () => {
     totalProperties: 0,
     totalReservations: 0,
     totalRevenue: 0,
-    occupancyRate: 0,
-    revpar: 0
   });
 
   const [userid, setUserid] = useState('');
@@ -68,9 +66,23 @@ const Dashboard = () => {
   });
 
   // Fetch finance data
-  const { data: finance = {}, isLoading: financeLoading } = useQuery({
+  const { data: finance = { totalRevenue: 0 }, isLoading: financeLoading } = useQuery({
     queryKey: ['finance', userid],
     queryFn: () => fetchFinance(userid),
+    enabled: !!userid,
+  });
+
+  // Fetch occupancy rate
+  const { data: occupancyRate = { rate: 0 }, isLoading: occupancyRateLoading } = useQuery({
+    queryKey: ['occupancyRate', userid],
+    queryFn: () => fetchOccupancyRate(userid),
+    enabled: !!userid,
+  });
+
+  // Fetch RevPAR
+  const { data: revPAR = { rate: 0 }, isLoading: revPARLoading } = useQuery({
+    queryKey: ['revPAR', userid],
+    queryFn: () => fetchRevPAR(userid),
     enabled: !!userid,
   });
 
@@ -88,35 +100,12 @@ const Dashboard = () => {
                          (Array.isArray(moderators) ? moderators.length : 0) + 
                          (Array.isArray(administrators) ? administrators.length : 0);
 
-      // Get revenue and occupancy from finance data
-      let totalRevenue = 0;
-      let occupancyRate = 0;
-      let revpar = 0;
-
-      if (finance && finance.monthlyData && finance.monthlyData.length > 0) {
-        // Sum up revenue from all months
-        totalRevenue = finance.monthlyData.reduce((sum, month) => {
-          return sum + (parseFloat(month.monthly_revenue) || 0);
-        }, 0);
-
-        // Get occupancy rate from the most recent month
-        const lastMonth = finance.monthlyData[finance.monthlyData.length - 1];
-        occupancyRate = parseFloat(lastMonth.occupancy_rate) || 0;
-        
-        // Calculate RevPAR (Revenue Per Available Room)
-        if (lastMonth.total_available_nights && lastMonth.total_available_nights > 0) {
-          revpar = parseFloat(lastMonth.monthly_revenue) / parseFloat(lastMonth.total_available_nights);
-        }
-      }
-
       // Set calculated statistics
       setStats({
         totalUsers,
         totalProperties: Array.isArray(properties) ? properties.length : 0,
         totalReservations: Array.isArray(reservations) ? reservations.length : 0,
-        totalRevenue,
-        occupancyRate,
-        revpar
+        totalRevenue: finance?.totalRevenue || 0,
       });
     }
   }, [
@@ -125,12 +114,11 @@ const Dashboard = () => {
   ]);
 
   console.log("finance:", finance);
-  console.log("occupancyRate from API:", finance?.monthlyData?.[0]?.occupancy_rate);
-  console.log("stats:", stats);
+  console.log("occupancyRate:", occupancyRate);
 
   const isLoading = customersLoading || moderatorsLoading || administratorsLoading || 
                    propertiesLoading || reservationsLoading || financeLoading ||
-                   guestSatisfactionScoreLoading;
+                   occupancyRateLoading || revPARLoading || guestSatisfactionScoreLoading;
 
   // Format currency for display
   const formatCurrency = (amount) => {
@@ -216,7 +204,7 @@ const Dashboard = () => {
               <FaChartLine />
             </div>
           </div>
-          <div className="stat-card-value">{formatPercentage(stats.occupancyRate)}</div>
+          <div className="stat-card-value">{formatPercentage(occupancyRate?.rate || 0)}</div>
           <button 
             className="view-details-btn" 
             onClick={() => navigateToDetails('/administrator_dashboard/finance')}
@@ -232,7 +220,7 @@ const Dashboard = () => {
               <FaRegCreditCard />
             </div>
           </div>
-          <div className="stat-card-value">{formatCurrency(stats.revpar)}</div>
+          <div className="stat-card-value">{formatCurrency(revPAR?.rate || 0)}</div>
           <button 
             className="view-details-btn" 
             onClick={() => navigateToDetails('/administrator_dashboard/finance')}
