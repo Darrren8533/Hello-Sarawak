@@ -18,12 +18,42 @@ const BackUserProfile = () => {
     const [activeTab, setActiveTab] = useState('account');
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const [decryptedPassword, setDecryptedPassword] = useState('');
 
     const userid = localStorage.getItem('userid');
     const googleAccessToken = localStorage.getItem('googleAccessToken');
-    const plainPassword = localStorage.getItem('plainPassword');
+    // const plainPassword = localStorage.getItem('plainPassword');
+
+    const API_URL = import.meta.env.VITE_API_URL;
 
     const generateRandomNumber = () => Math.floor(100000 + Math.random() * 900000);
+
+    const fetchDecryptedPassword = async () => {
+        if (!userid || isNaN(userid)) {
+            displayToast('error', 'Invalid or missing user ID');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/users/getDecryptedPassword/${userid}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                setDecryptedPassword(data.password);
+                localStorage.setItem('plainPassword', data.password);
+                console.log("decryptedPassword:", data.password);
+            } else {
+                console.error('Error fetching password:', data.message);
+            }
+        } catch (error) {
+            console.error('Error fetching decrypted password:', error);
+        }
+    };
 
     useEffect(() => {
         const loadUserDetails = async () => {
@@ -53,7 +83,6 @@ const BackUserProfile = () => {
                         : `data:image/jpeg;base64,${data.uimage}`;
                 }
 
-                // Set default "Not Provided" for all empty fields
                 const defaultData = {
                     ufirstname: data.ufirstname || 'Not Provided',
                     ulastname: data.ulastname || 'Not Provided',
@@ -65,7 +94,7 @@ const BackUserProfile = () => {
                     udob: data.udob || 'Not Provided',
                     utitle: data.utitle || 'Not Provided',
                     ucountry: data.ucountry || 'Not Provided',
-                    password: plainPassword || '',
+                    password: decryptedPassword || '',
                     ...data
                 };
 
@@ -76,6 +105,8 @@ const BackUserProfile = () => {
             }
             setIsLoading(false);
         };
+
+        fetchDecryptedPassword();
 
         if (googleAccessToken) {
             fetchGoogleUserData(googleAccessToken)
@@ -107,7 +138,7 @@ const BackUserProfile = () => {
         }
 
         loadUserDetails();
-    }, [userid, googleAccessToken]);
+    }, [userid, googleAccessToken, decryptedPassword]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -247,7 +278,6 @@ const BackUserProfile = () => {
             
             payload.userid = userid;
 
-            // Validation for profile fields
             if (activeTab === 'account') {
                 if (payload.ufirstname && !nameRegex.test(payload.ufirstname)) {
                     throw new Error('First name should only contain letters and spaces');
@@ -502,7 +532,7 @@ const BackUserProfile = () => {
                                             <input
                                                 type={showPassword ? 'text' : 'password'}
                                                 name="password"
-                                                value={plainPassword || ''}
+                                                value={decryptedPassword || ''}
                                                 onChange={handleInputChange}
                                                 className="back-password-input"
                                                 placeholder={userData.password ? '' : 'Not Provided'}
