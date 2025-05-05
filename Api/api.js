@@ -955,7 +955,6 @@ export const forgotPassword = async (email) => {
 //Google Login
 export const googleLogin = async (token) => {
     try {
-        console.log("Sending token to backend:", token);
         const response = await fetch(`${API_URL}/google-login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
