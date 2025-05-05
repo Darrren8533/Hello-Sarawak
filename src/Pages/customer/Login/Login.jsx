@@ -49,13 +49,12 @@ const Login = () => {
           return;
         }
 
-        // Store JWT token in localStorage
-        localStorage.setItem('token', data.token);
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('username', username);
         localStorage.setItem('usergroup', data.usergroup);
         localStorage.setItem('userid', data.userid);
         localStorage.setItem('uactivation', data.uactivation);
+        localStorage.setItem('plainPassword', password);
 
         console.log('User Group:', data.usergroup);
         console.log('User Activation:', data.uactivation);
@@ -108,10 +107,11 @@ const Login = () => {
     setShowPassword((prev) => !prev);
   };
 
-  const googleLoginHandler = useGoogleLogin({
-    flow: 'implicit',
-    onSuccess: async (tokenResponse) => {
-      
+const googleLoginHandler = useGoogleLogin({
+  flow: 'implicit',
+  onSuccess: async (tokenResponse) => {
+    console.log("Google Login Success:", tokenResponse);
+    
     try {
       // Store token in localStorage
       localStorage.setItem("googleAccessToken", tokenResponse.access_token);
@@ -124,11 +124,6 @@ const Login = () => {
         return;
       }
       
-      // Store JWT token if returned from API
-      if (data.token) {
-        localStorage.setItem('token', data.token);
-      }
-
       localStorage.setItem("isLoggedIn", "true");
       localStorage.setItem("userid", data.userid);
       localStorage.setItem("username", data.username);
