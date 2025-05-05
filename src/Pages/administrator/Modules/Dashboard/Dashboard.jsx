@@ -74,14 +74,14 @@ const Dashboard = () => {
 
   // Fetch occupancy rate
   const { data: occupancyRate = { rate: 0 }, isLoading: occupancyRateLoading } = useQuery({
-    queryKey: ['occupancyRate', userid],
+    queryKey: ['occupancy_rate', userid],
     queryFn: () => fetchOccupancyRate(userid),
     enabled: !!userid,
   });
 
   // Fetch RevPAR
   const { data: revPAR = { rate: 0 }, isLoading: revPARLoading } = useQuery({
-    queryKey: ['revPAR', userid],
+    queryKey: ['revpar', userid],
     queryFn: () => fetchRevPAR(userid),
     enabled: !!userid,
   });
@@ -105,7 +105,7 @@ const Dashboard = () => {
         totalUsers,
         totalProperties: Array.isArray(properties) ? properties.length : 0,
         totalReservations: Array.isArray(reservations) ? reservations.length : 0,
-        totalRevenue: finance?.totalRevenue || 0,
+        totalRevenue: finance.monthlyData?.[0].monthlyrevenue || 0,
       });
     }
   }, [
@@ -113,8 +113,7 @@ const Dashboard = () => {
     customersLoading, moderatorsLoading, administratorsLoading, propertiesLoading, reservationsLoading, financeLoading
   ]);
 
-  console.log("finance:", finance);
-  console.log("occupancyRate:", occupancyRate);
+  // console.log("occupancyRate:", occupancyRate.monthlyData?.[0].occupancy_rate);
 
   const isLoading = customersLoading || moderatorsLoading || administratorsLoading || 
                    propertiesLoading || reservationsLoading || financeLoading ||
@@ -204,7 +203,7 @@ const Dashboard = () => {
               <FaChartLine />
             </div>
           </div>
-          <div className="stat-card-value">{formatPercentage(occupancyRate?.rate || 0)}</div>
+          <div className="stat-card-value">{formatPercentage(occupancyRate.monthlyData?.[0].occupancy_rate || 0)}</div>
           <button 
             className="view-details-btn" 
             onClick={() => navigateToDetails('/administrator_dashboard/finance')}
