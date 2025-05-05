@@ -51,57 +51,17 @@ export const checkstatus = async (userid) => {
 // Logout
 export const logoutUser = async (userid) => {
   try {
-    // Get the token from localStorage
-    const token = localStorage.getItem('token');
-    
     const response = await fetch(`${API_URL}/logout`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}` // Include token in the header
       },
       body: JSON.stringify({ userid }),
     });
 
-    // Clear the token from localStorage
-    localStorage.removeItem('token');
-    
     const responseData = await response.json();
     return responseData;
-  } catch (error) {
-    console.error('API error:', error);
-    throw error;
-  }
-};
-
-// Function to refresh the token
-export const refreshToken = async () => {
-  try {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
-    
-    const response = await fetch(`${API_URL}/refresh-token`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
-    
-    if (!response.ok) {
-      // Handle token expiration or invalid token
-      localStorage.removeItem('token');
-      window.location.href = '/login';
-      throw new Error('Token refresh failed');
-    }
-    
-    const data = await response.json();
-    localStorage.setItem('token', data.token);
-    
-    return data.token;
-  } catch (error) {
+  }catch (error) {
     console.error('API error:', error);
     throw error;
   }
