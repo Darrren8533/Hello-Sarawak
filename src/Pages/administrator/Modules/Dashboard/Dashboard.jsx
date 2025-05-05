@@ -113,8 +113,8 @@ const Dashboard = () => {
     customersLoading, moderatorsLoading, administratorsLoading, propertiesLoading, reservationsLoading, financeLoading
   ]);
 
-  console.log(finance.totalRevenue);
-  console.log(occupancyRate);
+  console.log("finance:", finance);
+  console.log("occupancyRate:", occupancyRate);
 
   const isLoading = customersLoading || moderatorsLoading || administratorsLoading || 
                    propertiesLoading || reservationsLoading || financeLoading ||
