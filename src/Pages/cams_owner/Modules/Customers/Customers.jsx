@@ -5,6 +5,8 @@ import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Toast from '../../../../Component/Toast/Toast';
+import Role from '../../../../Component/Role/Role';
+import RoleManager from '../../../../Component/RoleManager/RoleManager';
 import { FaEye, FaUserTag } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -157,9 +159,7 @@ const Customers = () => {
             header: 'Role',
             accessor: 'usergroup',
             render: (customer) => (
-                <span className={`role-badge ${customer.usergroup ? customer.usergroup.toLowerCase() : 'customer'}`}>
-                    {customer.usergroup || 'Customer'}
-                </span>
+               <Role role={customer.usergroup || 'Customer'} />
             ),
         },
         
@@ -206,47 +206,15 @@ const Customers = () => {
                 onClose={() => setSelectedCustomer(null)}
             />
             
-            {showRoleModal && (
-                <div className="modal-overlay">
-                    <div className="modal-container">
-                        <div className="modal-header">
-                            <h2>Assign Role to {roleCustomer?.ufirstname} {roleCustomer?.ulastname}</h2>
-                            <button className="close-button" onClick={() => setShowRoleModal(false)}>×</button>
-                        </div>
-                        <div className="modal-body">
-                            <div className="form-group">
-                                <label htmlFor="role" className="role-label">Select Role:</label>
-                                <select 
-                                    id="role" 
-                                    value={selectedRole} 
-                                    onChange={handleRoleChange}
-                                    className="role-select"
-                                >
-                                    {roles.map(role => (
-                                        <option key={role} value={role}>{role}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                        <div className="modal-footer">
-                            <div className="button-group">
-                                <button 
-                                    className="cancel-button" 
-                                    onClick={() => setShowRoleModal(false)}
-                                >
-                                    Cancel
-                                </button>
-                                <button 
-                                    className="assign-button" 
-                                    onClick={handleRoleSubmit}
-                                >
-                                    Assign Role
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <RoleManager
+                isOpen={showRoleModal}
+                user={roleCustomer}
+                roles={roles}
+                selectedRole={selectedRole}
+                onRoleChange={handleRoleChange}
+                onSubmit={handleRoleSubmit}
+                onClose={() => setShowRoleModal(false)}
+            />
         </div>
     );
 };
