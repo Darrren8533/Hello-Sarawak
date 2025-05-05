@@ -8,6 +8,7 @@ import Filter from '../../../../Component/Filter/Filter';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Toast from '../../../../Component/Toast/Toast';
 import Alert from '../../../../Component/Alert/Alert';
+import Status from '../../../../Component/Status/Status';
 import { FaEye} from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 
@@ -134,9 +135,7 @@ const PropertyListing = () => {
             header: 'Status',
             accessor: 'propertystatus',
             render: (property) => (
-              <span className={`property-status ${(property.propertystatus ?? 'Pending').toLowerCase()}`}>
-                {property.propertystatus || 'Pending'}
-              </span>
+              <Status value={property.propertystatus || 'Pending'} />
             )
         },
         {
