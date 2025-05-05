@@ -1,28 +1,3 @@
-.role-badge {
-  padding: 2px 6px;
-  border-radius: 5px;
-  color: #333; 
-  font-weight: bold;
-  font-size: 12px; 
-  display: inline-block;
-}
-
-.administrator {
-  background-color: #C1F0C1; 
-  color: #2E7D32; 
-}
-
-.moderator {
-  background-color: #FFE9A3; 
-  color: #FF8C00; 
-}
-
-.customer {
-  background-color: #E0F0FF; 
-  color: #0052CC; 
-}
-
-
 /* Role Assignment Modal Styles */
 .modal-overlay {
   position: fixed;
