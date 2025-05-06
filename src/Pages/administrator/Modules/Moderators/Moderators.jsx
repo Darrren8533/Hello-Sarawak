@@ -214,7 +214,9 @@ const Moderators = () => {
           <div className="avatar-container">
             {moderator.uimage && moderator.uimage.length > 0 ? (
               <img
-                src={`data:image/jpeg;base64,${moderator.uimage}`}
+              src={moderator.uimage.startsWith('http') 
+                ? moderator.uimage 
+                : `data:image/jpeg;base64,${moderator.uimage}`}
                 alt={moderator.username || 'Avatar'}
                 className="table-user-avatar"
                 onError={(e) => {
