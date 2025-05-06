@@ -101,7 +101,7 @@ const Administrators = () => {
           <div className="avatar-container">
             {administrator.uimage && administrator.uimage.length > 0 ? (
               <img
-                src={`data:image/jpeg;base64,${administrator.uimage}`}
+                src={`${administrator.uimage}`}
                 alt={administrator.username || 'Avatar'}
                 className="table-user-avatar"
                 onError={(e) => {
