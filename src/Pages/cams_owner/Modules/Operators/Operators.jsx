@@ -8,6 +8,7 @@ import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable'
 import Toast from '../../../../Component/Toast/Toast';
 import Role from '../../../../Component/Role/Role';
 import RoleManager from '../../../../Component/RoleManager/RoleManager';
+import UserActivityCell from '../../../../Component/UserActivityCell/UserActivityCell';
 import { FaEye, FaBan, FaUserTag } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -161,35 +162,7 @@ const Operators = () => {
       header: 'Operator',
       accessor: 'operator',
       render: (operator) => (
-        <div className="user-container">
-          <div className="avatar-container">
-            {operator.uimage && operator.uimage.length > 0 ? (
-              <img
-                src={`data:image/jpeg;base64,${operator.uimage}`}
-                alt={operator.username || 'Avatar'}
-                className="table-user-avatar"
-                onError={(e) => {
-                  console.error(`Failed to load avatar for operator ${operator.userid}:`, operator.uimage);
-                  e.target.src = '/public/avatar.png';
-                }}
-              />
-            ) : (
-              <img
-                src="/public/avatar.png"
-                alt="Default Avatar"
-                className="table-user-avatar"
-              />
-            )}
-            <span
-              className={`status-dot ${
-                operator.ustatus === 'login' ? 'status-login' :
-                operator.ustatus === 'registered' ? 'status-registered' :
-                'status-logout'
-              }`}
-            />
-          </div>
-          <span className="table-user-username">{operator.username || 'N/A'}</span>
-        </div>
+        <UserActivityCell user={operator} />
       ),
     },
     { header: 'Email', accessor: 'uemail' },
