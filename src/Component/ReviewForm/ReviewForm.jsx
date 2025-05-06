@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { IoMdClose } from "react-icons/io";
 import { FaStar } from "react-icons/fa";
 import { submitReview } from '../../../Api/api';
+import Toast from '../Toast/Toast';
 
 const ReviewForm = ({ isOpen, onClose, propertyId }) => {
   const [review, setReview] = useState('');
@@ -10,6 +11,9 @@ const ReviewForm = ({ isOpen, onClose, propertyId }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('');
 
   // Add useEffect to manage body overflow similar to Reviews.jsx
   useEffect(() => {
@@ -50,16 +54,23 @@ const ReviewForm = ({ isOpen, onClose, propertyId }) => {
     }
   }, [isOpen]);
 
+  const displayToast = (type, message) => {
+    setToastType(type);
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 5000);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (review.trim() === '') {
-      setError('Please write a review');
+      displayToast('error', 'Please write a review');
       return;
     }
     
     if (rating === 0) {
-      setError('Please select a rating');
+      displayToast('error', 'Please select a rating');
       return;
     }
     
@@ -71,7 +82,7 @@ const ReviewForm = ({ isOpen, onClose, propertyId }) => {
       const userId = localStorage.getItem('userid');
       
       if (!userId) {
-        setError('You must be logged in to submit a review');
+        displayToast('error', 'You must be logged in to submit a review');
         setIsSubmitting(false);
         return;
       }
@@ -88,7 +99,7 @@ const ReviewForm = ({ isOpen, onClose, propertyId }) => {
       const response = await submitReview(reviewData);
       
       // Success
-      setSuccess('Your review has been submitted!');
+      displayToast('success', 'Your review has been submitted!');
       setReview('');
       setRating(0);
       
@@ -98,7 +109,11 @@ const ReviewForm = ({ isOpen, onClose, propertyId }) => {
       }, 2000);
       
     } catch (error) {
-      setError(error.message || 'An error occurred while submitting your review');
+      if (error.response && error.response.status === 409) {
+        displayToast('error', 'You have already submitted a review for this property');
+      } else {
+        displayToast('error', error.message || 'An error occurred while submitting your review');
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -185,6 +200,7 @@ const ReviewForm = ({ isOpen, onClose, propertyId }) => {
           </form>
         </div>
       </div>
+      {showToast && <Toast type={toastType} message={toastMessage} />}
     </div>
   );
 };
