@@ -9,6 +9,7 @@ import Reservations from './Modules/Reservations/Reservations';
 import Finances from './Modules/Finances/Finances';
 import AuditTrails from './Modules/Audit Trails/AuditTrails';
 import Profile from './Modules/Profile/Profile';
+import Cluster from './Modules/Cluster/Cluster';
 import NoAccess from '../../Component/NoAccess/NoAccess';
 import { FiHome, FiUsers, FiCalendar, FiCreditCard, FiBarChart, FiMessageSquare, FiFileText } from 'react-icons/fi';
 import { FaHotel, FaUserTie } from 'react-icons/fa';
