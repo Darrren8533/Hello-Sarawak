@@ -11,6 +11,7 @@ import Toast from '../../../../Component/Toast/Toast';
 import Alert from '../../../../Component/Alert/Alert';
 import Loader from '../../../../Component/Loader/Loader';
 import Status from '../../../../Component/Status/Status';
+import UserActivityCell from '../../../../Component/UserActivityCell/UserActivityCell';
 import { FaEye, FaBan, FaUser, FaEdit, FaTrash } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -210,37 +211,7 @@ const Moderators = () => {
       header: 'Moderator',
       accessor: 'moderator',
       render: (moderator) => (
-        <div className="user-container">
-          <div className="avatar-container">
-            {moderator.uimage && moderator.uimage.length > 0 ? (
-              <img
-              src={moderator.uimage.startsWith('http') 
-                ? moderator.uimage 
-                : `data:image/jpeg;base64,${moderator.uimage}`}
-                alt={moderator.username || 'Avatar'}
-                className="table-user-avatar"
-                onError={(e) => {
-                  console.error(`Failed to load avatar for moderator ${moderator.userid}:`, moderator.uimage);
-                  e.target.src = '/public/avatar.png';
-                }}
-              />
-            ) : (
-              <img
-                src="/public/avatar.png"
-                alt={moderator.username || 'Avatar'}
-                className="table-user-avatar"
-              />
-            )}
-            <span
-              className={`status-dot ${
-                moderator.ustatus === 'login' ? 'status-login' :
-                moderator.ustatus === 'registered' ? 'status-registered' :
-                'status-logout'
-              }`}
-            />
-          </div>
-         <span className="table-user-username">{moderator.username || 'N/A'}</span>
-        </div>
+        <UserActivityCell user={moderator} />
       ),
     },
     { header: 'Email', accessor: 'uemail' },
