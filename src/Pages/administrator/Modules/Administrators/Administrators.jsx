@@ -8,6 +8,7 @@ import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Loader from '../../../../Component/Loader/Loader';
 import Status from '../../../../Component/Status/Status';
+import UserActivityCell from '../../../../Component/UserActivityCell/UserActivityCell';
 import { FaEye } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -97,37 +98,7 @@ const Administrators = () => {
       header: 'Administrator',
       accessor: 'administrator',
       render: (administrator) => (
-        <div className="user-container">
-          <div className="avatar-container">
-            {administrator.uimage && administrator.uimage.length > 0 ? (
-              <img
-                src={administrator.uimage.startsWith('http') 
-                  ? administrator.uimage 
-                  : `data:image/jpeg;base64,${administrator.uimage}`}
-                alt={administrator.username || 'Avatar'}
-                className="table-user-avatar"
-                onError={(e) => {
-                  console.error(`Failed to load avatar for admin ${administrator.userid}:`, administrator.uimage);
-                  e.target.src = '/public/avatar.png';
-                }}
-              />
-            ) : (
-              <img
-                src="/public/avatar.png"
-                alt="Default Avatar"
-                className="table-user-avatar"
-              />
-            )}
-            <span
-              className={`status-dot ${
-                administrator.ustatus === 'login' ? 'status-login' :
-                administrator.ustatus === 'registered' ? 'status-registered' :
-                'status-logout'
-              }`}
-            />
-          </div>
-           <span className="table-user-username">{administrator.username || 'N/A'}</span>
-        </div>
+        <UserActivityCell user={administrator} />
       ),
     },
     { header: 'Email', accessor: 'uemail' },
