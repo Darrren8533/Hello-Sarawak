@@ -170,7 +170,9 @@ const Customers = () => {
                     <div className="avatar-container">
                         {customer.uimage && customer.uimage.length > 0 ? (
                             <img
-                                src={`data:image/jpeg;base64,${customer.uimage}`}
+                                src={customer.uimage.startsWith('http') 
+                                    ? customer.uimage 
+                                    : `data:image/jpeg;base64,${customer.uimage}`}
                                 alt={customer.username || 'Avatar'}
                                 className="table-user-avatar"
                                 onError={(e) => {
