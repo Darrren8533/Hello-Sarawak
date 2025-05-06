@@ -65,12 +65,12 @@ const ReviewForm = ({ isOpen, onClose, propertyId }) => {
     e.preventDefault();
     
     if (review.trim() === '') {
-      setError('Please write a review');
+      displayToast('error', 'Please write a review');
       return;
     }
     
     if (rating === 0) {
-      setError('Please select a rating');
+      displayToast('error', 'Please select a rating');
       return;
     }
     
