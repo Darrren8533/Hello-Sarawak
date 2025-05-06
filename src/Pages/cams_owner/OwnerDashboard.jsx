@@ -59,6 +59,7 @@ import '../../Component/MainContent/MainContent.css';
     { path: '/owner_dashboard/finances', label: 'Finances', icon: <FiCreditCard /> },
     { path: '/owner_dashboard/audit-trails', label: 'Audit Trails', icon: <FiFileText /> },
     { path: '/owner_dashboard/profile', label: 'Profile', icon: <FiUsers /> },
+    { path: '/owner_dashboard/cluster', label: 'Cluster', icon: <FiUsers /> },
   ];
 
   const handleLogout = () => {
@@ -85,6 +86,7 @@ import '../../Component/MainContent/MainContent.css';
           <Route path="reservations" element={<Reservations />} />
           <Route path="finances" element={<Finances />} />
           <Route path="audit-trails" element={<AuditTrails />} />
+          <Route path="cluster" element={<Cluster />} />
           <Route path="profile" element={<Profile />} />
           {/* Catch-all for undefined routes */}
           <Route path="*" element={<NoAccess />} />
