@@ -46,7 +46,7 @@ const BackUserProfile = () => {
             if (data.success) {
                 setDecryptedPassword(data.password);
                 localStorage.setItem('plainPassword', data.password);
-                // console.log("decryptedPassword:", data.password);
+                console.log("decryptedPassword:", data.password);
             } else {
                 console.error('Error fetching password:', data.message);
             }
