@@ -115,7 +115,9 @@ function Navbar() {
 
     useEffect(() => {
         if (userData?.uimage) {
-            const avatarUrl = `data:image/jpeg;base64,${userData.uimage}`;
+            const avatarUrl = userData.uimage.startsWith('http') 
+                ? userData.uimage 
+                : `data:image/jpeg;base64,${userData.uimage}`;
             updateAvatar(avatarUrl);
         }
     }, [userData, updateAvatar]);
