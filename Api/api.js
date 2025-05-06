@@ -1050,3 +1050,13 @@ export const fetchReviews = async (propertyid) => {
     throw error;
   }
 };
+
+export const fetchClusters = async () => {
+  try {
+    const response = await fetch(`${API_URL}/clusters`);
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching clusters:', error);
+    throw error;
+  }
+};
