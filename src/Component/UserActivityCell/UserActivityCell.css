@@ -28,11 +28,11 @@
     border: 2px solid white;
 }
 
-.status-online {
+.status-login {
     background-color: #22c55e;
 }
 
-.status-offline {
+.status-logout {
     background-color: #ef4444; 
 }
 
