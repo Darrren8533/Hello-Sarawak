@@ -147,6 +147,7 @@ const Moderators = () => {
   ];
 
   const displayLabels = {
+    userid: 'UID',
     ufirstname: 'First Name',
     ulastname: 'Last Name',
     uemail: 'Email',
@@ -159,6 +160,7 @@ const Moderators = () => {
   const handleAction = async (action, moderator) => {
     if (action === 'view') {
       setSelectedModerator({
+        userid: moderator.userid || 'N/A',
         ufirstname: moderator.ufirstname || 'N/A',
         ulastname: moderator.ulastname || 'N/A',
         uemail: moderator.uemail || 'N/A',
@@ -189,24 +191,24 @@ const Moderators = () => {
   const moderatorDropdownItems = (moderatorStatus) => {
     if (moderatorStatus === 'Inactive') {
       return [
-        { label: 'View Moderator', icon: <FaEye />, action: 'view' },
+        { label: 'View Details', icon: <FaEye />, action: 'view' },
         { label: 'Edit', icon: <FaEdit />, action: 'edit' },
         { label: 'Activate', icon: <FaUser />, action: 'activate' },
         { label: 'Remove', icon: <FaTrash />, action: 'remove' },
       ];
     } else if (moderatorStatus === 'Active') {
       return [
-        { label: 'View Moderator', icon: <FaEye />, action: 'view' },
+        { label: 'View Details', icon: <FaEye />, action: 'view' },
         { label: 'Edit', icon: <FaEdit />, action: 'edit' },
         { label: 'Suspend', icon: <FaBan />, action: 'suspend' },
       ];
     }
 
-    return [{ label: 'View Moderator', icon: <FaEye />, action: 'view' }];
+    return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
   };
 
   const columns = [
-    { header: 'ID', accessor: 'userid' },
+    { header: 'UID', accessor: 'userid' },
     {
       header: 'Moderator',
       accessor: 'moderator',
