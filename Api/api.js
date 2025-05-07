@@ -629,7 +629,6 @@ export const createReservation = async (reservationData) => {
 
 // Fetch all Reservations
 export const fetchReservation = async () => {
-  // Retrieve the username from localStorage
   const username = localStorage.getItem('username');
   
   try {
@@ -653,8 +652,11 @@ export const fetchReservation = async () => {
 
 // Update reservation status
 export const updateReservationStatus = async (reservationid, status, userid) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
   try {
-    const response = await fetch(`${API_URL}/updateReservationStatus/${reservationid}`, {
+    const response = await fetch(`${API_URL}/updateReservationStatus/${reservationid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ reservationStatus: status, userid: userid }),
