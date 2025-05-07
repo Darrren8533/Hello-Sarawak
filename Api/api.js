@@ -837,7 +837,7 @@ export const getOperatorProperties = async (userid) => {
   }
 };
 
-// fetch normal user data
+// Fetch normal user data
 export const fetchUserData = async (userid) => {
   try {
       const response = await fetch(`${API_URL}/users/${userid}`);
@@ -852,7 +852,7 @@ export const fetchUserData = async (userid) => {
   }
 };
 
-// fetch google user data
+// Fetch google user data
 export const fetchGoogleUserData = async (accessToken) => {
   try {
       const response = await fetch(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${accessToken}`, {
@@ -876,13 +876,16 @@ export const fetchGoogleUserData = async (accessToken) => {
 
 // Update user profile
 export const updateProfile = async (userData) => {
+    const creatorid = localStorage.getItem("userid");
+    const creatorUsername = localStorage.getItem("username");
+    
     try {
         // Validate user ID
         if (!userData.userid) {
             throw new Error('User ID is missing');
         }
       
-        const response = await fetch(`${API_URL}/users/updateProfile/${userData.userid}`, {
+        const response = await fetch(`${API_URL}/users/updateProfile/${userData.userid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -904,12 +907,15 @@ export const updateProfile = async (userData) => {
 
 //Upload Avatar
 export const uploadAvatar = async (userid, base64String) => {
+    const creatorid = localStorage.getItem("userid");
+    const creatorUsername = localStorage.getItem("username");
+  
     try {
       if (!userid) {
         throw new Error('User ID is missing');
       }
   
-      const response = await fetch(`${API_URL}/users/uploadAvatar/${userid}`, {
+      const response = await fetch(`${API_URL}/users/uploadAvatar/${userid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -1013,8 +1019,10 @@ export const auditTrails = async (userid) => {
 
 // Submit a review for a property
 export const submitReview = async (reviewData) => {
+  const creatorUsername = localStorage.getItem("username");
+  
   try {
-    const response = await fetch(`${API_URL}/reviews`, {
+    const response = await fetch(`${API_URL}/reviews?creatorUsername=${creatorUsername}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
