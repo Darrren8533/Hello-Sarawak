@@ -651,12 +651,9 @@ export const fetchReservation = async () => {
 };
 
 // Update reservation status
-export const updateReservationStatus = async (reservationid, status, userid) => {
-  const creatorid = localStorage.getItem("userid");
-  const creatorUsername = localStorage.getItem("username");
-  
+export const updateReservationStatus = async (reservationid, status, userid) => {  
   try {
-    const response = await fetch(`${API_URL}/updateReservationStatus/${reservationid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
+    const response = await fetch(`${API_URL}/updateReservationStatus/${reservationid}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ reservationStatus: status, userid: userid }),
