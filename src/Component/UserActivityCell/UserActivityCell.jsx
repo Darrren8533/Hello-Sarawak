@@ -4,19 +4,21 @@ import './UserActivityCell.css';
 
 const UserActivityCell = ({ user }) => {
     const [avatarSrc, setAvatarSrc] = useState(null);
-    const [hasFallback, setHasFallback] = useState(false); // Track fallback attempts
+    const [hasFallback, setHasFallback] = useState(false); 
     const googleAccessToken = localStorage.getItem('googleAccessToken');
 
     const statusMap = {
-        'online': 'status-online',
-        'offline': 'status-offline',
+        'login': 'status-login',
+        'logout': 'status-logout',
         'registered': 'status-registered',
     };
 
     // Validate Base64 string
     const isValidBase64 = (str) => {
         try {
-            return typeof str === 'string' && /^[A-Za-z0-9+/=]+$/.test(str) && atob(str);
+            // Basic Base64 format check
+            const base64Regex = /^[A-Za-z0-9+/=]+$/;
+            return typeof str === 'string' && base64Regex.test(str) && atob(str);
         } catch (e) {
             console.warn('Invalid Base64 string:', str, e);
             return false;
@@ -26,16 +28,10 @@ const UserActivityCell = ({ user }) => {
     useEffect(() => {
         const fetchAvatar = async () => {
             try {
-                setHasFallback(false); // Reset fallback state
+                // Reset fallback state on new fetch attempt
+                setHasFallback(false);
 
-                // Case 1: Use uimage if it starts with http (e.g., Google URL)
-                if (user.uimage && user.uimage.length > 0 && user.uimage.startsWith('http')) {
-                    console.log('Using uimage as URL:', user.uimage);
-                    setAvatarSrc(user.uimage);
-                    return;
-                }
-
-                // Case 2: Use Base64 image if valid
+                // Case 1: Use Base64 image if available and valid
                 if (user.uimage && user.uimage.length > 0 && isValidBase64(user.uimage)) {
                     const base64Src = `data:image/jpeg;base64,${user.uimage}`;
                     console.log('Using base64 uimage:', base64Src);
@@ -43,20 +39,20 @@ const UserActivityCell = ({ user }) => {
                     return;
                 }
 
-                // Case 3: Fetch Google avatar if token exists
+                // Case 2: Fetch Google avatar if token exists
                 if (googleAccessToken) {
                     console.log('Fetching Google avatar with token:', googleAccessToken);
                     const googleData = await fetchGoogleUserData(googleAccessToken);
-                    if (googleData && googleData.picture && googleData.picture.startsWith('http')) {
-                        console.log('Google avatar URL fetched:', googleData.picture);
+                    if (googleData && googleData.picture) {
+                        console.log('Google avatar fetched:', googleData.picture);
                         setAvatarSrc(googleData.picture);
                         return;
                     } else {
-                        console.warn('No valid picture URL in Google data:', googleData);
+                        console.warn('No picture in Google data:', googleData);
                     }
                 }
 
-                // Case 4: Fallback to default avatar
+                // Case 3: Fallback to default avatar
                 console.log('No uimage or Google token, using default avatar');
                 setAvatarSrc('/public/avatar.png');
             } catch (error) {
@@ -74,18 +70,19 @@ const UserActivityCell = ({ user }) => {
             setHasFallback(true);
             e.target.src = '/public/avatar.png'; // Attempt fallback
         } else {
-            console.error('Default avatar failed to load, using placeholder:', e);
-            e.target.src = 'https://via.placeholder.com/40?text=User'; // Final fallback
+            console.error('Default avatar also failed to load:', e);
+
+            e.target.src = 'https://via.placeholder.com/40?text=User';
         }
     };
 
-    const statusClass = statusMap[user.ustatus?.toLowerCase()] || 'status-offline';
+    const statusClass = statusMap[user.ustatus?.toLowerCase()] || 'status-logout';
 
     return (
         <div className="user-container">
             <div className="avatar-container">
                 <img
-                    src={avatarSrc || 'https://via.placeholder.com/40?text=User'} // Initial placeholder
+                    src={avatarSrc || 'https://via.placeholder.com/40?text=User'}
                     alt={user.username || 'Avatar'}
                     className="table-user-avatar"
                     onError={handleImageError}
