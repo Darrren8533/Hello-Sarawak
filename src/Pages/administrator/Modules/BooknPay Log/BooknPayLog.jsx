@@ -54,7 +54,7 @@ const BooknPayLog = () => {
   ];
 
   const displayLabels = {
-    userid: 'User ID',
+    userid: 'UID',
     timestamp: 'Timestamp',
     action: 'Action',
   };
@@ -87,7 +87,7 @@ const BooknPayLog = () => {
   ];
 
   const columns = [
-    { header: 'User ID', accessor: 'userid' },
+    { header: 'UID', accessor: 'userid' },
     { header: 'Timestamp', accessor: 'timestamp' },
     { header: 'Action', accessor: 'action' },
     {
