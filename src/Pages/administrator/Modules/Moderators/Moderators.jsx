@@ -161,6 +161,7 @@ const Moderators = () => {
     if (action === 'view') {
       setSelectedModerator({
         userid: moderator.userid || 'N/A',
+        username: moderator.username || 'N/A',
         ufirstname: moderator.ufirstname || 'N/A',
         ulastname: moderator.ulastname || 'N/A',
         uemail: moderator.uemail || 'N/A',
@@ -261,7 +262,7 @@ const Moderators = () => {
 
       <Modal
         isOpen={!!selectedModerator}
-        title={`${selectedModerator?.username} ${selectedModerator?.ulastname}`}
+        title={`${selectedModerator?.ufirstname}`}
         data={selectedModerator || {}}
         labels={displayLabels}
         onClose={() => setSelectedModerator(null)}
