@@ -670,7 +670,7 @@ export const updateReservationStatus = async (reservationid, status, userid) => 
   }
 };
 
-//Cart
+// Cart
 export const fetchCart = async () => {
   const userid = localStorage.getItem('userid');
   
@@ -692,8 +692,11 @@ export const fetchCart = async () => {
 
 // Remove Reservation
 export const removeReservation = async (reservationid) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
   try {
-    const response = await fetch(`${API_URL}/removeReservation/${reservationid}`, {
+    const response = await fetch(`${API_URL}/removeReservation/${reservationid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
       method: 'DELETE',
     });
 
@@ -708,7 +711,7 @@ export const removeReservation = async (reservationid) => {
   }
 };
 
-//Booking Log
+//Book & Pay Log
 export const fetchBookLog = async () => {
   try {
     const response = await fetch(`${API_URL}/users/booklog`);
