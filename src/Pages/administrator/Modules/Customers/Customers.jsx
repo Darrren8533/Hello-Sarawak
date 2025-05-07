@@ -8,8 +8,6 @@ import Filter from '../../../../Component/Filter/Filter';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Toast from '../../../../Component/Toast/Toast';
 import Loader from '../../../../Component/Loader/Loader';
-import Status from '../../../../Component/Status/Status';
-import UserActivityCell from '../../../../Component/UserActivityCell/UserActivityCell';
 import { FaEye, FaBan, FaUser } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -17,7 +15,6 @@ import '../../../../Component/Modal/Modal.css';
 import '../../../../Component/Filter/Filter.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 import './Customers.css';
-
 
 const Customers = () => {
     const [filteredCustomers, setFilteredCustomers] = useState([]);
@@ -116,21 +113,29 @@ const Customers = () => {
     ];
 
     const displayLabels = {
-        username: 'Username',
-        email: 'Email',
+        userid: 'UID',
+        ufirstname: 'First Name',
+        ulastname: 'Last Name',
+        uemail: 'Email',
+        uphoneno: 'Phone Number',
         uactivation: 'Status',
-        gender: 'Gender',
-        country: 'Country',
-        ustatus: 'Login Status',
-    };
+        ugender: 'Gender',
+        ucountry: 'Country',
+        ustatus: 'Login Status'
+      };
 
     const handleAction = async (action, customer) => {
         if (action === 'view') {
             const essentialFields = {
+                userid: customer.userid || 'N/A',
                 username: customer.username || 'N/A',
-                email: customer.uemail || 'N/A',
-                gender: customer.ugender || 'N/A',
-                country: customer.ucountry || 'N/A',
+                ufirstname: customer.ufirstname || 'N/A',
+                ulastname: customer.ulastname || 'N/A',
+                uemail: customer.uemail || 'N/A',
+                uphoneno: customer.uphoneno || 'N/A',
+                uactivation: customer.uactivation || 'N/A',
+                ugender: customer.ugender || 'N/A',
+                ucountry: customer.ucountry || 'N/A',
                 ustatus: customer.ustatus || 'N/A',
             };
             setSelectedCustomer(essentialFields);
@@ -162,12 +167,40 @@ const Customers = () => {
     };
 
     const columns = [
-        { header: 'ID', accessor: 'userid' },
+        { header: 'UID', accessor: 'userid' },
         {
             header: 'Customer',
             accessor: 'customer',
             render: (customer) => (
-                <UserActivityCell user={customer} />
+                <div className="user-container">
+                    <div className="avatar-container">
+                        {customer.uimage && customer.uimage.length > 0 ? (
+                            <img
+                                src={`data:image/jpeg;base64,${customer.uimage}`}
+                                alt={customer.username || 'Avatar'}
+                                className="table-user-avatar"
+                                onError={(e) => {
+                                    console.error(`Failed to load avatar for user ${customer.userid}:`, customer.uimage);
+                                    e.target.src = '/public/avatar.png';
+                                }}
+                            />
+                        ) : (
+                            <img
+                                src="/public/avatar.png"
+                                alt="Default Avatar"
+                                className="table-user-avatar"
+                            />
+                        )}
+                        <span
+                            className={`status-dot ${
+                                customer.ustatus === 'login' ? 'status-login' :
+                                customer.ustatus === 'registered' ? 'status-registered' :
+                                'status-logout'
+                            }`}
+                        />
+                    </div>
+                    <span className="table-user-username">{customer.username || 'N/A'}</span>
+                </div>
             ),
         },
         { header: 'Email', accessor: 'uemail' },
@@ -175,7 +208,9 @@ const Customers = () => {
             header: 'Status',
             accessor: 'uactivation',
             render: (customer) => (
-                <Status value={customer.uactivation || 'Active'} />
+                <span className={`status-badge ${(customer.uactivation || 'Active').toLowerCase()}`}>
+                    {customer.uactivation || 'Active'}
+                </span>
             ),
         },
         {
@@ -218,7 +253,7 @@ const Customers = () => {
 
             <Modal
                 isOpen={!!selectedCustomer}
-                title={selectedCustomer?.username || 'Customer Details'}
+                title={'Customer Details'}
                 data={selectedCustomer || {}}
                 labels={displayLabels}
                 onClose={() => setSelectedCustomer(null)}
