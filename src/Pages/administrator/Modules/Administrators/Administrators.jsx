@@ -78,6 +78,7 @@ const Administrators = () => {
     if (action === 'view') {
       const essentialFields = {
         userid: administrator.userid || 'N/A',
+        username: administrator.username || 'N/A',
         ufirstname: administrator.ufirstname || 'N/A',
         ulastname: administrator.ulastname || 'N/A',
         uemail: administrator.uemail || 'N/A',
@@ -147,7 +148,7 @@ const Administrators = () => {
 
       <Modal
         isOpen={!!selectedOperator}
-        title={`${selectedOperator?.ufirstname} ${selectedOperator?.ulastname}`}
+        title={`${selectedOperator?.username}`}
         data={selectedOperator || {}}
         labels={displayLabels}
         onClose={() => setSelectedOperator(null)}
