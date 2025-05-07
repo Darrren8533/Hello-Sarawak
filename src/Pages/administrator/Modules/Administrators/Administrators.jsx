@@ -51,7 +51,7 @@ const Administrators = () => {
   ];
 
   const displayLabels = {
-    userid: 'ID',
+    userid: 'User ID',
     ufirstname: 'First Name',
     ulastname: 'Last Name',
     uemail: 'Email',
@@ -93,7 +93,7 @@ const Administrators = () => {
   const operatorDropdownItems = [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
 
   const columns = [
-    { header: 'ID', accessor: 'userid' },
+    { header: 'User ID', accessor: 'userid' },
     {
       header: 'Administrator',
       accessor: 'administrator',
