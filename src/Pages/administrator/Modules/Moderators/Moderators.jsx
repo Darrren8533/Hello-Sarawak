@@ -261,7 +261,7 @@ const Moderators = () => {
 
       <Modal
         isOpen={!!selectedModerator}
-        title={`${selectedModerator?.username}`}
+        title={`${selectedModerator?.username} ${selectedModerator?.ulastname}`}
         data={selectedModerator || {}}
         labels={displayLabels}
         onClose={() => setSelectedModerator(null)}
