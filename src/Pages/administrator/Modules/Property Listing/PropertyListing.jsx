@@ -106,6 +106,7 @@ const PropertyListing = () => {
         try {
             if (action === 'view') {
                 setSelectedProperty({
+                    propertyid: property.propertyid || 'N/A',
                     propertyname: property.propertyaddress || 'N/A',
                     clustername: property.clustername || 'N/A',
                     categoryname: property.categoryname || 'N/A',
@@ -213,6 +214,7 @@ const PropertyListing = () => {
     ];
 
     const displayLabels = {
+        propertyid: "PID",
         propertyname: "Property Name",
         clustername: "Cluster Name",
         categoryname: "Category Name",
@@ -318,7 +320,7 @@ const username = localStorage.getItem('username');
 const usergroup = localStorage.getItem('usergroup'); 
 
 const columns = [
-    { header: 'ID', accessor: 'propertyid' },
+    { header: 'PID', accessor: 'propertyid' },
     {
         header: 'Image',
         accessor: 'propertyimage',
@@ -335,7 +337,7 @@ const columns = [
         ),
     },
     { header: 'Name', accessor: 'propertyaddress' },
-    { header: 'Price(RM)', accessor: 'rateamount' },
+    { header: 'Price', accessor: 'rateamount' },
     { header: 'Cluster', accessor: 'clustername' },
     {
         header: 'Status',
@@ -409,7 +411,7 @@ const columns = [
 
             <Modal
                 isOpen={!!selectedProperty}
-                title={`${selectedProperty?.propertyname}`}
+                title={'Property Details'}
                 data={selectedProperty || {}}
                 labels={displayLabels}
                 onClose={() => setSelectedProperty(null)}
