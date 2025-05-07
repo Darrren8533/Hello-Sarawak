@@ -9,9 +9,14 @@
     transition: background-color 0.2s ease;
     margin-bottom: 1.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.create-moderator-button:hover {
+  }
+  
+  .create-moderator-button:hover {
     background: var(--hoverColor);
     color: var(--blackColor);
-}
+  }
+  
+  .create-moderator-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
+  }
