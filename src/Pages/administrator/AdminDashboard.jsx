@@ -20,88 +20,110 @@ import { VscGraphLine } from "react-icons/vsc";
 import { CgProfile } from "react-icons/cg";
 import { MdHistory } from "react-icons/md";
 import '../../Component/MainContent/MainContent.css';
+import { useQuery } from '@tanstack/react-query';
+import { fetchUserData } from '../../../Api/api';
 
-  const AdminDashboard = () => {
+const AdminDashboard = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [usergroup, setusergroup] = useState('');
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
     const navigate = useNavigate();
+    const userID = localStorage.getItem('userid');
+
+    // React Query for user data with polling
+    const { data: userData } = useQuery({
+        queryKey: ['userData', userID],
+        queryFn: () => fetchUserData(userID),
+        enabled: !!isLoggedIn && !!userID,
+        staleTime: 0,
+        refetchInterval: 1000, // Check every 1 second for faster response
+        refetchIntervalInBackground: true,
+    });
 
     useEffect(() => {
-    // Initial check
-    checkAndRedirect();
-  
-    const checkInterval = setInterval(() => {
-      checkAndRedirect();
-    }, 3000); // Check every 3 seconds
-  
-    // Define the check function
-    function checkAndRedirect() {
-    const loggedInStatus = localStorage.getItem('isLoggedIn');
-    const usergroupStatus = localStorage.getItem('usergroup');
+        // Check for inactive status
+        if (userData?.uactivation === "Inactive") {
+            handleLogout();
+            navigate('/no-access');
+        }
+    }, [userData?.uactivation, navigate]);
+
+    useEffect(() => {
+        // Initial check
+        checkAndRedirect();
     
-    setIsLoggedIn(loggedInStatus === 'true');
-    setusergroup(usergroupStatus);
+        const checkInterval = setInterval(() => {
+            checkAndRedirect();
+        }, 3000); // Check every 3 seconds
     
-    if (loggedInStatus !== 'true' || usergroupStatus !== 'Administrator') {
-      navigate('/no-access');
+        // Define the check function
+        function checkAndRedirect() {
+            const loggedInStatus = localStorage.getItem('isLoggedIn');
+            const usergroupStatus = localStorage.getItem('usergroup');
+            
+            setIsLoggedIn(loggedInStatus === 'true');
+            setusergroup(usergroupStatus);
+            
+            if (loggedInStatus !== 'true' || usergroupStatus !== 'Administrator') {
+                navigate('/no-access');
+            }
+        }
+
+        // Clean up interval on unmount
+        return () => clearInterval(checkInterval);
+    }, [navigate]);
+
+    const handleLogout = () => {
+        localStorage.clear();
+        setIsLoggedIn(false);
+        setusergroup('');
+    };
+
+    // Display a loading state until authentication is confirmed
+    if (!isLoggedIn || usergroup !== 'Administrator') {
+        return <div>Loading...</div>;
     }
-  }
-  
-    // Clean up interval on unmount
-    return () => clearInterval(checkInterval);
-  }, [navigate]);
 
-  // Display a loading state until authentication is confirmed
-  if (!isLoggedIn || usergroup !== 'Administrator') {
-    return <div>Loading...</div>;
-  }
+    const links = [
+        { path: '/administrator_dashboard/dashboard', label: 'Dashboard', icon: <FiHome /> },
+        { path: '/administrator_dashboard/customers', label: 'Customer', icon: <FiUsers /> },
+        { path: '/administrator_dashboard/moderators', label: 'Moderator', icon: <FaBuildingUser  /> },
+        { path: '/administrator_dashboard/administrators', label: 'Administrator', icon: <FaUserTie /> },
+        { path: '/administrator_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel />},
+        { path: '/administrator_dashboard/reservations', label: 'Reservation', icon: <FiCalendar /> },
+        { path: '/administrator_dashboard/booknpay-log', label: 'BooknPayLog', icon: <GoLog /> },
+        { path: '/administrator_dashboard/audit-trails', label: 'AuditTrails', icon: <MdHistory /> },
+        { path: '/administrator_dashboard/finance', label: 'Finance', icon: <VscGraphLine /> },
+        { path: '/administrator_dashboard/profile', label: 'Profile', icon: <CgProfile /> },
+    ];
 
-  const links = [
-    { path: '/administrator_dashboard/dashboard', label: 'Dashboard', icon: <FiHome /> },
-    { path: '/administrator_dashboard/customers', label: 'Customer', icon: <FiUsers /> },
-    { path: '/administrator_dashboard/moderators', label: 'Moderator', icon: <FaBuildingUser  /> },
-    { path: '/administrator_dashboard/administrators', label: 'Administrator', icon: <FaUserTie /> },
-    { path: '/administrator_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel />},
-    { path: '/administrator_dashboard/reservations', label: 'Reservation', icon: <FiCalendar /> },
-    { path: '/administrator_dashboard/booknpay-log', label: 'BooknPayLog', icon: <GoLog /> },
-    { path: '/administrator_dashboard/audit-trails', label: 'AuditTrails', icon: <MdHistory /> },
-    { path: '/administrator_dashboard/finance', label: 'Finance', icon: <VscGraphLine /> },
-    { path: '/administrator_dashboard/profile', label: 'Profile', icon: <CgProfile /> },
-  ];
-
-  const handleLogout = () => {
-    localStorage.clear();
-    navigate('/login');
-  };
-
-  return (
-    <div className={`dashboard-container ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
-      <Sidebar
-        title="Administrator"
-        links={links}
-        isCollapsed={isSidebarCollapsed}
-        toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-        handleLogout={handleLogout}
-      />
-      <div className="dashboard-content">
-        <Routes>
-          <Route path="/" element={<Navigate to="dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="property-listing" element={<PropertyListing />} />
-          <Route path="administrators" element={<Administrators />} />
-          <Route path="moderators" element={<Moderators />} />
-          <Route path="customers" element={<Customers />} />
-          <Route path="reservations" element={<Reservations />} />
-          <Route path="booknpay-log" element={<BooknPayLog />} />
-          <Route path="audit-trails" element={<AuditTrails />} />
-          <Route path="finance" element={<Finance />} />
-          <Route path="profile" element={<Profile />} /> 
-          <Route path="*" element={<NoAccess />} />
-        </Routes>
-      </div>
-    </div>
-  );
+    return (
+        <div className={`dashboard-container ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+            <Sidebar
+                title="Administrator"
+                links={links}
+                isCollapsed={isSidebarCollapsed}
+                toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                handleLogout={handleLogout}
+            />
+            <div className="dashboard-content">
+                <Routes>
+                    <Route path="/" element={<Navigate to="dashboard" replace />} />
+                    <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="property-listing" element={<PropertyListing />} />
+                    <Route path="administrators" element={<Administrators />} />
+                    <Route path="moderators" element={<Moderators />} />
+                    <Route path="customers" element={<Customers />} />
+                    <Route path="reservations" element={<Reservations />} />
+                    <Route path="booknpay-log" element={<BooknPayLog />} />
+                    <Route path="audit-trails" element={<AuditTrails />} />
+                    <Route path="finance" element={<Finance />} />
+                    <Route path="profile" element={<Profile />} /> 
+                    <Route path="*" element={<NoAccess />} />
+                </Routes>
+            </div>
+        </div>
+    );
 };
 
 export default AdminDashboard;
