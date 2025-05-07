@@ -154,7 +154,8 @@ const Moderators = () => {
     uphoneno: 'Phone Number',
     uactivation: 'Status',
     ugender: 'Gender',
-    ucountry: 'Country'
+    ucountry: 'Country',
+    ustatus: 'Login Status'
   };
 
   const handleAction = async (action, moderator) => {
@@ -169,6 +170,7 @@ const Moderators = () => {
         uactivation: moderator.uactivation,
         ugender: moderator.ugender || 'N/A',
         ucountry: moderator.ucountry || 'N/A',
+        ustatus: moderator.ustatus || 'N/A',
       });
     } else if (action === 'edit') {
       setEditModerator(moderator);
@@ -262,7 +264,7 @@ const Moderators = () => {
 
       <Modal
         isOpen={!!selectedModerator}
-        title={`${selectedModerator?.username}`}
+        title={'Moderator Details'}
         data={selectedModerator || {}}
         labels={displayLabels}
         onClose={() => setSelectedModerator(null)}
