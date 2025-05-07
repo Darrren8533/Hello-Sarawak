@@ -261,7 +261,7 @@ const Moderators = () => {
 
       <Modal
         isOpen={!!selectedModerator}
-        title={`${selectedModerator?.ufirstname} ${selectedModerator?.ulastname}`}
+        title={`${selectedModerator?.username}`}
         data={selectedModerator || {}}
         labels={displayLabels}
         onClose={() => setSelectedModerator(null)}
@@ -282,7 +282,7 @@ const Moderators = () => {
       <Alert
         isOpen={isDialogOpen}
         title="Confirm Remove"
-        message={`Are you sure you want to remove Moderator ${moderatorToDelete?.ufirstname} ${moderatorToDelete?.ulastname}?`}
+        message={`Are you sure you want to remove Moderator ${moderatorToDelete?.username}?`}
         onConfirm={handleRemoveModerator}
         onCancel={() => {
           setIsDialogOpen(false);
