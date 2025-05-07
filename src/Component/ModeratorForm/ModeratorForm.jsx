@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { createModerator, updateUser } from "../../../Api/api"; 
-import { FaUserCircle, FaUserAlt, FaMailBulk, FaHashtag } from 'react-icons/fa';
+import { FaUserCircle, FaUserAlt, FaMailBulk } from 'react-icons/fa';
 import { RiLockPasswordFill, RiLockPasswordLine, RiGlobalLine } from 'react-icons/ri';
 import { MdCall } from 'react-icons/md';
 import Toast from "../Toast/Toast";
@@ -15,7 +15,6 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [phoneNo, setPhoneNo] = useState('');
     const [country, setCountry] = useState('');
-    const [zipCode, setZipCode] = useState('');
     const [title, setTitle] = useState('');
     const [toastMessage, setToastMessage] = useState('');
     const [showToast, setShowToast] = useState(false);
@@ -32,19 +31,16 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
             setEmail(initialData.uemail || '');
             setPhoneNo(initialData.uphoneno || '');
             setCountry(initialData.ucountry || '');
-            setZipCode(initialData.uzipcode || '');
             setTitle(initialData.utitle || '');
             setPassword(''); 
             setConfirmPassword(''); 
         } else {
-          
             setFirstName('');
             setLastName('');
             setUsername('');
             setEmail('');
             setPhoneNo('');
             setCountry('');
-            setZipCode('');
             setTitle('');
             setPassword('');
             setConfirmPassword('');
@@ -77,7 +73,6 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
             password,
             phoneNo,
             country,
-            zipCode,
             title,
             usergroup: "Moderator",
             uactivation: "Active",
@@ -214,19 +209,6 @@ const ModeratorForm = ({ initialData, onSubmit, onClose }) => {
                                 name="country"
                                 value={country}
                                 onChange={(e) => setCountry(e.target.value)}
-                                required
-                            />
-                        </div>
-                    </div>
-                    <div className="inputDiv">
-                        <label htmlFor="zipCode">ZipCode</label>
-                        <div className="input">
-                            <FaHashtag className="icon" />
-                            <input
-                                type="text"
-                                name="zipCode"
-                                value={zipCode}
-                                onChange={(e) => setZipCode(e.target.value)}
                                 required
                             />
                         </div>
