@@ -59,6 +59,7 @@ const Administrators = () => {
     uactivation: 'Status',
     ugender: 'Gender',
     ucountry: 'Country',
+    ustatus: 'Login Status'
   };
 
   // Filtering users based on search key and status
@@ -86,6 +87,7 @@ const Administrators = () => {
         uactivation: administrator.uactivation || 'N/A',
         ugender: administrator.ugender || 'N/A',
         ucountry: administrator.ucountry || 'N/A',
+        ustatus: administrator.ustatus || 'N/A',
       };
       setSelectedOperator(essentialFields);
     }
@@ -148,7 +150,7 @@ const Administrators = () => {
 
       <Modal
         isOpen={!!selectedOperator}
-        title={`${selectedOperator?.username}`}
+        title={'Administrator Details'}
         data={selectedOperator || {}}
         labels={displayLabels}
         onClose={() => setSelectedOperator(null)}
