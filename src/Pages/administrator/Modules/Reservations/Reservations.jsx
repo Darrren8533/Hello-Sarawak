@@ -172,15 +172,16 @@ const Reservations = () => {
     ];
 
     const displayLabels = {
-        reservationid: "Reservation ID",
+        reservationid: "RID",
         propertyaddress: "Property Name",
         checkindatetime: "Check-In Date Time",
         checkoutdatetime: "Check-Out Date Time",
         reservationblocktime: "Block Time",
         request: "Request",
         totalprice: "Total Price",
+        rcid: "RCID",
         reservationstatus: "Status",
-        userid: "User ID",
+        userid: "UID",
         images: "Images",
     };
 
@@ -350,7 +351,7 @@ const Reservations = () => {
     };
 
     const columns = [
-        { header: 'ID', accessor: 'reservationid' },
+        { header: 'RID', accessor: 'reservationid' },
         {
             header: 'Image',
             accessor: 'propertyimage',
@@ -366,7 +367,7 @@ const Reservations = () => {
                 ),
         },
         { header: 'Property Name', accessor: 'propertyaddress' },
-        { header: 'Total Price(RM)', accessor: 'totalprice' },
+        { header: 'Total Price', accessor: 'totalprice' },
         {
             header: 'Status',
             accessor: 'reservationstatus',
@@ -411,7 +412,7 @@ const Reservations = () => {
 
             <Modal
                 isOpen={!!selectedReservation}
-                title={`Reservation ID: ${selectedReservation?.reservationid}`}
+                title={'Reservation Details'}
                 data={selectedReservation || {}}
                 labels={displayLabels}
                 onClose={() => setSelectedReservation(null)}
