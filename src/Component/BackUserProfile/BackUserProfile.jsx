@@ -297,10 +297,12 @@ const BackUserProfile = () => {
                 if (payload.username && !usernameRegex.test(payload.username)) {
                     throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
                 }
-                if (payload.password && !passwordRegex.test(payload.password)) {
-                    throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
+                if (!isGoogleLogin) {
+                    if (payload.password && !passwordRegex.test(payload.password)) {
+                        throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
+                    }
+                    payload.password = passwordInput;
                 }
-                payload.password = passwordInput;
             }
 
             const response = await updateProfile(payload);
@@ -352,6 +354,8 @@ const BackUserProfile = () => {
             ucountry: val === 'Not Provided' ? '' : val,
         }));
     };
+
+    const isGoogleLogin = !!googleAccessToken;
 
     return (
         <div className="back-profile-container">
@@ -529,22 +533,24 @@ const BackUserProfile = () => {
                                             placeholder="Not Provided"
                                         />
                                     </div>
-                                    <div className="back-profile-form-group">
-                                        <label>Password</label>
-                                        <div className="back-password-input-wrapper">
-                                            <input
-                                                type={showPassword ? 'text' : 'password'}
-                                                name="password"
-                                                value={passwordInput}
-                                                onChange={e => setPasswordInput(e.target.value)}
-                                                className="back-password-input"
-                                                placeholder={userData.password ? '' : 'Not Provided'}
-                                            />
-                                            <span className="back-password-toggle-icon" onClick={() => setShowPassword(!showPassword)}>
-                                                {showPassword ? <FaEye /> : <FaEyeSlash />}
-                                            </span>
+                                    {!isGoogleLogin && (
+                                        <div className="back-profile-form-group">
+                                            <label>Password</label>
+                                            <div className="back-password-input-wrapper">
+                                                <input
+                                                    type={showPassword ? 'text' : 'password'}
+                                                    name="password"
+                                                    value={passwordInput}
+                                                    onChange={e => setPasswordInput(e.target.value)}
+                                                    className="back-password-input"
+                                                    placeholder={userData.password ? '' : 'Not Provided'}
+                                                />
+                                                <span className="back-password-toggle-icon" onClick={() => setShowPassword(!showPassword)}>
+                                                    {showPassword ? <FaEye /> : <FaEyeSlash />}
+                                                </span>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
                                     <button type="button" className="back-profile-update-button" onClick={handleUpdate}>
                                         Update Profile
                                     </button>
