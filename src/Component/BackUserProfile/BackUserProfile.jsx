@@ -44,13 +44,14 @@ const BackUserProfile = () => {
             });
 
             const data = await response.json();
-            if (data.success) {
+            if (data.success && data.password) {
                 setDecryptedPassword(data.password);
                 setPasswordInput(data.password);
                 localStorage.setItem('plainPassword', data.password);
                 console.log("decryptedPassword:", data.password);
             } else {
-                console.error('Error fetching password:', data.message);
+                setDecryptedPassword('');
+                setPasswordInput('');
             }
         } catch (error) {
             console.error('Error fetching decrypted password:', error);
@@ -297,12 +298,7 @@ const BackUserProfile = () => {
                 if (payload.username && !usernameRegex.test(payload.username)) {
                     throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
                 }
-                if (!isGoogleLogin) {
-                    if (payload.password && !passwordRegex.test(payload.password)) {
-                        throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
-                    }
-                    payload.password = passwordInput;
-                }
+                payload.password = passwordInput;
             }
 
             const response = await updateProfile(payload);
@@ -533,24 +529,22 @@ const BackUserProfile = () => {
                                             placeholder="Not Provided"
                                         />
                                     </div>
-                                    {!isGoogleLogin && (
-                                        <div className="back-profile-form-group">
-                                            <label>Password</label>
-                                            <div className="back-password-input-wrapper">
-                                                <input
-                                                    type={showPassword ? 'text' : 'password'}
-                                                    name="password"
-                                                    value={passwordInput}
-                                                    onChange={e => setPasswordInput(e.target.value)}
-                                                    className="back-password-input"
-                                                    placeholder={userData.password ? '' : 'Not Provided'}
-                                                />
-                                                <span className="back-password-toggle-icon" onClick={() => setShowPassword(!showPassword)}>
-                                                    {showPassword ? <FaEye /> : <FaEyeSlash />}
-                                                </span>
-                                            </div>
+                                    <div className="back-profile-form-group">
+                                        <label>Password</label>
+                                        <div className="back-password-input-wrapper">
+                                            <input
+                                                type={showPassword ? 'text' : 'password'}
+                                                name="password"
+                                                value={passwordInput}
+                                                onChange={e => setPasswordInput(e.target.value)}
+                                                className="back-password-input"
+                                                placeholder="Enter new password"
+                                            />
+                                            <span className="back-password-toggle-icon" onClick={() => setShowPassword(!showPassword)}>
+                                                {showPassword ? <FaEye /> : <FaEyeSlash />}
+                                            </span>
                                         </div>
-                                    )}
+                                    </div>
                                     <button type="button" className="back-profile-update-button" onClick={handleUpdate}>
                                         Update Profile
                                     </button>
