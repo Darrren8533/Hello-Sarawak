@@ -19,6 +19,7 @@ const BackUserProfile = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [decryptedPassword, setDecryptedPassword] = useState('');
+    const [passwordInput, setPasswordInput] = useState('');
 
     const userid = localStorage.getItem('userid');
     const googleAccessToken = localStorage.getItem('googleAccessToken');
@@ -45,6 +46,7 @@ const BackUserProfile = () => {
             const data = await response.json();
             if (data.success) {
                 setDecryptedPassword(data.password);
+                setPasswordInput(data.password);
                 localStorage.setItem('plainPassword', data.password);
                 console.log("decryptedPassword:", data.password);
             } else {
@@ -298,6 +300,7 @@ const BackUserProfile = () => {
                 if (payload.password && !passwordRegex.test(payload.password)) {
                     throw new Error('Password must be 8+ characters with at least 1 letter and 1 number');
                 }
+                payload.password = passwordInput;
             }
 
             const response = await updateProfile(payload);
@@ -532,8 +535,8 @@ const BackUserProfile = () => {
                                             <input
                                                 type={showPassword ? 'text' : 'password'}
                                                 name="password"
-                                                value={decryptedPassword || ''}
-                                                onChange={handleInputChange}
+                                                value={passwordInput}
+                                                onChange={e => setPasswordInput(e.target.value)}
                                                 className="back-password-input"
                                                 placeholder={userData.password ? '' : 'Not Provided'}
                                             />
