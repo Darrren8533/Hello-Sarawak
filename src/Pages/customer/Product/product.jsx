@@ -34,7 +34,6 @@ const queryClient = new QueryClient({
 
 const Product = () => {
   const [properties, setProperties] = useState([]);
-  const [rating] = useState(4.5);
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('');
@@ -706,7 +705,7 @@ const Product = () => {
                           <div className="property-location">
                             <h4>{property.propertyaddress}</h4>
                             <div className="tour-property-rating">
-                              <span className="rating-number">{rating}</span>
+                              <span className="rating-number">{property.rating}</span>
                               <FaStar />
                             </div>
                           </div>
@@ -743,7 +742,7 @@ const Product = () => {
                           <div className="property-location">
                             <h4>{property.propertyaddress}</h4>
                             <div className="tour-property-rating">
-                              <span className="rating-number">{rating}</span>
+                              <span className="rating-number">{property.rating}</span>
                               <FaStar />
                             </div>
                           </div>
