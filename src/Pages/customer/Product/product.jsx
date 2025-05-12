@@ -705,7 +705,11 @@ const Product = () => {
                           <div className="property-location">
                             <h4>{property.propertyaddress}</h4>
                             <div className="tour-property-rating">
-                              <span className="rating-number">{property.rating}</span>
+                              <span className="rating-number">
+                                {Number.isInteger(property.rating) 
+                                  ? property.rating.toFixed(1)
+                                  : property.rating.toFixed(2).replace(/\.?0+$/, '')}
+                              </span>
                               <FaStar />
                             </div>
                           </div>
@@ -742,8 +746,12 @@ const Product = () => {
                           <div className="property-location">
                             <h4>{property.propertyaddress}</h4>
                             <div className="tour-property-rating">
-                              <span className="rating-number">{property.rating}</span>
-                              <FaStar />
+                              <span className="rating-number">
+                                {Number.isInteger(property.rating) 
+                                  ? property.rating.toFixed(1)
+                                  : property.rating.toFixed(2).replace(/\.?0+$/, '')}
+                              </span>
+                              <FaStar/>
                             </div>
                           </div>
                           <span className="property-cluster">{property.clustername}</span>
