@@ -4,7 +4,7 @@ import { GiWashingMachine, GiClothesline, GiDesert  } from "react-icons/gi";
 import { PiSecurityCamera } from "react-icons/pi";
 import { SiLightning } from "react-icons/si";
 import { TbPawFilled, TbPawOff } from "react-icons/tb";
-import { MdLandscape, MdOutlineKingBed, MdFireplace, MdSmokingRooms} from "react-icons/md";
+import { MdLandscape, MdOutlineKingBed, MdFireplace, MdSmokingRooms, MdKeyboardArrowDown, MdKeyboardArrowUp} from "react-icons/md";
 import { FaWifi, FaDesktop, FaDumbbell, FaWater, FaSkiing, FaChargingStation, FaParking, FaSwimmingPool, FaTv, FaUtensils, FaSnowflake, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaBicycle, FaBabyCarriage, FaKey, FaBell, FaTree, FaCity } from "react-icons/fa";
 import { propertiesListing, updateProperty, propertyListingRequest } from "../../../Api/api";
 import Toast from "../Toast/Toast";
@@ -58,46 +58,50 @@ const resizeImage = (file, maxWidth, maxHeight) => {
 
 const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const predefinedFacilities = [
-        { name: "Wi-Fi", icon: <FaWifi /> },
-        { name: "Kitchen", icon: <FaUtensils /> },
-        { name: "Washer", icon: <GiWashingMachine /> },
-        { name: "Dryer", icon: <GiClothesline /> },
-        { name: "Air Conditioning", icon: <FaSnowflake /> },
-        { name: "Heating", icon: <FaWind /> },
-        { name: "Dedicated workspace", icon: <FaDesktop /> },
-        { name: "TV", icon: <FaTv /> },
+        // Essentials
+        { name: "Wi-Fi", icon: <FaWifi />, category: "essentials" },
+        { name: "Kitchen", icon: <FaUtensils />, category: "essentials" },
+        { name: "Washer", icon: <GiWashingMachine />, category: "essentials" },
+        { name: "Dryer", icon: <GiClothesline />, category: "essentials" },
+        { name: "Air Conditioning", icon: <FaSnowflake />, category: "essentials" },
+        { name: "Heating", icon: <FaWind />, category: "essentials" },
+        { name: "Dedicated workspace", icon: <FaDesktop />, category: "essentials" },
+        { name: "TV", icon: <FaTv />, category: "essentials" },
 
-        { name: "Free Parking", icon: <FaParking /> },
-        { name: "Swimming Pool", icon: <FaSwimmingPool /> },
-        { name: "Bathtub", icon: <FaBath /> },
-        { name: "Shower", icon: <FaShower /> },
-        { name: "EV charger", icon: <FaChargingStation /> },
-        { name: "Baby Crib", icon: <FaBabyCarriage /> },
-        { name: "King bed", icon: <MdOutlineKingBed /> },
-        { name: "Gym", icon: <FaDumbbell /> },
-        { name: "Breakfast", icon: <FaCoffee /> },
-        { name: "Indoor fireplace", icon: <MdFireplace /> },
-        { name: "Smoking allowed", icon: <MdSmokingRooms /> },
-        { name: "No Smoking", icon: <FaSmokingBan /> },
+        // Features
+        { name: "Free Parking", icon: <FaParking />, category: "features" },
+        { name: "Swimming Pool", icon: <FaSwimmingPool />, category: "features" },
+        { name: "Bathtub", icon: <FaBath />, category: "features" },
+        { name: "EV charger", icon: <FaChargingStation />, category: "features" },
+        { name: "Baby Crib", icon: <FaBabyCarriage />, category: "features" },
+        { name: "King bed", icon: <MdOutlineKingBed />, category: "features" },
+        { name: "Gym", icon: <FaDumbbell />, category: "features" },
+        { name: "Breakfast", icon: <FaCoffee />, category: "features" },
+        { name: "Indoor fireplace", icon: <MdFireplace />, category: "features" },
+        { name: "Smoking allowed", icon: <MdSmokingRooms />, category: "features" },
+        { name: "No Smoking", icon: <FaSmokingBan />, category: "features" },
 
-        { name: "City View", icon: <FaCity /> },
-        { name: "Garden", icon: <FaTree /> },
-        { name: "Bicycle Rental", icon: <FaBicycle /> },
-        { name: "Beachfront", icon: <FaUmbrellaBeach /> },
-        { name: "Waterfront", icon: <FaWater /> },
-        { name: "Countryside", icon: <MdLandscape /> },
-        { name: "Ski-in/ski-out", icon: <FaSkiing /> },
-        { name: "Desert", icon: <GiDesert /> },
+        // Location
+        { name: "City View", icon: <FaCity />, category: "location" },
+        { name: "Garden", icon: <FaTree />, category: "location" },
+        { name: "Bicycle Rental", icon: <FaBicycle />, category: "location" },
+        { name: "Beachfront", icon: <FaUmbrellaBeach />, category: "location" },
+        { name: "Waterfront", icon: <FaWater />, category: "location" },
+        { name: "Countryside", icon: <MdLandscape />, category: "location" },
+        { name: "Ski-in/ski-out", icon: <FaSkiing />, category: "location" },
+        { name: "Desert", icon: <GiDesert />, category: "location" },
         
-        { name: "Security Alarm", icon: <FaBell /> },
-        { name: "Fire Extinguisher", icon: <FaFireExtinguisher /> },
-        { name: "First Aid Kit", icon: <FaFirstAid /> },
-        { name: "Security Camera", icon: <PiSecurityCamera /> },
+        // Safety
+        { name: "Security Alarm", icon: <FaBell />, category: "safety" },
+        { name: "Fire Extinguisher", icon: <FaFireExtinguisher />, category: "safety" },
+        { name: "First Aid Kit", icon: <FaFirstAid />, category: "safety" },
+        { name: "Security Camera", icon: <PiSecurityCamera />, category: "safety" },
 
-        { name: "Instant booking", icon: <SiLightning /> },
-        { name: "Self check-in", icon: <FaKey /> },
-        { name: "Pets Allowed", icon: <TbPawFilled /> },
-        { name: "No Pets", icon: <TbPawOff /> },
+        // Booking Options
+        { name: "Instant booking", icon: <SiLightning />, category: "booking" },
+        { name: "Self check-in", icon: <FaKey />, category: "booking" },
+        { name: "Pets Allowed", icon: <TbPawFilled />, category: "booking" },
+        { name: "No Pets", icon: <TbPawOff />, category: "booking" },
     ];
 
     const clusters = [
@@ -158,16 +162,65 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const [selectedFacilities, setSelectedFacilities] = useState([]);
     const fileInputRef = useRef(null);
     const locationInputRef = useRef(null);
+    const [showMoreAmenities, setShowMoreAmenities] = useState(false);
+    const formStorageKey = 'property_form_data';
 
+    // Load form data from localStorage on component mount
     useEffect(() => {
-        if (initialData?.facilities) {
-          const selected = initialData.facilities.split(',').map(f => f.trim());
-          setSelectedFacilities(selected);
+        // First try to load from localStorage
+        const savedFormData = localStorage.getItem(formStorageKey);
+        const savedImages = localStorage.getItem(`${formStorageKey}_images`);
+        
+        if (savedFormData) {
+            try {
+                const parsedData = JSON.parse(savedFormData);
+                let propertyImageArray = [];
+                
+                // Load saved images if available
+                if (savedImages) {
+                    const parsedImages = JSON.parse(savedImages);
+                    
+                    // Process each saved image
+                    propertyImageArray = parsedImages.map(img => {
+                        if (img.isFile) {
+                            // Convert back to File object
+                            const byteString = atob(img.base64.split(',')[1]);
+                            const arrayBuffer = new ArrayBuffer(byteString.length);
+                            const uint8Array = new Uint8Array(arrayBuffer);
+                            
+                            for (let i = 0; i < byteString.length; i++) {
+                                uint8Array[i] = byteString.charCodeAt(i);
+                            }
+                            
+                            return new File([arrayBuffer], img.name, {
+                                type: img.type,
+                                lastModified: img.lastModified
+                            });
+                        } else {
+                            // Return the base64 string as is
+                            return img.data;
+                        }
+                    });
+                }
+                
+                // Set the form data with processed image data
+                setFormData({
+                    ...parsedData,
+                    propertyImage: propertyImageArray
+                });
+                
+                // Also set selected facilities
+                if (parsedData.facilities && Array.isArray(parsedData.facilities)) {
+                    setSelectedFacilities(parsedData.facilities);
+                }
+                
+                return; // Skip initialData processing if we loaded from localStorage
+            } catch (error) {
+                console.error("Error loading saved form data:", error);
+            }
         }
-    }, [initialData]);
-      
 
-    useEffect(() => {  
+        // If no localStorage data or error, proceed with initialData
         const storedUsername = localStorage.getItem("username");
         if (storedUsername) {
             setFormData((prev) => ({ ...prev, username: storedUsername }));
@@ -178,7 +231,6 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             
             if (initialData.facilities) {
                 if (typeof initialData.facilities === 'string') {
-                    // Handle empty string case
                     facilitiesArray = initialData.facilities.trim() 
                         ? initialData.facilities.split(",").map(facility => facility.trim())
                         : [];
@@ -187,10 +239,8 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 }
             }
             
-            console.log("Parsed facilities array:", facilitiesArray);
-    
             setFormData({
-                username: initialData.username || "",
+                username: initialData.username || storedUsername || "",
                 propertyPrice: initialData.rateamount || "",
                 propertyAddress: initialData.propertyaddress || "",
                 nearbyLocation: initialData.nearbylocation || "",
@@ -208,6 +258,76 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         }
     }, [initialData]);
 
+    // Save form data to localStorage whenever it changes
+    useEffect(() => {
+        // Don't save empty form data
+        if (formData.username || formData.propertyAddress || formData.propertyImage.length > 0) {
+            // Create a safe-to-serialize copy of the form data
+            const dataToSave = {
+                ...formData,
+                // Remove propertyImage as we'll handle it separately
+                propertyImage: [],
+                facilities: selectedFacilities,
+            };
+            
+            // Process images for storage
+            saveImagesToLocalStorage(formData.propertyImage);
+            
+            localStorage.setItem(formStorageKey, JSON.stringify(dataToSave));
+        }
+    }, [formData, selectedFacilities]);
+
+    // Function to convert and save File objects to localStorage
+    const saveImagesToLocalStorage = async (images) => {
+        try {
+            const imageStorage = [];
+            
+            // Process each image - either File objects or base64 strings
+            for (let i = 0; i < images.length; i++) {
+                const image = images[i];
+                
+                if (image instanceof File) {
+                    // Convert File to base64
+                    const base64 = await fileToBase64(image);
+                    imageStorage.push({
+                        isFile: true,
+                        name: image.name,
+                        type: image.type,
+                        base64: base64,
+                        lastModified: image.lastModified
+                    });
+                } else {
+                    // Already a base64 string from the server
+                    imageStorage.push({
+                        isFile: false,
+                        data: image
+                    });
+                }
+            }
+            
+            localStorage.setItem(`${formStorageKey}_images`, JSON.stringify(imageStorage));
+        } catch (error) {
+            console.error("Error saving images to localStorage:", error);
+        }
+    };
+
+    // Helper function to convert File to base64
+    const fileToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (error) => reject(error);
+        });
+    };
+
+    useEffect(() => {
+        if (initialData?.facilities) {
+          const selected = initialData.facilities.split(',').map(f => f.trim());
+          setSelectedFacilities(selected);
+        }
+    }, [initialData]);
+
     useEffect(() => {
         if (window.google) {
             const autocomplete = new window.google.maps.places.Autocomplete(locationInputRef.current);
@@ -221,11 +341,42 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     }, []);
 
     const toggleFacility = (facilityName) => {
-        setSelectedFacilities((prev) =>
-            prev.includes(facilityName)
+        setSelectedFacilities((prev) => {
+            // Handle mutual exclusivity between smoking options
+            if (facilityName === "Smoking allowed") {
+                return prev.includes("No Smoking")
+                    ? prev.filter(name => name !== "No Smoking").concat(facilityName)
+                    : prev.includes(facilityName)
+                        ? prev.filter(name => name !== facilityName)
+                        : [...prev, facilityName];
+            } else if (facilityName === "No Smoking") {
+                return prev.includes("Smoking allowed")
+                    ? prev.filter(name => name !== "Smoking allowed").concat(facilityName)
+                    : prev.includes(facilityName)
+                        ? prev.filter(name => name !== facilityName)
+                        : [...prev, facilityName];
+            }
+            
+            // Handle mutual exclusivity between pets options
+            if (facilityName === "Pets Allowed") {
+                return prev.includes("No Pets")
+                    ? prev.filter(name => name !== "No Pets").concat(facilityName)
+                    : prev.includes(facilityName)
+                        ? prev.filter(name => name !== facilityName)
+                        : [...prev, facilityName];
+            } else if (facilityName === "No Pets") {
+                return prev.includes("Pets Allowed")
+                    ? prev.filter(name => name !== "Pets Allowed").concat(facilityName)
+                    : prev.includes(facilityName)
+                        ? prev.filter(name => name !== facilityName)
+                        : [...prev, facilityName];
+            }
+            
+            // Handle all other facilities normally
+            return prev.includes(facilityName)
                 ? prev.filter((name) => name !== facilityName)
-                : [...prev, facilityName]
-        );
+                : [...prev, facilityName];
+        });
     };
 
     const handleChange = (e) => {
@@ -273,8 +424,8 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (formData.propertyImage.length < 5) {
-            setToastMessage("Please upload at least 5 images");
+        if (formData.propertyImage.length < 4) {
+            setToastMessage("Please upload at least 4 images");
             setToastType("error");
             setShowToast(true);
             return;
@@ -326,6 +477,10 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 setShowToast(true);
             }
 
+            // Clear form data and localStorage on successful submission
+            localStorage.removeItem(formStorageKey);
+            localStorage.removeItem(`${formStorageKey}_images`);
+            
             setFormData({
                 username: "",
                 propertyPrice: "",
@@ -352,35 +507,76 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         }
     };
 
+    const handleReset = () => {
+        // Clear localStorage data
+        localStorage.removeItem(formStorageKey);
+        localStorage.removeItem(`${formStorageKey}_images`);
+        
+        setFormData({
+            username: localStorage.getItem("username") || "",
+            propertyPrice: "1",
+            propertyAddress: "",
+            nearbyLocation: "",
+            propertyBedType: "1",
+            propertyGuestPaxNo: "1",
+            propertyDescription: "",
+            facilities: [],
+            propertyImage: [],
+            clusterName: "",
+            categoryName: "",
+        });
+        setRemovedImages([]);
+        setSelectedFacilities([]);
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
+    };
+
     const handleOverlayClick = (e) => e.stopPropagation();
 
     const handleDragEnd = (result) => {
         if (!result.destination) return;
+        
+        // Don't do anything if dropped in the same position
+        if (result.destination.index === result.source.index) return;
+        
         const items = Array.from(formData.propertyImage);
         const [reorderedItem] = items.splice(result.source.index, 1);
         items.splice(result.destination.index, 0, reorderedItem);
+        
+        // Update the form data with the new order
         setFormData((prev) => ({ ...prev, propertyImage: items }));
     };
 
+    // Add an info message about image dragging
+    const imageInfoText = 
+        formData.propertyImage.length > 0 
+            ? "Drag images to reorder. The first image will be the main display image." 
+            : "";
+
     const getImageLabel = (index) =>
-        index === 0 ? "Main Image" : index <= 4 ? "Secondary Image" : "Additional Image";
+        index === 0 ? "Main Image" : index <= 2 ? "Secondary Image" : "Additional Image";
 
     const getLabelStyle = (index) => ({
-        backgroundColor: index === 0 ? '#4CAF50' : index <= 4 ? '#2196F3' : '#9E9E9E',
+        backgroundColor: index === 0 ? '#4CAF50' : index <= 2 ? '#2196F3' : '#9E9E9E',
         color: 'white',
     });
 
     return (
-        <div className="property-form-overlay" onClick={onClose}>
-            <div className="property-form-content" onClick={handleOverlayClick}>
-                <h1>{initialData ? "Edit Property" : "Create a New Property"}</h1>
-                <button onClick={onClose} className="property-form-close-button">×</button>
-                <form onSubmit={handleSubmit} className="property-listing-form">
-                    <div className="property-listing-form-group">
+        <div className="property-form-overlay" onClick={(e) => e.stopPropagation()}>
+            <div className="property-form-content">
+                <div className="property-form-header">
+                    <h1>{initialData ? "Edit Property" : "Create a New Property"}</h1>
+                    <div className="property-form-header-buttons">
+                        <button onClick={onClose} className="property-form-close-button">×</button>
+                    </div>
+                </div>
+                <form onSubmit={handleSubmit} className="property-form-listing-form">
+                    <div className="property-form-group">
                         <label>Username:</label>
                         <input type="text" name="username" value={formData.username} readOnly required />
                     </div>
-                    <div className="property-listing-form-group">
+                    <div className="property-form-group">
                         <label>Property Name:</label>
                         <input
                             type="text"
@@ -391,7 +587,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                             required
                         />
                     </div>
-                    <div className="property-listing-form-group">
+                    <div className="property-form-group">
                         <label>Cluster (City):</label>
                         <select name="clusterName" value={formData.clusterName} onChange={handleChange} required>
                             <option value="">Select Cluster (City)</option>
@@ -400,8 +596,8 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                             ))}
                         </select>
                     </div>
-                    <div className="property-listing-form-group">
-                        <label>Categories:</label>
+                    <div className="property-form-group">
+                        <label>Category:</label>
                         <select name="categoryName" value={formData.categoryName} onChange={handleChange} required>
                             <option value="">Select Category</option>
                             {categories.map((category) => (
@@ -409,18 +605,18 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                             ))}
                         </select>
                     </div>
-                    <div className="property-listing-form-group">
+                    <div className="property-form-group">
                         <label>Property Price (MYR):</label>
                         <input
                             type="number"
                             name="propertyPrice"
                             value={formData.propertyPrice}
                             onChange={handleChange}
-                            min="0"
+                            min="1"
                             required
                         />
                     </div>
-                    <div className="property-listing-form-group">
+                    <div className="property-form-group">
                         <label>Guest Capacity:</label>
                         <input
                             type="number"
@@ -431,7 +627,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                             required
                         />
                     </div>
-                    <div className="property-listing-form-group">
+                    <div className="property-form-group">
                         <label>Bed:</label>
                         <input
                             type="number"
@@ -442,7 +638,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                             required
                         />
                     </div>
-                    <div className="property-listing-form-group">
+                    <div className="property-form-group">
                         <label>Property Location:</label>
                         <input
                             type="text"
@@ -454,7 +650,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                             ref={locationInputRef}
                         />
                     </div>
-                    <div className="property-listing-form-group full-width">
+                    <div className="property-form-group full-width">
                         <label>Property Description:</label>
                         <textarea
                             name="propertyDescription"
@@ -464,42 +660,114 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                             required
                         />
                     </div>
-                    <div className="property-listing-form-group full-width">
-                        <label>Facilities</label>
-                        <div className="Facilities-list">
-                            {predefinedFacilities
-                                .filter((facility) => !selectedFacilities.includes(facility.name))
-                                .map((facility) => (
-                                    <div
-                                        key={facility.name} // Added key for React list rendering
-                                        className="facility-item"
-                                        onClick={() => toggleFacility(facility.name)}
-                                    >
-                                        {facility.icon} {facility.name}
+                    <div className="property-form-group full-width">
+                        <div className="property-form-filter-section">
+                            <div className="property-form-essentials-section">
+                                <h5>Essentials</h5>
+                                <div className="property-form-amenities-grid">
+                                    {predefinedFacilities
+                                        .filter(facility => facility.category === "essentials")
+                                        .map((facility) => (
+                                            <div
+                                                key={facility.name}
+                                                className={`property-form-amenity-item ${selectedFacilities.includes(facility.name) ? 'selected' : ''}`}
+                                                onClick={() => toggleFacility(facility.name)}
+                                            >
+                                                <span className="property-form-amenity-icon">{facility.icon}</span>
+                                                <span className="property-form-amenity-text">{facility.name}</span>
+                                            </div>
+                                        ))}
+                                </div>
+                            </div>
+
+                            {!showMoreAmenities && (
+                                <button className="property-form-show-more-button" onClick={() => setShowMoreAmenities(true)}>
+                                    Show more <MdKeyboardArrowDown />
+                                </button>
+                            )}
+
+                            {showMoreAmenities && (
+                                <>
+                                    <div className="property-form-features-section">
+                                        <h5>Features</h5>
+                                        <div className="property-form-amenities-grid">
+                                            {predefinedFacilities
+                                                .filter(facility => facility.category === "features")
+                                                .map((facility) => (
+                                                    <div
+                                                        key={facility.name}
+                                                        className={`property-form-amenity-item ${selectedFacilities.includes(facility.name) ? 'selected' : ''}`}
+                                                        onClick={() => toggleFacility(facility.name)}
+                                                    >
+                                                        <span className="property-form-amenity-icon">{facility.icon}</span>
+                                                        <span className="property-form-amenity-text">{facility.name}</span>
+                                                    </div>
+                                                ))}
+                                        </div>
                                     </div>
-                                ))}
+
+                                    <div className="property-form-location-section">
+                                        <h5>Location</h5>
+                                        <div className="property-form-amenities-grid">
+                                            {predefinedFacilities
+                                                .filter(facility => facility.category === "location")
+                                                .map((facility) => (
+                                                    <div
+                                                        key={facility.name}
+                                                        className={`property-form-amenity-item ${selectedFacilities.includes(facility.name) ? 'selected' : ''}`}
+                                                        onClick={() => toggleFacility(facility.name)}
+                                                    >
+                                                        <span className="property-form-amenity-icon">{facility.icon}</span>
+                                                        <span className="property-form-amenity-text">{facility.name}</span>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="property-form-safety-section">
+                                        <h5>Safety</h5>
+                                        <div className="property-form-amenities-grid">
+                                            {predefinedFacilities
+                                                .filter(facility => facility.category === "safety")
+                                                .map((facility) => (
+                                                    <div
+                                                        key={facility.name}
+                                                        className={`property-form-amenity-item ${selectedFacilities.includes(facility.name) ? 'selected' : ''}`}
+                                                        onClick={() => toggleFacility(facility.name)}
+                                                    >
+                                                        <span className="property-form-amenity-icon">{facility.icon}</span>
+                                                        <span className="property-form-amenity-text">{facility.name}</span>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="property-form-booking-section">
+                                        <h5>Booking Options</h5>
+                                        <div className="property-form-amenities-grid">
+                                            {predefinedFacilities
+                                                .filter(facility => facility.category === "booking")
+                                                .map((facility) => (
+                                                    <div
+                                                        key={facility.name}
+                                                        className={`property-form-amenity-item ${selectedFacilities.includes(facility.name) ? 'selected' : ''}`}
+                                                        onClick={() => toggleFacility(facility.name)}
+                                                    >
+                                                        <span className="property-form-amenity-icon">{facility.icon}</span>
+                                                        <span className="property-form-amenity-text">{facility.name}</span>
+                                                    </div>
+                                                ))}
+                                        </div>
+                                    </div>
+
+                                    <button className="property-form-show-less-button" onClick={() => setShowMoreAmenities(false)}>
+                                        Show less <MdKeyboardArrowUp />
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </div>
-                    {selectedFacilities.length > 0 && (
-                        <div className="property-listing-form-group full-width">
-                            <label>Selected Facilities</label>
-                            <div className="Facilities-list">
-                                {selectedFacilities.map((facilityName) => {
-                                    const facility = predefinedFacilities.find((f) => f.name === facilityName);
-                                    return facility ? ( // Ensure facility exists before rendering
-                                        <div
-                                            key={facilityName}
-                                            className="selected-facility-item"
-                                            onClick={() => toggleFacility(facilityName)}
-                                        >
-                                            {facility.icon} {facilityName}
-                                        </div>
-                                    ) : null;
-                                })}
-                            </div>
-                        </div>
-                    )}
-                    <div className="property-listing-form-group full-width">
+                    <div className="property-form-group full-width">
                         <label>Property Image:</label>
                         <input
                             type="file"
@@ -509,34 +777,44 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                             ref={fileInputRef}
                             multiple
                         />
-                        {formData.propertyImage.length < 5 && (
-                            <div className="validation-warning">
-                                Minimum 5 images required ({formData.propertyImage.length}/5 uploaded)
+                        {formData.propertyImage.length < 4 && (
+                            <div className="property-form-validation-warning">
+                                Minimum 4 images required ({formData.propertyImage.length}/4 uploaded)
+                            </div>
+                        )}
+                        {formData.propertyImage.length > 0 && (
+                            <div className="property-form-info-text">
+                                {imageInfoText}
                             </div>
                         )}
                     </div>
                     <DragDropContext onDragEnd={handleDragEnd}>
                         <Droppable droppableId="images" direction="horizontal">
-                            {(provided) => (
+                            {(provided, snapshot) => (
                                 <div
                                     {...provided.droppableProps}
                                     ref={provided.innerRef}
-                                    className="existing-images-container"
+                                    className={`property-form-existing-images-container ${snapshot.isDraggingOver ? 'dragging-over' : ''}`}
                                 >
                                     {formData.propertyImage.map((image, index) => (
                                         <Draggable
-                                            key={image instanceof File ? image.name : `image-${index}`}
-                                            draggableId={image instanceof File ? image.name : `image-${index}`}
+                                            key={image instanceof File ? `file-${image.name}-${index}` : `image-${index}`}
+                                            draggableId={image instanceof File ? `file-${image.name}-${index}` : `image-${index}`}
                                             index={index}
                                         >
-                                            {(provided) => (
+                                            {(provided, snapshot) => (
                                                 <div
                                                     ref={provided.innerRef}
                                                     {...provided.draggableProps}
                                                     {...provided.dragHandleProps}
-                                                    className="image-item"
+                                                    className={`property-form-image-item ${snapshot.isDragging ? 'dragging' : ''}`}
+                                                    style={{
+                                                        ...provided.draggableProps.style,
+                                                        cursor: snapshot.isDragging ? 'grabbing' : 'grab',
+                                                        transform: snapshot.isDragging ? `${provided.draggableProps.style.transform} scale(1.05)` : provided.draggableProps.style.transform
+                                                    }}
                                                 >
-                                                    <div className="image-label" style={getLabelStyle(index)}>
+                                                    <div className="property-form-image-label" style={getLabelStyle(index)}>
                                                         {getImageLabel(index)}
                                                     </div>
                                                     {image instanceof File ? (
@@ -546,7 +824,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                                                     )}
                                                     <button
                                                         type="button"
-                                                        className="remove-image-btn"
+                                                        className="property-form-remove-image-btn"
                                                         onClick={() => handleRemoveImage(index)}
                                                     >
                                                         ×
@@ -560,9 +838,14 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                             )}
                         </Droppable>
                     </DragDropContext>
-                    <button type="submit" className="property-listing-submit-button">
-                        {initialData ? "Update Property" : "Create Property"}
-                    </button>
+                    <div className="property-form-button-group">
+                        <button type="button" onClick={handleReset} className="property-form-reset-button">
+                            Reset
+                        </button>
+                        <button type="submit" className="property-form-submit-button">
+                            {initialData ? "Update Property" : "Create Property"}
+                        </button>
+                    </div>
                 </form>
                 {showToast && <Toast type={toastType} message={toastMessage} />}
             </div>
