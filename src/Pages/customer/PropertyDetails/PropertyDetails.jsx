@@ -601,11 +601,13 @@ const PropertyDetails = () => {
                   <h2 className="Room_name">{propertyDetails?.propertyaddress}</h2>
                   <div className='Rating_Container'>
                     <p className="Rating_score">
-                      {propertyDetails?.rating}
+                      {Number.isInteger(propertyDetails.rating) 
+                        ? propertyDetails.rating.toFixed(1)
+                        : propertyDetails.rating.toFixed(2).replace(/\.?0+$/, '')}
                     </p>
                     <FaStar className='icon_star'/>
                     <button className="show-reviews-btn" onClick={() => setShowReviews(true)}>
-                      {propertyDetails?.ratingno} reviews
+                      {propertyDetails.ratingno} reviews
                     </button>
                   </div>
                 </div>
