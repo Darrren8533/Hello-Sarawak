@@ -601,11 +601,11 @@ const PropertyDetails = () => {
                   <h2 className="Room_name">{propertyDetails?.propertyaddress}</h2>
                   <div className='Rating_Container'>
                     <p className="Rating_score">
-                      {propertyDetails?.rating ? propertyDetails.rating.toFixed(1) : '0.0'}
+                      {propertyDetails?.rating}
                     </p>
                     <FaStar className='icon_star'/>
                     <button className="show-reviews-btn" onClick={() => setShowReviews(true)}>
-                      {propertyDetails?.ratingno || 0} reviews
+                      {propertyDetails?.ratingno} reviews
                     </button>
                   </div>
                 </div>
