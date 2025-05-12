@@ -186,7 +186,11 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
               <div className="reviews-summary">
                 <div className="reviews-average">
                   <div className="rating-display">
-                    <span className="average-rating">{propertyData.rating}</span>
+                    <span className="average-rating">
+                      {Number.isInteger(propertyData.rating) 
+                        ? propertyData.rating.toFixed(1)
+                        : propertyData.rating.toFixed(2).replace(/\.?0+$/, '')}
+                    </span>
                     <FaStar className="star-icon" />
                     <span className="total-reviews">{propertyData.ratingno} reviews</span>
                   </div>
