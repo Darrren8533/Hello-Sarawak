@@ -9,7 +9,7 @@ import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable'
 import Toast from '../../../../Component/Toast/Toast';
 import Loader from '../../../../Component/Loader/Loader';
 import Status from '../../../../Component/Status/Status';
-import RoomPlannerCalendar from '../../../../Component/Room_Planner_Calender/Room_Planner_Calender';
+// import RoomPlannerCalendar from '../../../../Component/Room_Planner_Calender/Room_Planner_Calender';
 import { FaEye, FaCheck, FaTimes } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -397,9 +397,7 @@ const Reservations = () => {
 
             <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-            <div className="room-planner-container">
-                <RoomPlannerCalendar />
-            </div>
+            
 
             {reservationsLoading ? (
                 <div className="loader-box">
