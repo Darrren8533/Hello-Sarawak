@@ -496,7 +496,7 @@ const { data: reservations = [], isLoading: loading } = useQuery({
                 Array(3).fill().map((_, index) => <CartItemSkeleton key={index} />)
               ) : currentReservations.length > 0 ? (
                 currentReservations.map((reservation) => (
-                  <div className="reservation-item" key={reservation.reservationid}>
+                  <div className="cart-reservation-item" key={reservation.reservationid}>
                     <div className="reservation-content">
                       <div className="reservation-image">
                         {reservation.propertyimage ? (
