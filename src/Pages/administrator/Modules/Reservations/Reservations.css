@@ -9,6 +9,7 @@
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(4px);
 }
 
 .custom-message-box {
@@ -68,6 +69,8 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 15px;
+  max-height: calc(80vh - 250px);
+  overflow-y: auto;
 }
 
 .property-option {
@@ -185,35 +188,8 @@
   color: #333;
 }
 
-.custom-message-box-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-}
-
-.suggest-properties.custom-message-box {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  width: 90%;
-  max-width: 800px;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-}
-
 .property-card {
   position: relative;
-  border: 1px solid #eee;
-  border-radius: 8px;
   overflow: hidden;
   transition: all 0.2s ease;
   display: flex;
@@ -223,7 +199,6 @@
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s ease;
 }
 
 .property-card:hover {
@@ -253,7 +228,6 @@
   color: #666;
   font-size: 0.9rem;
 }
-
 
 .property-pax {
   color: #4a5568;
@@ -351,20 +325,33 @@
   font-weight: 500;
 }
 
-.suggest-properties.custom-message-box {
-  padding: 20px;
-}
-
-.property-list {
-  max-height: calc(80vh - 250px);
-  overflow-y: auto;
-}
-
 .room-planner-container {
-    margin: 20px 0;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 15px;
-    width: 100%;
+  margin: 20px 0;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  width: 100%;
+}
+
+.table-controls {
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px 20px;
+  margin-bottom: 15px;
+}
+
+.toggle-table-btn {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.toggle-table-btn:hover {
+  background-color: #357abd;
 }
