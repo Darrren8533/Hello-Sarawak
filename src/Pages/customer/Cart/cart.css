@@ -117,7 +117,7 @@
 }
 
 /* Cart item styling */
-.cart-item, .reservation-item {
+.cart-item, .cart-reservation-item {
   padding: var(--spacing-lg);
   border: 1px solid var(--border-color);
   border-radius: 8px;
@@ -127,7 +127,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
 }
 
-.cart-item:hover, .reservation-item:hover {
+.cart-item:hover, .cart-reservation-item:hover {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
   transform: translateY(-2px);
 }
@@ -658,7 +658,7 @@
   }
   
   .cart-item, 
-  .reservation-item {
+  .cart-reservation-item {
     padding: var(--spacing-md);
   }
   
