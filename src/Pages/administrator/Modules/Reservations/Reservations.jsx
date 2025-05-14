@@ -397,7 +397,9 @@ const Reservations = () => {
 
             <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-            
+            <div className="room-planner-container">
+                <RoomPlannerCalendar />
+            </div>
 
             {reservationsLoading ? (
                 <div className="loader-box">
