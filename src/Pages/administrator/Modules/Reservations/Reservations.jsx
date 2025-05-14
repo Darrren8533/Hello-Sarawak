@@ -32,6 +32,7 @@ const Reservations = () => {
     const [rejectedReservationID, setRejectedReservationID] = useState(null);
     const [suggestSearchKey, setSuggestSearchKey] = useState('');
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+    const [showTable, setShowTable] = useState(true);
     const [currentUser, setCurrentUser] = useState({
         username: '',
         userid: '',
@@ -395,23 +396,32 @@ const Reservations = () => {
                 <SearchBar value={searchKey} onChange={(newValue) => setSearchKey(newValue)} placeholder="Search reservations..." />
             </div>
 
-            <Filter filters={filters} onApplyFilters={handleApplyFilters} />
-
             <div className="room-planner-container">
                 <RoomPlannerCalendar />
             </div>
 
-            {reservationsLoading ? (
-                <div className="loader-box">
-                    <Loader />
-                </div>
-            ) : (
-                <PaginatedTable
-                    data={filteredReservations}
-                    columns={columns}
-                    rowKey="reservationid"
-                    enableCheckbox={false}
-                />
+            <div className="table-controls">
+                <button 
+                    className="toggle-table-btn" 
+                    onClick={() => setShowTable(!showTable)}
+                >
+                    {showTable ? 'Hide Reservations Table' : 'Show Reservations Table'}
+                </button>
+            </div>
+
+            {showTable && (
+                reservationsLoading ? (
+                    <div className="loader-box">
+                        <Loader />
+                    </div>
+                ) : (
+                    <PaginatedTable
+                        data={filteredReservations}
+                        columns={columns}
+                        rowKey="reservationid"
+                        enableCheckbox={false}
+                    />
+                )
             )}
 
             <Modal
