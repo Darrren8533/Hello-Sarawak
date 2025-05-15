@@ -438,7 +438,7 @@ function RoomPlannerCalendar() {
   }, [showViewModeDropdown]);
 
   // Handle date click to show overlay
-  const handleDateClick = (dateStr, clickedDate) => {
+  const handleDateClick = (clickedDate) => {
     // Format the clicked date properly (YYYY-MM-DD format with leading zeros)
     const year = clickedDate.getFullYear();
     const month = String(clickedDate.getMonth() + 1).padStart(2, '0');
@@ -804,6 +804,11 @@ function RoomPlannerCalendar() {
     return weeks;
   };
 
+  const handleViewReservation = (reservation) => {
+    const reservationcheckindate = reservation.checkindatetime;
+    handleDateClick(reservationcheckindate);
+  }
+  
   return (
     <div className="scheduler-container">
       {/* Calendar top controls */}
@@ -947,7 +952,7 @@ function RoomPlannerCalendar() {
                   <div 
                     key={day.formatted} 
                     className={`scheduler-cell ${day.isCurrentMonth ? '' : 'other-month'} ${day.isToday ? 'today' : ''} ${day.hasReservations ? 'has-reservations' : ''}`}
-                    onClick={() => handleDateClick(day.formatted, day.date)}
+                    onClick={() => handleDateClick(day.date)}
                   >
                     <div className="day-content">
                       <span className="cell-date">{day.displayDate}</span>
@@ -1142,30 +1147,10 @@ function RoomPlannerCalendar() {
                     </div>
                     <div className="pending-actions">
                       <button 
-                        className="pending-accept-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAction('accept', reservation);
-                          setShowPendingBox(false);
-                        }}
-                      >
-                        Accept
-                      </button>
-                      <button 
-                        className="pending-reject-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAction('reject', reservation);
-                          setShowPendingBox(false);
-                        }}
-                      >
-                        Reject
-                      </button>
-                      <button 
                         className="pending-view-button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleAction('view', reservation);
+                          handleViewReservation(reservation);
                         }}
                       >
                         View
