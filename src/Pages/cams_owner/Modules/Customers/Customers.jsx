@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchCustomers } from '../../../../../Api/api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
@@ -16,7 +17,6 @@ import '../../../../Component/SearchBar/SearchBar.css';
 import './Customers.css';
 
 const Customers = () => {
-    const [customers, setCustomers] = useState([]);
     const [searchKey, setSearchKey] = useState('');
     const [selectedCustomer, setSelectedCustomer] = useState(null);
     const [showRoleModal, setShowRoleModal] = useState(false);
@@ -26,8 +26,25 @@ const Customers = () => {
     const [showToast, setShowToast] = useState(false);
     const [toastType, setToastType] = useState('');
     const API_URL = import.meta.env.VITE_API_URL;
+    const queryClient = useQueryClient();
     
     const roles = ['Customer', 'Moderator', 'Administrator'];
+
+    // Using React Query to fetch customers data
+    const { data: customers = [], isLoading, error } = useQuery({
+        queryKey: ['customers'],
+        queryFn: fetchCustomers,
+        staleTime: 5 * 60 * 1000, // Data remains fresh for 5 minutes
+        cacheTime: 10 * 60 * 1000, // Cache persists for 10 minutes
+    });
+
+    // Display error toast if data fetching fails
+    useEffect(() => {
+        if (error) {
+            displayToast('error', 'Failed to fetch customer details');
+            console.error('Failed to fetch customer details', error);
+        }
+    }, [error]);
 
     const displayToast = (type, message) => {
         setToastType(type);
@@ -35,18 +52,6 @@ const Customers = () => {
         setShowToast(true);
         setTimeout(() => setShowToast(false), 5000);
     };
-
-    useEffect(() => {
-        const fetchCustomerData = async () => {
-            try {
-                const customerData = await fetchCustomers();
-                setCustomers(customerData);
-            } catch (error) {
-                console.error('Failed to fetch customer details', error);
-            }
-        };
-        fetchCustomerData();
-    }, []);
 
     const handleAction = (action, customer) => {
         if (action === 'view') {
@@ -70,38 +75,43 @@ const Customers = () => {
         setSelectedRole(e.target.value);
     };
 
-    const handleRoleSubmit = async () => {
-        try {
+    // Using React Query mutation for role assignment
+    const assignRoleMutation = useMutation({
+        mutationFn: async ({ userId, role }) => {
             const response = await fetch(`${API_URL}/users/assignRole`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    userid: roleCustomer.userid,
-                    role: selectedRole
+                    userid: userId,
+                    role: role
                 }),
             });
-
-            const data = await response.json();
             
-            if (data.success) {
-                // Update local state
-                setCustomers(customers.map(customer => 
-                    customer.userid === roleCustomer.userid 
-                        ? {...customer, usergroup: selectedRole} 
-                        : customer
-                ));
-                setShowRoleModal(false);
-                displayToast('success', `Successfully assigned ${selectedRole} role to ${roleCustomer.username}`);
-            } else {
-                console.error('Failed to assign role:', data.message);
-                displayToast('error', `Failed to assign role: ${data.message || 'Unknown error'}`);
+            const data = await response.json();
+            if (!data.success) {
+                throw new Error(data.message || 'Failed to assign role');
             }
-        } catch (error) {
+            return data;
+        },
+        onSuccess: () => {
+            // Invalidate and refetch the customers query
+            queryClient.invalidateQueries({ queryKey: ['customers'] });
+            setShowRoleModal(false);
+            displayToast('success', `Successfully assigned ${selectedRole} role to ${roleCustomer.username}`);
+        },
+        onError: (error) => {
             console.error('Error assigning role:', error);
-            displayToast('error', 'Error assigning role. Please try again.');
+            displayToast('error', `Failed to assign role: ${error.message || 'Unknown error'}`);
         }
+    });
+
+    const handleRoleSubmit = async () => {
+        assignRoleMutation.mutate({ 
+            userId: roleCustomer.userid, 
+            role: selectedRole 
+        });
     };
 
     const customerDropdownItems = [
@@ -164,12 +174,16 @@ const Customers = () => {
                 <SearchBar value={searchKey} onChange={(newValue) => setSearchKey(newValue)} placeholder="Search customers..." />
             </div>
 
-            <PaginatedTable
-                data={filteredCustomers}
-                columns={columns}
-                rowKey="userid"
-                enableCheckbox={false}
-            />
+            {isLoading ? (
+                <div className="loading-container">Loading customer data...</div>
+            ) : (
+                <PaginatedTable
+                    data={filteredCustomers}
+                    columns={columns}
+                    rowKey="userid"
+                    enableCheckbox={false}
+                />
+            )}
 
             <Modal
                 isOpen={!!selectedCustomer}
@@ -187,6 +201,7 @@ const Customers = () => {
                 onRoleChange={handleRoleChange}
                 onSubmit={handleRoleSubmit}
                 onClose={() => setShowRoleModal(false)}
+                isLoading={assignRoleMutation.isPending}
             />
         </div>
     );
