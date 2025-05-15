@@ -451,6 +451,9 @@ function RoomPlannerCalendar() {
     
     // Update the selected day to move the purple dot
     setSelectedDay(new Date(clickedDate));
+
+    // Close pending reservations message box
+    setShowPendingBox(false);
   };
 
   // Close overlay
