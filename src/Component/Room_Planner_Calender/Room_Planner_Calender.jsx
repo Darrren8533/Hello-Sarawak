@@ -540,9 +540,16 @@ function RoomPlannerCalendar() {
   };
 
   // Reservation dropdown items
-  const reservationDropdownItems = (reservation) => {
-    return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
-  };
+   const reservationDropdownItems = (reservation) => {
+        if (reservation.reservationstatus === 'Pending' && isPropertyOwner(reservation)) {
+            return [
+                { label: 'View Details', icon: <FaEye />, action: 'view' },
+                { label: 'Accept', icon: <FaCheck />, action: 'accept' },
+                { label: 'Reject', icon: <FaTimes />, action: 'reject' },
+            ];
+        }
+        return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
+    };
 
   // Display labels for reservation details
   const displayLabels = {
