@@ -103,6 +103,28 @@ function RoomPlannerCalendar() {
       setPendingReservations([]);
     }
   }, [reservationsData]);
+
+  const isPropertyOwner = (reservation) => {
+        if (!currentUser.username || !reservation) {
+            console.log('Missing data:', { currentUser, reservation });
+            return false;
+        }
+    
+        const propertyOwnerUsername = reservation.property_owner_username;
+        if (!propertyOwnerUsername) {
+            console.log('Property owner username missing in reservation:', reservation);
+            return false;
+        }
+    
+        const isOwner = propertyOwnerUsername.toLowerCase() === currentUser.username.toLowerCase();
+        console.log('Ownership Check:', { 
+            currentUsername: currentUser.username, 
+            propertyOwnerUsername, 
+            userGroup: currentUser.userGroup, 
+            isOwner 
+        });
+        return isOwner;
+    };
   
   // Add click outside handler to close date picker
   useEffect(() => {
