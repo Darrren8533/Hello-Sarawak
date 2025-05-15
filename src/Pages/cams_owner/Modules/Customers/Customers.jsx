@@ -165,12 +165,18 @@ const Customers = () => {
                 <SearchBar value={searchKey} onChange={(newValue) => setSearchKey(newValue)} placeholder="Search customers..." />
             </div>
 
+            {isLoading ? (
+                <div className="loader-box">
+                    <Loader />
+                </div>
+            ) : (
             <PaginatedTable
                 data={filteredCustomers}
                 columns={columns}
                 rowKey="userid"
                 enableCheckbox={false}
             />
+            )}
 
             <Modal
                 isOpen={!!selectedCustomer}
