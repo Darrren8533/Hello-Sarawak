@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import {fetchPropertiesListingTable,updatePropertyStatus,deleteProperty} from '../../../../../Api/api';
+import React, { useState } from 'react';
+import {fetchPropertiesListingTable, updatePropertyStatus, deleteProperty} from '../../../../../Api/api';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
 import PropertyForm from '../../../../Component/PropertyForm/PropertyForm';
@@ -11,10 +11,10 @@ import Alert from '../../../../Component/Alert/Alert';
 import Status from '../../../../Component/Status/Status';
 import { FaEye} from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 
 const PropertyListing = () => {
-    const [properties, setProperties] = useState([]);
     const [searchKey, setSearchKey] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('All');
     const [appliedFilters, setAppliedFilters] = useState({ status: 'All' });
@@ -22,11 +22,8 @@ const PropertyListing = () => {
     const [toastMessage, setToastMessage] = useState('');
     const [showToast, setShowToast] = useState(false);
     const [toastType, setToastType] = useState('');
-
-
-    useEffect(() => {
-        fetchProperties();
-    }, []);
+    
+    const queryClient = useQueryClient();
 
     const displayToast = (type, message) => {
         setToastType(type);
@@ -35,18 +32,56 @@ const PropertyListing = () => {
         setTimeout(() => setShowToast(false), 5000);
     };
 
-    const fetchProperties = async () => {
-        try {
-            const propertyData = await fetchPropertiesListingTable();
-            const validProperties = (propertyData?.properties || []).filter(
-                (property) => property.propertyid !== undefined
-            );
-            setProperties(validProperties);
-        } catch (error) {
-            console.error('Failed to fetch property details', error);
+    // Use TanStack Query to fetch properties
+    const { 
+        data: propertiesData, 
+        isLoading, 
+        isError,
+        error 
+    } = useQuery({
+        queryKey: ['properties'],
+        queryFn: async () => {
+            try {
+                const propertyData = await fetchPropertiesListingTable();
+                const validProperties = (propertyData?.properties || []).filter(
+                    (property) => property.propertyid !== undefined
+                );
+                return validProperties;
+            } catch (error) {
+                throw new Error('Failed to fetch property details');
+            }
+        },
+        staleTime: 5 * 60 * 1000, // 5 minutes before considering data stale
+        onError: (error) => {
             displayToast('error', 'Failed to load properties. Please try again.');
         }
-    };
+    });
+
+    // Use TanStack Mutation for updating property status
+    const updateStatusMutation = useMutation({
+        mutationFn: (data) => updatePropertyStatus(data.propertyId, data.newStatus),
+        onSuccess: () => {
+            // Invalidate and refetch properties after status change
+            queryClient.invalidateQueries({ queryKey: ['properties'] });
+            displayToast('success', 'Property status updated successfully');
+        },
+        onError: (error) => {
+            displayToast('error', 'Failed to update property status');
+        }
+    });
+
+    // Use TanStack Mutation for deleting property
+    const deletePropertyMutation = useMutation({
+        mutationFn: (propertyId) => deleteProperty(propertyId),
+        onSuccess: () => {
+            // Invalidate and refetch properties after deletion
+            queryClient.invalidateQueries({ queryKey: ['properties'] });
+            displayToast('success', 'Property deleted successfully');
+        },
+        onError: (error) => {
+            displayToast('error', 'Failed to delete property');
+        }
+    });
 
     const handleAction = (action, property) => {
         if (action === 'view') {
@@ -59,9 +94,21 @@ const PropertyListing = () => {
                 propertybedtype: property.propertybedtype || 'N/A',
                 propertydescription: property.propertydescription || 'N/A',
                 images: property.propertyimage || [],
-                username:property.username || 'N/A',
+                username: property.username || 'N/A',
             });
-        } 
+        } else if (action === 'changeStatus') {
+            // Example: Toggle between 'Available' and 'Unavailable'
+            const newStatus = property.propertystatus === 'Available' ? 'Unavailable' : 'Available';
+            updateStatusMutation.mutate({ 
+                propertyId: property.propertyid, 
+                newStatus: newStatus 
+            });
+        } else if (action === 'delete') {
+            // Assuming you want to confirm before deletion
+            if (window.confirm('Are you sure you want to delete this property?')) {
+                deletePropertyMutation.mutate(property.propertyid);
+            }
+        }
     };
 
     const handleApplyFilters = () => {
@@ -95,6 +142,9 @@ const PropertyListing = () => {
         username: "Operator Name"
     };
 
+    // Get properties from the query data
+    const properties = propertiesData || [];
+
     const filteredProperties = properties.filter(
         (property) =>
             (appliedFilters.status === 'All' || (property.propertystatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
@@ -109,6 +159,9 @@ const PropertyListing = () => {
 
     const propertyDropdownItems = [
         { label: 'View Details', icon: <FaEye />, action: 'view' },
+        // Uncomment and customize these as needed:
+        // { label: 'Change Status', icon: <FaExchangeAlt />, action: 'changeStatus' },
+        // { label: 'Delete', icon: <FaTrash />, action: 'delete' },
     ];
 
     const columns = [
@@ -135,7 +188,7 @@ const PropertyListing = () => {
             header: 'Status',
             accessor: 'propertystatus',
             render: (property) => (
-              <Status value={property.propertystatus || 'Pending'} />
+                <Status value={property.propertystatus || 'Pending'} />
             )
         },
         {
@@ -159,12 +212,19 @@ const PropertyListing = () => {
 
             <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-            <PaginatedTable
-                data={filteredProperties}
-                columns={columns}
-                rowKey="propertyid"
-              
-            />
+            {isLoading && <div>Loading properties...</div>}
+            
+            {isError && (
+                <Alert type="error" message={`Error: ${error.message || 'Failed to load properties'}`} />
+            )}
+
+            {!isLoading && !isError && (
+                <PaginatedTable
+                    data={filteredProperties}
+                    columns={columns}
+                    rowKey="propertyid"
+                />
+            )}
 
             <Modal
                 isOpen={!!selectedProperty}
@@ -173,8 +233,6 @@ const PropertyListing = () => {
                 labels={displayLabels}
                 onClose={() => setSelectedProperty(null)}
             />
-
-
             
             {showToast && <Toast type={toastType} message={toastMessage} />}
         </div>
