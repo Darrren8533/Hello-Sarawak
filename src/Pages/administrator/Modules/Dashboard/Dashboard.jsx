@@ -13,7 +13,8 @@ import {
   fetchFinance,
   fetchOccupancyRate,
   fetchRevPAR,
-  fetchGuestSatisfactionScore
+  fetchGuestSatisfactionScore,
+  fetchPropertiesListingTable
 } from '../../../../../Api/api';
 import Loader from '../../../../Component/Loader/Loader';
 
@@ -56,7 +57,7 @@ const Dashboard = () => {
   // Fetch properties
   const { data: properties = [], isLoading: propertiesLoading } = useQuery({
     queryKey: ['properties'],
-    queryFn: fetchProduct,
+    queryFn: fetchPropertiesListingTable,
   });
 
   // Fetch reservations
