@@ -1136,21 +1136,28 @@ function RoomPlannerCalendar() {
                 <IoMdClose />
               </button>
             </div>
-            
+      
             <div className="pending-reservations-list">
               {pendingReservations.length > 0 ? (
-                pendingReservations.map(reservation => (
-                  <div key={reservation.reservationid} className="pending-reservation-item">
+                Object.entries(
+                  pendingReservations.reduce((acc, reservation) => {
+                    const date = reservation.formattedDate;
+                    if (!acc[date]) acc[date] = [];
+                    acc[date].push(reservation);
+                    return acc;
+                  }, {})
+                ).map(([date, reservationsForDate]) => (
+                  <div key={date} className="pending-reservation-item">
                     <div className="pending-property-info">
-                      <div className="pending-date">{reservation.formattedDate}</div>
-                      <div className="pending-property-name">{reservation.propertyaddress}</div>
+                      <div className="pending-date">{date}</div>
+                      <div className="pending-property-name">Reservations: x{reservationsForDate.length}</div>
                     </div>
                     <div className="pending-actions">
-                      <button 
+                      <button
                         className="pending-view-button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleViewReservation(reservation);
+                          handleViewReservation(reservationsForDate); // Pass array instead of one reservation
                         }}
                       >
                         View
