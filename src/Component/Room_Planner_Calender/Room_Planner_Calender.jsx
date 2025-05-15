@@ -77,6 +77,20 @@ function RoomPlannerCalendar() {
       year: 'numeric'
     }));
   }, []);
+
+  useEffect(() => {
+        const username = localStorage.getItem('username');
+        const userid = localStorage.getItem('userid');
+        const userGroup = localStorage.getItem('userGroup');
+        
+        setCurrentUser({
+            username,
+            userid,
+            userGroup
+        });
+        
+        console.log('Current user loaded:', { username, userid, userGroup });
+    }, []);
   
   // Extract and update pending reservations
   useEffect(() => {
