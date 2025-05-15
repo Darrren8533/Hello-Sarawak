@@ -5,7 +5,7 @@ import PaginatedTable from '../PaginatedTable/PaginatedTable';
 import ActionDropdown from '../ActionDropdown/ActionDropdown';
 import Status from '../Status/Status';
 import Modal from '../Modal/Modal';
-import { FaEye, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaEye, FaCheck, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { IoMdClose } from "react-icons/io";
 import Loader from '../Loader/Loader';
 import './Room_Planner_Calender.css';
