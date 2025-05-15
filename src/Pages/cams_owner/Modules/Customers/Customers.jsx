@@ -14,6 +14,7 @@ import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 import './Customers.css';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const Customers = () => {
     const [customers, setCustomers] = useState([]);
@@ -36,17 +37,17 @@ const Customers = () => {
         setTimeout(() => setShowToast(false), 5000);
     };
 
-    useEffect(() => {
-        const fetchCustomerData = async () => {
-            try {
-                const customerData = await fetchCustomers();
-                setCustomers(customerData);
-            } catch (error) {
-                console.error('Failed to fetch customer details', error);
-            }
-        };
-        fetchCustomerData();
-    }, []);
+    const { data: customerData = [], isLoading } = useQuery({
+        queryKey: ['customers'],
+        queryFn: fetchCustomers,
+        onError: (error) => {
+            console.error('Failed to fetch customer details', error);
+            displayToast('error', 'Failed to load customers. Please try again.');
+        },
+        staleTime: 5 * 60 * 1000,
+    });
+
+    setCustomers(customerData);
 
     const handleAction = (action, customer) => {
         if (action === 'view') {
