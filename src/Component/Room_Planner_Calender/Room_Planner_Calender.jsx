@@ -1195,6 +1195,10 @@ function RoomPlannerCalendar() {
           <div className="legend-dot legend-dot-status-pickup"></div>
           <span className="legend-label">Pick Up Section</span>
         </div>
+        <div className="legend-item">
+          <div className="status-dot legend-dot-status-other"></div>
+          <span className="legend-label">Others</span>
+        </div>
       </div>
     </div>
   );
