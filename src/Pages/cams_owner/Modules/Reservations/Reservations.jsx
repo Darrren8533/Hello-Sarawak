@@ -8,13 +8,14 @@ import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable'
 import Status from '../../../../Component/Status/Status';
 import { FaEye } from 'react-icons/fa';
 import Toast from '../../../../Component/Toast/Toast';
+import Alert from '../../../../Component/Alert/Alert';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
 import '../../../../Component/Filter/Filter.css';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 const Reservations = () => {
-    const [reservations, setReservations] = useState([]);
     const [searchKey, setSearchKey] = useState('');
     const [selectedStatus, setSelectedStatus] = useState('All');
     const [appliedFilters, setAppliedFilters] = useState({ status: 'All' });
@@ -22,33 +23,53 @@ const Reservations = () => {
     const [toastMessage, setToastMessage] = useState('');
     const [toastType, setToastType] = useState('');
     const [showToast, setShowToast] = useState(false);
+    
+    const queryClient = useQueryClient();
 
-    useEffect(() => {
-        const fetchReservationsData = async () => {
+    const displayToast = (type, message) => {
+        setToastType(type);
+        setToastMessage(message);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 5000);
+    };
+
+    // Use TanStack Query to fetch and process reservations
+    const { 
+        data: reservations = [],
+        isLoading,
+        isError,
+        error,
+        refetch
+    } = useQuery({
+        queryKey: ['reservations'],
+        queryFn: async () => {
             try {
                 const reservationData = await fetchReservation();
-                if (Array.isArray(reservationData)) {
-                    const updatedReservations = reservationData.map(reservation => {
-                        const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
-                        const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
-
-                        if (reservation.reservationstatus === 'Pending' && currentDateTime > reservationblocktime) {
-                            return { ...reservation, reservationstatus: 'expired' };
-                        }
-                        return reservation;
-                    });
-                    setReservations(updatedReservations);
-                } else {
-                    console.error("Invalid data format received:", reservationData);
-                    setReservations([]);
+                if (!Array.isArray(reservationData)) {
+                    throw new Error("Invalid data format received");
                 }
+                
+                // Process reservations to check for expired status
+                return reservationData.map(reservation => {
+                    const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
+                    const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
+
+                    if (reservation.reservationstatus === 'Pending' && currentDateTime > reservationblocktime) {
+                        return { ...reservation, reservationstatus: 'expired' };
+                    }
+                    return reservation;
+                });
             } catch (error) {
                 console.error('Failed to fetch reservation details:', error);
-                setReservations([]);
+                throw new Error(`Failed to fetch reservations: ${error.message}`);
             }
-        };
-        fetchReservationsData();
-    }, []);
+        },
+        staleTime: 5 * 60 * 1000, // 5 minutes
+        refetchOnWindowFocus: false,
+        onError: (error) => {
+            displayToast('error', error.message || 'Failed to load reservations');
+        }
+    });
 
     const handleApplyFilters = () => {
         setAppliedFilters({ status: selectedStatus });
@@ -72,7 +93,6 @@ const Reservations = () => {
             ],
         },
     ];
-
 
     const displayLabels = {
         reservationid: "Reservation ID",
@@ -98,7 +118,6 @@ const Reservations = () => {
     );
 
     const handleAction = (action, reservation) => {
-
         if (reservation.reservationstatus === 'expired') {
             displayToast('error', 'Action cannot be performed. This reservation has expired.');
             return;
@@ -116,13 +135,6 @@ const Reservations = () => {
                 images: reservation.propertyimage || [],
             });
         }
-    };
-
-    const displayToast = (type, message) => {
-        setToastType(type);
-        setToastMessage(message);
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 5000);
     };
 
     const reservationDropdownItems = [
@@ -173,18 +185,39 @@ const Reservations = () => {
             {showToast && <Toast type={toastType} message={toastMessage} />}
             <div className="header-container">
                 <h1 className="dashboard-page-title">Reservations</h1>
-                <SearchBar value={searchKey} onChange={(newValue) => setSearchKey(newValue)} placeholder="Search reservation..." />
-
+                <SearchBar 
+                    value={searchKey} 
+                    onChange={(newValue) => setSearchKey(newValue)} 
+                    placeholder="Search reservation..." 
+                />
+                <button 
+                    onClick={() => refetch()} 
+                    className="refresh-button"
+                    disabled={isLoading}
+                >
+                    Refresh
+                </button>
             </div>
 
             <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-            <PaginatedTable
-                data={filteredReservations}
-                columns={columns}
-                rowKey="reservationid"
-                enableCheckbox={false} 
-            />
+            {isLoading && <div>Loading reservations...</div>}
+            
+            {isError && (
+                <Alert 
+                    type="error" 
+                    message={`Error: ${error?.message || 'Failed to load reservations'}`} 
+                />
+            )}
+
+            {!isLoading && !isError && (
+                <PaginatedTable
+                    data={filteredReservations}
+                    columns={columns}
+                    rowKey="reservationid"
+                    enableCheckbox={false} 
+                />
+            )}
 
             <Modal
                 isOpen={!!selectedReservation}
