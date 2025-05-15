@@ -25,6 +25,11 @@ function RoomPlannerCalendar() {
   const [selectedDay, setSelectedDay] = useState(null); // Track which day is selected
   const [showPendingBox, setShowPendingBox] = useState(false); // State for pending reservations box
   const [pendingReservations, setPendingReservations] = useState([]); // State to store pending reservations
+  const [currentUser, setCurrentUser] = useState({
+        username: '',
+        userid: '',
+        userGroup: ''
+    });
   
   // Fetch reservations with React Query
   const { data: reservationsData = [], isLoading: reservationsLoading } = useQuery({
@@ -77,6 +82,20 @@ function RoomPlannerCalendar() {
       year: 'numeric'
     }));
   }, []);
+
+  useEffect(() => {
+        const username = localStorage.getItem('username');
+        const userid = localStorage.getItem('userid');
+        const userGroup = localStorage.getItem('userGroup');
+        
+        setCurrentUser({
+            username,
+            userid,
+            userGroup
+        });
+        
+        console.log('Current user loaded:', { username, userid, userGroup });
+    }, []);
   
   // Extract and update pending reservations
   useEffect(() => {
@@ -103,6 +122,28 @@ function RoomPlannerCalendar() {
       setPendingReservations([]);
     }
   }, [reservationsData]);
+
+  const isPropertyOwner = (reservation) => {
+        if (!currentUser.username || !reservation) {
+            console.log('Missing data:', { currentUser, reservation });
+            return false;
+        }
+    
+        const propertyOwnerUsername = reservation.property_owner_username;
+        if (!propertyOwnerUsername) {
+            console.log('Property owner username missing in reservation:', reservation);
+            return false;
+        }
+    
+        const isOwner = propertyOwnerUsername.toLowerCase() === currentUser.username.toLowerCase();
+        console.log('Ownership Check:', { 
+            currentUsername: currentUser.username, 
+            propertyOwnerUsername, 
+            userGroup: currentUser.userGroup, 
+            isOwner 
+        });
+        return isOwner;
+    };
   
   // Add click outside handler to close date picker
   useEffect(() => {
@@ -509,35 +550,35 @@ function RoomPlannerCalendar() {
       };
       setSelectedReservation(essentialFields);
     } else if (action === 'accept') {
-      // Accept the reservation - in a real implementation this would call an API
-      console.log(`Accepting reservation ${reservation.reservationid}`);
-      
-      // Here you would typically call the API to update the reservation status
-      // Example: updateReservationStatus(reservation.reservationid, 'Accepted');
-      
-      // For demo purposes, we'll just show an alert
-      alert(`Reservation ${reservation.reservationid} accepted`);
-      
-      // Update pending reservations by removing this one from the list
-      setPendingReservations(prevReservations => 
-        prevReservations.filter(res => res.reservationid !== reservation.reservationid)
-      );
-    } else if (action === 'reject') {
-      // Reject the reservation - in a real implementation this would call an API
-      console.log(`Rejecting reservation ${reservation.reservationid}`);
-      
-      // Here you would typically call the API to update the reservation status
-      // Example: updateReservationStatus(reservation.reservationid, 'Rejected');
-      
-      // For demo purposes, we'll just show an alert
-      alert(`Reservation ${reservation.reservationid} rejected`);
-      
-      // Update pending reservations by removing this one from the list
-      setPendingReservations(prevReservations => 
-        prevReservations.filter(res => res.reservationid !== reservation.reservationid)
-      );
-    }
-  };
+        // Accept the reservation - in a real implementation this would call an API
+        console.log(`Accepting reservation ${reservation.reservationid}`);
+        
+        // Here you would typically call the API to update the reservation status
+        // Example: updateReservationStatus(reservation.reservationid, 'Accepted');
+        
+        // For demo purposes, we'll just show an alert
+        alert(`Reservation ${reservation.reservationid} accepted`);
+        
+        // Update pending reservations by removing this one from the list
+        setPendingReservations(prevReservations => 
+          prevReservations.filter(res => res.reservationid !== reservation.reservationid)
+        );
+      } else if (action === 'reject') {
+        // Reject the reservation - in a real implementation this would call an API
+        console.log(`Rejecting reservation ${reservation.reservationid}`);
+        
+        // Here you would typically call the API to update the reservation status
+        // Example: updateReservationStatus(reservation.reservationid, 'Rejected');
+        
+        // For demo purposes, we'll just show an alert
+        alert(`Reservation ${reservation.reservationid} rejected`);
+        
+        // Update pending reservations by removing this one from the list
+        setPendingReservations(prevReservations => 
+          prevReservations.filter(res => res.reservationid !== reservation.reservationid)
+        );
+      }
+    };
 
   // Reservation dropdown items
    const reservationDropdownItems = (reservation) => {
