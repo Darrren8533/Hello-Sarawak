@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { fetchOperators } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
@@ -9,17 +9,18 @@ import Toast from '../../../../Component/Toast/Toast';
 import Role from '../../../../Component/Role/Role';
 import RoleManager from '../../../../Component/RoleManager/RoleManager';
 import UserActivityCell from '../../../../Component/UserActivityCell/UserActivityCell';
-import { FaEye, FaBan, FaUserTag } from 'react-icons/fa';
+import Alert from '../../../../Component/Alert/Alert';
+import { FaEye, FaUserTag } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
 import '../../../../Component/Filter/Filter.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 import '../Operators/Operators.css';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 
 const Operators = () => {
-  const [operators, setOperators] = useState([]);
   const [searchKey, setSearchKey] = useState('');
   const [selectedRole, setSelectedRole] = useState('All');
   const [appliedFilters, setAppliedFilters] = useState({ role: 'All' });
@@ -32,19 +33,8 @@ const Operators = () => {
   const [toastType, setToastType] = useState('');
   const API_URL = import.meta.env.VITE_API_URL;
   
+  const queryClient = useQueryClient();
   const roles = ['Customer', 'Moderator', 'Administrator'];
-
-  useEffect(() => {
-    const fetchOperatorsData = async () => {
-      try {
-        const operatorData = await fetchOperators();
-        setOperators(operatorData);
-      } catch (error) {
-        console.error('Failed to fetch operator details', error);
-      }
-    };
-    fetchOperatorsData();
-  }, []);
 
   const displayToast = (type, message) => {
     setToastType(type);
@@ -52,6 +42,61 @@ const Operators = () => {
     setShowToast(true);
     setTimeout(() => setShowToast(false), 5000);
   };
+
+  // Fetch operators with TanStack Query
+  const { 
+    data: operators = [], 
+    isLoading, 
+    isError, 
+    error 
+  } = useQuery({
+    queryKey: ['operators'],
+    queryFn: async () => {
+      try {
+        return await fetchOperators();
+      } catch (error) {
+        throw new Error('Failed to fetch operator details');
+      }
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    onError: (error) => {
+      displayToast('error', `Failed to fetch operators: ${error.message}`);
+    }
+  });
+
+  // Role assignment mutation
+  const assignRoleMutation = useMutation({
+    mutationFn: async ({ userId, role }) => {
+      const response = await fetch(`${API_URL}/users/assignRole`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userid: userId,
+          role: role
+        }),
+      });
+      
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to assign role');
+      }
+      return data;
+    },
+    onSuccess: (data, variables) => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ['operators'] });
+      setShowRoleModal(false);
+      displayToast(
+        'success', 
+        `Successfully assigned ${variables.role} role to ${roleOperator.username}`
+      );
+    },
+    onError: (error) => {
+      displayToast('error', `Error assigning role: ${error.message}`);
+    }
+  });
 
   const handleApplyFilters = () => {
     setAppliedFilters({ role: selectedRole });
@@ -81,10 +126,9 @@ const Operators = () => {
     ucountry: 'Country',
   };
 
-
   const filteredOperators = operators.filter((operator) => {
     const searchInFields =
-      `${operator.ufirstname} ${operator.ulastname} ${operator.uemail} ${operator.uphoneno} ${operator.usergroup}`
+      `${operator.ufirstname || ''} ${operator.ulastname || ''} ${operator.uemail || ''} ${operator.uphoneno || ''} ${operator.usergroup || ''}`
         .toLowerCase()
         .includes(searchKey.toLowerCase());
 
@@ -117,38 +161,13 @@ const Operators = () => {
     setSelectedAssignRole(e.target.value);
   };
 
-  const handleRoleSubmit = async () => {
-    try {
-      const response = await fetch(`${API_URL}/users/assignRole`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userid: roleOperator.userid,
-          role: selectedAssignRole
-        }),
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        // Update local state
-        setOperators(operators.map(operator => 
-          operator.userid === roleOperator.userid 
-            ? {...operator, usergroup: selectedAssignRole} 
-            : operator
-        ));
-        setShowRoleModal(false);
-        displayToast('success', `Successfully assigned ${selectedAssignRole} role to ${roleOperator.username}`);
-      } else {
-        console.error('Failed to assign role:', data.message);
-        displayToast('error', `Failed to assign role: ${data.message || 'Unknown error'}`);
-      }
-    } catch (error) {
-      console.error('Error assigning role:', error);
-      displayToast('error', 'Error assigning role. Please try again.');
-    }
+  const handleRoleSubmit = () => {
+    if (!roleOperator || !selectedAssignRole) return;
+    
+    assignRoleMutation.mutate({
+      userId: roleOperator.userid,
+      role: selectedAssignRole
+    });
   };
 
   const operatorDropdownItems = [
@@ -201,12 +220,20 @@ const Operators = () => {
 
       <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-      <PaginatedTable
-        data={filteredOperators}
-        columns={columns}
-        rowKey="userid"
-        enableCheckbox={false}
-      />
+      {isLoading && <div>Loading operators...</div>}
+      
+      {isError && (
+        <Alert type="error" message={`Error: ${error.message || 'Failed to load operators'}`} />
+      )}
+
+      {!isLoading && !isError && (
+        <PaginatedTable
+          data={filteredOperators}
+          columns={columns}
+          rowKey="userid"
+          enableCheckbox={false}
+        />
+      )}
 
       <Modal
         isOpen={!!selectedOperator}
@@ -224,6 +251,7 @@ const Operators = () => {
         onRoleChange={handleRoleChange}
         onSubmit={handleRoleSubmit}
         onClose={() => setShowRoleModal(false)}
+        isLoading={assignRoleMutation.isPending}
       />
     </div>
   );
