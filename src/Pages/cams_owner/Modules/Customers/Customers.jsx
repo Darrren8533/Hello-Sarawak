@@ -14,8 +14,6 @@ import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 import './Customers.css';
-import Loader from '../../../../Component/Loader/Loader';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const Customers = () => {
     const [customers, setCustomers] = useState([]);
@@ -38,17 +36,17 @@ const Customers = () => {
         setTimeout(() => setShowToast(false), 5000);
     };
 
-    const { data: customerData = [], isLoading } = useQuery({
-        queryKey: ['customers'],
-        queryFn: fetchCustomers,
-        onError: (error) => {
-            console.error('Failed to fetch customer details', error);
-            displayToast('error', 'Failed to load customers. Please try again.');
-        },
-        staleTime: 5 * 60 * 1000,
-    });
-
-    setCustomers(customerData);
+    useEffect(() => {
+        const fetchCustomerData = async () => {
+            try {
+                const customerData = await fetchCustomers();
+                setCustomers(customerData);
+            } catch (error) {
+                console.error('Failed to fetch customer details', error);
+            }
+        };
+        fetchCustomerData();
+    }, []);
 
     const handleAction = (action, customer) => {
         if (action === 'view') {
@@ -166,18 +164,12 @@ const Customers = () => {
                 <SearchBar value={searchKey} onChange={(newValue) => setSearchKey(newValue)} placeholder="Search customers..." />
             </div>
 
-            {isLoading ? (
-                <div className="loader-box">
-                    <Loader />
-                </div>
-            ) : (
             <PaginatedTable
                 data={filteredCustomers}
                 columns={columns}
                 rowKey="userid"
                 enableCheckbox={false}
             />
-            )}
 
             <Modal
                 isOpen={!!selectedCustomer}
