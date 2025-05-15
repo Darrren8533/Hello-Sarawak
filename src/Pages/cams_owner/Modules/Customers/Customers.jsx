@@ -14,6 +14,7 @@ import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 import './Customers.css';
+import Loader from '../../../../Component/Loader/Loader';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 const Customers = () => {
