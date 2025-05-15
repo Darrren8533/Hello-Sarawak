@@ -804,10 +804,10 @@ function RoomPlannerCalendar() {
     return weeks;
   };
 
-  const handleViewReservation = (reservation) => {
-    const reservationcheckindate = reservation.checkindatetime;
-    handleDateClick(reservationcheckindate);
-  }
+  const handleViewReservation = (dateString) => {
+    const reservationDate = new Date(dateString);
+    handleDateClick(reservationDate);
+  };
   
   return (
     <div className="scheduler-container">
@@ -1157,7 +1157,7 @@ function RoomPlannerCalendar() {
                         className="pending-view-button"
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleViewReservation(reservationsForDate); // Pass array instead of one reservation
+                          handleViewReservation(date); 
                         }}
                       >
                         View
@@ -1172,6 +1172,7 @@ function RoomPlannerCalendar() {
           </div>
         </div>
       )}
+
       
       {/* Legend for status colors */}
       <div className="calendar-legend">
