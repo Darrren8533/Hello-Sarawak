@@ -199,7 +199,7 @@ const PropertyDetails = () => {
       
       if (nights > 0) {
         setTotalNights(nights);
-        const basePrice = propertyDetails?.rateamount * nights;
+        const basePrice = propertyDetails?.normalrate * nights;
         const taxes = basePrice * 0.1;
         settotalprice(basePrice + taxes);
       }
@@ -756,7 +756,7 @@ const PropertyDetails = () => {
               <div className="second_container">
                 <div className="booking_card">
                   <div className="price_section">
-                    <span className="room_price">${propertyDetails?.rateamount}</span>
+                    <span className="room_price">${propertyDetails?.normalrate}</span>
                     <span className="price_night">/night</span>
                   </div>
 
@@ -780,16 +780,16 @@ const PropertyDetails = () => {
 
                   <div className="price_details">
                     <div className="price_item">
-                      <div>${propertyDetails?.rateamount} × {totalNights} nights</div>
-                      <div>${propertyDetails?.rateamount * totalNights}</div>
+                      <div>${propertyDetails?.normalrate} × {totalNights} nights</div>
+                      <div>${propertyDetails?.normalrate * totalNights}</div>
                     </div>
                     <div className="price_item">
                       <div>Cleaning fee (10%)</div>
-                      <div>${Math.floor(propertyDetails?.rateamount * totalNights * 0.1)}</div>
+                      <div>${Math.floor(propertyDetails?.normalrate * totalNights * 0.1)}</div>
                     </div>
                     <div className="price_item">
                       <div>Service fee (10%)</div>
-                      <div>${Math.floor(propertyDetails?.rateamount * totalNights * 0.1)}</div>
+                      <div>${Math.floor(propertyDetails?.normalrate * totalNights * 0.1)}</div>
                     </div>
                     <div className="price_total">
                       <div><strong>Total (MYR)</strong></div>
@@ -990,12 +990,12 @@ const PropertyDetails = () => {
                         <h3>Price details</h3>
                         <div className="price-breakdown">
                           <div className="price-row">
-                            <span>RM {propertyDetails?.rateamount} × {totalNights} night</span>
-                            <span>RM {propertyDetails?.rateamount * totalNights}</span>
+                            <span>RM {propertyDetails?.normalrate} × {totalNights} night</span>
+                            <span>RM {propertyDetails?.normalrate * totalNights}</span>
                           </div>
                           <div className="price-row">
                             <span>Taxes (10%)</span>
-                            <span>RM {Math.floor(propertyDetails?.rateamount * totalNights * 0.1)}</span>
+                            <span>RM {Math.floor(propertyDetails?.normalrate * totalNights * 0.1)}</span>
                           </div>
                           <div className="price-total">
                             <span>Total (MYR)</span>
@@ -1014,7 +1014,7 @@ const PropertyDetails = () => {
           <div className="mobile-booking-bar">
             <div className="mobile-booking-bar-content">
               <div className="mobile-price-info">
-                <h3>${propertyDetails?.rateamount} <span>/night</span></h3>
+                <h3>${propertyDetails?.normalrate} <span>/night</span></h3>
                 {totalNights > 0 && (
                   <span>Total: ${totalprice} for {totalNights} {totalNights === 1 ? 'night' : 'nights'}</span>
                 )}
