@@ -279,7 +279,7 @@ const Product = () => {
       let availableProperties = fetchedProps.filter((property) => {
         const existingCheckin = new Date(property.checkindatetime);
         const existingCheckout = new Date(property.checkoutdatetime);
-        const propertyPrice = parseFloat(property.rateamount);
+        const propertyPrice = parseFloat(property.normalrate);
 
         // Filter by price range if set
         if (propertyPrice < priceRange.min || propertyPrice > priceRange.max) return false;
@@ -313,9 +313,9 @@ const Product = () => {
       
       // Sort by price if requested
       if (sortOrder === "asc") {
-        availableProperties.sort((a, b) => parseFloat(a.rateamount) - parseFloat(b.rateamount));
+        availableProperties.sort((a, b) => parseFloat(a.normalrate) - parseFloat(b.normalrate));
       } else if (sortOrder === "desc") {
-        availableProperties.sort((a, b) => parseFloat(b.rateamount) - parseFloat(a.rateamount));
+        availableProperties.sort((a, b) => parseFloat(b.normalrate) - parseFloat(a.normalrate));
       }
   
       if (availableProperties.length === 0) {
@@ -716,7 +716,7 @@ const Product = () => {
                           <span className="property-cluster">{property.clustername}</span>
                           <div className="property-details-row">
                             <div className="property-price">
-                              <span className="price-amount">${property.rateamount}</span>
+                              <span className="price-amount">${property.normalrate}</span>
                               <span className="price-period">/night</span>
                             </div>
                           </div>
@@ -757,7 +757,7 @@ const Product = () => {
                           <span className="property-cluster">{property.clustername}</span>
                           <div className="property-details-row">
                             <div className="property-price">
-                              <span className="price-amount">${property.rateamount}</span>
+                              <span className="price-amount">${property.normalrate}</span>
                               <span className="price-period">/night</span>
                             </div>
                           </div>
