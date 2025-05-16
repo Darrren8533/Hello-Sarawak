@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchPropertiesListingTable, updatePropertyStatus, deleteProperty, propertyListingAccept, propertyListingReject, fetchReservation } from '../../../../../Api/api';
+import { fetchPropertiesListingTable, updatePropertyStatus, deleteProperty, propertyListingAccept, propertyListingReject, fetchReservation, fetchRates } from '../../../../../Api/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
@@ -30,6 +30,7 @@ const PropertyListing = () => {
     const [propertyToDelete, setPropertyToDelete] = useState(null);
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(10);
+    const [propertyRates, setPropertyRates] = useState({});
     
     const queryClient = useQueryClient();
     
@@ -44,6 +45,24 @@ const PropertyListing = () => {
         staleTime: 30 * 60 * 1000,
         refetchInterval: 1000,  
     });
+    
+    // Fetch rates data
+    const { data: ratesData } = useQuery({
+        queryKey: ['rates'],
+        queryFn: fetchRates,
+        staleTime: 30 * 60 * 1000,
+    });
+    
+    // Map rates to properties
+    useEffect(() => {
+        if (ratesData && ratesData.rates) {
+            const ratesMap = {};
+            ratesData.rates.forEach(rate => {
+                ratesMap[rate.rateID] = rate;
+            });
+            setPropertyRates(ratesMap);
+        }
+    }, [ratesData]);
     
     // Extract properties from query result
     const properties = data?.properties || [];
@@ -105,12 +124,18 @@ const PropertyListing = () => {
     const handleAction = async (action, property) => {
         try {
             if (action === 'view') {
+                // Fetch the rate information for this property
+                let rateInfo = null;
+                if (property.rateid && propertyRates[property.rateid]) {
+                    rateInfo = propertyRates[property.rateid];
+                }
+                
                 setSelectedProperty({
                     propertyid: property.propertyid || 'N/A',
                     propertyname: property.propertyaddress || 'N/A',
                     clustername: property.clustername || 'N/A',
                     categoryname: property.categoryname || 'N/A',
-                    propertyprice: property.rateamount || 'N/A',
+                    propertyprice: property.normalrate || 'N/A',
                     propertylocation: property.nearbylocation || 'N/A',
                     propertyguestpaxno: property.propertyguestpaxno || 'N/A',
                     propertystatus: property.propertystatus || 'N/A',
@@ -118,13 +143,31 @@ const PropertyListing = () => {
                     propertydescription: property.propertydescription || 'N/A',
                     images: property.propertyimage || [],
                     username: property.username || 'N/A',
+                    // Add dynamic pricing information
+                    normalRate: rateInfo ? rateInfo.normalRate : property.normalrate || 'N/A',
+                    weekendRate: rateInfo ? rateInfo.weekendRate : 'N/A',
+                    holidayRate: rateInfo ? rateInfo.holidayRate : 'N/A',
+                    specialEventRate: rateInfo ? rateInfo.specialEventRate : 'N/A',
+                    earlyBirdDiscountRate: rateInfo ? rateInfo.earlyBirdDiscountRate : 'N/A',
+                    lastMinuteDiscountRate: rateInfo ? rateInfo.lastMinuteDiscountRate : 'N/A',
+                    period: rateInfo ? rateInfo.period : 'N/A',
                 });
             } else if (action === 'edit') {
                 if (property.propertystatus === 'Available') {
                     displayToast('error', 'You need to disable the property first before editing.');
                     return;
                 }
-                setEditProperty({ ...property });
+                
+                // Include rate information for editing
+                let rateInfo = null;
+                if (property.rateid && propertyRates[property.rateid]) {
+                    rateInfo = propertyRates[property.rateid];
+                }
+                
+                setEditProperty({ 
+                    ...property,
+                    rates: rateInfo
+                });
                 setIsPropertyFormOpen(true);
             } else if (action === 'accept') {
                 await acceptMutation.mutateAsync(property.propertyid);
@@ -218,14 +261,22 @@ const PropertyListing = () => {
         propertyname: "Property Name",
         clustername: "Cluster Name",
         categoryname: "Category Name",
-        propertyprice: "Property Price",
+        propertyprice: "Standard Rate",
         propertylocation: "Property Location",
         propertyguestpaxno: "Guest Capacity",
         propertystatus: "Property Status",
         propertybedtype: "Bed Type",
         propertydescription: "Description",
         images: "Images",
-        username: "Operator Name"
+        username: "Operator Name",
+        // Add dynamic pricing labels
+        normalRate: "Normal Rate",
+        weekendRate: "Weekend Rate",
+        holidayRate: "Holiday Rate",
+        specialEventRate: "Special Event Rate",
+        earlyBirdDiscountRate: "Early Bird Discount",
+        lastMinuteDiscountRate: "Last Minute Discount",
+        period: "Rate Period"
     };
 
     const filteredProperties = properties.filter((property) => {
@@ -236,7 +287,7 @@ const PropertyListing = () => {
 
 
         const searchInFields =
-            `${property.propertyid} ${property.propertyaddress} ${property.clustername} ${property.rateamount} ${property.propertystatus}`
+            `${property.propertyid} ${property.propertyaddress} ${property.clustername} ${property.normalrate} ${property.propertystatus}`
                 .toLowerCase()
                 .includes(searchKey.toLowerCase());
 
@@ -337,7 +388,7 @@ const columns = [
         ),
     },
     { header: 'Name', accessor: 'propertyaddress' },
-    { header: 'Price', accessor: 'rateamount' },
+    { header: 'Price', accessor: 'normalrate' },
     { header: 'Cluster', accessor: 'clustername' },
     {
         header: 'Status',
@@ -423,6 +474,7 @@ const columns = [
                     onSubmit={() => {
                     setIsPropertyFormOpen(false);
                     queryClient.invalidateQueries({ queryKey: ['properties'] });
+                    queryClient.invalidateQueries({ queryKey: ['rates'] });
                     displayToast('success', editProperty? 'Property updated successfully' : 'Property created successfully');
                 }}
                     onClose={() => setIsPropertyFormOpen(false)}
