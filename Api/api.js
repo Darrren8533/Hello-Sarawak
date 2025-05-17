@@ -884,16 +884,6 @@ export const updateProfile = async (userData) => {
         if (!userData.userid) {
             throw new Error('User ID is missing');
         }
-        
-       
-        // const dataToSend = { ...userData };
-        
-        // delete dataToSend.uimage;
-        
-        
-        // if (dataToSend.utitle && dataToSend.utitle.length > 50) {
-        //     throw new Error('Title is too long, maximum 50 characters allowed');
-        // }
       
         const response = await fetch(`${API_URL}/users/updateProfile/${userData.userid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
             method: 'PUT',
