@@ -180,8 +180,6 @@ const FrontUserProfile = () => {
                 if (!passwordRegex.test(password)) {
                     throw new Error('Password must be 6-20 characters with at least 1 letter and 1 number');
                 }
-                // Update password in userData
-                setUserData((prev) => ({ ...prev, password })); // Update password directly
             }
 
             if (editingField === 'email') {
@@ -197,8 +195,29 @@ const FrontUserProfile = () => {
                 if (!userData.ucountry?.trim()) throw new Error('Country cannot be empty');
             }
 
-            const dataToUpdate = { ...userData };
-            if (editingField === 'password') {
+            // Create a data object that only includes necessary fields, not the entire userData
+            const dataToUpdate = {
+                userid: userData.userid,
+                username: userData.username, // Basic information that must be included
+            };
+
+            // Add relevant data based on the editing field
+            if (editingField === 'name') {
+                dataToUpdate.ufirstname = userData.ufirstname;
+                dataToUpdate.ulastname = userData.ulastname;
+            } else if (editingField === 'phone') {
+                dataToUpdate.uphoneno = userData.uphoneno;
+            } else if (editingField === 'email') {
+                dataToUpdate.uemail = userData.uemail;
+            } else if (editingField === 'dob') {
+                dataToUpdate.udob = userData.udob;
+            } else if (editingField === 'country') {
+                dataToUpdate.ucountry = userData.ucountry;
+            } else if (editingField === 'title') {
+                dataToUpdate.utitle = userData.utitle;
+            } else if (editingField === 'gender') {
+                dataToUpdate.ugender = userData.ugender;
+            } else if (editingField === 'password') {
                 dataToUpdate.password = password;
             }
 
