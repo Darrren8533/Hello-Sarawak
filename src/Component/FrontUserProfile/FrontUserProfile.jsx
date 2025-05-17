@@ -95,8 +95,8 @@ const FrontUserProfile = () => {
             img.onload = async () => {
                 URL.revokeObjectURL(objectUrl);
 
-                const maxWidth = 200;
-                const maxHeight = 200;
+                const maxWidth = 300;
+                const maxHeight = 300;
                 let width = img.width;
                 let height = img.height;
 
@@ -116,7 +116,7 @@ const FrontUserProfile = () => {
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
 
-                const resizedImage = canvas.toDataURL('image/jpeg', 0.5);
+                const resizedImage = canvas.toDataURL('image/jpeg', 0.7);
                 const base64String = resizedImage.split(',')[1];
 
                 setPreviewAvatar(resizedImage);
