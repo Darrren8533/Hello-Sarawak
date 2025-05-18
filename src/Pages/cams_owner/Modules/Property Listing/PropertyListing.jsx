@@ -12,7 +12,7 @@ import Status from '../../../../Component/Status/Status';
 import { FaEye} from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-
+import Loader from '../../../../Component/Loader/Loader';
 
 const PropertyListing = () => {
     const [searchKey, setSearchKey] = useState('');

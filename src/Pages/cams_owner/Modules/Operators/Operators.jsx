@@ -18,6 +18,7 @@ import '../../../../Component/Filter/Filter.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 import '../Operators/Operators.css';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import Loader from '../../../../Component/Loader/Loader';
 
 
 const Operators = () => {

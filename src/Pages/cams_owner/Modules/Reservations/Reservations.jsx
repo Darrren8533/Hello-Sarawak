@@ -14,6 +14,7 @@ import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
 import '../../../../Component/Filter/Filter.css';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
+import Loader from '../../../../Component/Loader/Loader';
 
 const Reservations = () => {
     const [searchKey, setSearchKey] = useState('');
