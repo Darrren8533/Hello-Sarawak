@@ -201,7 +201,9 @@ const Reservations = () => {
 
             <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-            {isLoading && <div>Loading reservations...</div>}
+            {isLoading && <div className="loader-box">
+                <Loader />
+            </div>}
             
             {isError && (
                 <Alert 

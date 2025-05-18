@@ -212,7 +212,9 @@ const PropertyListing = () => {
 
             <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-            {isLoading && <div>Loading properties...</div>}
+            {isLoading && <div className="loader-box">
+                <Loader />
+            </div>}
             
             {isError && (
                 <Alert type="error" message={`Error: ${error.message || 'Failed to load properties'}`} />

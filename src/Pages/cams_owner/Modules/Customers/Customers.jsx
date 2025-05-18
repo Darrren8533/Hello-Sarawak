@@ -15,6 +15,7 @@ import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 import './Customers.css';
+import Loader from '../../../../Component/Loader/Loader';
 
 const Customers = () => {
     const [searchKey, setSearchKey] = useState('');
@@ -175,7 +176,9 @@ const Customers = () => {
             </div>
 
             {isLoading ? (
-                <div className="loading-container">Loading customer data...</div>
+                <div className="loader-box">
+                    <Loader />
+                </div>
             ) : (
                 <PaginatedTable
                     data={filteredCustomers}
