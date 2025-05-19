@@ -18,7 +18,7 @@
     object-fit: cover;
 }
 
-.status-dot {
+.user-status-dot {
     position: absolute;
     bottom: 4px;
     right: 0;
