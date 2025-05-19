@@ -995,22 +995,18 @@ export const getCoordinates = async (location) => {
 };
 
 // Assign Role
-export const assignRole = async ({ userId, role }) => {
+export const assignRole = async (userid, role) => {
   const creatorid = localStorage.getItem("userid");
   const creatorUsername = localStorage.getItem("username");
   
   try {
     const response = await fetch(
-      `${API_URL}/users/assignRole?creatorid=${encodeURIComponent(creatorid)}&creatorUsername=${encodeURIComponent(creatorUsername)}`,
+      `${API_URL}/users/assignRole/${userid}/${role}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userid: userId,
-          role,
-        }),
+        }
       }
     );
 
@@ -1019,8 +1015,7 @@ export const assignRole = async ({ userId, role }) => {
       throw new Error(errorData.message || "Failed to assign role");
     }
 
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (err) {
     console.error("API error in assignRole:", err);
     throw err;
