@@ -68,7 +68,10 @@ const Operators = () => {
   // Role assignment mutation
   const assignRoleMutation = useMutation({
     mutationFn: async ({ userId, role }) => {
-      const response = await fetch(`${API_URL}/users/assignRole`, {
+      const creatorid = localStorage.getItem("userid");
+      const creatorUsername = localStorage.getItem("username");
+      
+      const response = await fetch(`${API_URL}/users/assignRole?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
