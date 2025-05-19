@@ -996,18 +996,21 @@ export const getCoordinates = async (location) => {
 
 // Assign Role
 export const assignRole = async ({ userId, role }) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
   try {
-    const creatorid = localStorage.getItem("userid");
-    const creatorUsername = localStorage.getItem("username");
-
     const response = await fetch(
-      `${API_URL}/users/assignRole?creatorid=${creatorid}&creatorUsername=${creatorUsername}`,
+      `${API_URL}/users/assignRole?creatorid=${encodeURIComponent(creatorid)}&creatorUsername=${encodeURIComponent(creatorUsername)}`,
       {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ userid: userId, role }),
+        body: JSON.stringify({
+          userid: userId,
+          role,
+        }),
       }
     );
 
@@ -1018,9 +1021,9 @@ export const assignRole = async ({ userId, role }) => {
 
     const data = await response.json();
     return data;
-  } catch (error) {
-    console.error("API error in assignRole:", error);
-    throw error;
+  } catch (err) {
+    console.error("API error in assignRole:", err);
+    throw err;
   }
 };
 
