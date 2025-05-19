@@ -80,7 +80,7 @@ const Customers = () => {
     const assignRoleMutation = useMutation({
       mutationFn: ({ userId, role }) => assignRole(userId, role),
       onSuccess: (data, variables) => {
-        queryClient.invalidateQueries(['operators']);
+        queryClient.invalidateQueries(['customers']);
         setShowRoleModal(false);
         displayToast(
           'success',
