@@ -67,21 +67,19 @@ const Operators = () => {
 
   // Role assignment mutation
   const assignRoleMutation = useMutation({
-  mutationFn: async ({ userId, role }) => {
-    return await assignRole(userId, role);
-  },
-  onSuccess: (data, variables) => {
-    queryClient.invalidateQueries({ queryKey: ['operators'] });
-    setShowRoleModal(false);
-    displayToast(
-      'success',
-      `Successfully assigned ${variables.role} role to ${roleOperator.username}`
-    );
-  },
-  onError: (error) => {
-    displayToast('error', `Error assigning role: ${error.message}`);
-  }
-});
+    mutationFn: ({ userId, role }) => assignRole(userId, role),
+    onSuccess: (data, variables) => {
+      queryClient.invalidateQueries(['operators']);
+      setShowRoleModal(false);
+      displayToast(
+        'success',
+        `Successfully assigned ${variables.role} role to ${roleOperator.username}`
+      );
+    },
+    onError: (error) => {
+      displayToast('error', `Error assigning role: ${error.message}`);
+    }
+  });
 
   const handleApplyFilters = () => {
     setAppliedFilters({ role: selectedRole });
