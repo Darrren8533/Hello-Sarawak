@@ -96,7 +96,7 @@ const UserActivityCell = ({ user }) => {
                     className="table-user-avatar"
                     onError={handleImageError}
                 />
-                <span className={`status-dot ${statusClass}`} />
+                <span className={`user-status-dot ${statusClass}`} />
             </div>
             <span className="table-user-username">{user.username || 'N/A'}</span>
         </div>
