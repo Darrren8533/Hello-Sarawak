@@ -84,7 +84,7 @@ const Customers = () => {
         setShowRoleModal(false);
         displayToast(
           'success',
-          `Successfully assigned ${variables.role} role to ${roleOperator.username}`
+          `Successfully assigned ${variables.role} role to ${roleCustomer.username}`
         );
       },
       onError: (error) => {
