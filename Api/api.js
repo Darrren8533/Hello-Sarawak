@@ -994,34 +994,6 @@ export const getCoordinates = async (location) => {
   throw new Error('Location not found');
 };
 
-// Assign Role
-export const assignRole = async (userid, role) => {
-  const creatorid = localStorage.getItem("userid");
-  const creatorUsername = localStorage.getItem("username");
-  
-  try {
-    const response = await fetch(
-      `${API_URL}/users/assignRole/${userid}/${role}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        }
-      }
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to assign role");
-    }
-
-    return await response.json();
-  } catch (err) {
-    console.error("API error in assignRole:", err);
-    throw err;
-  }
-};
-
 // Fetch Audit Trails
 export const auditTrails = async (userid) => {
   try {
