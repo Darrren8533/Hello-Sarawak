@@ -690,6 +690,27 @@ export const fetchCart = async () => {
   }
 };
 
+// Get property owner's PayPal ID
+export const getPropertyOwnerPayPalId = async (propertyId) => {
+  try {
+    const response = await fetch(`${API_URL}/property/owner-paypal/${propertyId}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch property owner PayPal ID');
+    }
+    
+    const data = await response.json();
+
+    return {
+      payPalId: data.payPalId,
+      ownerName: data.ownerName
+    };
+  } catch (error) {
+    console.error('API error fetching PayPal ID:', error);
+    throw error;
+  }
+};
+
 // Remove Reservation
 export const removeReservation = async (reservationid) => {
   const creatorid = localStorage.getItem("userid");
