@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { fetchOperators } from '../../../../../Api/api';
+import { fetchOperators, assignRole } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
@@ -67,40 +67,21 @@ const Operators = () => {
 
   // Role assignment mutation
   const assignRoleMutation = useMutation({
-    mutationFn: async ({ userId, role }) => {
-      const creatorid = localStorage.getItem("userid");
-      const creatorUsername = localStorage.getItem("username");
-      
-      const response = await fetch(`${API_URL}/users/assignRole?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userid: userId,
-          role: role
-        }),
-      });
-      
-      const data = await response.json();
-      if (!data.success) {
-        throw new Error(data.message || 'Failed to assign role');
-      }
-      return data;
-    },
-    onSuccess: (data, variables) => {
-      // Invalidate and refetch
-      queryClient.invalidateQueries({ queryKey: ['operators'] });
-      setShowRoleModal(false);
-      displayToast(
-        'success', 
-        `Successfully assigned ${variables.role} role to ${roleOperator.username}`
-      );
-    },
-    onError: (error) => {
-      displayToast('error', `Error assigning role: ${error.message}`);
-    }
-  });
+  mutationFn: async ({ userId, role }) => {
+    return await assignRole(userId, role);
+  },
+  onSuccess: (data, variables) => {
+    queryClient.invalidateQueries({ queryKey: ['operators'] });
+    setShowRoleModal(false);
+    displayToast(
+      'success',
+      `Successfully assigned ${variables.role} role to ${roleOperator.username}`
+    );
+  },
+  onError: (error) => {
+    displayToast('error', `Error assigning role: ${error.message}`);
+  }
+});
 
   const handleApplyFilters = () => {
     setAppliedFilters({ role: selectedRole });
