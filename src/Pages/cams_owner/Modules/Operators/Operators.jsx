@@ -224,11 +224,11 @@ const Operators = () => {
 
       <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-      {isLoading && 
+      {isLoading && (
         <div className="loader-box">
           <Loader />
         </div>
-      }
+      )}
       
       {isError && (
         <Alert type="error" message={`Error: ${error.message || 'Failed to load operators'}`} />
