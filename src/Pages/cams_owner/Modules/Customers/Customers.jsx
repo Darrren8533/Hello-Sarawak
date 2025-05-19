@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { fetchCustomers } from '../../../../../Api/api';
+import { fetchCustomers, assignRole } from '../../../../../Api/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
@@ -78,34 +78,18 @@ const Customers = () => {
 
     // Using React Query mutation for role assignment
     const assignRoleMutation = useMutation({
-        mutationFn: async ({ userId, role }) => {
-            const response = await fetch(`${API_URL}/users/assignRole`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    userid: userId,
-                    role: role
-                }),
-            });
-            
-            const data = await response.json();
-            if (!data.success) {
-                throw new Error(data.message || 'Failed to assign role');
-            }
-            return data;
-        },
-        onSuccess: () => {
-            // Invalidate and refetch the customers query
-            queryClient.invalidateQueries({ queryKey: ['customers'] });
-            setShowRoleModal(false);
-            displayToast('success', `Successfully assigned ${selectedRole} role to ${roleCustomer.username}`);
-        },
-        onError: (error) => {
-            console.error('Error assigning role:', error);
-            displayToast('error', `Failed to assign role: ${error.message || 'Unknown error'}`);
-        }
+      mutationFn: ({ userId, role }) => assignRole(userId, role),
+      onSuccess: (data, variables) => {
+        queryClient.invalidateQueries(['operators']);
+        setShowRoleModal(false);
+        displayToast(
+          'success',
+          `Successfully assigned ${variables.role} role to ${roleOperator.username}`
+        );
+      },
+      onError: (error) => {
+        displayToast('error', `Error assigning role: ${error.message}`);
+      }
     });
 
     const handleRoleSubmit = async () => {
