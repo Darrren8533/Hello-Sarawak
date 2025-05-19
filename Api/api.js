@@ -1019,28 +1019,29 @@ export const getCoordinates = async (location) => {
 export const assignRole = async (userid, role) => {
   const creatorid = localStorage.getItem("userid");
   const creatorUsername = localStorage.getItem("username");
-  
-  try {
-    const response = await fetch(
-      `${API_URL}/users/assignRole/${userid}/${role}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        }
-      }
-    );
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to assign role");
+  const res = await fetch(
+    `${API_URL}/users/assignRole/${userid}/${role}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
     }
+  );
 
-    return await response.json();
-  } catch (err) {
-    console.error("API error in assignRole:", err);
-    throw err;
+  const text = await res.text();
+  let data;
+
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error(`Server returned unexpected response:\n${text}`);
   }
+
+  if (!res.ok) {
+    throw new Error(data.message || JSON.stringify(data));
+  }
+
+  return data;
 };
 
 // Fetch Audit Trails
