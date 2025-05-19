@@ -23,7 +23,7 @@ const Cart = () => {
   const [selectedReservation, setSelectedReservation] = useState(null);
   const [paymentStatus, setPaymentStatus] = useState('idle'); // idle, loading, success, error
   const [paymentError, setPaymentError] = useState('');
-  const [payPalClientId, setPayPalClientId] = useState('sb'); // 'sb' is the sandbox client ID
+  const [payPalClientId, setPayPalClientId] = useState(import.meta.env.VITE_PAYPAL_CLIENT_ID || 'AYJvR4a3Wr32N3bfYSsX1Am18FQhyXVhndhQUT2nmJ4I9GLmcL2kG5wIyt16IQ6EmP4xLj_SZtcdiaXF');
   const [propertyOwnerPayPalId, setPropertyOwnerPayPalId] = useState(null);
   const [propertyOwnerName, setPropertyOwnerName] = useState('');
   
@@ -452,26 +452,30 @@ const Cart = () => {
             ) : (
               <div className="payment-methods">
                 <div className="paypal-container">
-                  <PayPalScriptProvider options={{ 
-                    "client-id": payPalClientId,
-                    currency: "MYR",
-                    intent: "capture"
-                  }}>
-                    <PayPalButtons
-                      style={{
-                        layout: "vertical",
-                        color: "blue",
-                        shape: "rect",
-                        label: "pay"
-                      }}
-                      createOrder={createOrder}
-                      onApprove={(data, actions) => handlePayPalApprove(data, actions, selectedReservation.reservationid)}
-                      onError={handlePayPalError}
-                      onCancel={() => {
-                        console.log('Payment canceled by user');
-                      }}
-                    />
-                  </PayPalScriptProvider>
+                <PayPalScriptProvider options={{ 
+                  "client-id": payPalClientId,
+                  currency: "MYR",
+                  intent: "capture",
+                  components: "buttons", // Specify the components you need
+                  "disable-funding": "credit,card", // Optional: limit funding sources
+                  "data-order-id": selectedReservation?.reservationid // Help with tracking
+                }}>
+                  <PayPalButtons
+                    style={{
+                      layout: "vertical",
+                      color: "blue",
+                      shape: "rect",
+                      label: "pay"
+                    }}
+                    createOrder={createOrder}
+                    onApprove={handlePayPalApprove}
+                    onError={handlePayPalError}
+                    onCancel={() => {
+                      console.log('Payment canceled by user');
+                      setPaymentError('Payment was canceled. You can try again when ready.');
+                    }}
+                  />
+                </PayPalScriptProvider>
                   {paymentError && <p className="payment-error-message">{paymentError}</p>}
                 </div>
               </div>
