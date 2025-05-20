@@ -351,6 +351,12 @@
   gap: 15px;
 }
 
+.no-reviews {
+  color: #666;
+  font-size: 14px;
+  font-style: italic;
+}
+
 .rating-number {
   font-weight: 700;
   font-size: 16px;
@@ -359,7 +365,8 @@
 
 .property-price {
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  gap: 4px;
 }
 
 .price-amount {
@@ -372,6 +379,16 @@
   font-size: 0.85rem;
   color: #666;
   margin-left: 2px;
+}
+
+.status-label {
+  background-color: #ff4d4d;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: 160px;
 }
 
 .no-properties-message {
