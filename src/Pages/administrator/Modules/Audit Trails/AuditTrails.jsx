@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FaEye } from 'react-icons/fa';
+import { useQuery } from '@tanstack/react-query';
 import Filter from '../../../../Component/Filter/Filter';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
-import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown'; // Ensure this is imported
+import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
+import Loader from '../../../../Component/Loader/Loader';
 import { auditTrails } from '../../../../../Api/api';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -13,7 +15,6 @@ import '../../../../Component/Filter/Filter.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 
 const AuditTrails = () => {
-  const [auditTrailsLog, setAuditTrailsLog] = useState([]);
   const [searchKey, setSearchKey] = useState('');
   const [selectedActionType, setSelectedActionType] = useState('All');
   const [appliedFilters, setAppliedFilters] = useState({ actionType: 'All' });
@@ -21,18 +22,15 @@ const AuditTrails = () => {
 
   const userid = localStorage.getItem('userid');
 
-  useEffect(() => {
-    const fetchAuditTrails = async (userid) => {
-      try {
-        const auditTrailData = await auditTrails(userid);
-        setAuditTrailsLog(auditTrailData || []);
-      } catch (error) {
-        console.error('Failed to fetch Audit Trails Logs:', error);
-      }
-    };
-
-    fetchAuditTrails(userid);
-  }, [userid]);
+  // Replace useEffect with React Query
+  const { data: auditTrailsLog = [], isLoading } = useQuery({
+    queryKey: ['auditTrails', userid],
+    queryFn: () => auditTrails(userid),
+    onError: (error) => {
+      console.error('Failed to fetch Audit Trails Logs:', error);
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   const handleApplyFilters = () => {
     setAppliedFilters({ actionType: selectedActionType });
@@ -132,12 +130,18 @@ const AuditTrails = () => {
 
       <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-      <PaginatedTable
-        data={filteredLogs}
-        columns={columns}
-        rowKey={(log) => `${log.timestamp}-${log.audittrailid}`} 
-        enableCheckbox={false}
-      />
+      {isLoading ? (
+        <div className="loader-box">
+          <Loader />
+        </div>
+      ) : (
+        <PaginatedTable
+          data={filteredLogs}
+          columns={columns}
+          rowKey={(log) => `${log.timestamp}-${log.audittrailid}`}
+          enableCheckbox={false}
+        />
+      )}
 
       <Modal
         isOpen={!!selectedLog}
