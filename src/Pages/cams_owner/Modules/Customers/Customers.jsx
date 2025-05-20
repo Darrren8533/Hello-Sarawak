@@ -122,7 +122,6 @@ const Customers = () => {
             ),
         },
         { header: 'Email', accessor: 'uemail' },
-        { header: 'Phone', accessor: 'uphoneno' },
         {
             header: 'Role',
             accessor: 'usergroup',
