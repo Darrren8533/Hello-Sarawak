@@ -2,16 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import Sidebar from '../../Component/Sidebar/Sidebar';
 import Dashboard from './Modules/Dashboard/Dashboard';
+import Customers from './Modules/Customers/Customers';
 import PropertyListing from './Modules/Property Listing/PropertyListing';
 import Reservations from './Modules/Reservations/Reseravtions';
+import BooknPayLog from './Modules/BooknPay Log/BooknPayLog';
+import Finance from './Modules/Finance/Finances';
 import NoAccess from '../../Component/NoAccess/NoAccess';
 import Profile from './Modules/Profile/Profile';
 import AuditTrails from './Modules/Audit Trails/AuditTrails';
-import { FiCalendar, FiHome } from 'react-icons/fi';
+import '../../Component/MainContent/MainContent.css';
+import { FiCalendar, FiUsers, FiHome } from 'react-icons/fi';
 import { CgProfile } from "react-icons/cg";
+import { GoLog } from "react-icons/go";
 import { FaHotel } from 'react-icons/fa';
 import { MdHistory } from "react-icons/md";
-import '../../Component/MainContent/MainContent.css';
+import { VscGraphLine } from "react-icons/vsc";
 import { useQuery } from '@tanstack/react-query';
 import { fetchUserData } from '../../../Api/api';
 
@@ -78,9 +83,12 @@ const ModeratorDashboard = () => {
 
     const links = [
         { path: '/moderator_dashboard/dashboard', label: 'Dashboard', icon: <FiHome /> },
+        { path: '/moderator_dashboard/customers', label: 'Customer', icon: <FiUsers /> },
         { path: '/moderator_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel /> },
         { path: '/moderator_dashboard/reservations', label: 'Reservations', icon: <FiCalendar /> },
+        { path: '/moderator_dashboard/booknpay-log', label: 'BooknPayLog', icon: <GoLog /> },
         { path: '/moderator_dashboard/audit-trails', label: 'AuditTrails', icon: <MdHistory /> },
+        { path: '/moderator_dashboard/finance', label: 'Finance', icon: <VscGraphLine /> },
         { path: '/moderator_dashboard/profile', label: 'Profile', icon: <CgProfile /> },
     ];
 
@@ -97,9 +105,12 @@ const ModeratorDashboard = () => {
                 <Routes>
                     <Route path="/" element={<Navigate to="dashboard" replace />} />
                     <Route path="dashboard" element={<Dashboard />} />
+                    <Route path="customers" element={<Customers />} />
                     <Route path="property-listing" element={<PropertyListing />} />
                     <Route path="reservations" element={<Reservations/>} />
+                    <Route path="booknpay-log" element={<BooknPayLog />} />
                     <Route path="audit-trails" element={<AuditTrails />} />
+                    <Route path="finance" element={<Finance />} />
                     <Route path="profile" element={<Profile />} />
                     <Route path="*" element={<NoAccess />} />
                 </Routes>
