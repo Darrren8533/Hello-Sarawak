@@ -6,28 +6,26 @@ import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable'
 import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
-import Loader from '../../../../Component/Loader/Loader';
-import { auditTrails } from '../../../../../Api/api';
+import Loader from '../../../../Component/Loader/Loader'; // Import the Loader component
+import { fetchBookLog } from '../../../../../Api/api';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
 import '../../../../Component/Filter/Filter.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 
-const AuditTrails = () => {
+const BooknPayLog = () => {
   const [searchKey, setSearchKey] = useState('');
   const [selectedActionType, setSelectedActionType] = useState('All');
   const [appliedFilters, setAppliedFilters] = useState({ actionType: 'All' });
   const [selectedLog, setSelectedLog] = useState(null);
 
-  const userid = localStorage.getItem('userid');
-
   // Replace useEffect with React Query
-  const { data: auditTrailsLog = [], isLoading } = useQuery({
-    queryKey: ['auditTrails', userid],
-    queryFn: () => auditTrails(userid),
+  const { data: logs = [], isLoading } = useQuery({
+    queryKey: ['bookLogs'],
+    queryFn: fetchBookLog,
     onError: (error) => {
-      console.error('Failed to fetch Audit Trails Logs:', error);
+      console.error('Failed to fetch Book & Pay Logs:', error);
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
@@ -54,18 +52,13 @@ const AuditTrails = () => {
   ];
 
   const displayLabels = {
-    audittrailid: 'Audit Trail ID',
-    entityid: 'Entity ID',
-    entitytype: 'Entity Type',
+    userid: 'UID',
     timestamp: 'Timestamp',
     action: 'Action',
-    actiontype: 'Action Type',
-    creatorid: 'Creator ID',
-    actionedby: 'Actioned By',
   };
 
-  const filteredLogs = auditTrailsLog.filter((log) => {
-    const searchInFields = `${log.userid} ${log.entityid} ${log.actiontype}`
+  const filteredLogs = logs.filter((log) => {
+    const searchInFields = `${log.userid} ${log.action}`
       .toLowerCase()
       .includes(searchKey.toLowerCase());
 
@@ -79,13 +72,9 @@ const AuditTrails = () => {
   const handleAction = (action, log) => {
     if (action === 'view') {
       const essentialFields = {
-        creatorid: log.userid || 'N/A',
-        actionedby: log.username || 'N/A',
-        entityid: log.entityid || 'N/A',
-        entitytype: log.entitytype || 'N/A',
+        userid: log.userid || 'N/A',
         timestamp: log.timestamp || 'N/A',
         action: log.action || 'N/A',
-        actiontype: log.actiontype || 'N/A',
       };
       setSelectedLog(essentialFields);
     }
@@ -96,14 +85,9 @@ const AuditTrails = () => {
   ];
 
   const columns = [
-    {
-      header: 'Entity[Entity ID]',
-      accessor: 'entityInfo',
-      render: (log) => `${log.entitytype}[${log.entityid}]`,
-    },
-    { header: 'Action', accessor: 'action' },
-    { header: 'Actioned By', accessor: 'username' },
+    { header: 'UID', accessor: 'userid' },
     { header: 'Timestamp', accessor: 'timestamp' },
+    { header: 'Action', accessor: 'action' },
     {
       header: 'Actions',
       accessor: 'actions',
@@ -120,11 +104,11 @@ const AuditTrails = () => {
   return (
     <div>
       <div className="header-container">
-        <h1 className="dashboard-page-title">Audit Trails</h1>
+        <h1 className="dashboard-page-title">Book & Pay Log</h1>
         <SearchBar
           value={searchKey}
           onChange={(newValue) => setSearchKey(newValue)}
-          placeholder="Search audit trail..."
+          placeholder="Search logs..."
         />
       </div>
 
@@ -138,14 +122,14 @@ const AuditTrails = () => {
         <PaginatedTable
           data={filteredLogs}
           columns={columns}
-          rowKey={(log) => `${log.timestamp}-${log.audittrailid}`}
+          rowKey={(log) => `${log.timestamp}-${log.userid}`}
           enableCheckbox={false}
         />
       )}
 
       <Modal
         isOpen={!!selectedLog}
-        title="Audit Trail Details"
+        title="Log Details"
         data={selectedLog || {}}
         labels={displayLabels}
         onClose={() => setSelectedLog(null)}
@@ -154,4 +138,4 @@ const AuditTrails = () => {
   );
 };
 
-export default AuditTrails;
+export default BooknPayLog;
