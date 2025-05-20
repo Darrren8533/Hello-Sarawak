@@ -4,7 +4,7 @@ import { fetchGoogleUserData, fetchUserData, updateProfile, uploadAvatar } from 
 import Toast from '../Toast/Toast';
 import Loader from '../../Component/Loader/Loader';
 import './BackUserProfile.css';
-import { FaUser, FaLock, FaCamera, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaUser, FaLock, FaCamera, FaEye, FaEyeSlash, FaPaypal } from 'react-icons/fa';
 import { CountryDropdown } from 'react-country-region-selector';
 
 const BackUserProfile = () => {
@@ -20,6 +20,7 @@ const BackUserProfile = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [decryptedPassword, setDecryptedPassword] = useState('');
     const [passwordInput, setPasswordInput] = useState('');
+    const [avatarKey, setAvatarKey] = useState(0); // Added missing state variable
 
     const userid = localStorage.getItem('userid');
     const googleAccessToken = localStorage.getItem('googleAccessToken');
@@ -48,7 +49,6 @@ const BackUserProfile = () => {
                 setDecryptedPassword(data.password);
                 setPasswordInput(data.password);
                 localStorage.setItem('plainPassword', data.password);
-                console.log("decryptedPassword:", data.password);
             } else {
                 setDecryptedPassword('');
                 setPasswordInput('');
@@ -56,6 +56,10 @@ const BackUserProfile = () => {
         } catch (error) {
             console.error('Error fetching decrypted password:', error);
         }
+    };
+
+    const isPayPalEligible = () => {
+        return userData.usergroup === 'Administrator' || userData.usergroup === 'Moderator';
     };
 
     useEffect(() => {
@@ -97,6 +101,8 @@ const BackUserProfile = () => {
                     udob: data.udob || 'Not Provided',
                     utitle: data.utitle || 'Not Provided',
                     ucountry: data.ucountry || 'Not Provided',
+                    payPalID: data.paypalid || 'Not Provided',
+                    userGroup: data.usergroup || '',
                     ...data,
                     password: googleAccessToken ? '' : (decryptedPassword || ''),
                 };
@@ -214,14 +220,15 @@ const BackUserProfile = () => {
 
                     const updatedData = await fetchUserData(userid);
                     setUserData(updatedData);
-                    setOriginalUserData(updatedData);
                     let updatedAvatar = updatedData.uimage?.startsWith('http')
                         ? updatedData.uimage
                         : `data:image/jpeg;base64,${updatedData.uimage}` || '/avatar.png';
                     setPreviewAvatar(updatedAvatar);
                     localStorage.setItem("uimage", updatedAvatar);
 
-                    eventBus.emit('avatarUpdated', updatedAvatar);
+                    if (typeof eventBus !== 'undefined' && eventBus.emit) {
+                        eventBus.emit('avatarUpdated', updatedAvatar);
+                    }
                 } catch (error) {
                     displayToast('error', error.message || 'Failed to update avatar');
                 }
@@ -265,6 +272,12 @@ const BackUserProfile = () => {
         }
     };
     
+    const validatePayPalEmail = (email) => {
+        // Basic validation for PayPal email format
+        const paypalRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return paypalRegex.test(email);
+    };
+
     const handleUpdate = async () => {
         const nameRegex = /^[A-Za-z\s]*$/;
         const usernameRegex = /^[a-zA-Z0-9_]{6,15}$/;
@@ -293,6 +306,10 @@ const BackUserProfile = () => {
                 }
                 if (payload.uemail && !emailRegex.test(payload.uemail)) {
                     throw new Error('Please enter a valid email address');
+                }
+                // Validate PayPal ID if provided and user is eligible
+                if (isPayPalEligible() && payload.payPalID && !validatePayPalEmail(payload.payPalID)) {
+                    throw new Error('Please enter a valid PayPal email address');
                 }
             } else if (activeTab === 'security') {
                 if (payload.username && !usernameRegex.test(payload.username)) {
@@ -383,6 +400,7 @@ const BackUserProfile = () => {
                             </div>
                             <div className="back-user-name">
                                 <h2>{userData.ufirstname === 'Not Provided' ? '' : userData.ufirstname} {userData.ulastname === 'Not Provided' ? '' : userData.ulastname}</h2>
+                                {userData.userGroup && <p className="user-group-label">{userData.userGroup}</p>}
                             </div>
                             <button type="button" className="back-profile-save-avatar-button" onClick={handleAvatarUpload}>
                                 Save Avatar
@@ -398,6 +416,11 @@ const BackUserProfile = () => {
                             <button className={`back-profile-tab-button ${activeTab === 'security' ? 'active' : ''}`} onClick={() => setActiveTab('security')}>
                                 <FaLock /> Security
                             </button>
+                            {isPayPalEligible() && (
+                                <button className={`back-profile-tab-button ${activeTab === 'payment' ? 'active' : ''}`} onClick={() => setActiveTab('payment')}>
+                                    <FaPaypal /> Payment Info
+                                </button>
+                            )}
                         </div>
 
                         <div className="back-profile-tab-content">
@@ -547,6 +570,33 @@ const BackUserProfile = () => {
                                     </div>
                                     <button type="button" className="back-profile-update-button" onClick={handleUpdate}>
                                         Update Profile
+                                    </button>
+                                </form>
+                            )}
+
+                            {activeTab === 'payment' && isPayPalEligible() && (
+                                <form className="back-profile-form">
+                                    <div className="back-profile-form-group">
+                                        <label>PayPal Email</label>
+                                        <div className="back-paypal-input-wrapper">
+                                            <input 
+                                                type="email" 
+                                                name="payPalID" 
+                                                value={userData.payPalID === 'Not Provided' ? '' : userData.payPalID} 
+                                                onChange={handleInputChange}
+                                                onFocus={handleFocus}
+                                                onBlur={handleBlur}
+                                                placeholder="example@example.com"
+                                                className="back-paypal-input"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="back-profile-payment-info">
+                                        <h3>Payment Information</h3>
+                                        <p>As a {userData.userGroup}, you are required to provide your PayPal account for receiving payments.</p>
+                                    </div>
+                                    <button type="button" className="back-profile-update-button" onClick={handleUpdate}>
+                                        Update PayPal Information
                                     </button>
                                 </form>
                             )}
