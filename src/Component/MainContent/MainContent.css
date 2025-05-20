@@ -31,7 +31,7 @@
 }
 
 .sidebar-collapsed .dashboard-content {
-  margin-left: 70px; 
+  margin-left: 0; 
 }
 
 @media (max-width: 768px) {
