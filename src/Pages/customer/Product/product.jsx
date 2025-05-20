@@ -705,12 +705,18 @@ const Product = () => {
                           <div className="property-location">
                             <h4>{property.propertyaddress}</h4>
                             <div className="tour-property-rating">
-                              <span className="rating-number">
-                                {Number.isInteger(property.rating) 
-                                  ? property.rating.toFixed(1)
-                                  : property.rating.toFixed(2).replace(/\.?0+$/, '')}
-                              </span>
-                              <FaStar />
+                              {property.rating ? (
+                                <>
+                                  <span className="rating-number">
+                                    {Number.isInteger(property.rating) 
+                                      ? property.rating.toFixed(1)
+                                      : property.rating.toFixed(2).replace(/\.?0+$/, '')}
+                                  </span>
+                                  <FaStar />
+                                </>
+                              ) : (
+                                <span className="no-reviews">No reviews</span>
+                              )}
                             </div>
                           </div>
                           <span className="property-cluster">{property.clustername}</span>
@@ -718,6 +724,9 @@ const Product = () => {
                             <div className="property-price">
                               <span className="price-amount">${property.normalrate}</span>
                               <span className="price-period">/night</span>
+                              {property.propertystatus === 'Unavailable' && (
+                                <span className="status-label">FULL</span>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -746,12 +755,18 @@ const Product = () => {
                           <div className="property-location">
                             <h4>{property.propertyaddress}</h4>
                             <div className="tour-property-rating">
-                              <span className="rating-number">
-                                {Number.isInteger(property.rating) 
-                                  ? property.rating.toFixed(1)
-                                  : property.rating.toFixed(2).replace(/\.?0+$/, '')}
-                              </span>
-                              <FaStar/>
+                              {property.rating ? (
+                                <>
+                                  <span className="rating-number">
+                                    {Number.isInteger(property.rating) 
+                                      ? property.rating.toFixed(1)
+                                      : property.rating.toFixed(2).replace(/\.?0+$/, '')}
+                                  </span>
+                                  <FaStar />
+                                </>
+                              ) : (
+                                <span className="no-reviews">No reviews</span>
+                              )}
                             </div>
                           </div>
                           <span className="property-cluster">{property.clustername}</span>
@@ -759,6 +774,9 @@ const Product = () => {
                             <div className="property-price">
                               <span className="price-amount">${property.normalrate}</span>
                               <span className="price-period">/night</span>
+                              {property.propertystatus === 'Unavailable' && (
+                                <span className="status-label">FULL</span>
+                              )}
                             </div>
                           </div>
                         </div>
