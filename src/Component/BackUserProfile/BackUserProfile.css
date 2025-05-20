@@ -303,6 +303,14 @@
     font-weight: 500;
     cursor: pointer;
   }
+
+  .back-profile-payment-info{
+    margin-top: 15px;
+  }
+
+ .back-profile-form{
+  justify-content: space-between;
+ }
   
 
   @media screen and (max-width: 992px) {
