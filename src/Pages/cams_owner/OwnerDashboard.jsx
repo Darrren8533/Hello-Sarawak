@@ -6,6 +6,7 @@ import Customers from './Modules/Customers/Customers';
 import Operators from './Modules/Operators/Operators';
 import PropertyListing from './Modules/Property Listing/PropertyListing';
 import Reservations from './Modules/Reservations/Reservations';
+import BooknPayLog from './Modules/BooknPay Log/BooknPayLog';
 import Finances from './Modules/Finances/Finances';
 import AuditTrails from './Modules/Audit Trails/AuditTrails';
 import Profile from './Modules/Profile/Profile';
@@ -13,6 +14,7 @@ import Cluster from './Modules/Cluster/Cluster';
 import NoAccess from '../../Component/NoAccess/NoAccess';
 import { FiHome, FiUsers, FiCalendar, FiCreditCard, FiBarChart, FiMessageSquare, FiFileText } from 'react-icons/fi';
 import { FaHotel, FaUserTie } from 'react-icons/fa';
+import { GoLog } from "react-icons/go";
 import { RiAdminLine } from 'react-icons/ri';
 import '../../Component/MainContent/MainContent.css';
 
@@ -57,6 +59,7 @@ import '../../Component/MainContent/MainContent.css';
     { path: '/owner_dashboard/operators', label: 'Admin/Moderator', icon: <FaUserTie /> },
     { path: '/owner_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel /> },
     { path: '/owner_dashboard/reservations', label: 'Reservations', icon: <FiCalendar /> },
+    { path: '/owner_dashboard/booknpay-log', label: 'BooknPayLog', icon: <GoLog /> },
     { path: '/owner_dashboard/finances', label: 'Finances', icon: <FiCreditCard /> },
     { path: '/owner_dashboard/audit-trails', label: 'Audit Trails', icon: <FiFileText /> },
     { path: '/owner_dashboard/profile', label: 'Profile', icon: <FiUsers /> },
@@ -85,6 +88,7 @@ import '../../Component/MainContent/MainContent.css';
           <Route path="operators" element={<Operators />} />
           <Route path="property-listing" element={<PropertyListing />} />
           <Route path="reservations" element={<Reservations />} />
+          <Route path="booknpay-log" element={<BooknPayLog />} />
           <Route path="finances" element={<Finances />} />
           <Route path="audit-trails" element={<AuditTrails />} />
           {/* <Route path="cluster" element={<Cluster />} /> */}
