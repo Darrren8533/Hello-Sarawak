@@ -26,10 +26,13 @@ const DashboardCard = () => {
         totalRevenue: 0,
     });
     const [userid, setUserid] = useState('');
+    const [userGroup, setUserGroup] = useState('');
 
     useEffect(() => {
         const storedUserId = localStorage.getItem('userid');
+        const storedUserGroup = localStorage.getItem('usergroup');
         if (storedUserId) setUserid(storedUserId);
+        if (storedUserGroup) setUserGroup(storedUserGroup);
     }, []);
 
     // Fetch customers
@@ -100,7 +103,9 @@ const DashboardCard = () => {
                 totalProperties: properties.properties.length,
                 totalReservations: Array.isArray(reservations) ? reservations.length : 0,
                 totalRevenue: finance.monthlyData?.[0]?.monthlyrevenue || 0,
+                
             });
+            
         }
     }, [
         customers, moderators, administrators, properties, reservations, finance,
@@ -114,61 +119,74 @@ const DashboardCard = () => {
     const formatCurrency = (amount) => `MYR ${amount.toFixed(2)}`;
     const formatPercentage = (value) => `${value.toFixed(1)}%`;
 
+    const getNavigationPath = (path) => {
+        switch (userGroup) {
+            case 'Moderator':
+                return `/moderator_dashboard${path}`;
+            case 'Administrator':
+                return `/administrator_dashboard${path}`;
+            case 'Owner':
+                return `/owner_dashboard${path}`;
+            default:
+                return `/moderator_dashboard${path}`;
+        }
+    };
+
     const cardData = [
         {
             title: 'Total Users',
             value: stats.totalUsers,
             icon: <FiUsers />,
             iconClass: 'user-icon',
-            onDetails: () => navigate('/moderator_dashboard/customers'),
+            onDetails: () => navigate(getNavigationPath('/customers')),
         },
         {
             title: 'Total Properties',
             value: stats.totalProperties,
             icon: <FaBuilding />,
             iconClass: 'property-icon',
-            onDetails: () => navigate('/moderator_dashboard/property-listing'),
+            onDetails: () => navigate(getNavigationPath('/property-listing')),
         },
         {
             title: 'Total Reservations',
             value: stats.totalReservations,
             icon: <FiCalendar />,
             iconClass: 'reservation-icon',
-            onDetails: () => navigate('/moderator_dashboard/reservations'),
+            onDetails: () => navigate(getNavigationPath('/reservations')),
         },
         {
             title: 'Occupancy Rate',
             value: formatPercentage(occupancyRate.monthlyData?.[0]?.occupancy_rate || 0),
             icon: <FaChartLine />,
             iconClass: 'occupancy-icon',
-            onDetails: () => navigate('/moderator_dashboard/finance'),
+            onDetails: () => navigate(getNavigationPath('/finance')),
         },
         {
             title: 'RevPAR',
             value: formatCurrency(revPAR?.rate || 0),
             icon: <FaRegCreditCard />,
             iconClass: 'revpar-icon',
-            onDetails: () => navigate('/moderator_dashboard/finance'),
+            onDetails: () => navigate(getNavigationPath('/finance')),
         },
         {
             title: 'Total Revenue',
             value: formatCurrency(stats.totalRevenue),
             icon: <FiDollarSign />,
             iconClass: 'revenue-icon',
-            onDetails: () => navigate('/moderator_dashboard/finance'),
+            onDetails: () => navigate(getNavigationPath('/finance')),
         },
         {
             title: 'Guest Satisfaction',
             value: `${guestSatisfactionScore?.score?.toFixed(1) || "0.0"}/5.0`,
             icon: <FaChartBar />,
             iconClass: 'satisfaction-icon',
-            onDetails: () => navigate('/moderator_dashboard/finance'),
+            onDetails: () => navigate(getNavigationPath('/finance')),
         },
     ];
 
     if (isLoading) {
         return (
-            <div className="dashboard-loading">
+            <div className="loader-box">
                 <Loader />
             </div>
         );
