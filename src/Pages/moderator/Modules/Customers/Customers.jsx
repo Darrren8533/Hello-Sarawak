@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { fetchCustomers, assignRole } from '../../../../../Api/api';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { fetchCustomers } from '../../../../../Api/api';
+import { useQuery } from '@tanstack/react-query';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Toast from '../../../../Component/Toast/Toast';
 import Role from '../../../../Component/Role/Role';
-import RoleManager from '../../../../Component/RoleManager/RoleManager';
 import UserActivityCell from '../../../../Component/UserActivityCell/UserActivityCell';
-import { FaEye, FaUserTag } from 'react-icons/fa';
+import { FaEye } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
@@ -20,16 +19,10 @@ import Loader from '../../../../Component/Loader/Loader';
 const Customers = () => {
     const [searchKey, setSearchKey] = useState('');
     const [selectedCustomer, setSelectedCustomer] = useState(null);
-    const [showRoleModal, setShowRoleModal] = useState(false);
-    const [roleCustomer, setRoleCustomer] = useState(null);
-    const [selectedRole, setSelectedRole] = useState('');
     const [toastMessage, setToastMessage] = useState('');
     const [showToast, setShowToast] = useState(false);
     const [toastType, setToastType] = useState('');
     const API_URL = import.meta.env.VITE_API_URL;
-    const queryClient = useQueryClient();
-    
-    const roles = ['Customer', 'Moderator', 'Administrator'];
 
     // Using React Query to fetch customers data
     const { data: customers = [], isLoading, error } = useQuery({
@@ -65,50 +58,17 @@ const Customers = () => {
                 country: customer.ucountry || 'N/A',
             };
             setSelectedCustomer(essentialFields);
-        } else if (action === 'assignRole') {
-            setRoleCustomer(customer);
-            setSelectedRole(customer.usergroup || 'Customer');
-            setShowRoleModal(true);
         }
-    };
-
-    const handleRoleChange = (e) => {
-        setSelectedRole(e.target.value);
-    };
-
-    // Using React Query mutation for role assignment
-    const assignRoleMutation = useMutation({
-      mutationFn: ({ userId, role }) => assignRole(userId, role),
-      onSuccess: (data, variables) => {
-        queryClient.invalidateQueries(['customers']);
-        setShowRoleModal(false);
-        displayToast(
-          'success',
-          `Successfully assigned ${variables.role} role to ${roleCustomer.username}`
-        );
-      },
-      onError: (error) => {
-        displayToast('error', `Error assigning role: ${error.message}`);
-      }
-    });
-
-    const handleRoleSubmit = async () => {
-        assignRoleMutation.mutate({ 
-            userId: roleCustomer.userid, 
-            role: selectedRole 
-        });
     };
 
     const customerDropdownItems = [
         { label: 'View Details', icon: <FaEye />, action: 'view' },
-        { label: 'Assign Role', icon: <FaUserTag />, action: 'assignRole' },
     ];
 
     const displayLabels = {
         firstName: "First Name",
         lastName: "Last Name",
         email: "Email",
-        phoneNo: "Phone Number",
         gender: "Gender",
         country: "Country"
     };
@@ -122,7 +82,6 @@ const Customers = () => {
             ),
         },
         { header: 'Email', accessor: 'uemail' },
-        { header: 'Phone', accessor: 'uphoneno' },
         {
             header: 'Role',
             accessor: 'usergroup',
@@ -130,7 +89,6 @@ const Customers = () => {
                <Role role={customer.usergroup || 'Customer'} />
             ),
         },
-        
         {
             header: 'Actions',
             accessor: 'actions',
@@ -178,17 +136,6 @@ const Customers = () => {
                 data={selectedCustomer || {}}
                 labels={displayLabels}
                 onClose={() => setSelectedCustomer(null)}
-            />
-            
-            <RoleManager
-                isOpen={showRoleModal}
-                user={roleCustomer}
-                roles={roles}
-                selectedRole={selectedRole}
-                onRoleChange={handleRoleChange}
-                onSubmit={handleRoleSubmit}
-                onClose={() => setShowRoleModal(false)}
-                isLoading={assignRoleMutation.isPending}
             />
         </div>
     );

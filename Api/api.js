@@ -72,7 +72,7 @@ export const propertiesListing = async (propertyData) => {
   const usergroup = localStorage.getItem("usergroup");
   
   try {
-    const response = await fetch(`${API_URL}/propertiesListing?usergroup=${usergroup}`, {
+    const response = await fetch(`${API_URL}/propertiesListing`, {
       method: 'POST',
       body: propertyData,
     });
