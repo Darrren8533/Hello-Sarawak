@@ -1,15 +1,14 @@
-/* Grid container for cards */
 .stats-grid {
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.5rem;
+    gap: 20px;
     padding: 1.5rem;
     max-width: 100%;
     box-sizing: border-box;
-    justify-content: center; /* Center the grid items */
+    justify-content: center;
   }
   
-  /* Individual card styling */
   .dashboard-card {
     background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);
     border-radius: 1rem;
@@ -25,14 +24,12 @@
     width: 360px;
   }
   
-  /* Hover effects */
   .dashboard-card:hover {
     box-shadow: 0 8px 32px rgba(30,34,90,0.18), 0 2px 8px rgba(30,34,90,0.10);
     transform: translateY(-4px) scale(1.025);
     border-color: #a5b4fc;
   }
   
-  /* Card header */
   .dashboard-card-header {
     display: flex;
     justify-content: space-between;
@@ -43,7 +40,6 @@
     font-weight: 600;
   }
   
-  /* Card value */
   .dashboard-card-value {
     font-size: 36px;
     font-weight: 800;
@@ -56,7 +52,6 @@
     white-space: nowrap;
   }
   
-  /* Card button */
   .dashboard-card-btn {
     width: 100%;
     padding: 0.75rem;
@@ -75,16 +70,11 @@
     box-shadow: 0 1px 4px rgba(99,102,241,0.08);
   }
 
-
-  
-  
-  /* Button hover */
   .dashboard-card-btn:hover {
     background: linear-gradient(90deg, #bdf094 0%, #87cd51 100%);
     box-shadow: 0 2px 8px rgba(99,102,241,0.13);
   }
   
-  /* Card icon */
   .dashboard-card-icon {
     width: 2.5rem;
     height: 2.5rem;
@@ -97,7 +87,6 @@
     box-shadow: 0 2px 8px rgba(99,102,241,0.07);
   }
   
-  /* Icon colors */
   .dashboard-card-icon.user-icon { color: #4f46e5; }
   .dashboard-card-icon.property-icon { color: #10b981; }
   .dashboard-card-icon.reservation-icon { color: #3b82f6; }
