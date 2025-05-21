@@ -101,7 +101,7 @@ const BackUserProfile = () => {
                     udob: data.udob || 'Not Provided',
                     utitle: data.utitle || 'Not Provided',
                     ucountry: data.ucountry || 'Not Provided',
-                    payPalID: data.paypalid || 'Not Provided',
+                    paypalid: data.paypalid || 'Not Provided',
                     userGroup: data.usergroup || '',
                     ...data,
                     password: googleAccessToken ? '' : (decryptedPassword || ''),
@@ -271,12 +271,6 @@ const BackUserProfile = () => {
             setIsLoading(false);
         }
     };
-    
-    const validatePayPalEmail = (email) => {
-        // Basic validation for PayPal email format
-        const paypalRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return paypalRegex.test(email);
-    };
 
     const handleUpdate = async () => {
         const nameRegex = /^[A-Za-z\s]*$/;
@@ -293,6 +287,7 @@ const BackUserProfile = () => {
             }, {});
             
             payload.userid = userid;
+            console.log('Full payload being sent:', payload);
 
             if (activeTab === 'account') {
                 if (payload.ufirstname && !nameRegex.test(payload.ufirstname)) {
@@ -307,15 +302,19 @@ const BackUserProfile = () => {
                 if (payload.uemail && !emailRegex.test(payload.uemail)) {
                     throw new Error('Please enter a valid email address');
                 }
-                // Validate PayPal ID if provided and user is eligible
-                if (isPayPalEligible() && payload.payPalID && !validatePayPalEmail(payload.payPalID)) {
-                    throw new Error('Please enter a valid PayPal email address');
-                }
-            } else if (activeTab === 'security') {
+            } 
+            
+            else if (activeTab === 'security') {
                 if (payload.username && !usernameRegex.test(payload.username)) {
                     throw new Error('Username must be 6-15 characters (letters, numbers, underscores)');
                 }
                 payload.password = passwordInput;
+            }
+
+            else if(activeTab == 'payment'){
+                    if (isPayPalEligible() && payload.paypalid && !emailRegex.test(payload.paypalid)) {
+                    throw new Error('Invalid PayPal email address');
+                }
             }
 
             const response = await updateProfile(payload);
@@ -581,8 +580,8 @@ const BackUserProfile = () => {
                                         <div className="back-paypal-input-wrapper">
                                             <input 
                                                 type="email" 
-                                                name="payPalID" 
-                                                value={userData.payPalID === 'Not Provided' ? '' : userData.payPalID} 
+                                                name="paypalid" 
+                                                value={userData.paypalid === 'Not Provided' ? '' : userData.paypalid} 
                                                 onChange={handleInputChange}
                                                 onFocus={handleFocus}
                                                 onBlur={handleBlur}
