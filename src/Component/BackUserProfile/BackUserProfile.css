@@ -65,7 +65,7 @@
     position: absolute;
     bottom: 8px;
     right: 8px;
-    background-color: #4285f4;
+    background-color: #87cd51;
     color: white;
     border-radius: 50%;
     padding: 8px;
@@ -82,7 +82,7 @@
   }
   
   .back-profile-camera-icon:hover {
-    background: #3367d6;
+    background: #bdf094;
     transform: scale(1.1);
   }
   
@@ -98,7 +98,7 @@
   }
   
   .back-profile-save-avatar-button {
-    background-color: #4285f4;
+    background: linear-gradient(90deg, #87cd51 0%, #bdf094 100%);
     color: white;
     border: none;
     padding: 8px 24px;
@@ -112,7 +112,7 @@
   }
   
   .back-profile-save-avatar-button:hover {
-    background: #3367d6;
+    background: linear-gradient(90deg, #bdf094 0%, #87cd51 100%);
     box-shadow: 0 4px 6px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
     transform: translateY(-2px);
   }
@@ -158,20 +158,20 @@
     justify-content: center;
     gap: 8px;
     position: relative;
-    color: #5f6368;
+    color: #87cd51;
     transition: all 250ms ease;
     border-bottom: 3px solid transparent;
     margin-bottom: -2px;
   }
   
   .back-profile-tab-button:hover {
-    color: #4285f4;
+    color: #bdf094;
   }
   
   .back-profile-tab-button.active {
-    color: #4285f4;
+    color: #87cd51;
     font-weight: 600;
-    border-bottom: 3px solid #4285f4;
+    border-bottom: 3px solid #87cd51 ;
   }
   
   .back-profile-tab-button svg {
@@ -297,11 +297,15 @@
     padding: 16px;
     font-size: 16px;
     border-radius: 8px;
-    background: #4285f4;
+    background: linear-gradient(90deg, #87cd51 0%, #bdf094 100%);
     color: #fff;
     border: none;
     font-weight: 500;
     cursor: pointer;
+  }
+
+  .back-profile-update-button:hover {
+    background: linear-gradient(90deg, #bdf094 0%, #87cd51 100%);
   }
 
   .back-profile-payment-info{
