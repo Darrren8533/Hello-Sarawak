@@ -47,10 +47,6 @@ const Modal = ({ isOpen, title, data, labels = {}, onClose }) => {
     }
   };
 
-  // Group rate-related fields
-  const rateFields = ['normalRate', 'weekendRate', 'holidayRate', 'specialEventRate', 'earlyBirdDiscountRate', 'lastMinuteDiscountRate', 'period'];
-  const hasRateData = rateFields.some(field => data[field] && data[field] !== 'N/A');
-
   return (
     <div className="modal-overlay">
       <div className="modal-container">
@@ -101,9 +97,8 @@ const Modal = ({ isOpen, title, data, labels = {}, onClose }) => {
           ) : null}
 
           <div className="data-container">
-            {/* Display basic property information first */}
             {Object.keys(data).map((key) =>
-              key !== 'images' && !rateFields.includes(key) ? (
+              key !== 'images' ? (
                 <div key={key} className="data-item">
                   <div className="data-label">
                     {labels[key] || key.replace(/([A-Z])/g, ' $1')}
@@ -111,29 +106,6 @@ const Modal = ({ isOpen, title, data, labels = {}, onClose }) => {
                   <div className="data-value">{data[key]}</div>
                 </div>
               ) : null
-            )}
-            
-            {/* Display dynamic pricing information in a dedicated section if available */}
-            {hasRateData && (
-              <div className="pricing-section">
-                <h3 className="pricing-title">Dynamic Pricing</h3>
-                <div className="pricing-grid">
-                  {rateFields.map(field => 
-                    data[field] && data[field] !== 'N/A' ? (
-                      <div key={field} className="pricing-item">
-                        <div className="pricing-label">
-                          {labels[field] || field.replace(/([A-Z])/g, ' $1')}
-                        </div>
-                        <div className="pricing-value">
-                          {field.toLowerCase().includes('rate') && !isNaN(data[field]) && data[field] !== 'N/A' 
-                            ? `MYR ${parseFloat(data[field]).toFixed(2)}` 
-                            : data[field]}
-                        </div>
-                      </div>
-                    ) : null
-                  )}
-                </div>
-              </div>
             )}
           </div>
         </div>
