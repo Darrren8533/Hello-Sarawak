@@ -60,7 +60,7 @@ const Reservations = () => {
             try {
                 const reservationData = await fetchReservation();
                 if (Array.isArray(reservationData)) {
-                    console.log('Reservations Data:', reservationData);
+                    // console.log('Reservations Data:', reservationData);
                     return reservationData.map(reservation => {
                         const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
                         const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
@@ -107,8 +107,9 @@ const Reservations = () => {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['reservations'] });
         },
+        
     });
-
+    console.log(userid);
     // Accept booking mutation
     const acceptBookingMutation = useMutation({
         mutationFn: (reservationId) => acceptBooking(reservationId),
@@ -143,12 +144,12 @@ const Reservations = () => {
         }
     
         const isOwner = propertyOwnerUsername.toLowerCase() === currentUser.username.toLowerCase();
-        console.log('Ownership Check:', { 
-            currentUsername: currentUser.username, 
-            propertyOwnerUsername, 
-            userGroup: currentUser.userGroup, 
-            isOwner 
-        });
+        // console.log('Ownership Check:', { 
+        //     currentUsername: currentUser.username, 
+        //     propertyOwnerUsername, 
+        //     userGroup: currentUser.userGroup, 
+        //     isOwner 
+        // });
         return isOwner;
     };
 
