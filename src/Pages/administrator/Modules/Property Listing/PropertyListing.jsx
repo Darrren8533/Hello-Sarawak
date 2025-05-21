@@ -110,7 +110,7 @@ const PropertyListing = () => {
                     propertyname: property.propertyaddress || 'N/A',
                     clustername: property.clustername || 'N/A',
                     categoryname: property.categoryname || 'N/A',
-                    propertyprice: property.rateamount || 'N/A',
+                    propertyprice: property.normalrate || 'N/A',
                     propertylocation: property.nearbylocation || 'N/A',
                     propertyguestpaxno: property.propertyguestpaxno || 'N/A',
                     propertystatus: property.propertystatus || 'N/A',
@@ -236,7 +236,7 @@ const PropertyListing = () => {
 
 
         const searchInFields =
-            `${property.propertyid} ${property.propertyaddress} ${property.clustername} ${property.rateamount} ${property.propertystatus}`
+            `${property.propertyid} ${property.propertyaddress} ${property.clustername} ${property.normalrate} ${property.propertystatus}`
                 .toLowerCase()
                 .includes(searchKey.toLowerCase());
 
@@ -337,7 +337,7 @@ const columns = [
         ),
     },
     { header: 'Name', accessor: 'propertyaddress' },
-    { header: 'Price', accessor: 'rateamount' },
+    { header: 'Price', accessor: 'normalrate' },
     { header: 'Cluster', accessor: 'clustername' },
     {
         header: 'Status',
