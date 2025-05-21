@@ -230,3 +230,64 @@
     font-size: 14px;
   }
 }
+
+.pricing-section {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 2px solid #e2e8f0;
+}
+
+.pricing-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 16px;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.pricing-item {
+  padding: 12px;
+  border-radius: 8px;
+  background-color: #f8fafc;
+  transition: all 0.2s ease;
+}
+
+.pricing-item:hover {
+  background-color: #edf2f7;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.pricing-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #718096;
+  margin-bottom: 4px;
+}
+
+.pricing-value {
+  font-size: 16px;
+  font-weight: 500;
+  color: #2d3748;
+}
+
+/* Highlight special rates */
+.pricing-item:nth-child(1) .pricing-value {
+  color: #3182ce; /* Blue for normal rate */
+  font-weight: 700;
+}
+
+.pricing-item:nth-child(even) .pricing-value {
+  color: #38a169; /* Green for discount rates */
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .pricing-grid {
+    grid-template-columns: 1fr;
+  }
+}
