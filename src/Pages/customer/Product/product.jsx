@@ -57,6 +57,7 @@ const Product = () => {
   const [selectedFacilities, setSelectedFacilities] = useState([]);
   const [selectedPropertyTypes, setSelectedPropertyTypes] = useState([]);
   const [selectedBookingOptions, setSelectedBookingOptions] = useState([]);
+  const [isDateOverlapping, setIsDateOverlapping] = useState({});
   const observer = useRef();
 
   const clusters = [
@@ -286,7 +287,12 @@ const Product = () => {
 
         if (property.propertyguestpaxno < totalGuests) return false;
         
-        if (checkIn < existingCheckout && checkOut > existingCheckin) return false; 
+        // Check for date overlap and update state
+        const hasOverlap = checkIn < existingCheckout && checkOut > existingCheckin;
+        setIsDateOverlapping(prev => ({
+          ...prev,
+          [property.propertyid]: hasOverlap
+        }));
         
         if (selectedCluster && property.clustername !== selectedCluster) return false;
         
@@ -724,8 +730,8 @@ const Product = () => {
                             <div className="property-price">
                               <span className="price-amount">${property.normalrate}</span>
                               <span className="price-period">/night</span>
-                              {property.propertystatus === 'Unavailable' && (
-                                <span className="status-label">FULL</span>
+                              {isDateOverlapping[property.propertyid] && (
+                                <span className="status-label">CLASHED</span>
                               )}
                             </div>
                           </div>
@@ -774,7 +780,7 @@ const Product = () => {
                             <div className="property-price">
                               <span className="price-amount">${property.normalrate}</span>
                               <span className="price-period">/night</span>
-                              {property.propertystatus === 'Unavailable' && (
+                              {isDateOverlapping[property.propertyid] && (
                                 <span className="status-label">FULL</span>
                               )}
                             </div>
