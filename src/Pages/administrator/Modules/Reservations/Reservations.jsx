@@ -199,6 +199,31 @@ const Reservations = () => {
         )
         : [];
 
+    const hasOverlappingReservation = (reservation) => {
+        if (!Array.isArray(reservationsData)) return false;
+        
+        const newCheckIn = new Date(reservation.checkindatetime);
+        const newCheckOut = new Date(reservation.checkoutdatetime);
+        
+        return reservationsData.some(existingReservation => {
+            // Skip the current reservation
+            if (existingReservation.reservationid === reservation.reservationid) {
+                return false;
+            }
+            
+            // Only check for overlaps with Accepted reservations
+            if (existingReservation.reservationstatus !== 'Accepted') {
+                return false;
+            }
+            
+            const existingCheckIn = new Date(existingReservation.checkindatetime);
+            const existingCheckOut = new Date(existingReservation.checkoutdatetime);
+            
+            // Check for overlap
+            return (newCheckIn < existingCheckOut && newCheckOut > existingCheckIn);
+        });
+    };
+
     const handleAction = async (action, reservation) => {
         if (reservation.reservationstatus === 'expired') {
             displayToast('error', 'Action cannot be performed. This reservation has expired.');
@@ -221,18 +246,21 @@ const Reservations = () => {
             };
             setSelectedReservation(essentialFields);
         } else if (action === 'accept') {
-            try {
+            // Check for overlapping reservations before accepting
+            if (hasOverlappingReservation(reservation)) {
+                displayToast('error', 'Cannot accept reservation: There is an overlapping accepted reservation for these dates.');
+                return;
+            }
 
+            try {
                 const newStatus = 'Accepted';
                 
-
                 await updateStatusMutation.mutateAsync({ 
                     reservationId: reservation.reservationid, 
                     newStatus,
                     userid: currentUser.userid
                 });
                 
-   
                 await acceptBookingMutation.mutateAsync(reservation.reservationid);
         
                 displayToast('success', 'Reservation Accepted Successfully');
