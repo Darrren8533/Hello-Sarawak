@@ -91,6 +91,7 @@ const PropertyDetails = () => {
   const navigate = useNavigate();
   const [showDescriptionOverlay, setShowDescriptionOverlay] = useState(false);
   const [locationCoords, setLocationCoords] = useState({ lat: null, lng: null });
+  const [isDateOverlapping, setIsDateOverlapping] = useState(false);
 
   const facilitiesArray = propertyDetails?.facilities
   ? propertyDetails.facilities.split(",") 
@@ -162,6 +163,17 @@ const PropertyDetails = () => {
           name === "checkIn" ? value : prev.checkIn,
           name === "checkOut" ? value : prev.checkOut
         );
+
+        // Check for date overlap
+        if (value && (name === "checkIn" ? prev.checkOut : prev.checkIn)) {
+          const checkIn = new Date(name === "checkIn" ? value : prev.checkIn);
+          const checkOut = new Date(name === "checkOut" ? value : prev.checkOut);
+          const existingCheckin = new Date(propertyDetails.checkindatetime);
+          const existingCheckout = new Date(propertyDetails.checkoutdatetime);
+          
+          const hasOverlap = checkIn < existingCheckout && checkOut > existingCheckin;
+          setIsDateOverlapping(hasOverlap);
+        }
       }
 
       return updatedData;
@@ -600,15 +612,23 @@ const PropertyDetails = () => {
                 <div className="Room_name_container">
                   <h2 className="Room_name">{propertyDetails?.propertyaddress}</h2>
                   <div className='Rating_Container'>
-                    <p className="Rating_score">
-                      {Number.isInteger(propertyDetails.rating) 
-                        ? propertyDetails.rating.toFixed(1)
-                        : propertyDetails.rating.toFixed(2).replace(/\.?0+$/, '')}
-                    </p>
-                    <FaStar className='icon_star'/>
-                    <button className="show-reviews-btn" onClick={() => setShowReviews(true)}>
-                      {propertyDetails.ratingno} reviews
-                    </button>
+                    {propertyDetails.rating > 0 ? (
+                      <>
+                        <p className="Rating_score">
+                          {Number.isInteger(propertyDetails.rating) 
+                            ? propertyDetails.rating.toFixed(1)
+                            : propertyDetails.rating.toFixed(2).replace(/\.?0+$/, '')}
+                        </p>
+                        <FaStar className='icon_star'/>
+                        <button className="show-reviews-btn" onClick={() => setShowReviews(true)}>
+                          {propertyDetails.ratingno} reviews
+                        </button>
+                      </>
+                    ) : (
+                      <button className="show-reviews-btn" onClick={() => setShowReviews(true)}>
+                        No reviews · Be the first to share your experience!
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -758,6 +778,9 @@ const PropertyDetails = () => {
                   <div className="price_section">
                     <span className="room_price">${propertyDetails?.normalrate}</span>
                     <span className="price_night">/night</span>
+                    {isDateOverlapping && (
+                      <span className="details-status-label">CLASHED</span>
+                    )}
                   </div>
 
                   <div className="dates_section">
@@ -798,7 +821,12 @@ const PropertyDetails = () => {
                   </div>
 
                   <br /><br />
-                  <button className="reserve_button" onClick={() => setShowBookingForm(true)}>Book Now</button>
+                  <button 
+                    className="reserve_button" 
+                    onClick={() => setShowBookingForm(true)}
+                  >
+                    {isDateOverlapping ? 'Enquiry' : 'Book & Pay'}
+                  </button>
                 </div>
               </div>
             </div>
@@ -1020,7 +1048,7 @@ const PropertyDetails = () => {
                 )}
               </div>
               <button className="mobile-book-now-btn" onClick={() => setShowBookingForm(true)}>
-                Book Now
+                {propertyDetails.propertystatus === 'Unavailable' ? 'Enquiry' : 'Book & Pay'}
               </button>
             </div>
           </div>
