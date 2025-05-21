@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { fetchReservation } from '../../../Api/api';
-import { useQuery } from '@tanstack/react-query';
+import { fetchReservation, updateReservationStatus, acceptBooking } from '../../../Api/api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PaginatedTable from '../PaginatedTable/PaginatedTable';
 import ActionDropdown from '../ActionDropdown/ActionDropdown';
 import Status from '../Status/Status';
@@ -8,6 +8,7 @@ import Modal from '../Modal/Modal';
 import { FaEye, FaCheck, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { IoMdClose } from "react-icons/io";
 import Loader from '../Loader/Loader';
+import Toast from '../Toast/Toast';
 import './Room_Planner_Calender.css';
 
 function RoomPlannerCalendar() {
@@ -30,6 +31,12 @@ function RoomPlannerCalendar() {
         userid: '',
         userGroup: ''
     });
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState('');
+  const [showToast, setShowToast] = useState(false);
+  const [showMessageBox, setShowMessageBox] = useState(false);
+  const [rejectedReservationID, setRejectedReservationID] = useState(null);
+  const queryClient = useQueryClient();
   
   // Fetch reservations with React Query
   const { data: reservationsData = [], isLoading: reservationsLoading } = useQuery({
@@ -59,6 +66,19 @@ function RoomPlannerCalendar() {
     },
     staleTime: 30 * 60 * 1000,
     refetchInterval: 1000,
+  });
+
+  // Add mutations
+  const updateStatusMutation = useMutation({
+    mutationFn: ({ reservationId, newStatus, userid }) => 
+        updateReservationStatus(reservationId, newStatus, userid),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reservations'] });
+    },
+  });
+
+  const acceptBookingMutation = useMutation({
+    mutationFn: (reservationId) => acceptBooking(reservationId),
   });
 
   // Generate calendar days when month changes or selectedDay changes
@@ -532,53 +552,106 @@ function RoomPlannerCalendar() {
     });
   };
 
-  // Handle view action for reservations
-  const handleAction = (action, reservation) => {
+  const hasOverlappingReservation = (reservation) => {
+    if (!Array.isArray(reservationsData)) return false;
+    
+    const newCheckIn = new Date(reservation.checkindatetime);
+    const newCheckOut = new Date(reservation.checkoutdatetime);
+    
+    return reservationsData.some(existingReservation => {
+        // Skip the current reservation
+        if (existingReservation.reservationid === reservation.reservationid) {
+            return false;
+        }
+        
+        // Only check for overlaps with Accepted reservations
+        if (existingReservation.reservationstatus !== 'Accepted') {
+            return false;
+        }
+        
+        const existingCheckIn = new Date(existingReservation.checkindatetime);
+        const existingCheckOut = new Date(existingReservation.checkoutdatetime);
+        
+        // Check for overlap
+        return (newCheckIn < existingCheckOut && newCheckOut > existingCheckIn);
+    });
+  };
+
+  const displayToast = (type, message) => {
+    setToastType(type);
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 5000);
+  };
+
+  const handleAction = async (action, reservation) => {
+    if (reservation.reservationstatus === 'expired') {
+        displayToast('error', 'Action cannot be performed. This reservation has expired.');
+        return;
+    }
+
     if (action === 'view') {
-      const essentialFields = {
-        reservationid: reservation.reservationid || 'N/A',
-        propertyaddress: reservation.propertyaddress || 'N/A',
-        checkindatetime: reservation.checkindatetime || 'N/A',
-        checkoutdatetime: reservation.checkoutdatetime || 'N/A',
-        reservationblocktime: reservation.reservationblocktime || 'N/A',
-        request: reservation.request || 'N/A',
-        totalprice: reservation.totalprice || 'N/A',
-        rcid: reservation.rcid || 'N/A',
-        reservationstatus: reservation.reservationstatus || 'N/A',
-        userid: reservation.userid || 'N/A',
-        images: reservation.propertyimage || [],
-      };
-      setSelectedReservation(essentialFields);
+        const essentialFields = {
+            reservationid: reservation.reservationid || 'N/A',
+            propertyaddress: reservation.propertyaddress || 'N/A',
+            checkindatetime: reservation.checkindatetime || 'N/A',
+            checkoutdatetime: reservation.checkoutdatetime || 'N/A',
+            reservationblocktime: reservation.reservationblocktime || 'N/A',
+            request: reservation.request || 'N/A',
+            totalprice: reservation.totalprice || 'N/A',
+            rcid: reservation.rcid || 'N/A',
+            reservationstatus: reservation.reservationstatus || 'N/A',
+            userid: reservation.userid || 'N/A',
+            images: reservation.propertyimage || [],
+        };
+        setSelectedReservation(essentialFields);
     } else if (action === 'accept') {
-        // Accept the reservation - in a real implementation this would call an API
-        console.log(`Accepting reservation ${reservation.reservationid}`);
-        
-        // Here you would typically call the API to update the reservation status
-        // Example: updateReservationStatus(reservation.reservationid, 'Accepted');
-        
-        // For demo purposes, we'll just show an alert
-        alert(`Reservation ${reservation.reservationid} accepted`);
-        
-        // Update pending reservations by removing this one from the list
-        setPendingReservations(prevReservations => 
-          prevReservations.filter(res => res.reservationid !== reservation.reservationid)
-        );
-      } else if (action === 'reject') {
-        // Reject the reservation - in a real implementation this would call an API
-        console.log(`Rejecting reservation ${reservation.reservationid}`);
-        
-        // Here you would typically call the API to update the reservation status
-        // Example: updateReservationStatus(reservation.reservationid, 'Rejected');
-        
-        // For demo purposes, we'll just show an alert
-        alert(`Reservation ${reservation.reservationid} rejected`);
-        
-        // Update pending reservations by removing this one from the list
-        setPendingReservations(prevReservations => 
-          prevReservations.filter(res => res.reservationid !== reservation.reservationid)
-        );
-      }
-    };
+        // Check for overlapping reservations before accepting
+        if (hasOverlappingReservation(reservation)) {
+            displayToast('error', 'Cannot accept reservation: There is an overlapping accepted reservation for these dates.');
+            return;
+        }
+
+        try {
+            const newStatus = 'Accepted';
+            
+            await updateStatusMutation.mutateAsync({ 
+                reservationId: reservation.reservationid, 
+                newStatus,
+                userid: currentUser.userid
+            });
+            
+            await acceptBookingMutation.mutateAsync(reservation.reservationid);
+    
+            displayToast('success', 'Reservation Accepted Successfully');
+        } catch (error) {
+            console.error('Failed to accept reservation or send email', error);
+            displayToast('error', 'Failed to accept reservation');
+        }
+    } else if (action === 'reject') {
+        const rejectedID = {
+            reservationid: reservation.reservationid || 'N/A',
+        };
+    
+        setRejectedReservationID(rejectedID);
+    
+        try {
+            const newStatus = 'Rejected';
+            
+            await updateStatusMutation.mutateAsync({ 
+                reservationId: reservation.reservationid, 
+                newStatus,
+                userid: currentUser.userid
+            });
+    
+            setShowMessageBox(true);
+            displayToast('success', 'Reservation Rejected Successfully');
+        } catch (error) {
+            console.error('Failed to update reservation status', error);
+            displayToast('error', 'Failed to reject reservation');
+        }
+    }
+  };
 
   // Reservation dropdown items
    const reservationDropdownItems = (reservation) => {
@@ -862,6 +935,7 @@ function RoomPlannerCalendar() {
   
   return (
     <div className="scheduler-container">
+      {showToast && <Toast type={toastType} message={toastMessage} />}
       {/* Calendar top controls */}
       <div className="scheduler-controls">
         <div className="left-controls">
