@@ -1,0 +1,179 @@
+/* Grid container for cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    padding: 1.5rem;
+    max-width: 100%;
+    box-sizing: border-box;
+    justify-content: center; /* Center the grid items */
+  }
+  
+  /* Individual card styling */
+  .dashboard-card {
+    background: linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%);
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 4px 24px rgba(30,34,90,0.10), 0 1.5px 6px rgba(30,34,90,0.06);
+    border: 1.5px solid #e0e7ef;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.25s, transform 0.18s;
+    cursor: pointer;
+    overflow: hidden;
+    height: 260px; 
+    width: 360px;
+  }
+  
+  /* Hover effects */
+  .dashboard-card:hover {
+    box-shadow: 0 8px 32px rgba(30,34,90,0.18), 0 2px 8px rgba(30,34,90,0.10);
+    transform: translateY(-4px) scale(1.025);
+    border-color: #a5b4fc;
+  }
+  
+  /* Card header */
+  .dashboard-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    color: #666;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  
+  /* Card value */
+  .dashboard-card-value {
+    font-size: 36px;
+    font-weight: 800;
+    color: #22223b;
+    margin-top: auto;
+    margin-bottom: 1rem;
+    letter-spacing: 0.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* Card button */
+  .dashboard-card-btn {
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(90deg, #87cd51 0%, #bdf094 100%);
+    border: none;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 4px rgba(99,102,241,0.08);
+  }
+
+
+  
+  
+  /* Button hover */
+  .dashboard-card-btn:hover {
+    background: linear-gradient(90deg, #bdf094 0%, #87cd51 100%);
+    box-shadow: 0 2px 8px rgba(99,102,241,0.13);
+  }
+  
+  /* Card icon */
+  .dashboard-card-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    background: #f1f5f9;
+    box-shadow: 0 2px 8px rgba(99,102,241,0.07);
+  }
+  
+  /* Icon colors */
+  .dashboard-card-icon.user-icon { color: #4f46e5; }
+  .dashboard-card-icon.property-icon { color: #10b981; }
+  .dashboard-card-icon.reservation-icon { color: #3b82f6; }
+  .dashboard-card-icon.occupancy-icon { color: #8b5cf6; }
+  .dashboard-card-icon.revpar-icon { color: #8b5cf6; }
+  .dashboard-card-icon.revenue-icon { color: #10b981; }
+  .dashboard-card-icon.satisfaction-icon { color: #ef4444; }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .stats-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      padding: 1rem;
+    }
+  
+    .dashboard-card {
+      padding: 1.5rem;
+      height: 240px;
+      width: 280px;
+    }
+  
+    .dashboard-card-header {
+      font-size: 16px;
+      margin-bottom: 0.75rem;
+    }
+  
+    .dashboard-card-value {
+      font-size: 32px;
+      margin-bottom: 0.75rem;
+    }
+  
+    .dashboard-card-btn {
+      font-size: 14px;
+      padding: 0.6rem;
+    }
+  
+    .dashboard-card-icon {
+      width: 2rem;
+      height: 2rem;
+      font-size: 1.2rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .stats-grid {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+  
+    .dashboard-card {
+      padding: 1rem;
+      height: 200px;
+      width: 100%;
+      max-width: 320px;
+      margin: 0 auto;
+    }
+  
+    .dashboard-card-header {
+      font-size: 14px;
+      margin-bottom: 0.5rem;
+    }
+  
+    .dashboard-card-value {
+      font-size: 28px;
+      margin-bottom: 0.5rem;
+    }
+  
+    .dashboard-card-btn {
+      font-size: 13px;
+      padding: 0.5rem;
+    }
+  
+    .dashboard-card-icon {
+      width: 1.8rem;
+      height: 1.8rem;
+      font-size: 1rem;
+    }
+  }
