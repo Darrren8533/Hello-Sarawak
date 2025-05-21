@@ -1,6 +1,6 @@
 /* Button Styles */
 .create-property-button {
-  background-color: var(--primaryColor);
+  background: linear-gradient(90deg, #87cd51 0%, #bdf094 100%);
   color: white;
   border: none;
   padding: 0.6rem 1.2rem;
@@ -13,8 +13,9 @@
 }
 
 .create-property-button:hover {
-  background: var(--hoverColor);
-  color: var(--blackColor);
+  background: linear-gradient(90deg, #bdf094 0%, #87cd51 100%);
+  box-shadow: 0 2px 8px rgba(99,102,241,0.13);
+  color: white;
 }
 
 .create-property-button:focus {
