@@ -102,8 +102,8 @@ const Reservations = () => {
 
     // Update reservation status mutation
     const updateStatusMutation = useMutation({
-        mutationFn: ({ reservationId, newStatus }) => 
-            updateReservationStatus(reservationId, newStatus),
+        mutationFn: ({ reservationId, newStatus, userid }) => 
+            updateReservationStatus(reservationId, newStatus, userid),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['reservations'] });
         },
