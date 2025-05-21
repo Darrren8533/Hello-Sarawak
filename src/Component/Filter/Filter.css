@@ -36,7 +36,7 @@
 }
 
 .apply-filters-btn {
-    background-color: #3498db;
+    background: linear-gradient(90deg, #87cd51 0%, #bdf094 100%);
     color: white;
     border: none;
     border-radius: 6px;
@@ -47,6 +47,6 @@
 }
 
 .apply-filters-btn:hover {
-    background-color: #2980b9;
+    background: linear-gradient(90deg, #bdf094 0%, #87cd51 100%);
 }
 
