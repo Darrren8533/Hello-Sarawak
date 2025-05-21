@@ -3,7 +3,6 @@ import './Dashboard.css';
 import '../../../../Component/MainContent/MainContent.css';
 import DashboardCard from '../../../../Component/DashboardCard/DashboardCard';
 
-
 const Dashboard = () => {
   return (
     <div>
