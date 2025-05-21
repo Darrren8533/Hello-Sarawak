@@ -97,7 +97,7 @@ const DashboardCard = () => {
                 + (Array.isArray(administrators) ? administrators.length : 0);
             setStats({
                 totalUsers,
-                totalProperties: Array.isArray(properties) ? properties.length : 0,
+                totalProperties: properties.properties.length,
                 totalReservations: Array.isArray(reservations) ? reservations.length : 0,
                 totalRevenue: finance.monthlyData?.[0]?.monthlyrevenue || 0,
             });
