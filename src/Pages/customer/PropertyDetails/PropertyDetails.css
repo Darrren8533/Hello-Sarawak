@@ -328,6 +328,19 @@ body {
   
 .price_section {
     margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+  
+.details-status-label {
+    background-color: #ff4d4d;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-left: 8px;
 }
   
 .room_price {
@@ -1630,6 +1643,17 @@ body {
 .radio-label:has(input[type="radio"]:checked) {
     border-color: #ff385c;
     background-color: #fff8f9;
+}
+
+.show-reviews-btn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  margin-left: 8px;
+  text-decoration: underline;
 }
 
 @media screen and (min-width: 990px) {
