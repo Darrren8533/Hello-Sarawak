@@ -149,7 +149,7 @@ const Reservations = () => {
         
         console.log('Ownership Check:', {
             currentUserID: currentUser.userid,
-            propertyOwnerUserID,
+            propertyOwnerID,
             userGroup: currentUser.userGroup,
             isOwner
         });
@@ -289,7 +289,6 @@ const Reservations = () => {
 
     const handleMessageBoxSelect = async (mode) => {
         if (mode === 'suggest') {
-            // Trigger the properties query
             refetchProperties();
         }
 
