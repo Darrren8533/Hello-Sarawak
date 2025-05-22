@@ -322,12 +322,10 @@ const Reservations = () => {
         setSelectedProperty(propertyid);
     };
 
-    useEffect(() => {
-        console.log("Selected ID:", selectedProperty);
-    }, [selectedProperty]);
-
     const handleConfirmSuggestion = async () => {
         if (selectedProperty && rejectedReservationID.reservationid) {
+            console.log("Selected Property:", selectedProperty);
+            console.log("Rejected Reservation ID:", rejectedReservationID?.reservationid);
             try {
                 const newStatus = 'Suggested';
 
