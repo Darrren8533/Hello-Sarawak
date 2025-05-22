@@ -1176,6 +1176,29 @@ export const suggestedReservations = async (userid) => {
   }
 };
 
+// Fetch Published Reservations
+export const publishedReservations = async (userid) => {
+  try {
+    const response = await fetch(`${API_URL}/publishedReservations/${userid}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to fetch published reservations');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('API error: ', error);
+    throw error;
+  }
+};
+
 // Add a new cluster
 export const addCluster = async (clusterData) => {
   try {
