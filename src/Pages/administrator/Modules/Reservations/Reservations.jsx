@@ -398,16 +398,6 @@ const Reservations = () => {
         setTimeout(() => setShowToast(false), 5000);
     };
 
-    const getFilteredProperties = () => {
-        if (!Array.isArray(administratorProperties)) return []; // Ensure an array
-        return administratorProperties.filter(property => {
-            const matchesSearch = property.propertyaddress.toString().toLowerCase().includes(suggestSearchKey.toLowerCase());
-            const matchesPrice = (!priceRange.min || property.rateamount >= Number(priceRange.min)) &&
-                (!priceRange.max || property.rateamount <= Number(priceRange.max));
-            return matchesSearch && matchesPrice;
-        });
-    };
-
     const columns = [
         { header: 'RID', accessor: 'reservationid' },
         {
@@ -512,40 +502,9 @@ const Reservations = () => {
                             <div className="form-close-button" onClick={() => setMessageBoxMode('')}>×</div>
                         </div>
 
-                        <div className="suggest-filters">
-                            <div className="search-container">
-                                <input
-                                    type="text"
-                                    placeholder="Search property name..."
-                                    value={suggestSearchKey}
-                                    onChange={(e) => setSuggestSearchKey(e.target.value)}
-                                    className="suggest-search-input"
-                                />
-                            </div>
-                            <div className="price-filter">
-                                <div className="price-input-group">
-                                    <input
-                                        type="number"
-                                        placeholder="Min price"
-                                        value={priceRange.min}
-                                        onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
-                                        className="price-input"
-                                    />
-                                    <span className="price-separator">-</span>
-                                    <input
-                                        type="number"
-                                        placeholder="Max price"
-                                        value={priceRange.max}
-                                        onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
-                                        className="price-input"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
                         <div className="property-list">
-                            {getFilteredProperties().length > 0 ? (
-                                getFilteredProperties().map((property) => (
+                            {administratorProperties.length > 0 ? (
+                                administratorProperties.map((property) => (
                                     <div key={property.propertyaddress} className="property-card">
                                         <input
                                             type="radio"
