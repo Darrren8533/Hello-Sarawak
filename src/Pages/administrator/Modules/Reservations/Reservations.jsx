@@ -145,7 +145,7 @@ const Reservations = () => {
             return false;
         }
 
-        const isOwner = propertyOwnerID === currentUser.userid;
+        const isOwner = Number(propertyOwnerID) === Number(currentUser.userid);
         
         console.log('Ownership Check:', {
             currentUserID: currentUser.userid,
