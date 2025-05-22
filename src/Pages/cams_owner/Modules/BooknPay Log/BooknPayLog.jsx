@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { FaEye } from 'react-icons/fa';
+import { useQuery } from '@tanstack/react-query';
 import Filter from '../../../../Component/Filter/Filter';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
-import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown'; // Ensure this is imported
+import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
+import Loader from '../../../../Component/Loader/Loader'; // Import the Loader component
 import { fetchBookLog } from '../../../../../Api/api';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -13,24 +15,20 @@ import '../../../../Component/Filter/Filter.css';
 import '../../../../Component/SearchBar/SearchBar.css';
 
 const BooknPayLog = () => {
-  const [logs, setLogs] = useState([]);
   const [searchKey, setSearchKey] = useState('');
   const [selectedActionType, setSelectedActionType] = useState('All');
   const [appliedFilters, setAppliedFilters] = useState({ actionType: 'All' });
   const [selectedLog, setSelectedLog] = useState(null);
 
-  useEffect(() => {
-    const fetchLogs = async () => {
-      try {
-        const logData = await fetchBookLog();
-        setLogs(logData || []); // Ensure logs is always an array
-      } catch (error) {
-        console.error('Failed to fetch Book & Pay Logs:', error);
-      }
-    };
-
-    fetchLogs();
-  }, []);
+  // Replace useEffect with React Query
+  const { data: logs = [], isLoading } = useQuery({
+    queryKey: ['bookLogs'],
+    queryFn: fetchBookLog,
+    onError: (error) => {
+      console.error('Failed to fetch Book & Pay Logs:', error);
+    },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   const handleApplyFilters = () => {
     setAppliedFilters({ actionType: selectedActionType });
@@ -54,7 +52,7 @@ const BooknPayLog = () => {
   ];
 
   const displayLabels = {
-    userid: 'User ID',
+    userid: 'UID',
     timestamp: 'Timestamp',
     action: 'Action',
   };
@@ -87,7 +85,7 @@ const BooknPayLog = () => {
   ];
 
   const columns = [
-    { header: 'User ID', accessor: 'userid' },
+    { header: 'UID', accessor: 'userid' },
     { header: 'Timestamp', accessor: 'timestamp' },
     { header: 'Action', accessor: 'action' },
     {
@@ -116,12 +114,18 @@ const BooknPayLog = () => {
 
       <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-      <PaginatedTable
-        data={filteredLogs}
-        columns={columns}
-        rowKey={(log) => `${log.timestamp}-${log.userid}`} // Unique key
-        enableCheckbox={false}
-      />
+      {isLoading ? (
+        <div className="loader-box">
+          <Loader />
+        </div>
+      ) : (
+        <PaginatedTable
+          data={filteredLogs}
+          columns={columns}
+          rowKey={(log) => `${log.timestamp}-${log.userid}`}
+          enableCheckbox={false}
+        />
+      )}
 
       <Modal
         isOpen={!!selectedLog}
