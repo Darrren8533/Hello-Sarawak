@@ -114,7 +114,7 @@ const Reservations = () => {
                 console.error('Failed to fetch administrator properties:', error);
                 return [];
             }
-        }
+        },
         enabled: false, // Prevent automatic fetch
     });
     
