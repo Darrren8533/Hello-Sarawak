@@ -191,13 +191,6 @@ const Reservations = () => {
                     onChange={(newValue) => setSearchKey(newValue)} 
                     placeholder="Search reservation..." 
                 />
-                <button 
-                    onClick={() => refetch()} 
-                    className="refresh-button"
-                    disabled={isLoading}
-                >
-                    Refresh
-                </button>
             </div>
 
             <Filter filters={filters} onApplyFilters={handleApplyFilters} />
