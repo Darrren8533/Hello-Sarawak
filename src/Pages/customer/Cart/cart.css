@@ -532,7 +532,7 @@
 }
 
 /* Modal */
-.modal-overlay {
+.modal-overlay_cart {
   position: fixed;
   top: 0;
   left: 0;
