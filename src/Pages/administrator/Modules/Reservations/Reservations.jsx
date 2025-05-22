@@ -361,7 +361,7 @@ const Reservations = () => {
                 const newStatus = 'Published';
 
                 await updateStatusMutation.mutateAsync({
-                    reservationId: reservation.reservationid,
+                    reservationId: rejectedReservationID.reservationid,
                     newStatus
                 });
 
