@@ -881,15 +881,16 @@ export const getOperatorProperties = async (userid) => {
 // Fetch normal user data
 export const fetchUserData = async (userid) => {
   try {
-      const response = await fetch(`${API_URL}/users/${userid}`);
-      if (!response.ok) {
-          throw new Error('Failed to fetch user data');
-      }
-      const data = await response.json();
-      return data;
+    const response = await fetch(`${API_URL}/users/${userid}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch user data');
+    }
+    
+    return await response.json();
   } catch (error) {
-      console.error('API error:', error);
-      throw error;
+    console.error('Error fetching user data:', error);
+    throw error;
   }
 };
 
