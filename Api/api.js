@@ -651,12 +651,14 @@ export const fetchReservation = async () => {
 };
 
 // Update reservation status
-export const updateReservationStatus = async (reservationid, status, userid) => {  
+export const updateReservationStatus = async (reservationid, status) => {
+  const userid = localStorage.getItem("userid");
+  
   try {
-    const response = await fetch(`${API_URL}/updateReservationStatus/${reservationid}`, {
+    const response = await fetch(`${API_URL}/updateReservationStatus/${reservationid}?userid=${userid}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reservationStatus: status, userid: userid }),
+      body: JSON.stringify({ reservationStatus: status }),
     });
 
     if (!response.ok) {
