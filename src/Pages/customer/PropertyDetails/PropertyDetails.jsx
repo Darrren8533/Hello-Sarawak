@@ -976,7 +976,7 @@ const PropertyDetails = () => {
                           </div>
 
                           <div className="form-group full-width">
-                            <label>Additional requests</label>
+                            <label>Additional requests (Optional)</label>
                             <textarea
                               name="additionalRequests"
                               value={bookingForm.additionalRequests}
