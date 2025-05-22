@@ -38,20 +38,20 @@ const Reservations = () => {
         userid: '',
         userGroup: ''
     });
-    
+
     const queryClient = useQueryClient();
 
     useEffect(() => {
         const username = localStorage.getItem('username');
         const userid = localStorage.getItem('userid');
         const userGroup = localStorage.getItem('userGroup');
-        
+
         setCurrentUser({
             username,
             userid,
             userGroup
         });
-        
+
         console.log('Current user loaded:', { username, userid, userGroup });
     }, []);
 
@@ -66,7 +66,7 @@ const Reservations = () => {
                     return reservationData.map(reservation => {
                         const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
                         const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
-    
+
                         if (reservation.reservationstatus === 'Pending' && currentDateTime > reservationblocktime) {
                             return { ...reservation, reservationstatus: 'expired' };
                         }
@@ -84,8 +84,8 @@ const Reservations = () => {
         staleTime: 30 * 60 * 1000,
         refetchInterval: 1000,
     });
-    
-    // Fetch operators with React Query   
+    // Fetch operators with React Query
+
     const { data: operators = [] } = useQuery({
         queryKey: ['operators'],
         queryFn: fetchOperators,
@@ -104,7 +104,7 @@ const Reservations = () => {
 
     // Update reservation status mutation
     const updateStatusMutation = useMutation({
-        mutationFn: ({ reservationId, newStatus }) => 
+        mutationFn: ({ reservationId, newStatus }) =>
             updateReservationStatus(reservationId, newStatus),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['reservations'] });
@@ -118,13 +118,13 @@ const Reservations = () => {
 
     // Suggest new room mutation
     const suggestRoomMutation = useMutation({
-        mutationFn: ({ propertyAddress, reservationId }) => 
+        mutationFn: ({ propertyAddress, reservationId }) =>
             suggestNewRoom(propertyAddress, reservationId),
     });
 
     // Send notification mutation
     const sendNotificationMutation = useMutation({
-        mutationFn: ({ reservationId, operators }) => 
+        mutationFn: ({ reservationId, operators }) =>
             sendSuggestNotification(reservationId, operators),
     });
 
@@ -137,19 +137,19 @@ const Reservations = () => {
             console.log('Missing data:', { currentUser, reservation });
             return false;
         }
-    
+
         const propertyOwnerUsername = reservation.property_owner_username;
         if (!propertyOwnerUsername) {
             console.log('Property owner username missing in reservation:', reservation);
             return false;
         }
-    
+
         const isOwner = propertyOwnerUsername.toLowerCase() === currentUser.username.toLowerCase();
-        console.log('Ownership Check:', { 
-            currentUsername: currentUser.username, 
-            propertyOwnerUsername, 
-            userGroup: currentUser.userGroup, 
-            isOwner 
+        console.log('Ownership Check:', {
+            currentUsername: currentUser.username,
+            propertyOwnerUsername,
+            userGroup: currentUser.userGroup,
+            isOwner
         });
         return isOwner;
     };
@@ -201,24 +201,24 @@ const Reservations = () => {
 
     const hasOverlappingReservation = (reservation) => {
         if (!Array.isArray(reservationsData)) return false;
-        
+
         const newCheckIn = new Date(reservation.checkindatetime);
         const newCheckOut = new Date(reservation.checkoutdatetime);
-        
+
         return reservationsData.some(existingReservation => {
             // Skip the current reservation
             if (existingReservation.reservationid === reservation.reservationid) {
                 return false;
             }
-            
+
             // Only check for overlaps with Accepted reservations
             if (existingReservation.reservationstatus !== 'Accepted') {
                 return false;
             }
-            
+
             const existingCheckIn = new Date(existingReservation.checkindatetime);
             const existingCheckOut = new Date(existingReservation.checkoutdatetime);
-            
+
             // Check for overlap
             return (newCheckIn < existingCheckOut && newCheckOut > existingCheckIn);
         });
@@ -229,7 +229,7 @@ const Reservations = () => {
             displayToast('error', 'Action cannot be performed. This reservation has expired.');
             return;
         }
-    
+
         if (action === 'view') {
             const essentialFields = {
                 reservationid: reservation.reservationid || 'N/A',
@@ -254,33 +254,39 @@ const Reservations = () => {
 
             try {
                 const newStatus = 'Accepted';
-                
-                await updateStatusMutation.mutateAsync({ 
-                    reservationId: reservation.reservationid, 
+
+                // First update the status
+                await updateStatusMutation.mutateAsync({
+                    reservationId: reservation.reservationid,
                     newStatus,
                     userid: currentUser.userid
                 });
-                
-                await acceptBookingMutation.mutateAsync(reservation.reservationid);
-        
-                displayToast('success', 'Reservation Accepted Successfully');
-            } catch (error) {
-                console.error('Failed to accept reservation or send email', error);
-                displayToast('error', 'Failed to accept reservation');
+
+                try {
+                    // Then try to accept the booking
+                    await acceptBookingMutation.mutateAsync(reservation.reservationid);
+                    displayToast('success', 'Reservation Accepted Successfully');
+                } catch (bookingError) {
+                    console.error('Failed to complete booking acceptance:', bookingError);
+                    displayToast('warning', 'Reservation status updated but booking acceptance failed. Please try again.');
+                }
+            } catch (statusError) {
+                console.error('Failed to update reservation status:', statusError);
+                displayToast('error', 'Failed to update reservation status');
             }
         } else if (action === 'reject') {
             const rejectedID = {
                 reservationid: reservation.reservationid || 'N/A',
             };
-    
-            setRejectedReservationID(rejectedID);
 
+            setRejectedReservationID(rejectedID);
             setShowMessageBox(true);
         }
     };
 
     const handleMessageBoxSelect = async (mode) => {
         if (mode === 'suggest') {
+            // Trigger the properties query
             refetchProperties();
         }
 
@@ -296,12 +302,12 @@ const Reservations = () => {
         if (selectedProperty && rejectedReservationID.reservationid) {
             try {
                 const newStatus = 'Suggested';
-                
-                await updateStatusMutation.mutateAsync({ 
-                    reservationId: rejectedReservationID.reservationid, 
+
+                await updateStatusMutation.mutateAsync({
+                    reservationId: reservation.reservationid,
                     newStatus
                 });
-                
+
                 await suggestRoomMutation.mutateAsync({
                     propertyAddress: selectedProperty,
                     reservationId: rejectedReservationID.reservationid
@@ -329,12 +335,12 @@ const Reservations = () => {
         if (selectedOperators.length > 0 && rejectedReservationID.reservationid) {
             try {
                 const newStatus = 'Published';
-                
-                await updateStatusMutation.mutateAsync({ 
-                    reservationId: rejectedReservationID.reservationid, 
+
+                await updateStatusMutation.mutateAsync({
+                    reservationId: reservation.reservationid,
                     newStatus
                 });
-                
+
                 await sendNotificationMutation.mutateAsync({
                     reservationId: rejectedReservationID.reservationid,
                     operators: selectedOperators
@@ -428,8 +434,8 @@ const Reservations = () => {
             </div>
 
             <div className="table-controls">
-                <button 
-                    className="toggle-table-btn" 
+                <button
+                    className="toggle-table-btn"
                     onClick={() => setShowTable(!showTable)}
                 >
                     {showTable ? 'Hide Reservations Table' : 'Show Reservations Table'}
