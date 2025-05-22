@@ -401,7 +401,7 @@ const Cart = () => {
     }
     
     return (
-      <div className="modal-overlay">
+      <div className="modal-overlay_cart">
         <div className="modal-content">
           <h3>{title}</h3>
           <p>{message}</p>
