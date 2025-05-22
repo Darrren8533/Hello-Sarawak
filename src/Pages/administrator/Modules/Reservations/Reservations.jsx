@@ -84,8 +84,8 @@ const Reservations = () => {
         staleTime: 30 * 60 * 1000,
         refetchInterval: 1000,
     });
+    
     // Fetch operators with React Query
-
     const { data: operators = [] } = useQuery({
         queryKey: ['operators'],
         queryFn: fetchOperators,
@@ -133,21 +133,23 @@ const Reservations = () => {
     };
 
     const isPropertyOwner = (reservation) => {
-        if (!currentUser.username || !reservation) {
+        if (!currentUser.userid || !reservation) {
             console.log('Missing data:', { currentUser, reservation });
             return false;
         }
 
-        const propertyOwnerUsername = reservation.property_owner_username;
-        if (!propertyOwnerUsername) {
-            console.log('Property owner username missing in reservation:', reservation);
+        const propertyOwnerID = reservation.userid;
+        
+        if (!propertyOwnerID) {
+            console.log('Property owner userid missing in reservation:', reservation);
             return false;
         }
 
-        const isOwner = propertyOwnerUsername.toLowerCase() === currentUser.username.toLowerCase();
+        const isOwner = propertyOwnerID === currentUser.userid;
+        
         console.log('Ownership Check:', {
-            currentUsername: currentUser.username,
-            propertyOwnerUsername,
+            currentUserID: currentUser.userid,
+            propertyOwnerUserID,
             userGroup: currentUser.userGroup,
             isOwner
         });
@@ -280,6 +282,7 @@ const Reservations = () => {
             };
 
             setRejectedReservationID(rejectedID);
+            
             setShowMessageBox(true);
         }
     };
