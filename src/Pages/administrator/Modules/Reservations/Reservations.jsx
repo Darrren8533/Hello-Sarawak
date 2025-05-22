@@ -140,8 +140,8 @@ const Reservations = () => {
 
     // Suggest new room mutation
     const suggestRoomMutation = useMutation({
-        mutationFn: ({ propertyAddress, reservationId }) =>
-            suggestNewRoom(propertyAddress, reservationId),
+        mutationFn: ({ propertyId, reservationId }) =>
+            suggestNewRoom(propertyId, reservationId),
     });
 
     // Send notification mutation
