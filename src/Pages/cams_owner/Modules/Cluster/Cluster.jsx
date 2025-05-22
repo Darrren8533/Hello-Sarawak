@@ -368,7 +368,6 @@ const Cluster = () => {
           
           <div className="modal-footer">
             <div className="button-group">
-              <button className="cancel-button" onClick={onClose}>Cancel</button>
               <button 
                 className="submit-button"
                 onClick={handleSubmit}
@@ -376,6 +375,8 @@ const Cluster = () => {
               >
                 {editMode ? 'Update Cluster' : 'Add Cluster'}
               </button>
+              <button className="cancel-button" onClick={onClose}>Cancel</button>
+              
             </div>
           </div>
         </div>
