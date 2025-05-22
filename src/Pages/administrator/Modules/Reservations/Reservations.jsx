@@ -101,20 +101,20 @@ const Reservations = () => {
         queryFn: async () => {
             const userid = localStorage.getItem('userid');
             const reservationid = rejectedReservationID?.reservationid;
-    
+        
             if (!userid || !reservationid) {
                 console.error('Missing userid or reservationid');
                 return [];
             }
-    
+        
             try {
                 const response = await getOperatorProperties(userid, reservationid);
-                return response;
+                return response.data;
             } catch (error) {
                 console.error('Failed to fetch administrator properties:', error);
                 return [];
             }
-        },
+        }
         enabled: false, // Prevent automatic fetch
     });
     
