@@ -183,88 +183,10 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const fileInputRef = useRef(null);
     const locationInputRef = useRef(null);
     const [showMoreAmenities, setShowMoreAmenities] = useState(false);
-    const formStorageKey = 'property_form_data';
 
-    // Load form data from localStorage on component mount
+    // Load form data on component mount
     useEffect(() => {
-        // First try to load from localStorage
-        const savedFormData = localStorage.getItem(formStorageKey);
-        const savedImages = localStorage.getItem(`${formStorageKey}_images`);
-        
-        if (savedFormData) {
-            try {
-                const parsedData = JSON.parse(savedFormData);
-                let propertyImageArray = [];
-                
-                // Load saved images if available
-                if (savedImages) {
-                    const parsedImages = JSON.parse(savedImages);
-                    
-                    // Process each saved image
-                    propertyImageArray = parsedImages.map(img => {
-                        if (img.isFile) {
-                            // Convert back to File object
-                            const byteString = atob(img.base64.split(',')[1]);
-                            const arrayBuffer = new ArrayBuffer(byteString.length);
-                            const uint8Array = new Uint8Array(arrayBuffer);
-                            
-                            for (let i = 0; i < byteString.length; i++) {
-                                uint8Array[i] = byteString.charCodeAt(i);
-                            }
-                            
-                            return new File([arrayBuffer], img.name, {
-                                type: img.type,
-                                lastModified: img.lastModified
-                            });
-                        } else {
-                            // Return the base64 string as is
-                            return img.data;
-                        }
-                    });
-                }
-                
-                // Load saved dynamic rates if available
-                if (parsedData.dynamicRates) {
-                    setDynamicRates(parsedData.dynamicRates);
-                    
-                    // Set toggles based on saved rates
-                    if (parsedData.rateToggles) {
-                        setRateToggles(parsedData.rateToggles);
-                    } else {
-                        // Initialize toggles based on rate values
-                        setRateToggles({
-                            weekendRate: parsedData.dynamicRates.weekendRate > 0,
-                            holidayRate: parsedData.dynamicRates.holidayRate > 0,
-                            specialEventRate: parsedData.dynamicRates.specialEventRate > 0,
-                            earlyBirdDiscountRate: parsedData.dynamicRates.earlyBirdDiscountRate > 0,
-                            lastMinuteDiscountRate: parsedData.dynamicRates.lastMinuteDiscountRate > 0
-                        });
-                    }
-                }
-                
-                // Set the form data with processed image data
-                setFormData({
-                    ...parsedData,
-                    propertyImage: propertyImageArray
-                });
-                
-                // Also set selected facilities
-                if (parsedData.facilities && Array.isArray(parsedData.facilities)) {
-                    setSelectedFacilities(parsedData.facilities);
-                }
-                
-                return; // Skip initialData processing if we loaded from localStorage
-            } catch (error) {
-                console.error("Error loading saved form data:", error);
-            }
-        }
-
-        // If no localStorage data or error, proceed with initialData
-        const storedUsername = localStorage.getItem("username");
-        if (storedUsername) {
-            setFormData((prev) => ({ ...prev, username: storedUsername }));
-        }
-    
+        // If initialData exists, load it
         if (initialData) {
             let facilitiesArray = [];
             
@@ -279,7 +201,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             }
             
             setFormData({
-                username: initialData.username || storedUsername || "",
+                username: initialData.username || "",
                 propertyPrice: initialData.normalrate || "",
                 propertyAddress: initialData.propertyaddress || "",
                 nearbyLocation: initialData.nearbylocation || "",
@@ -324,73 +246,29 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     
             // Set the selected facilities
             setSelectedFacilities(facilitiesArray);
+        } else {
+            // Initialize empty form for new property
+            setFormData({
+                username: localStorage.getItem("username") || "",
+                propertyPrice: "1",
+                propertyAddress: "",
+                nearbyLocation: "",
+                propertyBedType: "1",
+                propertyGuestPaxNo: "1",
+                propertyDescription: "",
+                facilities: [],
+                propertyImage: [],
+                clusterName: "",
+                categoryName: "",
+            });
+            setSelectedFacilities([]);
         }
     }, [initialData]);
 
-    // Save form data to localStorage whenever it changes
+    // Remove localStorage save effect
     useEffect(() => {
-        // Don't save empty form data
-        if (formData.username || formData.propertyAddress || formData.propertyImage.length > 0) {
-            // Create a safe-to-serialize copy of the form data
-            const dataToSave = {
-                ...formData,
-                // Remove propertyImage as we'll handle it separately
-                propertyImage: [],
-                facilities: selectedFacilities,
-                dynamicRates: dynamicRates,
-                rateToggles: rateToggles
-            };
-            
-            // Process images for storage
-            saveImagesToLocalStorage(formData.propertyImage);
-            
-            localStorage.setItem(formStorageKey, JSON.stringify(dataToSave));
-        }
+        // Don't save form data to localStorage anymore
     }, [formData, selectedFacilities, dynamicRates, rateToggles]);
-
-    // Function to convert and save File objects to localStorage
-    const saveImagesToLocalStorage = async (images) => {
-        try {
-            const imageStorage = [];
-            
-            // Process each image - either File objects or base64 strings
-            for (let i = 0; i < images.length; i++) {
-                const image = images[i];
-                
-                if (image instanceof File) {
-                    // Convert File to base64
-                    const base64 = await fileToBase64(image);
-                    imageStorage.push({
-                        isFile: true,
-                        name: image.name,
-                        type: image.type,
-                        base64: base64,
-                        lastModified: image.lastModified
-                    });
-                } else {
-                    // Already a base64 string from the server
-                    imageStorage.push({
-                        isFile: false,
-                        data: image
-                    });
-                }
-            }
-            
-            localStorage.setItem(`${formStorageKey}_images`, JSON.stringify(imageStorage));
-        } catch (error) {
-            console.error("Error saving images to localStorage:", error);
-        }
-    };
-
-    // Helper function to convert File to base64
-    const fileToBase64 = (file) => {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = (error) => reject(error);
-        });
-    };
 
     useEffect(() => {
         if (initialData?.facilities) {
@@ -624,10 +502,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 setShowToast(true);
             }
 
-            // Clear form data and localStorage on successful submission
-            localStorage.removeItem(formStorageKey);
-            localStorage.removeItem(`${formStorageKey}_images`);
-            
+            // Reset form data
             setFormData({
                 username: "",
                 propertyPrice: "",
@@ -660,10 +535,6 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     };
 
     const handleReset = () => {
-        // Clear localStorage data
-        localStorage.removeItem(formStorageKey);
-        localStorage.removeItem(`${formStorageKey}_images`);
-        
         setFormData({
             username: localStorage.getItem("username") || "",
             propertyPrice: "1",

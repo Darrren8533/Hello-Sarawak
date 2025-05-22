@@ -84,8 +84,8 @@ const Reservations = () => {
         staleTime: 30 * 60 * 1000,
         refetchInterval: 1000,
     });
- // Fetch operators with React Query
-   
+    
+    // Fetch operators with React Query   
     const { data: operators = [] } = useQuery({
         queryKey: ['operators'],
         queryFn: fetchOperators,
@@ -104,8 +104,8 @@ const Reservations = () => {
 
     // Update reservation status mutation
     const updateStatusMutation = useMutation({
-        mutationFn: ({ reservationId, newStatus, userid }) => 
-            updateReservationStatus(reservationId, newStatus, userid),
+        mutationFn: ({ reservationId, newStatus }) => 
+            updateReservationStatus(reservationId, newStatus),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['reservations'] });
         },
@@ -274,28 +274,13 @@ const Reservations = () => {
             };
     
             setRejectedReservationID(rejectedID);
-    
-            try {
-                const newStatus = 'Rejected';
-                
-                await updateStatusMutation.mutateAsync({ 
-                    reservationId: reservation.reservationid, 
-                    newStatus,
-                    userid: currentUser.userid
-                });
-    
-                setShowMessageBox(true);
-                displayToast('success', 'Reservation Rejected Successfully');
-            } catch (error) {
-                console.error('Failed to update reservation status', error);
-                displayToast('error', 'Failed to reject reservation');
-            }
+
+            setShowMessageBox(true);
         }
     };
 
     const handleMessageBoxSelect = async (mode) => {
         if (mode === 'suggest') {
-            // Trigger the properties query
             refetchProperties();
         }
 
@@ -310,6 +295,13 @@ const Reservations = () => {
     const handleConfirmSuggestion = async () => {
         if (selectedProperty && rejectedReservationID.reservationid) {
             try {
+                const newStatus = 'Suggested';
+                
+                await updateStatusMutation.mutateAsync({ 
+                    reservationId: rejectedReservationID.reservationid, 
+                    newStatus
+                });
+                
                 await suggestRoomMutation.mutateAsync({
                     propertyAddress: selectedProperty,
                     reservationId: rejectedReservationID.reservationid
@@ -336,6 +328,13 @@ const Reservations = () => {
     const handleConfirmNotification = async () => {
         if (selectedOperators.length > 0 && rejectedReservationID.reservationid) {
             try {
+                const newStatus = 'Published';
+                
+                await updateStatusMutation.mutateAsync({ 
+                    reservationId: rejectedReservationID.reservationid, 
+                    newStatus
+                });
+                
                 await sendNotificationMutation.mutateAsync({
                     reservationId: rejectedReservationID.reservationid,
                     operators: selectedOperators
