@@ -327,7 +327,6 @@ const Operators = () => {
     },
   ];
 
-
   useEffect(() => {
     if (operators.length > 0) {
 
@@ -407,7 +406,7 @@ const Operators = () => {
               <button className="close-button" onClick={() => setShowClusterModal(false)}>×</button>
             </div>
             <div className="modal-body">
-              <p>Assign cluster for {clusterOperator?.ufirstname} {clusterOperator?.ulastname}</p>
+              <h3>Assign cluster for Selected Operator</h3>
               <div className="form-group">
                 <label htmlFor="cluster-select">Select Cluster:</label>
                 <select
@@ -434,18 +433,21 @@ const Operators = () => {
             </div>
             <div className="modal-footer">
               <button
+                className="submit-button"
+                onClick={handleClusterSubmit}
+                disabled={updateClusterMutation.isPending}
+                style={{ marginRight: '10px' }}
+              >
+                {updateClusterMutation.isPending ? 'Saving...' : 'Save Changes'}
+              </button>
+              
+              <button
                 className="cancel-button"
                 onClick={() => setShowClusterModal(false)}
               >
                 Cancel
               </button>
-              <button
-                className="submit-button"
-                onClick={handleClusterSubmit}
-                disabled={updateClusterMutation.isPending}
-              >
-                {updateClusterMutation.isPending ? 'Saving...' : 'Save Changes'}
-              </button>
+              
             </div>
           </div>
         </div>
