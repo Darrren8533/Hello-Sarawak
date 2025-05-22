@@ -488,9 +488,8 @@ export const suggestNewRoom = async (propertyid, reservationid) => {
       },
     });
 
-    if(!response) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to suggest new room');
+    if (!response.ok) {
+      throw new Error(responseData.message || 'Failed to suggest new room');
     }
 
     return await response.json();
