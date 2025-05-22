@@ -6,9 +6,10 @@ import { SiLightning } from "react-icons/si";
 import { TbPawFilled, TbPawOff } from "react-icons/tb";
 import { MdLandscape, MdOutlineKingBed, MdFireplace, MdSmokingRooms, MdKeyboardArrowDown, MdKeyboardArrowUp} from "react-icons/md";
 import { FaWifi, FaDesktop, FaDumbbell, FaWater, FaSkiing, FaChargingStation, FaParking, FaSwimmingPool, FaTv, FaUtensils, FaSnowflake, FaSmokingBan, FaFireExtinguisher, FaFirstAid, FaShower, FaCoffee, FaUmbrellaBeach, FaBath, FaWind, FaBicycle, FaBabyCarriage, FaKey, FaBell, FaTree, FaCity } from "react-icons/fa";
-import { propertiesListing, updateProperty, propertyListingRequest} from "../../../Api/api";
+import { propertiesListing, updateProperty, propertyListingRequest, fetchClusters, fetchUserData } from "../../../Api/api";
 import Toast from "../Toast/Toast";
 import "./PropertyForm.css";
+import { useQuery } from '@tanstack/react-query';
 
 // Define maximum dimensions for image resizing
 const MAX_WIDTH = 1920;
@@ -104,34 +105,6 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         { name: "No Pets", icon: <TbPawOff />, category: "booking" },
     ];
 
-    const clusters = [
-        "Kuching", 
-        "Miri", 
-        "Sibu", 
-        "Bintulu",
-        "Limbang",
-        "Sarikei",
-        "Sri Aman",
-        "Kapit",
-        "Mukah",
-        "Betong",
-        "Samarahan",
-        "Serian",
-        "Lundu",
-        "Lawas",
-        "Marudi",
-        "Simunjan",
-        "Tatau",
-        "Belaga",
-        "Debak",
-        "Kabong",
-        "Pusa",
-        "Sebuyau",
-        "Saratok",
-        "Selangau",
-        "Tebedu"
-    ];
-
     const categories = [
         "Resort",
         "Hotel",
@@ -183,6 +156,24 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const fileInputRef = useRef(null);
     const locationInputRef = useRef(null);
     const [showMoreAmenities, setShowMoreAmenities] = useState(false);
+    const [userCluster, setUserCluster] = useState(null);
+    const userid = localStorage.getItem("userid");
+    
+    // 获取当前用户数据
+    const { data: userData } = useQuery({
+        queryKey: ['user', userid],
+        queryFn: () => fetchUserData(userid),
+        enabled: !!userid
+    });
+    
+    // 获取集群列表数据
+    const { data: clustersData = [] } = useQuery({
+        queryKey: ['clusters'],
+        queryFn: fetchClusters,
+    });
+    
+    // 从API获取的集群数据中提取集群名称
+    const clusters = clustersData.map(cluster => cluster.clustername || '');
 
     // Load form data on component mount
     useEffect(() => {
@@ -264,6 +255,24 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             setSelectedFacilities([]);
         }
     }, [initialData]);
+
+    // 根据用户的clusterid查找对应的集群名称并自动设置表单的clusterName
+    useEffect(() => {
+        if (userData && clustersData.length > 0 && !initialData) {
+            const userClusterId = userData.clusterid;
+            if (userClusterId) {
+                const userCluster = clustersData.find(
+                    cluster => cluster.clusterid?.toString() === userClusterId.toString()
+                );
+                if (userCluster) {
+                    setFormData(prev => ({
+                        ...prev,
+                        clusterName: userCluster.clustername
+                    }));
+                }
+            }
+        }
+    }, [userData, clustersData, initialData]);
 
     // Remove localStorage save effect
     useEffect(() => {
@@ -615,12 +624,15 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                             </div>
                             <div className="property-form-group">
                                 <label>Cluster (City):</label>
-                                <select name="clusterName" value={formData.clusterName} onChange={handleChange} required>
-                                    <option value="">Select Cluster (City)</option>
-                                    {clusters.map((cluster) => (
-                                        <option key={cluster} value={cluster}>{cluster}</option>
-                                    ))}
-                                </select>
+                                <input 
+                                    type="text" 
+                                    name="clusterName" 
+                                    value={formData.clusterName} 
+                                    readOnly 
+                                    required 
+                                    className="readonly-input"
+                                    style={{ backgroundColor: '#f0f0f0' }}
+                                />
                             </div>
                             <div className="property-form-group">
                                 <label>Category:</label>
