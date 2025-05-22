@@ -1,5 +1,11 @@
-import React, { useState, useEffect } from 'react';
-import { fetchClusters } from '../../../../../Api/api';
+import React, { useState, useEffect, useCallback } from 'react';
+import { 
+  fetchClusters, 
+  fetchClusterNames, 
+  addCluster, 
+  updateCluster, 
+  deleteCluster 
+} from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
@@ -30,36 +36,7 @@ const Cluster = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('');
-  const API_URL = import.meta.env.VITE_API_URL;
-
-  // Sarawak states
-  const states = [
-    'Kuching',
-    'Miri',
-    'Sibu',
-    'Bintulu',
-    'Limbang',
-    'Sarikei',
-    'Sri Aman',
-    'Kapit',
-    'Mukah',
-    'Betong',
-    'Samarahan',
-    'Serian'
-  ];
-
-  useEffect(() => {
-    const fetchClusterData = async () => {
-      try {
-        const clusterData = await fetchClusters();
-        setClusters(clusterData);
-      } catch (error) {
-        console.error('Failed to fetch cluster details', error);
-        displayToast('error', 'Failed to load clusters. Please try again.');
-      }
-    };
-    fetchClusterData();
-  }, []);
+  const [states, setStates] = useState([]);
 
   const displayToast = (type, message) => {
     setToastType(type);
@@ -68,85 +45,90 @@ const Cluster = () => {
     setTimeout(() => setShowToast(false), 5000);
   };
 
-  const handleApplyFilters = () => {
-    setAppliedFilters({ state: selectedState });
-  };
+  const resetForm = useCallback(() => {
+    setNewCluster({
+      clusterName: '',
+      clusterState: '',
+      clusterProvince: ''
+    });
+    setEditMode(false);
+  }, []);
 
-  const filters = [
-    {
-      name: 'state',
-      label: 'State',
-      value: selectedState,
-      onChange: setSelectedState,
-      options: [
-        { value: 'All', label: 'All States' },
-        ...states.map(state => ({ value: state, label: state }))
-      ],
-    },
-  ];
+  const handleInputChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setNewCluster(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  }, []);
 
-  const displayLabels = {
-    clusterID: 'ID',
-    clusterName: 'Name',
-    clusterState: 'State',
-    clusterProvince: 'Province',
-    timestamp: 'Created At'
-  };
+  
+  const handleSearchChange = useCallback((newValue) => {
+    // 直接更新状态，不再使用防抖
+    setSearchKey(newValue);
+  }, []);
 
-  const filteredClusters = clusters.filter((cluster) => {
-    const searchInFields =
-      `${cluster.clusterName} ${cluster.clusterState} ${cluster.clusterProvince}`
-        .toLowerCase()
-        .includes(searchKey.toLowerCase());
+  const handleDeleteCluster = useCallback(async (clusterID) => {
+    try {
+      const data = await deleteCluster(clusterID);
+      
+      if (data.success) {
+        setClusters(clusters.filter(cluster => cluster.clusterid !== clusterID));
+        displayToast('success', 'Successfully deleted cluster');
+      } else {
+        displayToast('error', `Failed to delete: ${data.message || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error deleting cluster:', error);
+      displayToast('error', 'Error deleting cluster. Please try again.');
+    }
+  }, [clusters, setClusters, displayToast]);
 
-    const stateFilter =
-      appliedFilters.state === 'All' || cluster.clusterState === appliedFilters.state;
-
-    return searchInFields && stateFilter;
-  });
-
-  const handleAction = (action, cluster) => {
+  const handleAction = useCallback((action, cluster) => {
     if (action === 'view') {
       setSelectedCluster(cluster);
     } else if (action === 'edit') {
       setNewCluster({
-        clusterID: cluster.clusterID,
-        clusterName: cluster.clusterName,
-        clusterState: cluster.clusterState,
-        clusterProvince: cluster.clusterProvince
+        clusterID: cluster.clusterid,
+        clusterName: cluster.clustername,
+        clusterState: cluster.clusterstate,
+        clusterProvince: cluster.clusterprovince
       });
       setEditMode(true);
       setShowAddModal(true);
     } else if (action === 'delete') {
-      if (window.confirm(`Are you sure you want to delete ${cluster.clusterName}?`)) {
-        handleDeleteCluster(cluster.clusterID);
+      if (window.confirm(`Are you sure you want to delete ${cluster.clustername}?`)) {
+        handleDeleteCluster(cluster.clusterid);
       }
     }
-  };
+  }, [setSelectedCluster, setNewCluster, setEditMode, setShowAddModal, handleDeleteCluster]);
 
-  const handleAddCluster = async () => {
+  const handleAddCluster = useCallback(async () => {
     try {
-      const endpoint = editMode 
-        ? `${API_URL}/clusters/${newCluster.clusterID}` 
-        : `${API_URL}/clusters`;
+      const clusterData = {
+        clusterName: newCluster.clusterName,
+        clusterState: newCluster.clusterState,
+        clusterProvince: newCluster.clusterProvince
+      };
       
-      const method = editMode ? 'PUT' : 'POST';
+      let data;
       
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newCluster),
-      });
-
-      const data = await response.json();
+      if (editMode) {
+        data = await updateCluster(newCluster.clusterID, clusterData);
+      } else {
+        data = await addCluster(clusterData);
+      }
       
       if (data.success) {
         if (editMode) {
           setClusters(clusters.map(cluster => 
-            cluster.clusterID === newCluster.clusterID 
-              ? { ...newCluster, timestamp: cluster.timestamp } 
+            cluster.clusterid === newCluster.clusterID 
+              ? { 
+                  ...cluster,
+                  clustername: newCluster.clusterName,
+                  clusterstate: newCluster.clusterState,
+                  clusterprovince: newCluster.clusterProvince
+                } 
               : cluster
           ));
           displayToast('success', `Successfully updated ${newCluster.clusterName}`);
@@ -163,44 +145,67 @@ const Cluster = () => {
       console.error(`Error ${editMode ? 'updating' : 'adding'} cluster:`, error);
       displayToast('error', `Error ${editMode ? 'updating' : 'adding'} cluster. Please try again.`);
     }
+  }, [clusters, editMode, newCluster, setShowAddModal, displayToast, resetForm, setClusters]);
+
+  const handleApplyFilters = () => {
+    setAppliedFilters({ state: selectedState });
   };
 
-  const handleDeleteCluster = async (clusterID) => {
-    try {
-      const response = await fetch(`${API_URL}/clusters/${clusterID}`, {
-        method: 'DELETE',
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setClusters(clusters.filter(cluster => cluster.clusterID !== clusterID));
-        displayToast('success', 'Successfully deleted cluster');
-      } else {
-        displayToast('error', `Failed to delete: ${data.message || 'Unknown error'}`);
+  // Fetch clusters and cluster states from the database
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch clusters
+        const clusterData = await fetchClusters();
+        setClusters(clusterData);
+        
+        // Fetch unique cluster names
+        const namesData = await fetchClusterNames();
+        setStates(namesData);
+      } catch (error) {
+        console.error('Failed to fetch data', error);
+        displayToast('error', 'Failed to load data. Please try again.');
       }
-    } catch (error) {
-      console.error('Error deleting cluster:', error);
-      displayToast('error', 'Error deleting cluster. Please try again.');
-    }
+    };
+    fetchData();
+  }, []);
+
+  const filters = [
+    {
+      name: 'state',
+      label: 'Cluster Name',
+      value: selectedState,
+      onChange: setSelectedState,
+      options: [
+        { value: 'All', label: 'All Cluster Names' },
+        ...states.map(state => (
+          typeof state === 'string' 
+            ? { value: state, label: state } 
+            : { value: state.clustername, label: state.clustername }
+        ))
+      ],
+    },
+  ];
+
+  const displayLabels = {
+    clusterid: 'ID',
+    clustername: 'Name',
+    clusterstate: 'State',
+    clusterprovince: 'Province',
+    timestamp: 'Created At'
   };
 
-  const resetForm = () => {
-    setNewCluster({
-      clusterName: '',
-      clusterState: '',
-      clusterProvince: ''
-    });
-    setEditMode(false);
-  };
+  const filteredClusters = clusters.filter((cluster) => {
+    const searchInFields =
+      `${cluster.clustername} ${cluster.clusterstate} ${cluster.clusterprovince}`
+        .toLowerCase()
+        .includes(searchKey.toLowerCase());
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewCluster(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+    const stateFilter =
+      appliedFilters.state === 'All' || cluster.clustername === appliedFilters.state;
+
+    return searchInFields && stateFilter;
+  });
 
   const clusterDropdownItems = [
     { label: 'View Details', icon: <FaEye />, action: 'view' },
@@ -209,10 +214,10 @@ const Cluster = () => {
   ];
 
   const columns = [
-    { header: 'ID', accessor: 'clusterID' },
-    { header: 'Name', accessor: 'clusterName' },
-    { header: 'State', accessor: 'clusterState' },
-    { header: 'Province', accessor: 'clusterProvince' },
+    { header: 'ID', accessor: 'clusterid' },
+    { header: 'Name', accessor: 'clustername' },
+    { header: 'State', accessor: 'clusterstate' },
+    { header: 'Province', accessor: 'clusterprovince' },
     { 
       header: 'Created At', 
       accessor: 'timestamp',
@@ -234,8 +239,80 @@ const Cluster = () => {
     },
   ];
 
-  const AddClusterModal = ({ isOpen, onClose }) => {
+  const AddClusterModal = React.memo(({ isOpen, onClose }) => {
     if (!isOpen) return null;
+    
+    const [localFormData, setLocalFormData] = useState(() => ({
+      clusterName: newCluster.clusterName,
+      clusterState: newCluster.clusterState,
+      clusterProvince: newCluster.clusterProvince
+    }));
+    
+    useEffect(() => {
+      if (isOpen) {
+        setLocalFormData({
+          clusterName: newCluster.clusterName,
+          clusterState: newCluster.clusterState,
+          clusterProvince: newCluster.clusterProvince
+        });
+      }
+    }, [isOpen, newCluster]);
+    
+    const handleLocalChange = (e) => {
+      const { name, value } = e.target;
+      setLocalFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    };
+    
+    const handleSubmit = () => {
+      const submitData = async () => {
+        try {
+          const clusterData = {
+            clusterName: localFormData.clusterName,
+            clusterState: localFormData.clusterState,
+            clusterProvince: localFormData.clusterProvince
+          };
+          
+          let data;
+          
+          if (editMode) {
+            data = await updateCluster(newCluster.clusterID, clusterData);
+          } else {
+            data = await addCluster(clusterData);
+          }
+          
+          if (data.success) {
+            if (editMode) {
+              setClusters(clusters.map(cluster => 
+                cluster.clusterid === newCluster.clusterID 
+                  ? { 
+                      ...cluster,
+                      clustername: localFormData.clusterName,
+                      clusterstate: localFormData.clusterState,
+                      clusterprovince: localFormData.clusterProvince
+                    } 
+                  : cluster
+              ));
+              displayToast('success', `Successfully updated ${localFormData.clusterName}`);
+            } else {
+              setClusters([...clusters, data.cluster]);
+              displayToast('success', `Successfully added ${localFormData.clusterName}`);
+            }
+            onClose();
+            resetForm();
+          } else {
+            displayToast('error', `Failed: ${data.message || 'Unknown error'}`);
+          }
+        } catch (error) {
+          console.error(`Error ${editMode ? 'updating' : 'adding'} cluster:`, error);
+          displayToast('error', `Error ${editMode ? 'updating' : 'adding'} cluster. Please try again.`);
+        }
+      };
+      
+      submitData();
+    };
     
     return (
       <div className="modal-overlay">
@@ -252,27 +329,26 @@ const Cluster = () => {
                 type="text"
                 id="clusterName"
                 name="clusterName"
-                value={newCluster.clusterName}
-                onChange={handleInputChange}
+                value={localFormData.clusterName}
+                onChange={handleLocalChange}
                 placeholder="Enter cluster name"
-                required
+                autoComplete="off"
               />
             </div>
             
             <div className="form-group">
               <label htmlFor="clusterState">State</label>
-              <select
+             
+              <input
+                type="text"
                 id="clusterState"
                 name="clusterState"
-                value={newCluster.clusterState}
-                onChange={handleInputChange}
+                value={localFormData.clusterState}
+                onChange={handleLocalChange}
+                placeholder="Enter cluster state"
                 required
-              >
-                <option value="">Select a state</option>
-                {states.map((state, index) => (
-                  <option key={index} value={state}>{state}</option>
-                ))}
-              </select>
+                autoComplete="off"
+              />
             </div>
             
             <div className="form-group">
@@ -281,10 +357,11 @@ const Cluster = () => {
                 type="text"
                 id="clusterProvince"
                 name="clusterProvince"
-                value={newCluster.clusterProvince}
-                onChange={handleInputChange}
+                value={localFormData.clusterProvince}
+                onChange={handleLocalChange}
                 placeholder="Enter province"
                 required
+                autoComplete="off"
               />
             </div>
           </div>
@@ -294,8 +371,8 @@ const Cluster = () => {
               <button className="cancel-button" onClick={onClose}>Cancel</button>
               <button 
                 className="submit-button"
-                onClick={handleAddCluster}
-                disabled={!newCluster.clusterName || !newCluster.clusterState || !newCluster.clusterProvince}
+                onClick={handleSubmit}
+                disabled={!localFormData.clusterName || !localFormData.clusterState || !localFormData.clusterProvince}
               >
                 {editMode ? 'Update Cluster' : 'Add Cluster'}
               </button>
@@ -304,7 +381,7 @@ const Cluster = () => {
         </div>
       </div>
     );
-  };
+  });
 
   return (
     <div>
@@ -315,7 +392,7 @@ const Cluster = () => {
         <div className="header-actions">
           <SearchBar
             value={searchKey}
-            onChange={(newValue) => setSearchKey(newValue)}
+            onChange={handleSearchChange}
             placeholder="Search clusters..."
           />
           <button 
@@ -335,13 +412,13 @@ const Cluster = () => {
       <PaginatedTable
         data={filteredClusters}
         columns={columns}
-        rowKey="clusterID"
+        rowKey="clusterid"
         enableCheckbox={false}
       />
 
       <Modal
         isOpen={!!selectedCluster}
-        title={selectedCluster?.clusterName || 'Cluster Details'}
+        title={selectedCluster?.clustername || 'Cluster Details'}
         data={selectedCluster || {}}
         labels={displayLabels}
         onClose={() => setSelectedCluster(null)}
