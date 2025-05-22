@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from "react";
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { GiWashingMachine, GiClothesline, GiDesert  } from "react-icons/gi";
 import { PiSecurityCamera } from "react-icons/pi";
 import { SiLightning } from "react-icons/si";
@@ -566,21 +565,6 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
 
     const handleOverlayClick = (e) => e.stopPropagation();
 
-    const handleDragEnd = (result) => {
-        if (!result.destination) return;
-        
-        // Don't do anything if dropped in the same position
-        if (result.destination.index === result.source.index) return;
-        
-        const items = Array.from(formData.propertyImage);
-        const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedItem);
-        
-        // Update the form data with the new order
-        setFormData((prev) => ({ ...prev, propertyImage: items }));
-    };
-
-    // Add an info message about image dragging
     const imageInfoText = 
         formData.propertyImage.length > 0 
             ? "Drag images to reorder. The first image will be the main display image." 
@@ -835,56 +819,27 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                                 </div>
                             )}
                         </div>
-                        <DragDropContext onDragEnd={handleDragEnd}>
-                            <Droppable droppableId="images" direction="horizontal">
-                                {(provided, snapshot) => (
-                                    <div
-                                        {...provided.droppableProps}
-                                        ref={provided.innerRef}
-                                        className={`property-form-existing-images-container ${snapshot.isDraggingOver ? 'dragging-over' : ''}`}
-                                    >
-                                        {formData.propertyImage.map((image, index) => (
-                                            <Draggable
-                                                key={image instanceof File ? `file-${image.name}-${index}` : `image-${index}`}
-                                                draggableId={image instanceof File ? `file-${image.name}-${index}` : `image-${index}`}
-                                                index={index}
-                                            >
-                                                {(provided, snapshot) => (
-                                                    <div
-                                                        ref={provided.innerRef}
-                                                        {...provided.draggableProps}
-                                                        {...provided.dragHandleProps}
-                                                        className={`property-form-image-item ${snapshot.isDragging ? 'dragging' : ''}`}
-                                                        style={{
-                                                            ...provided.draggableProps.style,
-                                                            cursor: snapshot.isDragging ? 'grabbing' : 'grab',
-                                                            transform: snapshot.isDragging ? `${provided.draggableProps.style.transform} scale(1.05)` : provided.draggableProps.style.transform
-                                                        }}
-                                                    >
-                                                        <div className="property-form-image-label" style={getLabelStyle(index)}>
-                                                            {getImageLabel(index)}
-                                                        </div>
-                                                        {image instanceof File ? (
-                                                            <img src={URL.createObjectURL(image)} alt="Property" />
-                                                        ) : (
-                                                            <img src={`data:image/jpeg;base64,${image}`} alt="Property" />
-                                                        )}
-                                                        <button
-                                                            type="button"
-                                                            className="property-form-remove-image-btn"
-                                                            onClick={() => handleRemoveImage(index)}
-                                                        >
-                                                            ×
-                                                        </button>
-                                                    </div>
-                                                )}
-                                            </Draggable>
-                                        ))}
-                                        {provided.placeholder}
+                        <div className="property-form-existing-images-container">
+                            {formData.propertyImage.map((image, index) => (
+                                <div key={index} className="property-form-image-item">
+                                    <div className="property-form-image-label" style={getLabelStyle(index)}>
+                                        {getImageLabel(index)}
                                     </div>
-                                )}
-                            </Droppable>
-                        </DragDropContext>
+                                    {image instanceof File ? (
+                                        <img src={URL.createObjectURL(image)} alt="Property" />
+                                    ) : (
+                                        <img src={`data:image/jpeg;base64,${image}`} alt="Property" />
+                                    )}
+                                    <button
+                                        type="button"
+                                        className="property-form-remove-image-btn"
+                                        onClick={() => handleRemoveImage(index)}
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                     
                     <div className="property-form-button-group">
