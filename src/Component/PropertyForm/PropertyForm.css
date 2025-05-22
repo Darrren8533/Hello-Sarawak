@@ -262,7 +262,7 @@ background-color: #bfdbfe;
 
 .property-form-image-item {
   position: relative;
-  width: 180px;
+  width: 174px;
   height: 150px;
   border-radius: 8px;
   overflow: hidden;
@@ -446,4 +446,215 @@ background-color: #bfdbfe;
   z-index: 100;
   position: relative;
   pointer-events: none;
+}
+
+.property-form-section {
+  margin: 20px 0;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+  background-color: #f8fafc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  width: 100%;
+}
+
+.property-form-section h3 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 18px;
+  color: #1e293b;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.property-form-section h3::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 18px;
+  background-color: #3b82f6;
+  margin-right: 8px;
+  border-radius: 2px;
+}
+
+.property-form-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.property-form-help-text {
+  display: block;
+  color: #64748b;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.property-form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Highlight the normal rate field */
+.property-form-pricing-grid .property-form-group:first-child input {
+  border-color: #3b82f6;
+  background-color: #f0f7ff;
+}
+
+.property-form-pricing-grid .property-form-group:first-child label {
+  color: #3b82f6;
+  font-weight: 700;
+}
+
+/* Style for discount rate fields */
+.property-form-pricing-grid .property-form-group input[name="earlyBirdDiscountRate"],
+.property-form-pricing-grid .property-form-group input[name="lastMinuteDiscountRate"] {
+  border-color: #10b981;
+  background-color: #ecfdf5;
+}
+
+.property-form-pricing-grid .property-form-group input[name="earlyBirdDiscountRate"] + small,
+.property-form-pricing-grid .property-form-group input[name="lastMinuteDiscountRate"] + small {
+  color: #10b981;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .property-form-pricing-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.property-form-details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+/* Responsive adjustments for property details grid */
+@media (max-width: 768px) {
+  .property-form-details-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Add visual distinction between sections */
+.property-form-section + .property-form-section {
+  margin-top: 30px;
+}
+
+/* Different accent colors for each section */
+.property-form-section:nth-child(1) h3::before {
+  background-color: #3b82f6; /* Blue for property details */
+}
+
+.property-form-section:nth-child(2) h3::before {
+  background-color: #10b981; /* Green for dynamic pricing */
+}
+
+.property-form-section:nth-child(3) h3::before {
+  background-color: #f59e0b; /* Amber for facilities */
+}
+
+.property-form-section:nth-child(4) h3::before {
+  background-color: #8b5cf6; /* Purple for images */
+}
+
+.property-form-pricing-note {
+  background-color: #f0f9ff;
+  border-left: 4px solid #3b82f6;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+}
+
+.property-form-pricing-note p {
+  margin: 0;
+  font-size: 14px;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.property-form-rate-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.property-form-toggle {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 24px;
+  margin-left: 10px;
+}
+
+.property-form-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.property-form-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
+}
+
+.property-form-toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+.property-form-toggle input:checked + .property-form-toggle-slider {
+  background-color: #10b981;
+}
+
+.property-form-toggle input:focus + .property-form-toggle-slider {
+  box-shadow: 0 0 1px #10b981;
+}
+
+.property-form-toggle input:checked + .property-form-toggle-slider:before {
+  transform: translateX(22px);
+}
+
+/* Style for disabled inputs */
+.disabled-input {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: #f3f4f6;
+}
+
+/* Add status indicator text */
+.property-form-toggle-slider:after {
+  content: "OFF";
+  color: #fff;
+  display: block;
+  position: absolute;
+  transform: translateX(0px);
+  top: 4px;
+  left: 24px;
+  font-size: 10px;
+  font-weight: bold;
+  transition: .4s;
+}
+
+.property-form-toggle input:checked + .property-form-toggle-slider:after {
+  content: "ON";
+  transform: translateX(-20px);
 }
