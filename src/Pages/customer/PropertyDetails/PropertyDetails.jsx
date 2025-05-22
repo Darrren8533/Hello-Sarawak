@@ -626,7 +626,7 @@ const PropertyDetails = () => {
                       </>
                     ) : (
                       <button className="show-reviews-btn" onClick={() => setShowReviews(true)}>
-                        No reviews · Be the first to share your experience!
+                        No reviews
                       </button>
                     )}
                   </div>
