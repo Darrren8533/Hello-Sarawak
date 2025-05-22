@@ -472,10 +472,11 @@ const Reservations = () => {
                     <div className="custom-message-box">
                         <h2>Choose An Action</h2>
                         <p>Please Select An Action For The Rejection:</p>
-                        <div className="message-box-buttons">
+                        <button onClick={() => setShowMessageBox(false)} className="form-close-button">×</button>
+
+                        <div class="message-box-buttons">
                             <button onClick={() => handleMessageBoxSelect('suggest')}>Suggest</button>
                             <button onClick={() => handleMessageBoxSelect('notify')}>Notify Suggest</button>
-                            <button onClick={() => setShowMessageBox(false)}>Cancel</button>
                         </div>
                     </div>
                 </div>
@@ -486,7 +487,7 @@ const Reservations = () => {
                     <div className="suggest-properties custom-message-box">
                         <div className="suggest-header">
                             <h2>Select A Property To Suggest</h2>
-                            <div className="close-button" onClick={() => setMessageBoxMode('')}>X</div>
+                            <div className="form-close-button" onClick={() => setMessageBoxMode('')}>×</div>
                         </div>
 
                         <div className="suggest-filters">
@@ -562,7 +563,7 @@ const Reservations = () => {
             {messageBoxMode === 'notify' && (
                 <div className="custom-message-box-overlay">
                     <div className="suggest-properties custom-message-box">
-                        <div className="close-button" onClick={() => setMessageBoxMode('')}>X</div>
+                        <div className="form-close-button" onClick={() => setMessageBoxMode('')}>×</div>
                         <h2>Select Operators To Notify</h2>
                         <div className="operator-list">
                             <div className="select-all-checkbox">
