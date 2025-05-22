@@ -732,7 +732,7 @@ const Product = () => {
                               <span className="price-period">/night</span>
                             </div>
                               {isDateOverlapping[property.propertyid] && (
-                                <span className="status-label">CLASHED</span>
+                                <span className="status-label">FULL</span>
                               )}
                           </div>
                         </div>
