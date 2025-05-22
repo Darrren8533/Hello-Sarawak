@@ -302,7 +302,9 @@ export const createModerator = async (userData) => {
 // Update User
 export const updateUser = async (userData, userid) => {
   try {
-    const response = await fetch(`${API_URL}/users/updateUser/${userid}`, {
+    const url = `${API_URL}/users/updateUser/${userid}`;
+
+    const response = await fetch(url, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -312,14 +314,30 @@ export const updateUser = async (userData, userid) => {
 
     if (!response.ok) {
       try {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Failed to update user');
-      } catch {
-          throw new Error('Failed to update user (non-JSON error response)');
+        const errorText = await response.text();
+        
+        let errorData;
+        try {
+          errorData = JSON.parse(errorText);
+          throw new Error(errorData.error || errorData.message || `Failed to update user (${response.status})`);
+        } catch (jsonError) {
+          // console.error('Response is not valid JSON:', jsonError);
+          throw new Error(`Server error (${response.status}): ${errorText || response.statusText}`);
+        }
+      } catch (parseError) {
+        // console.error('Error parsing response:', parseError);
+        throw new Error(`Failed to update user: ${response.status} ${response.statusText}`);
       }
     }
 
-    return await response.json();
+    // Attempt to parse response as JSON, if fails return an empty success object
+    try {
+      const data = await response.json();
+      return data;
+    } catch (jsonError) {
+      console.warn('Success response is not valid JSON, returning generic success object:', jsonError);
+      return { success: true, message: 'Update successful' };
+    }
   } catch (error) {
     console.error('API error:', error);
     throw error;
@@ -1121,6 +1139,17 @@ export const fetchClusters = async () => {
   }
 };
 
+// Fetch unique cluster names from the database
+export const fetchClusterNames = async () => {
+  try {
+    const response = await fetch(`${API_URL}/clusters/names`);
+    return response.json();
+  } catch (error) {
+    console.error('Error fetching cluster names:', error);
+    throw error;
+  }
+};
+
 // Fetch Suggested Reservations
 export const suggestedReservations = async (userid) => {
   try {
@@ -1140,6 +1169,56 @@ export const suggestedReservations = async (userid) => {
     return data;
   } catch (error) {
     console.error('API error: ', error);
+    throw error;
+  }
+};
+
+// Add a new cluster
+export const addCluster = async (clusterData) => {
+  try {
+    const response = await fetch(`${API_URL}/clusters`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(clusterData),
+    });
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error adding cluster:', error);
+    throw error;
+  }
+};
+
+// Update an existing cluster
+export const updateCluster = async (clusterID, clusterData) => {
+  try {
+    const response = await fetch(`${API_URL}/clusters/${clusterID}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(clusterData),
+    });
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating cluster:', error);
+    throw error;
+  }
+};
+
+// Delete a cluster
+export const deleteCluster = async (clusterID) => {
+  try {
+    const response = await fetch(`${API_URL}/clusters/${clusterID}`, {
+      method: 'DELETE',
+    });
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting cluster:', error);
     throw error;
   }
 };
