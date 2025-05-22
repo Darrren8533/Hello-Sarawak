@@ -323,9 +323,9 @@ const Reservations = () => {
     };
 
     const handleConfirmSuggestion = async () => {
+        console.log("Selected Property:", selectedProperty);
+        console.log("Rejected Reservation ID:", rejectedReservationID?.reservationid);
         if (selectedProperty && rejectedReservationID.reservationid) {
-            console.log("Selected Property:", selectedProperty);
-            console.log("Rejected Reservation ID:", rejectedReservationID?.reservationid);
             try {
                 const newStatus = 'Suggested';
 
