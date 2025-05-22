@@ -318,8 +318,8 @@ const Reservations = () => {
         setShowMessageBox(false);
     };
 
-    const handlePropertySelect = (propertyaddress) => {
-        setSelectedProperty(propertyaddress);
+    const handlePropertySelect = (propertyid) => {
+        setSelectedProperty(propertyid);
     };
 
     const handleConfirmSuggestion = async () => {
@@ -333,7 +333,7 @@ const Reservations = () => {
                 });
 
                 await suggestRoomMutation.mutateAsync({
-                    propertyAddress: selectedProperty,
+                    propertyId: selectedProperty,
                     reservationId: rejectedReservationID.reservationid
                 });
 
@@ -505,16 +505,16 @@ const Reservations = () => {
                         <div className="property-list">
                             {administratorProperties.length > 0 ? (
                                 administratorProperties.map((property) => (
-                                    <div key={property.propertyaddress} className="property-card">
+                                    <div key={property.propertyid} className="property-card">
                                         <input
                                             type="radio"
-                                            id={`property-${property.propertyaddress}`}
+                                            id={`property-${property.propertyid}`}
                                             name="property"
-                                            value={property.propertyaddress}
-                                            onChange={() => handlePropertySelect(property.propertyaddress)}
+                                            value={property.propertyid}
+                                            onChange={() => handlePropertySelect(property.propertyid)}
                                             className="property-radio"
                                         />
-                                        <label htmlFor={`property-${property.propertyaddress}`} className="property-label">
+                                        <label htmlFor={`property-${property.propertyid}`} className="property-label">
                                             <div className="property-image-container">
                                                 <img
                                                     src={`data:image/jpeg;base64,${property.images[0]}`}
@@ -525,7 +525,7 @@ const Reservations = () => {
                                             <div className="property-details">
                                                 <h3 className="property-title">{property.propertyaddress}</h3>
                                                 <p className="property-info-text">{property.propertyguestpaxno} Pax</p>
-                                                <p className="property-price">RM {property.rateamount}</p>
+                                                <p className="property-price">RM {property.normalrate}</p>
                                             </div>
                                         </label>
                                     </div>
