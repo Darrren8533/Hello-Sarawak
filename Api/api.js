@@ -856,13 +856,16 @@ export const fetchALOS = async (userid) => {
 };
 
 // Get Properties Of Administrator For "Suggest"
-export const getOperatorProperties = async (userid) => {
+export const getOperatorProperties = async (userid, reservationid) => {
   try {
     const response = await fetch(`${API_URL}/operatorProperties/${userid}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({
+        reservationid: reservationid,  
+      }),
     });
 
     if(!response) {
