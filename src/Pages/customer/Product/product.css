@@ -389,7 +389,6 @@
   border-radius: 4px;
   font-size: 12px;
   font-weight: bold;
-  margin-left: 10px;
 }
 
 .no-properties-message {
@@ -684,5 +683,13 @@
 
   .property-container_for_product h2{
     margin-top: 15px;
+  }
+
+  .no-reviews {
+    font-size: 12px;
+  }
+
+  .status-label{
+    font-size: 9px;
   }
 }
