@@ -93,25 +93,36 @@ const Reservations = () => {
 
     // Fetch administrator properties when needed
     const { data: administratorProperties = [], refetch: refetchProperties } = useQuery({
-        queryKey: ['administratorProperties', localStorage.getItem('userid'), rejectedReservationID.reservationid],
+        queryKey: [
+            'administratorProperties',
+            localStorage.getItem('userid'),
+            rejectedReservationID?.reservationid
+        ],
         queryFn: async () => {
             const userid = localStorage.getItem('userid');
-            
-            if (!userid || !rejectedReservationID.reservationid) {
+            const reservationid = rejectedReservationID?.reservationid;
+    
+            if (!userid || !reservationid) {
                 console.error('Missing userid or reservationid');
                 return [];
             }
     
             try {
-                const response = await getOperatorProperties(userid, rejectedReservationID.reservationid);
-                return response; 
+                const response = await getOperatorProperties(userid, reservationid);
+                return response;
             } catch (error) {
                 console.error('Failed to fetch administrator properties:', error);
                 return [];
             }
         },
-        enabled: false, // Don't run this query automatically unless refetched manually
+        enabled: false, // Prevent automatic fetch
     });
+    
+    useEffect(() => {
+        if (rejectedReservationID?.reservationid) {
+            refetchProperties();
+        }
+    }, [rejectedReservationID, refetchProperties]);
 
     // Update reservation status mutation
     const updateStatusMutation = useMutation({
