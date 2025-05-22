@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchModerators, suspendUser, activateUser, removeUser } from '../../../../../Api/api';
+import { fetchModerators, suspendUser, activateUser, removeUser, fetchClusters, updateUser } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
@@ -12,7 +12,7 @@ import Alert from '../../../../Component/Alert/Alert';
 import Loader from '../../../../Component/Loader/Loader';
 import Status from '../../../../Component/Status/Status';
 import UserActivityCell from '../../../../Component/UserActivityCell/UserActivityCell';
-import { FaEye, FaBan, FaUser, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEye, FaBan, FaUser, FaEdit, FaTrash, FaLayerGroup } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
@@ -34,6 +34,10 @@ const Moderators = () => {
   const [toastType, setToastType] = useState('');
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [moderatorToDelete, setModeratorToDelete] = useState(null);
+  const [showClusterModal, setShowClusterModal] = useState(false);
+  const [clusterModerator, setClusterModerator] = useState(null);
+  const [selectedCluster, setSelectedCluster] = useState('');
+  const [availableClusters, setAvailableClusters] = useState([]);
 
   // Initialize QueryClient
   const queryClient = useQueryClient();
@@ -41,10 +45,65 @@ const Moderators = () => {
   // Fetch moderators query
   const { data: moderators = [], isLoading } = useQuery({
     queryKey: ['moderators'],
-    queryFn: fetchModerators,
+    queryFn: async () => {
+      try {
+        // Fetch all moderators
+        const moderatorsData = await fetchModerators();
+        
+        // Fetch all clusters
+        const clustersData = await fetchClusters();
+        
+        // Add cluster information to moderator data
+        const moderatorsWithClusters = moderatorsData.map(moderator => {
+          // Handle possible different field names
+          const moderatorClusterId = moderator.clusterid || moderator.cluster_id || moderator.cluster || '';
+          
+          if (moderatorClusterId) {
+            // Attempt to match clusterid in different formats (number or string)
+            const matchingCluster = clustersData.find(cluster => {
+              const clusterId = cluster.clusterid || cluster.cluster_id || cluster.id;
+              return clusterId && (clusterId.toString() === moderatorClusterId.toString());
+            });
+            
+            if (matchingCluster) {
+              const clusterName = matchingCluster.clustername || matchingCluster.cluster_name || matchingCluster.name;
+              return {
+                ...moderator,
+                clusterid: moderatorClusterId, // Unified field name
+                clustername: clusterName // Unified field name
+              };
+            }
+          }
+          
+          // If no matching cluster is found, ensure standard format is returned
+          return {
+            ...moderator,
+            clusterid: moderatorClusterId || '',
+            clustername: ''
+          };
+        });
+        
+        return moderatorsWithClusters;
+      } catch (error) {
+        console.error('Error fetching moderator details:', error);
+        throw new Error('Failed to fetch moderator details');
+      }
+    },
     staleTime: 30 * 60 * 1000,
     refetchInterval: 1000,
   });
+
+  // Fetch clusters
+  const { data: clusters = [] } = useQuery({
+    queryKey: ['clusters'],
+    queryFn: fetchClusters,
+    staleTime: 30 * 60 * 1000
+  });
+
+  // Load clusters into state
+  useEffect(() => {
+    setAvailableClusters(clusters);
+  }, [clusters]);
 
   // Define mutations
   const suspendMutation = useMutation({
@@ -94,6 +153,24 @@ const Moderators = () => {
       setIsDialogOpen(false);
       setModeratorToDelete(null);
     },
+  });
+
+  // Mutation for updating moderator's cluster
+  const updateClusterMutation = useMutation({
+    mutationFn: ({ userData, userid }) => updateUser(userData, userid),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['moderators']);
+      queryClient.invalidateQueries(['clusters']);
+      
+      setShowClusterModal(false);
+      displayToast(
+        'success',
+        `Successfully updated cluster for ${clusterModerator.username}`
+      );
+    },
+    onError: (error) => {
+      displayToast('error', `Error updating cluster: ${error.message}`);
+    }
   });
 
   useEffect(() => {
@@ -182,6 +259,10 @@ const Moderators = () => {
     } else if (action === 'remove') {
       setModeratorToDelete(moderator);
       setIsDialogOpen(true);
+    } else if (action === 'editCluster') {
+      setClusterModerator(moderator);
+      setSelectedCluster(moderator.clusterid || '');
+      setShowClusterModal(true);
     }
   };
 
@@ -191,12 +272,44 @@ const Moderators = () => {
     }
   };
 
+  const handleClusterChange = (e) => {
+    setSelectedCluster(e.target.value);
+  };
+  
+  const handleClusterSubmit = () => {
+    if (!clusterModerator) return;
+    
+    const userData = { 
+      clusterid: selectedCluster || null,
+      username: clusterModerator.username || 'user_' + clusterModerator.userid,
+      firstName: clusterModerator.ufirstname,
+      lastName: clusterModerator.ulastname,
+      email: clusterModerator.uemail,
+      phoneNo: clusterModerator.uphoneno,
+      country: clusterModerator.ucountry,
+      zipCode: clusterModerator.uzipcode,
+      creatorid: localStorage.getItem("userid"),
+      creatorUsername: localStorage.getItem("username")
+    };
+    
+    if (!clusterModerator.userid) {
+      displayToast('error', 'Invalid moderator ID');
+      return;
+    }
+    
+    updateClusterMutation.mutate({
+      userData: userData,
+      userid: clusterModerator.userid
+    });
+  };
+
   const moderatorDropdownItems = (moderatorStatus) => {
     if (moderatorStatus === 'Inactive') {
       return [
         { label: 'View Details', icon: <FaEye />, action: 'view' },
         { label: 'Edit', icon: <FaEdit />, action: 'edit' },
         { label: 'Activate', icon: <FaUser />, action: 'activate' },
+        { label: 'Edit Cluster', icon: <FaLayerGroup />, action: 'editCluster' },
         { label: 'Remove', icon: <FaTrash />, action: 'remove' },
       ];
     } else if (moderatorStatus === 'Active') {
@@ -204,10 +317,14 @@ const Moderators = () => {
         { label: 'View Details', icon: <FaEye />, action: 'view' },
         { label: 'Edit', icon: <FaEdit />, action: 'edit' },
         { label: 'Suspend', icon: <FaBan />, action: 'suspend' },
+        { label: 'Edit Cluster', icon: <FaLayerGroup />, action: 'editCluster' },
       ];
     }
 
-    return [{ label: 'View Details', icon: <FaEye />, action: 'view' }];
+    return [
+      { label: 'View Details', icon: <FaEye />, action: 'view' },
+      { label: 'Edit Cluster', icon: <FaLayerGroup />, action: 'editCluster' },
+    ];
   };
 
   const columns = [
@@ -226,6 +343,15 @@ const Moderators = () => {
       render: (moderator) => (
         <Status value={moderator.uactivation || 'Active'} />
       ),
+    },
+    {
+      header: 'Cluster',
+      accessor: 'clustername',
+      render: (moderator) => {
+        // 直接显示集群名称，如果没有则显示N/A
+        const clusterName = moderator.clustername || 'N/A';
+        return <span>{clusterName}</span>;
+      },
     },
     {
       header: 'Actions',
@@ -292,6 +418,56 @@ const Moderators = () => {
           setModeratorToDelete(null);
         }}
       />
+
+      {/* Add Cluster Modal */}
+      {showClusterModal && (
+        <div className="modal-overlay">
+          <div className="modal-container">
+            <div className="modal-header">
+              <h2>Edit Cluster Assignment</h2>
+              <button className="close-button" onClick={() => setShowClusterModal(false)}>×</button>
+            </div>
+            <div className="modal-body">
+              <p>Assign cluster for {clusterModerator?.ufirstname} {clusterModerator?.ulastname}</p>
+              <div className="form-group">
+                <label htmlFor="cluster-select">Select Cluster:</label>
+                <select
+                  id="cluster-select"
+                  value={selectedCluster}
+                  onChange={handleClusterChange}
+                  className="form-control"
+                >
+                  <option value="">No Cluster</option>
+                  {availableClusters.map(cluster => {
+                    const clusterId = cluster.clusterid ? cluster.clusterid.toString() : '';
+                    const clusterName = cluster.clustername || `Cluster ${clusterId}`;
+                    return (
+                      <option key={clusterId} value={clusterId}>
+                        {clusterName}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button
+                className="cancel-button"
+                onClick={() => setShowClusterModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="submit-button"
+                onClick={handleClusterSubmit}
+                disabled={updateClusterMutation.isPending}
+              >
+                {updateClusterMutation.isPending ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showToast && <Toast type={toastType} message={toastMessage} />}
     </div>
