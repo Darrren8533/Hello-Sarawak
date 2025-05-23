@@ -57,6 +57,13 @@ const resizeImage = (file, maxWidth, maxHeight) => {
 };
 
 const PropertyForm = ({ initialData, onSubmit, onClose }) => {
+    // Add formatDate function at the top of the component
+    const formatDate = (dateString) => {
+        if (!dateString) return "";
+        const date = new Date(dateString);
+        return date.toISOString().split('T')[0];
+    };
+
     const predefinedFacilities = [
         // Essentials
         { name: "Wi-Fi", icon: <FaWifi />, category: "essentials" },
@@ -125,26 +132,12 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         propertyImage: [],
         clusterName: "",
         categoryName: "",
-    });
-
-    // Add dynamic pricing state
-    const [dynamicRates, setDynamicRates] = useState({
-        normalRate: 0,
-        weekendRate: 0,
-        holidayRate: 0,
-        specialEventRate: 0,
-        earlyBirdDiscountRate: 0,
-        lastMinuteDiscountRate: 0,
-        period: ""
-    });
-
-    // Add state for rate toggles
-    const [rateToggles, setRateToggles] = useState({
-        weekendRate: false,
-        holidayRate: false,
-        specialEventRate: false,
-        earlyBirdDiscountRate: false,
-        lastMinuteDiscountRate: false
+        weekendRate: "1",
+        specialEventRate: "1",
+        specialEventStartDate: "",
+        specialEventEndDate: "",
+        earlyBirdDiscountRate: "1",
+        lastMinuteDiscountRate: "1"
     });
 
     const [removedImages, setRemovedImages] = useState([]);
@@ -158,25 +151,21 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const [userCluster, setUserCluster] = useState(null);
     const userid = localStorage.getItem("userid");
     
-    // 获取当前用户数据
     const { data: userData } = useQuery({
         queryKey: ['user', userid],
         queryFn: () => fetchUserData(userid),
         enabled: !!userid
     });
     
-    // 获取集群列表数据
     const { data: clustersData = [] } = useQuery({
         queryKey: ['clusters'],
         queryFn: fetchClusters,
     });
     
-    // 从API获取的集群数据中提取集群名称
     const clusters = clustersData.map(cluster => cluster.clustername || '');
 
     // Load form data on component mount
     useEffect(() => {
-        // If initialData exists, load it
         if (initialData) {
             let facilitiesArray = [];
             
@@ -202,42 +191,16 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 propertyImage: initialData.propertyimage || [],
                 clusterName: initialData.clustername || "",
                 categoryName: initialData.categoryname || "",
+                weekendRate: initialData.weekendrate || "1",
+                specialEventRate: initialData.specialeventrate || "1",
+                specialEventStartDate: formatDate(initialData.startdate),
+                specialEventEndDate: formatDate(initialData.enddate),
+                earlyBirdDiscountRate: initialData.earlybirddiscountrate || "1",
+                lastMinuteDiscountRate: initialData.lastminutediscountrate || "1"
             });
             
-            // Set dynamic rates if available
-            if (initialData.rates) {
-                const rates = {
-                    normalRate: initialData.rates.normalRate || initialData.normalrate || 0,
-                    weekendRate: initialData.rates.weekendRate || 0,
-                    holidayRate: initialData.rates.holidayRate || 0,
-                    specialEventRate: initialData.rates.specialEventRate || 0,
-                    earlyBirdDiscountRate: initialData.rates.earlyBirdDiscountRate || 0,
-                    lastMinuteDiscountRate: initialData.rates.lastMinuteDiscountRate || 0,
-                    period: initialData.rates.period || ""
-                };
-                
-                setDynamicRates(rates);
-                
-                // Initialize toggles based on rate values
-                setRateToggles({
-                    weekendRate: rates.weekendRate > 0,
-                    holidayRate: rates.holidayRate > 0,
-                    specialEventRate: rates.specialEventRate > 0,
-                    earlyBirdDiscountRate: rates.earlyBirdDiscountRate > 0,
-                    lastMinuteDiscountRate: rates.lastMinuteDiscountRate > 0
-                });
-            } else {
-                // Initialize with property price as normal rate
-                setDynamicRates(prev => ({
-                    ...prev,
-                    normalRate: initialData.normalrate || 0
-                }));
-            }
-    
-            // Set the selected facilities
             setSelectedFacilities(facilitiesArray);
         } else {
-            // Initialize empty form for new property
             setFormData({
                 username: localStorage.getItem("username") || "",
                 propertyPrice: "1",
@@ -250,12 +213,17 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 propertyImage: [],
                 clusterName: "",
                 categoryName: "",
+                weekendRate: "1",
+                specialEventRate: "1",
+                specialEventStartDate: "",
+                specialEventEndDate: "",
+                earlyBirdDiscountRate: "1",
+                lastMinuteDiscountRate: "1"
             });
             setSelectedFacilities([]);
         }
     }, [initialData]);
 
-    // 根据用户的clusterid查找对应的集群名称并自动设置表单的clusterName
     useEffect(() => {
         if (userData && clustersData.length > 0 && !initialData) {
             const userClusterId = userData.clusterid;
@@ -276,7 +244,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     // Remove localStorage save effect
     useEffect(() => {
         // Don't save form data to localStorage anymore
-    }, [formData, selectedFacilities, dynamicRates, rateToggles]);
+    }, [formData, selectedFacilities]);
 
     useEffect(() => {
         if (initialData?.facilities) {
@@ -338,7 +306,33 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData((prev) => ({ ...prev, [name]: value }));
+        
+        // Special handling for date inputs
+        if (name === 'specialEventStartDate' || name === 'specialEventEndDate') {
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+            return;
+        }
+        
+        const numValue = parseFloat(value);
+        
+        // Special handling for weekend rate multiplier
+        if (name === 'weekendRate') {
+            // Validate multiplier range (1.0 to 2.0)
+            if (numValue < 1.0 || numValue > 2.0) {
+                setToastMessage("Weekend rate multiplier must be between 1.0 and 2.0");
+                setToastType("error");
+                setShowToast(true);
+                return;
+            }
+        }
+        
+        setFormData(prev => ({
+            ...prev,
+            [name]: numValue >= 0 ? numValue : value
+        }));
     };
 
     const handleFileChange = async (e) => {
@@ -379,75 +373,9 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         });
     };
 
-    // Handle dynamic rates change
-    const handleRateChange = (e) => {
-        const { name, value } = e.target;
-        const numValue = parseFloat(value);
-        
-        // If this is normalRate, update propertyPrice too
-        if (name === 'normalRate') {
-            setFormData(prev => ({
-                ...prev,
-                propertyPrice: value
-            }));
-        }
-        
-        setDynamicRates(prev => ({
-            ...prev,
-            [name]: numValue >= 0 ? numValue : 0
-        }));
-    };
-
-    // Handle toggle change for rates
-    const handleToggleChange = (rateName) => {
-        setRateToggles(prev => {
-            const newState = { ...prev, [rateName]: !prev[rateName] };
-            
-            // If toggling off, set the rate to 0
-            if (!newState[rateName]) {
-                setDynamicRates(prevRates => ({
-                    ...prevRates,
-                    [rateName]: 0
-                }));
-            }
-            
-            return newState;
-        });
-    };
-
-    // Validate that rates don't exceed normal rate
-    const validateRates = () => {
-        const { normalRate } = dynamicRates;
-        const maxRate = parseFloat(normalRate);
-        let isValid = true;
-        
-        Object.entries(dynamicRates).forEach(([key, value]) => {
-            // Skip normalRate and period validation
-            if (key === 'normalRate' || key === 'period') return;
-            
-            // Skip validation for disabled rates
-            if (!rateToggles[key]) return;
-            
-            const rateValue = parseFloat(value);
-            
-            // Special case for weekend rate - can be 0 to disable weekend pricing
-            if (key === 'weekendRate' && rateValue === 0) {
-                return; // Skip validation for weekend rate if it's 0 (disabled)
-            }
-            
-            if (rateValue > maxRate) {
-                setToastMessage(`${key} cannot exceed the normal rate`);
-                setToastType("error");
-                setShowToast(true);
-                isValid = false;
-            }
-        });
-        
-        return isValid;
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
         if (formData.propertyImage.length < 4) {
             setToastMessage("Please upload at least 4 images");
             setToastType("error");
@@ -455,12 +383,8 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             return;
         }
 
-        // Validate rates
-        if (!validateRates()) {
-            return;
-        }
-
         const data = new FormData();
+        // Basic property info
         data.append("username", formData.username);
         data.append("propertyPrice", formData.propertyPrice);
         data.append("propertyAddress", formData.propertyAddress);
@@ -471,11 +395,26 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         data.append("facilities", selectedFacilities.join(","));
         data.append("clusterName", formData.clusterName);
         data.append("categoryName", formData.categoryName);
+        
+        // Add creator info for audit trail
+        if (initialData) {
+            data.append("creatorid", localStorage.getItem("userid"));
+            data.append("creatorUsername", localStorage.getItem("username"));
+        }
+
+        // Add rate fields with default values if not set
+        data.append("weekendRate", formData.weekendRate || "1");
+        data.append("specialEventRate", formData.specialEventRate || "1");
+        data.append("specialEventStartDate", formData.specialEventStartDate || "");
+        data.append("specialEventEndDate", formData.specialEventEndDate || "");
+        data.append("earlyBirdDiscountRate", formData.earlyBirdDiscountRate || "1");
+        data.append("lastMinuteDiscountRate", formData.lastMinuteDiscountRate || "1");
 
         if (!initialData) {
             data.append("propertyStatus", "Pending");
         }
 
+        // Handle images
         formData.propertyImage.forEach((file) => {
             if (file instanceof File) {
                 data.append("propertyImage", file);
@@ -489,6 +428,9 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             
             if (initialData) {
                 propertyId = initialData.propertyid || initialData.propertyID;
+                if (!propertyId) {
+                    throw new Error('Property ID is required for update');
+                }
                 response = await updateProperty(data, propertyId);
             } else {
                 const usergroup = localStorage.getItem("usergroup");
@@ -502,41 +444,16 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                     await propertyListingRequest(propertyId);
                 }
             }
-            
            
             if (response && response.message) {
                 setToastMessage(response.message);
                 setToastType("success");
                 setShowToast(true);
+                onSubmit();
             }
-
-            // Reset form data
-            setFormData({
-                username: "",
-                propertyPrice: "",
-                propertyAddress: "",
-                nearbyLocation: "",
-                propertyBedType: "1",
-                propertyGuestPaxNo: "1",
-                propertyDescription: "",
-                facilities: [],
-                propertyImage: [],
-                clusterName: "",
-                categoryName: "",
-            });
-            
-
-            
-            setRemovedImages([]);
-            setSelectedFacilities([]);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = "";
-            }
-
-            onSubmit();
         } catch (error) {
             console.error("Error submitting form:", error);
-            setToastMessage("Error submitting form. Please try again.");
+            setToastMessage(error.message || "Error submitting form. Please try again.");
             setToastType("error");
             setShowToast(true);
         }
@@ -555,6 +472,12 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
             propertyImage: [],
             clusterName: "",
             categoryName: "",
+            weekendRate: "1",
+            specialEventRate: "1",
+            specialEventStartDate: "",
+            specialEventEndDate: "",
+            earlyBirdDiscountRate: "1",
+            lastMinuteDiscountRate: "1"
         });
         setRemovedImages([]);
         setSelectedFacilities([]);
@@ -563,11 +486,9 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         }
     };
 
-    const handleOverlayClick = (e) => e.stopPropagation();
-
     const imageInfoText = 
         formData.propertyImage.length > 0 
-            ? "Drag images to reorder. The first image will be the main display image." 
+            ? "The first image will be the main display image." 
             : "";
 
     const getImageLabel = (index) =>
@@ -628,7 +549,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                                 </select>
                             </div>
                             <div className="property-form-group">
-                                <label>Price (MYR):</label>
+                                <label>Base Price (MYR):</label>
                                 <input
                                     type="number"
                                     name="propertyPrice"
@@ -685,7 +606,114 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                         </div>
                     </div>
                     
+                    <div className="property-form-section full-width">
+                        <h3>Dynamic Pricing</h3>
+                        <div className="property-form-pricing-grid">
+                            <div className="property-form-group">
+                                <label>Weekend Rate:</label>
+                                <input
+                                    type="number"
+                                    name="weekendRate"
+                                    value={formData.weekendRate}
+                                    onChange={handleChange}
+                                    min="1"
+                                    max="2"
+                                    step="0.1"
+                                />
+                                <small className="property-form-help-text">
+                                    Rate for bookings made in weekends.
+                                </small>
+                                <div className="property-form-rate-preview">
+                                    Weekend price: MYR {(parseFloat(formData.propertyPrice) * formData.weekendRate).toFixed(2)}
+                                </div>
+                            </div>
+                            
+                            <div className="property-form-group">
+                                <label>Special Event Rate:</label>
+                                <input
+                                    type="number"
+                                    name="specialEventRate"
+                                    value={formData.specialEventRate}
+                                    onChange={handleChange}
+                                    min="1"
+                                    max="2"
+                                    step="0.01"
+                                />
+                                <small className="property-form-help-text">Rate for special events during selected period.</small>
+                                <div className="property-form-rate-preview">
+                                    Special Event price: MYR {(parseFloat(formData.propertyPrice) * formData.specialEventRate).toFixed(2)}
+                                </div>
+                            </div>
 
+                            <div className="property-form-group">
+                                <label>Special Event Date Range:</label>
+                                <div className="date-input-group">
+                                    <label>Start Date:</label>
+                                    <input
+                                        type="date"
+                                        name="specialEventStartDate"
+                                        value={formData.specialEventStartDate}
+                                        onChange={handleChange}
+                                        min={new Date().toISOString().split('T')[0]}
+                                        className="date-input"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="property-form-group">
+                                <label>Special Event Date Range:</label>
+                                <div className="date-input-group">
+                                    <label>End Date:</label>
+                                    <input
+                                        type="date"
+                                        name="specialEventEndDate"
+                                        value={formData.specialEventEndDate}
+                                        onChange={handleChange}
+                                        min={formData.specialEventStartDate || new Date().toISOString().split('T')[0]}
+                                        className="date-input"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <div className="property-form-group">
+                                <label>Early Bird Discount Rate:</label>
+                                <input
+                                    type="number"
+                                    name="earlyBirdDiscountRate"
+                                    value={formData.earlyBirdDiscountRate}
+                                    onChange={handleChange}
+                                    min="0.1"
+                                    max="1"
+                                    step="0.01"
+                                />
+                                <small className="property-form-help-text">
+                                    Discount rate for bookings made more than 30 days in advance. 
+                                </small>
+                                <div className="property-form-rate-preview">
+                                    Early Bird price: MYR {(parseFloat(formData.propertyPrice) * formData.earlyBirdDiscountRate).toFixed(2)}
+                                </div>
+                            </div>
+                            
+                            <div className="property-form-group">
+                                <label>Last Minute Discount Rate:</label>
+                                <input
+                                    type="number"
+                                    name="lastMinuteDiscountRate"
+                                    value={formData.lastMinuteDiscountRate}
+                                    onChange={handleChange}
+                                    min="0.1"
+                                    max="1"
+                                    step="0.01"
+                                />
+                                <small className="property-form-help-text">
+                                    Discount rate for bookings made 7 days or less before check-in. 
+                                </small>
+                                <div className="property-form-rate-preview">
+                                    Last Minute Discount price: MYR {(parseFloat(formData.propertyPrice) * formData.lastMinuteDiscountRate).toFixed(2)}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     
                     <div className="property-form-section full-width">
                         <h3>Facilities</h3>
