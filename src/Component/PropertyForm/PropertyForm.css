@@ -444,29 +444,22 @@ background-color: #bfdbfe;
 .property-form-pricing-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
+  gap: 24px;
+  padding: 16px;
+  background-color: #f8fafc;
+  border-radius: 8px;
 }
 
 .property-form-help-text {
   display: block;
   color: #64748b;
   font-size: 12px;
-  margin-top: 4px;
+  margin-top: 8px;
+  line-height: 1.4;
 }
 
 .property-form-group.full-width {
   grid-column: 1 / -1;
-}
-
-/* Highlight the normal rate field */
-.property-form-pricing-grid .property-form-group:first-child input {
-  border-color: #3b82f6;
-  background-color: #f0f7ff;
-}
-
-.property-form-pricing-grid .property-form-group:first-child label {
-  color: #3b82f6;
-  font-weight: 700;
 }
 
 /* Style for discount rate fields */
@@ -485,6 +478,12 @@ background-color: #bfdbfe;
 @media (max-width: 768px) {
   .property-form-pricing-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .property-form-pricing-grid .property-form-group:first-child {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
   }
 }
 
@@ -538,85 +537,102 @@ background-color: #bfdbfe;
   line-height: 1.5;
 }
 
+/* Rate toggle switch styles */
 .property-form-rate-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 10px;
 }
 
 .property-form-toggle {
-  position: relative;
-  display: inline-block;
-  width: 46px;
-  height: 24px;
-  margin-left: 10px;
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+/* Style for other rate sections */
+.property-form-pricing-grid .property-form-group{
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Adjust input styles for better alignment */
+.property-form-group input[type="number"] {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #1e293b;
+    background-color: #f8fafc;
+    transition: all 0.3s ease;
+}
+
+.property-form-group input[type="number"]:focus {
+    outline: none;
+    border-color: var(--primaryColor, #8b4513);
+    box-shadow: 0 0 0 2px rgba(139, 69, 19, 0.1);
+}
+
+/* Style for disabled rate inputs */
+.property-form-group input[type="number"]:disabled {
+    background-color: #f1f1f1;
+    cursor: not-allowed;
+    opacity: 0.7;
+    border-color: #e2e8f0;
+}
+
+/* Add visual feedback for active rate */
+.property-form-group input[type="number"]:not(:disabled) {
+    border-color: var(--primaryColor, #8b4513);
+    background-color: #fff;
 }
 
 .property-form-toggle input {
-  opacity: 0;
-  width: 0;
-  height: 0;
+    opacity: 0;
+    width: 0;
+    height: 0;
 }
 
-.property-form-toggle-slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  transition: .4s;
-  border-radius: 24px;
+.property-form-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
 }
 
-.property-form-toggle-slider:before {
-  position: absolute;
-  content: "";
-  height: 18px;
-  width: 18px;
-  left: 3px;
-  bottom: 3px;
-  background-color: white;
-  transition: .4s;
-  border-radius: 50%;
+.property-form-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
 }
 
-.property-form-toggle input:checked + .property-form-toggle-slider {
-  background-color: #10b981;
+.property-form-toggle input:checked + .property-form-slider {
+    background-color: var(--primaryColor, #8b4513);
 }
 
-.property-form-toggle input:focus + .property-form-toggle-slider {
-  box-shadow: 0 0 1px #10b981;
+.property-form-toggle input:checked + .property-form-slider:before {
+    transform: translateX(26px);
 }
 
-.property-form-toggle input:checked + .property-form-toggle-slider:before {
-  transform: translateX(22px);
-}
-
-/* Style for disabled inputs */
-.disabled-input {
-  opacity: 0.6;
-  cursor: not-allowed;
-  background-color: #f3f4f6;
-}
-
-/* Add status indicator text */
-.property-form-toggle-slider:after {
-  content: "OFF";
-  color: #fff;
-  display: block;
-  position: absolute;
-  transform: translateX(0px);
-  top: 4px;
-  left: 24px;
-  font-size: 10px;
-  font-weight: bold;
-  transition: .4s;
-}
-
-.property-form-toggle input:checked + .property-form-toggle-slider:after {
-  content: "ON";
-  transform: translateX(-20px);
+.property-form-toggle input:disabled + .property-form-slider {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
