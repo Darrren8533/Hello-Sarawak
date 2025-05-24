@@ -345,13 +345,42 @@ const Cart = () => {
         case 'rejected': return <FaExclamationCircle />;
         case 'paid': return <FaCreditCard />;
         case 'accepted': return <FaCalendarAlt />;
-        default: return null;
+        case 'expired': return <FaCalendarAlt />;
+        default: return <FaExclamationCircle />;
+      }
+    };
+    
+    const getStatusClass = (status) => {
+      switch(status.toLowerCase()) {
+        case 'pending':
+        case 'canceled':
+        case 'rejected':
+        case 'paid':
+        case 'accepted':
+        case 'expired':
+          return `status-${status.toLowerCase()}`;
+        default:
+          return 'status-rejected';
+      }
+    };
+
+    const getStatusText = (status) => {
+      switch(status.toLowerCase()) {
+        case 'pending':
+        case 'canceled':
+        case 'rejected':
+        case 'paid':
+        case 'accepted':
+        case 'expired':
+          return status;
+        default:
+          return 'Rejected';
       }
     };
     
     return (
-      <span className={`status-badge status-${status.toLowerCase()}`}>
-        {getStatusIcon(status)} {status}
+      <span className={`status-badge ${getStatusClass(status)}`}>
+        {getStatusIcon(status)} {getStatusText(status)}
       </span>
     );
   };
@@ -531,6 +560,10 @@ const Cart = () => {
             <FaCalendarAlt className="icon-inline" /> 
             Departure: {new Date(reservation.checkoutdatetime).toLocaleDateString()}
           </p>
+          <p>
+          <FaCalendarAlt className="icon-inline" /> 
+            Expired Date: {new Date(reservation.reservationblocktime).toLocaleDateString()}
+          </p>
           <p>Status: <StatusBadge status={reservation.reservationstatus} /></p>
         </div>
         <div className="cart-price">
@@ -707,6 +740,10 @@ const Cart = () => {
                           <p>
                             <FaCalendarAlt className="icon-inline" /> 
                             Check-out: {new Date(reservation.checkoutdatetime).toLocaleDateString()}
+                          </p>
+                          <p>
+                            <FaCalendarAlt className="icon-inline" /> 
+                            Expired Date: {new Date(reservation.reservationblocktime).toLocaleDateString()}
                           </p>
                           <p>Status: <StatusBadge status={reservation.reservationstatus} /></p>
                         </div>
