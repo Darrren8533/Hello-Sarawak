@@ -317,15 +317,15 @@ function Navbar() {
                         {isLoggedIn && isCustomer && !isUserLoading ? (
                             <>
                                 {/* Notification Bell Icon */}
-                                <div className="notification-container">
+                                <div className="nav-notification-container">
                                     <FaBell 
-                                        className='notification_icon'
+                                        className='nav-notification_icon'
                                         onClick={toggleNotifications}
                                     />
                                     {showNotifications && (
-                                        <div className="notification-overlay">
-                                            <div className="notification-content">
-                                                <div className="notification-header">
+                                        <div className="nav-notification-overlay">
+                                            <div className="nav-notification-content">
+                                                <div className="nav-notification-header">
                                                     <h3>Notifications</h3>
                                                     <button 
                                                         className="Notify-close-btn"
@@ -334,17 +334,17 @@ function Navbar() {
                                                         ×
                                                     </button>
                                                 </div>
-                                                <div className="notification-list">
-                                                    <div className="notification-item">
-                                                        <div className="notification-dot"></div>
-                                                        <div className="notification-text">
+                                                <div className="nav-notification-list">
+                                                    <div className="nav-notification-item">
+                                                        <div className="nav-notification-dot"></div>
+                                                        <div className="nav-notification-text">
                                                             <p>You have receive a new suggested room</p>
-                                                            <span className="notification-time">2 minutes ago</span>
+                                                            <span className="nav-notification-time">2 minutes ago</span>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div className="notification-footer">
-                                                    <button className="view-all-btn">View All</button>
+                                                <div className="nav-notification-footer">
+                                                    <button className="nav-view-all-btn">View All</button>
                                                 </div>
                                             </div>
                                         </div>
