@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { fetchReservation, updateReservationStatus, acceptBooking } from '../../../Api/api';
+import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification } from '../../../Api/api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import PaginatedTable from '../PaginatedTable/PaginatedTable';
 import ActionDropdown from '../ActionDropdown/ActionDropdown';
 import Status from '../Status/Status';
 import Modal from '../Modal/Modal';
-import { FaEye, FaCheck, FaTimes, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaEye, FaCheck, FaTimes, FaChevronLeft, FaChevronRight, FaTimesCircle, FaStar } from 'react-icons/fa';
 import { IoMdClose } from "react-icons/io";
 import Loader from '../Loader/Loader';
 import Toast from '../Toast/Toast';
@@ -36,6 +36,12 @@ function RoomPlannerCalendar() {
   const [showToast, setShowToast] = useState(false);
   const [showMessageBox, setShowMessageBox] = useState(false);
   const [rejectedReservationID, setRejectedReservationID] = useState(null);
+  const [messageBoxMode, setMessageBoxMode] = useState(null);
+  const [selectedProperty, setSelectedProperty] = useState(null);
+  const [selectedOperators, setSelectedOperators] = useState([]);
+  const [suggestSearchKey, setSuggestSearchKey] = useState('');
+  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const [administratorProperties, setAdministratorProperties] = useState([]);
   const queryClient = useQueryClient();
   
   // Fetch reservations with React Query
@@ -67,6 +73,12 @@ function RoomPlannerCalendar() {
     refetchInterval: 1000,
   });
 
+  // Fetch operators with React Query
+  const { data: operators = [] } = useQuery({
+    queryKey: ['operators'],
+    queryFn: fetchOperators,
+  });
+
   // Add mutations
   const updateStatusMutation = useMutation({
     mutationFn: ({ reservationId, newStatus, userid }) => 
@@ -79,6 +91,33 @@ function RoomPlannerCalendar() {
   const acceptBookingMutation = useMutation({
     mutationFn: (reservationId) => acceptBooking(reservationId),
   });
+
+  // Add suggest room mutation
+  const suggestRoomMutation = useMutation({
+    mutationFn: ({ propertyId, reservationId }) =>
+      suggestNewRoom(propertyId, reservationId),
+  });
+
+  // Add send notification mutation
+  const sendNotificationMutation = useMutation({
+    mutationFn: ({ reservationId, operators }) =>
+      sendSuggestNotification(reservationId, operators),
+  });
+
+  // Fetch administrator properties when needed
+  const fetchAdministratorProperties = async (userid, reservationid) => {
+    try {
+      const response = await getOperatorProperties(userid, reservationid);
+      if (response && response.data) {
+        setAdministratorProperties(response.data);
+      } else {
+        setAdministratorProperties([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch administrator properties:', error);
+      setAdministratorProperties([]);
+    }
+  };
 
   // Generate calendar days when month changes or selectedDay changes
   useEffect(() => {
@@ -576,70 +615,55 @@ function RoomPlannerCalendar() {
 
   const handleAction = async (action, reservation) => {
     if (reservation.reservationstatus === 'expired') {
-        displayToast('error', 'Action cannot be performed. This reservation has expired.');
-        return;
+      displayToast('error', 'Action cannot be performed. This reservation has expired.');
+      return;
     }
 
     if (action === 'view') {
-        const essentialFields = {
-            reservationid: reservation.reservationid || 'N/A',
-            propertyaddress: reservation.propertyaddress || 'N/A',
-            checkindatetime: reservation.checkindatetime || 'N/A',
-            checkoutdatetime: reservation.checkoutdatetime || 'N/A',
-            reservationblocktime: reservation.reservationblocktime || 'N/A',
-            request: reservation.request || 'N/A',
-            totalprice: reservation.totalprice || 'N/A',
-            rcid: reservation.rcid || 'N/A',
-            reservationstatus: reservation.reservationstatus || 'N/A',
-            userid: reservation.userid || 'N/A',
-            images: reservation.propertyimage || [],
-        };
-        setSelectedReservation(essentialFields);
+      const essentialFields = {
+        reservationid: reservation.reservationid || 'N/A',
+        propertyaddress: reservation.propertyaddress || 'N/A',
+        checkindatetime: reservation.checkindatetime || 'N/A',
+        checkoutdatetime: reservation.checkoutdatetime || 'N/A',
+        reservationblocktime: reservation.reservationblocktime || 'N/A',
+        request: reservation.request || 'N/A',
+        totalprice: reservation.totalprice || 'N/A',
+        rcid: reservation.rcid || 'N/A',
+        reservationstatus: reservation.reservationstatus || 'N/A',
+        userid: reservation.userid || 'N/A',
+        images: reservation.propertyimage || [],
+      };
+      setSelectedReservation(essentialFields);
     } else if (action === 'accept') {
-        // Check for overlapping reservations before accepting
-        if (hasOverlappingReservation(reservation)) {
-            displayToast('error', 'Cannot accept reservation: There is an overlapping accepted reservation for these dates.');
-            return;
-        }
+      // Check for overlapping reservations before accepting
+      if (hasOverlappingReservation(reservation)) {
+        displayToast('error', 'Cannot accept reservation: There is an overlapping accepted reservation for these dates.');
+        return;
+      }
 
-        try {
-            const newStatus = 'Accepted';
-            
-            await updateStatusMutation.mutateAsync({ 
-                reservationId: reservation.reservationid, 
-                newStatus,
-                userid: currentUser.userid
-            });
-            
-            await acceptBookingMutation.mutateAsync(reservation.reservationid);
-    
-            displayToast('success', 'Reservation Accepted Successfully');
-        } catch (error) {
-            console.error('Failed to accept reservation or send email', error);
-            displayToast('error', 'Failed to accept reservation');
-        }
+      try {
+        const newStatus = 'Accepted';
+        
+        await updateStatusMutation.mutateAsync({ 
+          reservationId: reservation.reservationid, 
+          newStatus,
+          userid: currentUser.userid
+        });
+        
+        await acceptBookingMutation.mutateAsync(reservation.reservationid);
+
+        displayToast('success', 'Reservation Accepted Successfully');
+      } catch (error) {
+        console.error('Failed to accept reservation or send email', error);
+        displayToast('error', 'Failed to accept reservation');
+      }
     } else if (action === 'reject') {
-        const rejectedID = {
-            reservationid: reservation.reservationid || 'N/A',
-        };
-    
-        setRejectedReservationID(rejectedID);
-    
-        try {
-            const newStatus = 'Rejected';
-            
-            await updateStatusMutation.mutateAsync({ 
-                reservationId: reservation.reservationid, 
-                newStatus,
-                userid: currentUser.userid
-            });
-    
-            setShowMessageBox(true);
-            displayToast('success', 'Reservation Rejected Successfully');
-        } catch (error) {
-            console.error('Failed to update reservation status', error);
-            displayToast('error', 'Failed to reject reservation');
-        }
+      const rejectedID = {
+        reservationid: reservation.reservationid || 'N/A',
+      };
+  
+      setRejectedReservationID(rejectedID);
+      setShowMessageBox(true);
     }
   };
 
@@ -922,7 +946,114 @@ function RoomPlannerCalendar() {
     const reservationDate = new Date(dateString);
     handleDateClick(reservationDate);
   };
-  
+
+  const handleMessageBoxSelect = async (mode) => {
+    if (mode === 'suggest') {
+      if (!currentUser.userid || !rejectedReservationID?.reservationid) {
+        displayToast('error', 'Missing user ID or reservation ID');
+        return;
+      }
+      await fetchAdministratorProperties(currentUser.userid, rejectedReservationID.reservationid);
+    }
+    setMessageBoxMode(mode);
+    setShowMessageBox(false);
+  };
+
+  const handlePropertySelect = (propertyid) => {
+    setSelectedProperty(propertyid);
+  };
+
+  const handleConfirmSuggestion = async () => {
+    if (selectedProperty && rejectedReservationID.reservationid) {
+      try {
+        const newStatus = 'Suggested';
+        await updateStatusMutation.mutateAsync({
+          reservationId: rejectedReservationID.reservationid,
+          newStatus
+        });
+
+        await suggestRoomMutation.mutateAsync({
+          propertyId: selectedProperty,
+          reservationId: rejectedReservationID.reservationid
+        });
+
+        displayToast('success', 'New Room Suggestion Email Sent Successfully');
+        setMessageBoxMode(null);
+      } catch (error) {
+        displayToast('error', 'Error Sending New Room Suggestion Email');
+      }
+    } else {
+      displayToast('error', 'Please select a property to suggest');
+    }
+  };
+
+  const handleOperatorSelect = (userid) => {
+    setSelectedOperators((prevSelectedOperators) =>
+      prevSelectedOperators.includes(userid)
+        ? prevSelectedOperators.filter((id) => id !== userid)
+        : [...prevSelectedOperators, userid]
+    );
+  };
+
+  const handleConfirmNotification = async () => {
+    if (selectedOperators.length > 0 && rejectedReservationID.reservationid) {
+      try {
+        const newStatus = 'Published';
+        await updateStatusMutation.mutateAsync({
+          reservationId: rejectedReservationID.reservationid,
+          newStatus
+        });
+
+        await sendNotificationMutation.mutateAsync({
+          reservationId: rejectedReservationID.reservationid,
+          operators: selectedOperators
+        });
+
+        displayToast('success', 'Suggest Notification Sent Successfully');
+        setMessageBoxMode(null);
+      } catch (error) {
+        displayToast('error', 'Error Sending Suggest Notification');
+      }
+    } else {
+      displayToast('error', 'Please select at least one operator to notify');
+    }
+  };
+
+  const clearFilters = () => {
+    setSuggestSearchKey('');
+    setPriceRange({ min: '', max: '' });
+  };
+
+  const filteredProperties = Array.isArray(administratorProperties) 
+    ? administratorProperties.filter(property => {
+        const matchesSearch = !suggestSearchKey || 
+          (property.propertyaddress && property.propertyaddress.toLowerCase().includes(suggestSearchKey.toLowerCase()));
+        
+        const matchesMinPrice = !priceRange.min || 
+          (property.normalrate && parseFloat(property.normalrate) >= parseFloat(priceRange.min));
+        
+        const matchesMaxPrice = !priceRange.max || 
+          (property.normalrate && parseFloat(property.normalrate) <= parseFloat(priceRange.max));
+        
+        return matchesSearch && matchesMinPrice && matchesMaxPrice;
+      })
+    : [];
+
+  const renderStars = (rating) => {
+    const stars = [];
+    const numRating = parseFloat(rating) || 0; // Default to 0 if rating is not available
+    
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <FaStar 
+          key={i} 
+          className={i <= numRating ? 'star-filled' : 'star-empty'} 
+        />
+      );
+    }
+    return stars;
+  };
+
   return (
     <div className="scheduler-container">
       {showToast && <Toast type={toastType} message={toastMessage} />}
@@ -1293,6 +1424,189 @@ function RoomPlannerCalendar() {
           <span className="legend-label">Rejected</span>
         </div>
       </div>
+
+      {/* Message Box */}
+      {showMessageBox && (
+        <div className="custom-message-box-overlay">
+          <div className="custom-message-box">
+            <h2>Choose An Action</h2>
+            <p>Please Select An Action For The Rejection:</p>
+            <button onClick={() => setShowMessageBox(false)} className="form-close-button">×</button>
+
+            <div className="message-box-buttons">
+              <button onClick={() => handleMessageBoxSelect('suggest')}>Suggest</button>
+              <button onClick={() => handleMessageBoxSelect('notify')}>Notify Suggest</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {messageBoxMode === 'suggest' && (
+        <div className="custom-message-box-overlay">
+          <div className="suggest-properties-modal">
+            <div className="suggest-header">
+              <div className="suggest-title-section">
+                <h2>Suggest Alternative Property</h2>
+                <p className="suggest-subtitle">Select a property to suggest as an alternative for the rejected reservation</p>
+              </div>
+              <button className="form-close-button" onClick={() => setMessageBoxMode('')}>
+                <FaTimesCircle />
+              </button>
+            </div>
+
+            <div className="suggest-filters">
+              <div className="filter-header">
+                <h3>Filter Properties</h3>
+                <button className="clear-filters-btn" onClick={clearFilters}>
+                  <FaTimesCircle /> Clear Filters
+                </button>
+              </div>
+              
+              <div className="filter-row">
+                <div className="search-container">
+                  <label>Search Properties</label>
+                  <input
+                    type="text"
+                    placeholder="Search by name or location..."
+                    value={suggestSearchKey}
+                    onChange={(e) => setSuggestSearchKey(e.target.value)}
+                    className="suggest-search-input"
+                  />
+                </div>
+              </div>
+              
+              <div className="filter-row">
+                <div className="price-filter-group">
+                  <div className="price-input-container">
+                    <label>Min Price (RM)</label>
+                    <input
+                      type="number"
+                      placeholder="0"
+                      value={priceRange.min}
+                      onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
+                      className="price-input"
+                    />
+                  </div>
+                  <div className="price-input-container">
+                    <label>Max Price (RM)</label>
+                    <input
+                      type="number"
+                      placeholder="1000"
+                      value={priceRange.max}
+                      onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
+                      className="price-input"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="property-grid">
+              {filteredProperties.length > 0 ? (
+                filteredProperties.map((property) => (
+                  <div 
+                    key={property.propertyid} 
+                    className={`property-card-modern ${selectedProperty === property.propertyid ? 'selected' : ''}`}
+                    onClick={() => handlePropertySelect(property.propertyid)}
+                  >
+                    <div className="property-image-section">
+                      <img
+                        src={`data:image/jpeg;base64,${property.images[0]}`}
+                        alt={property.propertyaddress}
+                        className="property-image-modern"
+                      />
+                    </div>
+                    
+                    <div className="property-content">
+                      <div className="property-header">
+                        <h4 className="property-name-modern">{property.propertyaddress}</h4>
+                        <div className="property-location">
+                          📍 {property.propertyaddress}
+                        </div>
+                      </div>
+                      
+                      <div className="property-stats">
+                        <div className="guest-capacity">
+                          👥 {property.propertyguestpaxno}
+                        </div>
+                        <div className="property-rating">
+                          {renderStars(property.rating)}
+                          <span className="rating-number">{property.rating}</span>
+                        </div>
+                      </div>
+                      
+                      <div className="property-price-section">
+                        <span className="price-amount">RM {property.normalrate}</span>
+                        <span className="price-period">per night</span>
+                      </div>
+                    </div>
+                    
+                    <input
+                      type="radio"
+                      name="property"
+                      value={property.propertyid}
+                      checked={selectedProperty === property.propertyid}
+                      onChange={() => handlePropertySelect(property.propertyid)}
+                      className="property-radio-hidden"
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="no-properties-message">
+                  <p>No properties match your search criteria</p>
+                </div>
+              )}
+              
+              <button className="confirm-suggestion-btn" onClick={handleConfirmSuggestion}>
+                Confirm Suggestion
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {messageBoxMode === 'notify' && (
+        <div className="custom-message-box-overlay">
+          <div className="suggest-properties custom-message-box">
+            <div className="form-close-button" onClick={() => setMessageBoxMode('')}>×</div>
+            <h2>Select Operators To Notify</h2>
+            <div className="operator-list">
+              <div className="select-all-checkbox">
+                <input
+                  type="checkbox"
+                  id="select-all-operators"
+                  checked={selectedOperators.length === operators.length && operators.length > 0}
+                  onChange={(e) => {
+                    const checked = e.target.checked;
+                    setSelectedOperators(checked ? operators.map(operator => operator.userid) : []);
+                  }}
+                />
+                <label htmlFor="select-all-operators">Select All</label>
+              </div>
+
+              {operators.length > 0 ? (
+                operators.map((operator) => (
+                  <div key={operator.userid} className="operator-option">
+                    <input
+                      type="checkbox"
+                      id={`operator-${operator.userid}`}
+                      value={operator.userid}
+                      checked={selectedOperators.includes(operator.userid)}
+                      onChange={() => handleOperatorSelect(operator.userid)}
+                    />
+                    <label htmlFor={`operator-${operator.userid}`}>
+                      {operator.ufirstname} {operator.ulastname} ({operator.username}) - {operator.usergroup}
+                    </label>
+                  </div>
+                ))
+              ) : (
+                <p>No operator available to notify</p>
+              )}
+            </div>
+            <button onClick={handleConfirmNotification}>Confirm Selection</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
