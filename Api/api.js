@@ -753,9 +753,9 @@ export const removeReservation = async (reservationid) => {
 };
 
 //Book & Pay Log
-export const fetchBookLog = async () => {
+export const fetchBookLog = async (userid) => {
   try {
-    const response = await fetch(`${API_URL}/users/booklog`);
+    const response = await fetch(`${API_URL}/users/booklog?userid=${userid}`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch book logs');
