@@ -237,8 +237,9 @@ const Reservations = () => {
                 return false;
             }
 
-            // Only check for overlaps with Accepted reservations
-            if (existingReservation.reservationstatus !== 'Accepted') {
+            // Only check for overlaps with Accepted reservations of the same property
+            if (existingReservation.reservationstatus !== 'Accepted' || 
+                existingReservation.propertyid !== reservation.propertyid) {
                 return false;
             }
 
@@ -518,7 +519,8 @@ const Reservations = () => {
 
                 const hasOverlap = reservationsData.some(existingReservation => {
                     if (existingReservation.reservationid === reservation.reservationid) return false;
-                    if (existingReservation.reservationstatus !== 'Accepted') return false;
+                    if (existingReservation.reservationstatus !== 'Accepted' || 
+                        existingReservation.propertyid !== reservation.propertyid) return false;
                     const existingCheckIn = new Date(existingReservation.checkindatetime);
                     const existingCheckOut = new Date(existingReservation.checkoutdatetime);
                     return (newCheckIn < existingCheckOut && newCheckOut > existingCheckIn);
