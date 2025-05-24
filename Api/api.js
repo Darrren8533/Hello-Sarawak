@@ -603,6 +603,31 @@ export const sendSuggestNotification = async (reservationid, selectedOperators) 
   }
 };
 
+// Send Picked Up Notification To Original Reservation Owner
+export const sendPickedUpNotification = async (reservationid) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
+  try {
+    const response = await fetch(`${API_URL}/sendPickedUpNotification/${reservationid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if(!response) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to send picked up notification');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('API error: ', error);
+    throw error;
+  }
+};
+
 // Store Reservation Data
 export const createReservation = async (reservationData) => {
   const userid = localStorage.getItem('userid');

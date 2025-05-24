@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
-import { FaBars, FaTimes, FaUserCircle } from "react-icons/fa";
+import { FaBars, FaTimes, FaUserCircle, FaBell } from "react-icons/fa";
 import { logoutUser, fetchUserData } from '../../../Api/api';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import DefaultAvatar from '../../../src/public/avatar.png';
@@ -17,6 +17,9 @@ function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [scrollPosition, setScrollPosition] = useState(0);
     
+    // Notification states
+    const [showNotifications, setShowNotifications] = useState(false);
+    
     // React Query for user data with polling
     const { data: userData, isLoading: isUserLoading } = useQuery({
         queryKey: ['userData', userID],
@@ -29,6 +32,15 @@ function Navbar() {
     
     // Derived state
     const isCustomer = userData?.usergroup === "Customer";
+
+    // Notification functions
+    const toggleNotifications = () => {
+        setShowNotifications(!showNotifications);
+    };
+
+    const closeNotifications = () => {
+        setShowNotifications(false);
+    };
 
     // Check for inactive user and handle logout
     useEffect(() => {
@@ -135,6 +147,18 @@ function Navbar() {
             updateAvatar(avatarUrl);
         }
     }, [userData, updateAvatar]);
+
+    // Close notifications when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (showNotifications && !event.target.closest('.notification-container')) {
+                closeNotifications();
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showNotifications]);
 
     const handleLogout = async () => {
         try {
@@ -291,22 +315,60 @@ function Navbar() {
 
                     <div className="nav-actions">
                         {isLoggedIn && isCustomer && !isUserLoading ? (
-                            <button
-                                className="user-icon-button"
-                                onClick={() => navigate('/profile')}
-                                aria-label="User Profile"
-                            >
-                                {userAvatar ? (
-                                    <img
-                                        src={userAvatar}
-                                        alt="User Avatar"
-                                        onError={handleImageError}
-                                        key={userAvatar}
+                            <>
+                                {/* Notification Bell Icon */}
+                                <div className="nav-notification-container">
+                                    <FaBell 
+                                        className='nav-notification_icon'
+                                        onClick={toggleNotifications}
                                     />
-                                ) : (
-                                    <FaUserCircle className="default-avatar" />
-                                )}
-                            </button>
+                                    {showNotifications && (
+                                        <div className="nav-notification-overlay">
+                                            <div className="nav-notification-content">
+                                                <div className="nav-notification-header">
+                                                    <h3>Notifications</h3>
+                                                    <button 
+                                                        className="Notify-close-btn"
+                                                        onClick={closeNotifications}
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                                <div className="nav-notification-list">
+                                                    <div className="nav-notification-item">
+                                                        <div className="nav-notification-dot"></div>
+                                                        <div className="nav-notification-text">
+                                                            <p>You have receive a new suggested room</p>
+                                                            <span className="nav-notification-time">2 minutes ago</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div className="nav-notification-footer">
+                                                    <button className="nav-view-all-btn">View All</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* User Avatar */}
+                                <button
+                                    className="user-icon-button"
+                                    onClick={() => navigate('/profile')}
+                                    aria-label="User Profile"
+                                >
+                                    {userAvatar ? (
+                                        <img
+                                            src={userAvatar}
+                                            alt="User Avatar"
+                                            onError={handleImageError}
+                                            key={userAvatar}
+                                        />
+                                    ) : (
+                                        <FaUserCircle className="default-avatar" />
+                                    )}
+                                </button>
+                            </>
                         ) : null}
                         
                         {isLoggedIn && isCustomer ? (
@@ -332,6 +394,14 @@ function Navbar() {
                     </div>
                 </nav>
             </div>
+
+            {/* 点击背景关闭overlay */}
+            {showNotifications && (
+                <div 
+                    className="overlay-backdrop"
+                    onClick={closeNotifications}
+                ></div>
+            )}
         </div>
     );
 }
