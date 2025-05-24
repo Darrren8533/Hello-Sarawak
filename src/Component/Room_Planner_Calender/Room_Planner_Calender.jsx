@@ -45,7 +45,6 @@ function RoomPlannerCalendar() {
       try {
         const reservationData = await fetchReservation();
         if (Array.isArray(reservationData)) {
-          console.log('Calendar Reservations Data:', reservationData);
           return reservationData.map(reservation => {
             const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
             const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
@@ -114,7 +113,6 @@ function RoomPlannerCalendar() {
             userGroup
         });
         
-        console.log('Current user loaded:', { username, userid, userGroup });
     }, []);
   
   // Extract and update pending reservations
@@ -145,23 +143,15 @@ function RoomPlannerCalendar() {
 
   const isPropertyOwner = (reservation) => {
         if (!currentUser.username || !reservation) {
-            console.log('Missing data:', { currentUser, reservation });
             return false;
         }
     
         const propertyOwnerUsername = reservation.property_owner_username;
         if (!propertyOwnerUsername) {
-            console.log('Property owner username missing in reservation:', reservation);
             return false;
         }
     
         const isOwner = propertyOwnerUsername.toLowerCase() === currentUser.username.toLowerCase();
-        console.log('Ownership Check:', { 
-            currentUsername: currentUser.username, 
-            propertyOwnerUsername, 
-            userGroup: currentUser.userGroup, 
-            isOwner 
-        });
         return isOwner;
     };
   
@@ -1100,17 +1090,6 @@ function RoomPlannerCalendar() {
                               {day.statusCounts.Rejected > 1 && <span className="count-badge">×{day.statusCounts.Rejected}</span>}
                             </div>
                           )}
-                          {day.statusCounts.Pickup > 0 && (
-                            <div className="planner-status-dot legend-dot-status-pickup" title={`${day.statusCounts.Pickup} Pick Up`}>
-                              {day.statusCounts.Pickup > 1 && <span className="count-badge">×{day.statusCounts.Pickup}</span>}
-                            </div>
-                          )}
-                          {(day.statusCounts.Paid + day.statusCounts.Canceled + day.statusCounts.expired > 0) && (
-                            <div className="planner-status-dot legend-dot-status-other" title="Other statuses">
-                              {(day.statusCounts.Paid + day.statusCounts.Canceled + day.statusCounts.expired) > 1 && 
-                                <span className="count-badge">×{day.statusCounts.Paid + day.statusCounts.Canceled + day.statusCounts.expired}</span>}
-                            </div>
-                          )}
                         </div>
                       )}
                     </div>
@@ -1312,14 +1291,6 @@ function RoomPlannerCalendar() {
         <div className="legend-item">
           <div className="legend-dot legend-dot-status-rejected"></div>
           <span className="legend-label">Rejected</span>
-        </div>
-        <div className="legend-item">
-          <div className="legend-dot legend-dot-status-pickup"></div>
-          <span className="legend-label">Pick Up Section</span>
-        </div>
-        <div className="legend-item">
-          <div className="legend-dot legend-dot-status-other"></div>
-          <span className="legend-label">Others</span>
         </div>
       </div>
     </div>
