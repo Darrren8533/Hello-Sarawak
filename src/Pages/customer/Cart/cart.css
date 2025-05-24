@@ -368,6 +368,12 @@
   border: 1px solid #B6DDFF;
 }
 
+.status-expired {
+  color: #717171;
+  background-color: #eaeaea;
+  border: 1px solid #f0f0f0;
+}
+
 /* Filters */
 .filter-cart {
   display: flex;
