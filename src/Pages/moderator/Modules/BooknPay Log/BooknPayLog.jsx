@@ -20,10 +20,14 @@ const BooknPayLog = () => {
   const [appliedFilters, setAppliedFilters] = useState({ actionType: 'All' });
   const [selectedLog, setSelectedLog] = useState(null);
 
+  // Get userid from localStorage
+  const userid = localStorage.getItem('userid');
+
   // Replace useEffect with React Query
   const { data: logs = [], isLoading } = useQuery({
-    queryKey: ['bookLogs'],
-    queryFn: fetchBookLog,
+    queryKey: ['bookLogs', userid],
+    queryFn: () => fetchBookLog(userid),
+    enabled: !!userid, // Only run query if userid exists
     onError: (error) => {
       console.error('Failed to fetch Book & Pay Logs:', error);
     },
