@@ -45,7 +45,7 @@ function RoomPlannerCalendar() {
       try {
         const reservationData = await fetchReservation();
         if (Array.isArray(reservationData)) {
-          console.log('Calendar Reservations Data:', reservationData);
+          // console.log('Calendar Reservations Data:', reservationData);
           return reservationData.map(reservation => {
             const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
             const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
