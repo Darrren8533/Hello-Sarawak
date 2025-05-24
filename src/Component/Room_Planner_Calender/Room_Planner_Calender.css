@@ -931,7 +931,7 @@ cursor: pointer;
   justify-content: center;
 }
 
-.status-dot {
+.planner-status-dot {
   width: 15px;
   height: 15px;
   border-radius: 50%;
@@ -977,7 +977,7 @@ cursor: pointer;
   margin-top: 3px;
 }
 
-.week-status-dot {
+.week-planner-status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
