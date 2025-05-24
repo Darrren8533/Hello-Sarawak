@@ -6,7 +6,7 @@ import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable'
 import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
-import Loader from '../../../../Component/Loader/Loader'; // Import the Loader component
+import Loader from '../../../../Component/Loader/Loader'; 
 import { fetchBookLog } from '../../../../../Api/api';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
@@ -20,10 +20,14 @@ const BooknPayLog = () => {
   const [appliedFilters, setAppliedFilters] = useState({ actionType: 'All' });
   const [selectedLog, setSelectedLog] = useState(null);
 
+  // Get userid from localStorage
+  const userid = localStorage.getItem('userid');
+
   // Replace useEffect with React Query
   const { data: logs = [], isLoading } = useQuery({
-    queryKey: ['bookLogs'],
-    queryFn: fetchBookLog,
+    queryKey: ['bookLogs', userid],
+    queryFn: () => fetchBookLog(userid),
+    enabled: !!userid, // Only run query if userid exists
     onError: (error) => {
       console.error('Failed to fetch Book & Pay Logs:', error);
     },
