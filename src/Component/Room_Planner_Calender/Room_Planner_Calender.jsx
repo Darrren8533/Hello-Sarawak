@@ -45,7 +45,7 @@ function RoomPlannerCalendar() {
       try {
         const reservationData = await fetchReservation();
         if (Array.isArray(reservationData)) {
-          // console.log('Calendar Reservations Data:', reservationData);
+          console.log('Calendar Reservations Data:', reservationData);
           return reservationData.map(reservation => {
             const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
             const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
@@ -1086,27 +1086,27 @@ function RoomPlannerCalendar() {
                       {day.hasReservations && (
                         <div className="reservation-status-indicators">
                           {day.statusCounts.Pending > 0 && (
-                            <div className="status-dot legend-dot-status-pending" title={`${day.statusCounts.Pending} Pending`}>
+                            <div className="planner-status-dot legend-dot-status-pending" title={`${day.statusCounts.Pending} Pending`}>
                               {day.statusCounts.Pending > 1 && <span className="count-badge">×{day.statusCounts.Pending}</span>}
                             </div>
                           )}
                           {day.statusCounts.Accepted > 0 && (
-                            <div className="status-dot legend-dot-status-accepted" title={`${day.statusCounts.Accepted} Accepted`}>
+                            <div className="planner-status-dot legend-dot-status-accepted" title={`${day.statusCounts.Accepted} Accepted`}>
                               {day.statusCounts.Accepted > 1 && <span className="count-badge">×{day.statusCounts.Accepted}</span>}
                             </div>
                           )}
                           {day.statusCounts.Rejected > 0 && (
-                            <div className="status-dot legend-dot-status-rejected" title={`${day.statusCounts.Rejected} Rejected`}>
+                            <div className="planner-status-dot legend-dot-status-rejected" title={`${day.statusCounts.Rejected} Rejected`}>
                               {day.statusCounts.Rejected > 1 && <span className="count-badge">×{day.statusCounts.Rejected}</span>}
                             </div>
                           )}
                           {day.statusCounts.Pickup > 0 && (
-                            <div className="status-dot legend-dot-status-pickup" title={`${day.statusCounts.Pickup} Pick Up`}>
+                            <div className="planner-status-dot legend-dot-status-pickup" title={`${day.statusCounts.Pickup} Pick Up`}>
                               {day.statusCounts.Pickup > 1 && <span className="count-badge">×{day.statusCounts.Pickup}</span>}
                             </div>
                           )}
                           {(day.statusCounts.Paid + day.statusCounts.Canceled + day.statusCounts.expired > 0) && (
-                            <div className="status-dot legend-dot-status-other" title="Other statuses">
+                            <div className="planner-status-dot legend-dot-status-other" title="Other statuses">
                               {(day.statusCounts.Paid + day.statusCounts.Canceled + day.statusCounts.expired) > 1 && 
                                 <span className="count-badge">×{day.statusCounts.Paid + day.statusCounts.Canceled + day.statusCounts.expired}</span>}
                             </div>
@@ -1141,16 +1141,16 @@ function RoomPlannerCalendar() {
                 {day.hasReservations && (
                   <div className="week-status-indicators">
                     {day.statusCounts.Pending > 0 && (
-                      <div className="week-status-dot legend-dot-status-pending" title={`${day.statusCounts.Pending} Pending`}></div>
+                      <div className="week-planner-status-dot legend-dot-status-pending" title={`${day.statusCounts.Pending} Pending`}></div>
                     )}
                     {day.statusCounts.Accepted > 0 && (
-                      <div className="week-status-dot legend-dot-status-accepted" title={`${day.statusCounts.Accepted} Accepted`}></div>
+                      <div className="week-planner-status-dot legend-dot-status-accepted" title={`${day.statusCounts.Accepted} Accepted`}></div>
                     )}
                     {day.statusCounts.Rejected > 0 && (
-                      <div className="week-status-dot legend-dot-status-rejected" title={`${day.statusCounts.Rejected} Rejected`}></div>
+                      <div className="week-planner-status-dot legend-dot-status-rejected" title={`${day.statusCounts.Rejected} Rejected`}></div>
                     )}
                     {day.statusCounts.Pickup > 0 && (
-                      <div className="week-status-dot legend-dot-status-pickup" title={`${day.statusCounts.Pickup} Pick Up`}></div>
+                      <div className="week-planner-status-dot legend-dot-status-pickup" title={`${day.statusCounts.Pickup} Pick Up`}></div>
                     )}
                   </div>
                 )}
