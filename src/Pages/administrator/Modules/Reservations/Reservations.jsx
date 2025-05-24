@@ -515,7 +515,7 @@ const Reservations = () => {
 
     const renderStars = (rating) => {
         const stars = [];
-        const numRating = parseFloat(rating) || 4.5; // Default rating if not available
+        const numRating = parseFloat(rating); // Default rating if not available
         
         for (let i = 1; i <= 5; i++) {
             stars.push(
@@ -682,8 +682,8 @@ const Reservations = () => {
                                                     👥 {property.propertyguestpaxno}
                                                 </div>
                                                 <div className="property-rating">
-                                                    {renderStars(property.rating || 4.5)}
-                                                    <span className="rating-number">{property.rating || '4.5'}</span>
+                                                    {renderStars(property.rating)}
+                                                    <span className="rating-number">{property.rating}</span>
                                                 </div>
                                             </div>
                                             
