@@ -528,6 +528,38 @@ const Reservations = () => {
         return stars;
     };
 
+    useEffect(() => {
+        if (!Array.isArray(reservationsData)) return;
+
+        reservationsData.forEach(async (reservation) => {
+            if (reservation.reservationstatus === 'Pending') {
+                const newCheckIn = new Date(reservation.checkindatetime);
+                const newCheckOut = new Date(reservation.checkoutdatetime);
+
+                const hasOverlap = reservationsData.some(existingReservation => {
+                    if (existingReservation.reservationid === reservation.reservationid) return false;
+                    if (existingReservation.reservationstatus !== 'Accepted') return false;
+                    const existingCheckIn = new Date(existingReservation.checkindatetime);
+                    const existingCheckOut = new Date(existingReservation.checkoutdatetime);
+                    return (newCheckIn < existingCheckOut && newCheckOut > existingCheckIn);
+                });
+
+                if (!hasOverlap) {
+                    // Auto-accept the reservation
+                    try {
+                        await updateStatusMutation.mutateAsync({
+                            reservationId: reservation.reservationid,
+                            newStatus: 'Accepted'
+                        });
+                        await acceptBookingMutation.mutateAsync(reservation.reservationid);
+                    } catch (error) {
+                        console.error('Auto-accept failed:', error);
+                    }
+                }
+            }
+        });
+    }, [reservationsData]);
+
     return (
         <div>
             {showToast && <Toast type={toastType} message={toastMessage} />}
