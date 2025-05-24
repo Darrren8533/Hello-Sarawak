@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification } from '../../../../../Api/api';
+import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification, fetchCategories } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
@@ -10,7 +10,7 @@ import Toast from '../../../../Component/Toast/Toast';
 import Loader from '../../../../Component/Loader/Loader';
 import Status from '../../../../Component/Status/Status';
 import RoomPlannerCalendar from '../../../../Component/Room_Planner_Calender/Room_Planner_Calender';
-import { FaEye, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaEye, FaCheck, FaTimes, FaWifi, FaCar, FaUtensils, FaUmbrellaBeach, FaFire, FaHeart, FaStar, FaTimes as FaTimesCircle, FaTv, FaWind, FaSwimmingPool, FaGamepad, FaWineGlass, FaCoffee, FaShower, FaBed, FaHome, FaBuilding } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
@@ -62,7 +62,7 @@ const Reservations = () => {
             try {
                 const reservationData = await fetchReservation();
                 if (Array.isArray(reservationData)) {
-                    console.log('Reservations Data:', reservationData);
+                    // console.log('Reservations Data:', reservationData);
                     return reservationData.map(reservation => {
                         const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
                         const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
@@ -117,6 +117,8 @@ const Reservations = () => {
         },
         enabled: false, // Prevent automatic fetch
     });
+
+    console.log('Administrator Properties:', administratorProperties);
     
     useEffect(() => {
         if (rejectedReservationID?.reservationid) {
@@ -150,6 +152,15 @@ const Reservations = () => {
             sendSuggestNotification(reservationId, operators),
     });
 
+    // Fetch categories with React Query
+    const { data: categories = [] } = useQuery({
+        queryKey: ['categories'],
+        queryFn: fetchCategories,
+    });
+
+    // console.log('Categories:', categories);
+    // console.log('Administrator Properties:', administratorProperties);
+
     const handleApplyFilters = () => {
         setAppliedFilters({ status: selectedStatus });
     };
@@ -169,12 +180,12 @@ const Reservations = () => {
 
         const isOwner = Number(propertyOwnerID) === Number(currentUser.userid);
         
-        console.log('Ownership Check:', {
-            currentUserID: currentUser.userid,
-            propertyOwnerID,
-            userGroup: currentUser.userGroup,
-            isOwner
-        });
+        // console.log('Ownership Check:', {
+        //     currentUserID: currentUser.userid,
+        //     propertyOwnerID,
+        //     userGroup: currentUser.userGroup,
+        //     isOwner
+        // });
         return isOwner;
     };
 
@@ -435,6 +446,88 @@ const Reservations = () => {
         },
     ];
 
+    const clearFilters = () => {
+        setSuggestSearchKey('');
+        setPriceRange({ min: '', max: '' });
+    };
+
+    const filteredProperties = administratorProperties.filter(property => {
+        const matchesSearch = !suggestSearchKey || 
+            property.propertyaddress.toLowerCase().includes(suggestSearchKey.toLowerCase());
+        
+        const matchesMinPrice = !priceRange.min || 
+            parseFloat(property.normalrate) >= parseFloat(priceRange.min);
+        
+        const matchesMaxPrice = !priceRange.max || 
+            parseFloat(property.normalrate) <= parseFloat(priceRange.max);
+        
+        return matchesSearch && matchesMinPrice && matchesMaxPrice;
+    });
+
+    const getPropertyType = (property) => {
+        if (!categories || categories.length === 0) {
+            // Fallback to original logic if categories not loaded
+            return property.propertyguestpaxno > 4 ? 'House' : 'Apartment';
+        }
+        
+        const category = categories.find(cat => cat.categoryid === property.categoryid);
+
+        return category ? category.categoryname : 'Unknown';
+    };
+
+    const renderAmenities = (property) => {
+        const facilitiesString = property.facilities || '';
+        const facilitiesList = facilitiesString.split(',').map(f => f.trim()).filter(f => f);
+        
+        // Icon mapping for different facilities
+        const amenityIcons = {
+            'TV': <FaTv />,
+            'Dryer': <FaWind />,
+            'Kitchen': <FaUtensils />,
+            'WiFi': <FaWifi />,
+            'Wifi': <FaWifi />,
+            'WIFI': <FaWifi />,
+            'Parking': <FaCar />,
+            'Car Park': <FaCar />,
+            'Swimming Pool': <FaSwimmingPool />,
+            'Pool': <FaSwimmingPool />,
+            'Beach Access': <FaUmbrellaBeach />,
+            'Beach': <FaUmbrellaBeach />,
+            'BBQ': <FaFire />,
+            'Barbecue': <FaFire />,
+            'Gaming': <FaGamepad />,
+            'Games': <FaGamepad />,
+            'Bar': <FaWineGlass />,
+            'Coffee': <FaCoffee />,
+            'Bathroom': <FaShower />,
+            'Shower': <FaShower />,
+            'Bedroom': <FaBed />,
+            'Bed': <FaBed />,
+        };
+        
+        const amenities = facilitiesList.map(facility => ({
+            icon: amenityIcons[facility] || <FaCheck />,
+            label: facility
+        }));
+        
+        return amenities.slice(0, 3); // Show max 3 amenities
+    };
+
+    const renderStars = (rating) => {
+        const stars = [];
+        const numRating = parseFloat(rating) || 4.5; // Default rating if not available
+        
+        for (let i = 1; i <= 5; i++) {
+            stars.push(
+                <FaStar 
+                    key={i} 
+                    className={i <= numRating ? 'star-filled' : 'star-empty'} 
+                />
+            );
+        }
+        return stars;
+    };
+
     return (
         <div>
             {showToast && <Toast type={toastType} message={toastMessage} />}
@@ -496,47 +589,139 @@ const Reservations = () => {
 
             {messageBoxMode === 'suggest' && (
                 <div className="custom-message-box-overlay">
-                    <div className="suggest-properties custom-message-box">
+                    <div className="suggest-properties-modal">
                         <div className="suggest-header">
-                            <h2>Select A Property To Suggest</h2>
-                            <div className="form-close-button" onClick={() => setMessageBoxMode('')}>×</div>
+                            <div className="suggest-title-section">
+                                <h2>Suggest Alternative Property</h2>
+                                <p className="suggest-subtitle">Select a property to suggest as an alternative for the rejected reservation</p>
+                            </div>
+                            <button className="form-close-button" onClick={() => setMessageBoxMode('')}>
+                                <FaTimesCircle />
+                            </button>
                         </div>
 
-                        <div className="property-list">
-                            {administratorProperties.length > 0 ? (
-                                administratorProperties.map((property) => (
-                                    <div key={property.propertyid} className="property-card">
+                        <div className="suggest-filters">
+                            <div className="filter-header">
+                                <h3>Filter Properties</h3>
+                                <button className="clear-filters-btn" onClick={clearFilters}>
+                                    <FaTimesCircle /> Clear Filters
+                                </button>
+                            </div>
+                            
+                            <div className="filter-row">
+                                <div className="search-container">
+                                    <label>Search Properties</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Search by name or location..."
+                                        value={suggestSearchKey}
+                                        onChange={(e) => setSuggestSearchKey(e.target.value)}
+                                        className="suggest-search-input"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <div className="filter-row">
+                                <div className="price-filter-group">
+                                    <div className="price-input-container">
+                                        <label>Min Price (RM)</label>
+                                        <input
+                                            type="number"
+                                            placeholder="0"
+                                            value={priceRange.min}
+                                            onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
+                                            className="price-input"
+                                        />
+                                    </div>
+                                    <div className="price-input-container">
+                                        <label>Max Price (RM)</label>
+                                        <input
+                                            type="number"
+                                            placeholder="1000"
+                                            value={priceRange.max}
+                                            onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
+                                            className="price-input"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="property-grid">
+                            {filteredProperties.length > 0 ? (
+                                filteredProperties.map((property) => (
+                                    <div 
+                                        key={property.propertyid} 
+                                        className={`property-card-modern ${selectedProperty === property.propertyid ? 'selected' : ''}`}
+                                        onClick={() => handlePropertySelect(property.propertyid)}
+                                    >
+                                        <div className="property-image-section">
+                                            <img
+                                                src={`data:image/jpeg;base64,${property.images[0]}`}
+                                                alt={property.propertyaddress}
+                                                className="property-image-modern"
+                                            />
+                                            <div className="property-type-badge">
+                                                {getPropertyType(property)}
+                                            </div>
+                                            {/* <button className="favorite-btn">
+                                                <FaHeart />
+                                            </button> */}
+                                        </div>
+                                        
+                                        <div className="property-content">
+                                            <div className="property-header">
+                                                <h4 className="property-name-modern">{property.propertyaddress}</h4>
+                                                <div className="property-location">
+                                                    📍 {property.propertyaddress}
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="property-stats">
+                                                <div className="guest-capacity">
+                                                    👥 {property.propertyguestpaxno}
+                                                </div>
+                                                <div className="property-rating">
+                                                    {renderStars(property.rating || 4.5)}
+                                                    <span className="rating-number">{property.rating || '4.5'}</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="property-price-section">
+                                                <span className="price-amount">RM {property.normalrate}</span>
+                                                <span className="price-period">per night</span>
+                                            </div>
+                                            
+                                            <div className="property-amenities">
+                                                {renderAmenities(property).map((amenity, index) => (
+                                                    <div key={index} className="amenity-item">
+                                                        {amenity.icon}
+                                                        <span>{amenity.label}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        
                                         <input
                                             type="radio"
-                                            id={`property-${property.propertyid}`}
                                             name="property"
                                             value={property.propertyid}
+                                            checked={selectedProperty === property.propertyid}
                                             onChange={() => handlePropertySelect(property.propertyid)}
-                                            className="property-radio"
+                                            className="property-radio-hidden"
                                         />
-                                        <label htmlFor={`property-${property.propertyid}`} className="property-label">
-                                            <div className="property-image-container">
-                                                <img
-                                                    src={`data:image/jpeg;base64,${property.images[0]}`}
-                                                    alt={property.propertyaddress}
-                                                    className="property-image"
-                                                />
-                                            </div>
-                                            <div className="property-details">
-                                                <h3 className="property-title">{property.propertyaddress}</h3>
-                                                <p className="property-info-text">{property.propertyguestpaxno} Pax</p>
-                                                <p className="property-price">RM {property.normalrate}</p>
-                                            </div>
-                                        </label>
                                     </div>
                                 ))
                             ) : (
-                                <p className="no-property-message">No properties match your search criteria</p>
+                                <div className="no-properties-message">
+                                    <p>No properties match your search criteria</p>
+                                </div>
                             )}
+                            
+                            <button className="confirm-suggestion-btn" onClick={handleConfirmSuggestion}>
+                                Confirm Suggestion
+                            </button>
                         </div>
-                        <button className="confirm-button" onClick={handleConfirmSuggestion}>
-                            Confirm Suggestion
-                        </button>
                     </div>
                 </div>
             )}
