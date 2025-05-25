@@ -40,6 +40,11 @@
     font-size: 24px;
     cursor: pointer;
     color: #555;
+    transition: color 0.2s ease;
+}
+
+.close-button:hover {
+    color: #333;
 }
 
 .modal-body {
@@ -54,6 +59,7 @@
     display: block;
     margin-bottom: 8px;
     font-weight: 500;
+    color: #333;
 }
 
 .role-select {
@@ -64,6 +70,13 @@
     font-size: 16px;
     appearance: auto;
     min-width: 200px;
+    transition: border-color 0.2s ease;
+}
+
+.role-select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
 }
 
 .role-select option {
@@ -83,29 +96,54 @@
     gap: 10px;
 }
 
-.cancel-button {
-    padding: 10px 15px;
-    background-color: #f2f2f2;
-    border: 1px solid #ddd;
+/* Unified button styles with higher specificity */
+.modal-container .cancel-button {
+    padding: 10px 20px;
+    background-color: #f8f9fa !important;
+    color: #6c757d !important;
+    border: 1px solid #dee2e6 !important;
     border-radius: 4px;
     cursor: pointer;
     font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    min-width: 80px;
 }
 
-.cancel-button:hover {
-    background-color: #e7e7e7;
+.modal-container .cancel-button:hover {
+    background-color: #e9ecef !important;
+    color: #495057 !important;
+    border-color: #adb5bd !important;
 }
 
-.assign-button {
-    padding: 10px 15px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
+.modal-container .assign-button {
+    padding: 10px 20px;
+    background-color: #4CAF50 !important;
+    color: white !important;
+    border: none !important;
     border-radius: 4px;
     cursor: pointer;
     font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    min-width: 100px;
 }
 
-.assign-button:hover {
-    background-color: #3e9142;
+.modal-container .assign-button:hover {
+    background-color: #45a049 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.2);
+}
+
+.modal-container .assign-button:disabled {
+    background-color: #cccccc !important;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.modal-container .assign-button:disabled:hover {
+    background-color: #cccccc !important;
+    transform: none;
+    box-shadow: none;
 }
