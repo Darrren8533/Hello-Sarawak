@@ -29,17 +29,18 @@ const RoleManager = ({ isOpen, user, roles, selectedRole, onRoleChange, onSubmit
                 <div className="modal-footer">
                     <div className="button-group">
                         <button 
-                            className="cancel-button" 
-                            onClick={onClose}
-                        >
-                            Cancel
-                        </button>
-                        <button 
                             className="assign-button" 
                             onClick={onSubmit}
                         >
                             Assign Role
                         </button>
+                        <button 
+                            className="cancel-button" 
+                            onClick={onClose}
+                        >
+                            Cancel
+                        </button>
+                        
                     </div>
                 </div>
             </div>
