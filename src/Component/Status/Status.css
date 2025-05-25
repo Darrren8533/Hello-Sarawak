@@ -10,7 +10,6 @@
     border: 1px solid transparent;
   }
   
-
   .status.pending {
     background-color: rgba(255, 193, 7, 0.25);  
     color: #b88600;  
@@ -72,10 +71,21 @@
     border: 1px solid rgba(139, 69, 19, 0.3);
   }
   
-  /* Fallback */
   .status.unknown {
     background-color: rgba(160, 160, 160, 0.15);
     color: #666;
     border-color: rgba(160, 160, 160, 0.3);
+  }
+  
+  .status.published {
+    background-color: rgba(147, 112, 219, 0.15);  
+    color: #9370DB; 
+    border: 1px solid rgba(147, 112, 219, 0.3);
+  }
+
+  .status.suggested {
+    background-color: rgba(255, 127, 80, 0.15);
+    color: #FF7F50;  
+    border: 1px solid rgba(255, 127, 80, 0.3);
   }
   
