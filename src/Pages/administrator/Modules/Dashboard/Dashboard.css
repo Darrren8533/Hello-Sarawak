@@ -4,18 +4,18 @@
     transition: all 0.2s ease;
     color: #000000;
     background: #eaeaea;
-}
-
-.notification_icon:hover {
+  }
+  
+  .notification_icon:hover {
     color: #007bff;
-}
-
-.notification-container {
+  }
+  
+  .notification-container {
     position: relative;
     display: inline-block;
-}
-
-.notification-overlay {
+  }
+  
+  .notification-overlay {
     position: absolute;
     top: 100%;
     right: 0;
@@ -28,9 +28,9 @@
     margin-top: 8px;
     animation: slideDown 0.2s ease-out;
     max-height: 600px;
-}
-
-@keyframes slideDown {
+  }
+  
+  @keyframes slideDown {
     from {
         opacity: 0;
         transform: translateY(-10px);
@@ -39,13 +39,13 @@
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-.notification-content {
+  }
+  
+  .notification-content {
     padding: 0;
-}
-
-.notification-header {
+  }
+  
+  .notification-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -53,48 +53,48 @@
     border-bottom: 1px solid #f0f0f0;
     background-color: #f8f9fa;
     border-radius: 8px 8px 0 0;
-}
-
-.notification-header h3 {
+  }
+  
+  .notification-header h3 {
     margin: 0;
     font-size: 16px;
     font-weight: 600;
     color: #333;
-}
-
-.pickup-table-container {
+  }
+  
+  .pickup-table-container {
     padding: 0 16px;
     max-height: 400px;
     overflow-y: auto;
-}
-
-.pickup-table-container table {
+  }
+  
+  .pickup-table-container table {
     width: 100%;
     font-size: 14px;
-}
-
-.pickup-table-container th {
+  }
+  
+  .pickup-table-container th {
     font-size: 13px;
     font-weight: 600;
     padding: 12px 8px;
-}
-
-.pickup-table-container td {
+  }
+  
+  .pickup-table-container td {
     padding: 10px 8px;
-}
-
-.date-cell {
+  }
+  
+  .date-cell {
     font-size: 13px;
     color: #555;
     font-weight: 500;
-}
-
-.notification-badge {
+  }
+  
+  .notification-badge {
     position: relative;
     display: inline-block;
-}
-
-.badge-count {
+  }
+  
+  .badge-count {
     position: absolute;
     top: -8px;
     right: -8px;
@@ -109,9 +109,9 @@
     align-items: center;
     justify-content: center;
     border: 2px solid white;
-}
-
-.overlay-backdrop {
+  }
+  
+  .overlay-backdrop {
     position: fixed;
     top: 0;
     left: 0;
@@ -119,4 +119,23 @@
     bottom: 0;
     z-index: 999;
     background: transparent;
-}
+  }
+  
+  .property-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .property-table-image {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+  
+  .property-name {
+    font-weight: 500;
+  }
+  
+  
