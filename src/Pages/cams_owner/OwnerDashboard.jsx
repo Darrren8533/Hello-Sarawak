@@ -62,8 +62,9 @@ import '../../Component/MainContent/MainContent.css';
     { path: '/owner_dashboard/booknpay-log', label: 'BooknPayLog', icon: <GoLog /> },
     { path: '/owner_dashboard/finances', label: 'Finances', icon: <FiCreditCard /> },
     { path: '/owner_dashboard/audit-trails', label: 'Audit Trails', icon: <FiFileText /> },
-    { path: '/owner_dashboard/profile', label: 'Profile', icon: <FiUsers /> },
     { path: '/owner_dashboard/cluster', label: 'Cluster', icon: <FiUsers /> },
+    { path: '/owner_dashboard/profile', label: 'Profile', icon: <FiUsers /> },
+    
   ];
 
   const handleLogout = () => {
