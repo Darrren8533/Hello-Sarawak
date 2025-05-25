@@ -836,7 +836,7 @@ const PropertyDetails = () => {
                     <span className="room_price">${propertyDetails?.normalrate}</span>
                     <span className="price_night">/night</span>
                     {isDateOverlapping && (
-                      <span className="details-status-label">CLASHED</span>
+                      <span className="details-status-label">FULL</span>
                     )}
                   </div>
 
