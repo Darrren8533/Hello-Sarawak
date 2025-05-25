@@ -327,26 +327,9 @@ const PropertyDetails = () => {
         adults: bookingData.adults,
         children: bookingData.children,
         userid: parseInt(userid),
-        // Set initial status as Pending, will be updated if no overlaps
-        reservationstatus: 'Pending'
+        // Set status based on overlap
+        reservationstatus: isDateOverlapping ? 'Pending' : 'Accepted'
       };
-
-      // Check for overlapping reservations
-      const hasOverlap = propertyDetails.existingReservations?.some(existingReservation => {
-        if (existingReservation.reservationstatus !== 'Accepted') return false;
-        
-        const newCheckIn = new Date(bookingData.checkIn);
-        const newCheckOut = new Date(bookingData.checkOut);
-        const existingCheckIn = new Date(existingReservation.checkindatetime);
-        const existingCheckOut = new Date(existingReservation.checkoutdatetime);
-        
-        return (newCheckIn < existingCheckOut && newCheckOut > existingCheckIn);
-      });
-
-      // If no overlaps, set status to Accepted
-      if (!hasOverlap) {
-        reservationData.reservationstatus = 'Accepted';
-      }
 
       const createdReservation = await createReservation(reservationData);
 
