@@ -194,7 +194,8 @@ const Moderators = () => {
           (moderator.ulastname?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
           (moderator.uemail?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
           (moderator.uphoneno?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-          (moderator.uactivation?.toLowerCase().includes(searchKey.toLowerCase()) || '')
+          (moderator.uactivation?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+          (moderator.clustername?.toLowerCase().includes(searchKey.toLowerCase()) || '')
         )
     );
     setFilteredModerators(filtered);
