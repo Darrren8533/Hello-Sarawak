@@ -298,13 +298,11 @@ const PropertyDetails = () => {
     if (!bookingForm.firstName || !bookingForm.lastName || !bookingForm.email || !bookingForm.phoneNumber) {
         displayToast('error', 'Please fill all required fields');
         return;
-
     }
 
     if (!bookingData.checkIn || !bookingData.checkOut) {
         displayToast('error', 'Please select Check-in and Check-out dates');
         return;
-  
     }
 
     try {
@@ -329,8 +327,26 @@ const PropertyDetails = () => {
         adults: bookingData.adults,
         children: bookingData.children,
         userid: parseInt(userid),
+        // Set initial status as Pending, will be updated if no overlaps
         reservationstatus: 'Pending'
       };
+
+      // Check for overlapping reservations
+      const hasOverlap = propertyDetails.existingReservations?.some(existingReservation => {
+        if (existingReservation.reservationstatus !== 'Accepted') return false;
+        
+        const newCheckIn = new Date(bookingData.checkIn);
+        const newCheckOut = new Date(bookingData.checkOut);
+        const existingCheckIn = new Date(existingReservation.checkindatetime);
+        const existingCheckOut = new Date(existingReservation.checkoutdatetime);
+        
+        return (newCheckIn < existingCheckOut && newCheckOut > existingCheckIn);
+      });
+
+      // If no overlaps, set status to Accepted
+      if (!hasOverlap) {
+        reservationData.reservationstatus = 'Accepted';
+      }
 
       const createdReservation = await createReservation(reservationData);
 
@@ -342,7 +358,7 @@ const PropertyDetails = () => {
 
       displayToast('success', 'Reservation added to the cart');
 
-        setTimeout(() => {
+      setTimeout(() => {
         setShowBookingForm(false);
         navigate('/cart');
       }, 5000);
