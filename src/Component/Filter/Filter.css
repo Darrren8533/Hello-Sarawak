@@ -36,7 +36,7 @@
 }
 
 .apply-filters-btn {
-    background: linear-gradient(90deg, #87cd51 0%, #bdf094 100%);
+    background: linear-gradient(90deg, #87cd51 50%, #bdf094 100%);
     color: white;
     border: none;
     border-radius: 6px;
