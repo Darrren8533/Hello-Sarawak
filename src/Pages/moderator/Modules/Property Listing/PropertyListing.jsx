@@ -233,7 +233,7 @@ const PropertyListing = () => {
             (property.propertystatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase();
 
         const searchInFields =
-            `${property.propertyid} ${property.propertyaddress} ${property.clustername} ${property.rateamount} ${property.propertystatus}`
+            `${property.propertyid} ${property.propertyaddress} ${property.clustername} ${property.normalrate} ${property.propertystatus}`
                 .toLowerCase()
                 .includes(searchKey.toLowerCase());
 
