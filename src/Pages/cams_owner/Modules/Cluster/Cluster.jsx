@@ -12,7 +12,10 @@ import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Toast from '../../../../Component/Toast/Toast';
+import Alert from '../../../../Component/Alert/Alert';
+import Loader from '../../../../Component/Loader/Loader';
 import { FaEye, FaEdit, FaTrash } from 'react-icons/fa';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
@@ -21,7 +24,6 @@ import '../../../../Component/SearchBar/SearchBar.css';
 import './Cluster.css';
 
 const Cluster = () => {
-  const [clusters, setClusters] = useState([]);
   const [searchKey, setSearchKey] = useState('');
   const [selectedState, setSelectedState] = useState('All');
   const [appliedFilters, setAppliedFilters] = useState({ state: 'All' });
@@ -36,7 +38,8 @@ const Cluster = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('');
-  const [states, setStates] = useState([]);
+
+  const queryClient = useQueryClient();
 
   const displayToast = (type, message) => {
     setToastType(type);
@@ -44,6 +47,77 @@ const Cluster = () => {
     setShowToast(true);
     setTimeout(() => setShowToast(false), 5000);
   };
+
+  // Fetch clusters with TanStack Query
+  const { 
+    data: clusters = [], 
+    isLoading: clustersLoading, 
+    isError: clustersError, 
+    error: clustersErrorMessage 
+  } = useQuery({
+    queryKey: ['clusters'],
+    queryFn: fetchClusters,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    onError: (error) => {
+      displayToast('error', `Failed to fetch clusters: ${error.message}`);
+    }
+  });
+
+  // Fetch cluster names for filter
+  const { 
+    data: states = [], 
+    isLoading: statesLoading 
+  } = useQuery({
+    queryKey: ['clusterNames'],
+    queryFn: fetchClusterNames,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    onError: (error) => {
+      displayToast('error', `Failed to fetch cluster names: ${error.message}`);
+    }
+  });
+
+  // Add cluster mutation
+  const addClusterMutation = useMutation({
+    mutationFn: addCluster,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries(['clusters']);
+      queryClient.invalidateQueries(['clusterNames']);
+      setShowAddModal(false);
+      resetForm();
+      displayToast('success', `Successfully added ${newCluster.clusterName}`);
+    },
+    onError: (error) => {
+      displayToast('error', `Error adding cluster: ${error.message}`);
+    }
+  });
+
+  // Update cluster mutation
+  const updateClusterMutation = useMutation({
+    mutationFn: ({ clusterID, clusterData }) => updateCluster(clusterID, clusterData),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['clusters']);
+      queryClient.invalidateQueries(['clusterNames']);
+      setShowAddModal(false);
+      resetForm();
+      displayToast('success', `Successfully updated ${newCluster.clusterName}`);
+    },
+    onError: (error) => {
+      displayToast('error', `Error updating cluster: ${error.message}`);
+    }
+  });
+
+  // Delete cluster mutation
+  const deleteClusterMutation = useMutation({
+    mutationFn: deleteCluster,
+    onSuccess: (data, clusterID) => {
+      queryClient.invalidateQueries(['clusters']);
+      queryClient.invalidateQueries(['clusterNames']);
+      displayToast('success', 'Successfully deleted cluster');
+    },
+    onError: (error) => {
+      displayToast('error', `Error deleting cluster: ${error.message}`);
+    }
+  });
 
   const resetForm = useCallback(() => {
     setNewCluster({
@@ -62,27 +136,15 @@ const Cluster = () => {
     }));
   }, []);
 
-  
   const handleSearchChange = useCallback((newValue) => {
-    // 直接更新状态，不再使用防抖
     setSearchKey(newValue);
   }, []);
 
   const handleDeleteCluster = useCallback(async (clusterID) => {
-    try {
-      const data = await deleteCluster(clusterID);
-      
-      if (data.success) {
-        setClusters(clusters.filter(cluster => cluster.clusterid !== clusterID));
-        displayToast('success', 'Successfully deleted cluster');
-      } else {
-        displayToast('error', `Failed to delete: ${data.message || 'Unknown error'}`);
-      }
-    } catch (error) {
-      console.error('Error deleting cluster:', error);
-      displayToast('error', 'Error deleting cluster. Please try again.');
+    if (window.confirm('Are you sure you want to delete this cluster?')) {
+      deleteClusterMutation.mutate(clusterID);
     }
-  }, [clusters, setClusters, displayToast]);
+  }, [deleteClusterMutation]);
 
   const handleAction = useCallback((action, cluster) => {
     if (action === 'view') {
@@ -97,78 +159,30 @@ const Cluster = () => {
       setEditMode(true);
       setShowAddModal(true);
     } else if (action === 'delete') {
-      if (window.confirm(`Are you sure you want to delete ${cluster.clustername}?`)) {
-        handleDeleteCluster(cluster.clusterid);
-      }
+      handleDeleteCluster(cluster.clusterid);
     }
-  }, [setSelectedCluster, setNewCluster, setEditMode, setShowAddModal, handleDeleteCluster]);
+  }, [handleDeleteCluster]);
 
   const handleAddCluster = useCallback(async () => {
-    try {
-      const clusterData = {
-        clusterName: newCluster.clusterName,
-        clusterState: newCluster.clusterState,
-        clusterProvince: newCluster.clusterProvince
-      };
-      
-      let data;
-      
-      if (editMode) {
-        data = await updateCluster(newCluster.clusterID, clusterData);
-      } else {
-        data = await addCluster(clusterData);
-      }
-      
-      if (data.success) {
-        if (editMode) {
-          setClusters(clusters.map(cluster => 
-            cluster.clusterid === newCluster.clusterID 
-              ? { 
-                  ...cluster,
-                  clustername: newCluster.clusterName,
-                  clusterstate: newCluster.clusterState,
-                  clusterprovince: newCluster.clusterProvince
-                } 
-              : cluster
-          ));
-          displayToast('success', `Successfully updated ${newCluster.clusterName}`);
-        } else {
-          setClusters([...clusters, data.cluster]);
-          displayToast('success', `Successfully added ${newCluster.clusterName}`);
-        }
-        setShowAddModal(false);
-        resetForm();
-      } else {
-        displayToast('error', `Failed: ${data.message || 'Unknown error'}`);
-      }
-    } catch (error) {
-      console.error(`Error ${editMode ? 'updating' : 'adding'} cluster:`, error);
-      displayToast('error', `Error ${editMode ? 'updating' : 'adding'} cluster. Please try again.`);
+    const clusterData = {
+      clusterName: newCluster.clusterName,
+      clusterState: newCluster.clusterState,
+      clusterProvince: newCluster.clusterProvince
+    };
+    
+    if (editMode) {
+      updateClusterMutation.mutate({
+        clusterID: newCluster.clusterID,
+        clusterData
+      });
+    } else {
+      addClusterMutation.mutate(clusterData);
     }
-  }, [clusters, editMode, newCluster, setShowAddModal, displayToast, resetForm, setClusters]);
+  }, [newCluster, editMode, addClusterMutation, updateClusterMutation]);
 
   const handleApplyFilters = () => {
     setAppliedFilters({ state: selectedState });
   };
-
-  // Fetch clusters and cluster states from the database
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch clusters
-        const clusterData = await fetchClusters();
-        setClusters(clusterData);
-        
-        // Fetch unique cluster names
-        const namesData = await fetchClusterNames();
-        setStates(namesData);
-      } catch (error) {
-        console.error('Failed to fetch data', error);
-        displayToast('error', 'Failed to load data. Please try again.');
-      }
-    };
-    fetchData();
-  }, []);
 
   const filters = [
     {
@@ -267,52 +281,23 @@ const Cluster = () => {
     };
     
     const handleSubmit = () => {
-      const submitData = async () => {
-        try {
-          const clusterData = {
-            clusterName: localFormData.clusterName,
-            clusterState: localFormData.clusterState,
-            clusterProvince: localFormData.clusterProvince
-          };
-          
-          let data;
-          
-          if (editMode) {
-            data = await updateCluster(newCluster.clusterID, clusterData);
-          } else {
-            data = await addCluster(clusterData);
-          }
-          
-          if (data.success) {
-            if (editMode) {
-              setClusters(clusters.map(cluster => 
-                cluster.clusterid === newCluster.clusterID 
-                  ? { 
-                      ...cluster,
-                      clustername: localFormData.clusterName,
-                      clusterstate: localFormData.clusterState,
-                      clusterprovince: localFormData.clusterProvince
-                    } 
-                  : cluster
-              ));
-              displayToast('success', `Successfully updated ${localFormData.clusterName}`);
-            } else {
-              setClusters([...clusters, data.cluster]);
-              displayToast('success', `Successfully added ${localFormData.clusterName}`);
-            }
-            onClose();
-            resetForm();
-          } else {
-            displayToast('error', `Failed: ${data.message || 'Unknown error'}`);
-          }
-        } catch (error) {
-          console.error(`Error ${editMode ? 'updating' : 'adding'} cluster:`, error);
-          displayToast('error', `Error ${editMode ? 'updating' : 'adding'} cluster. Please try again.`);
-        }
+      const clusterData = {
+        clusterName: localFormData.clusterName,
+        clusterState: localFormData.clusterState,
+        clusterProvince: localFormData.clusterProvince
       };
       
-      submitData();
+      if (editMode) {
+        updateClusterMutation.mutate({
+          clusterID: newCluster.clusterID,
+          clusterData
+        });
+      } else {
+        addClusterMutation.mutate(clusterData);
+      }
     };
+    
+    const isSubmitting = addClusterMutation.isPending || updateClusterMutation.isPending;
     
     return (
       <div className="modal-overlay">
@@ -333,12 +318,12 @@ const Cluster = () => {
                 onChange={handleLocalChange}
                 placeholder="Enter cluster name"
                 autoComplete="off"
+                disabled={isSubmitting}
               />
             </div>
             
             <div className="form-group">
               <label htmlFor="clusterState">State</label>
-             
               <input
                 type="text"
                 id="clusterState"
@@ -348,6 +333,7 @@ const Cluster = () => {
                 placeholder="Enter cluster state"
                 required
                 autoComplete="off"
+                disabled={isSubmitting}
               />
             </div>
             
@@ -362,6 +348,7 @@ const Cluster = () => {
                 placeholder="Enter province"
                 required
                 autoComplete="off"
+                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -371,12 +358,17 @@ const Cluster = () => {
               <button 
                 className="submit-button"
                 onClick={handleSubmit}
-                disabled={!localFormData.clusterName || !localFormData.clusterState || !localFormData.clusterProvince}
+                disabled={!localFormData.clusterName || !localFormData.clusterState || !localFormData.clusterProvince || isSubmitting}
               >
-                {editMode ? 'Update Cluster' : 'Add Cluster'}
+                {isSubmitting ? (editMode ? 'Updating...' : 'Adding...') : (editMode ? 'Update Cluster' : 'Add Cluster')}
               </button>
-              <button className="cancel-button" onClick={onClose}>Cancel</button>
-              
+              <button 
+                className="cancel-button" 
+                onClick={onClose}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
             </div>
           </div>
         </div>
@@ -410,12 +402,24 @@ const Cluster = () => {
 
       <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
-      <PaginatedTable
-        data={filteredClusters}
-        columns={columns}
-        rowKey="clusterid"
-        enableCheckbox={false}
-      />
+      {clustersLoading && (
+        <div className="loader-box">
+          <Loader />
+        </div>
+      )}
+      
+      {clustersError && (
+        <Alert type="error" message={`Error: ${clustersErrorMessage?.message || 'Failed to load clusters'}`} />
+      )}
+
+      {!clustersLoading && !clustersError && (
+        <PaginatedTable
+          data={filteredClusters}
+          columns={columns}
+          rowKey="clusterid"
+          enableCheckbox={false}
+        />
+      )}
 
       <Modal
         isOpen={!!selectedCluster}
