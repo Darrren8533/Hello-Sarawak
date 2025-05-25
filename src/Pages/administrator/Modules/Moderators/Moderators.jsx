@@ -451,19 +451,23 @@ const Moderators = () => {
               </div>
             </div>
             <div className="modal-footer">
+
+              <button
+                className="submit-button"
+                onClick={handleClusterSubmit}
+                disabled={updateClusterMutation.isPending}
+                style={{ marginRight: '10px' }}
+              >
+                {updateClusterMutation.isPending ? 'Saving...' : 'Save Changes'}
+              </button>
+
               <button
                 className="cancel-button"
                 onClick={() => setShowClusterModal(false)}
               >
                 Cancel
               </button>
-              <button
-                className="submit-button"
-                onClick={handleClusterSubmit}
-                disabled={updateClusterMutation.isPending}
-              >
-                {updateClusterMutation.isPending ? 'Saving...' : 'Save Changes'}
-              </button>
+              
             </div>
           </div>
         </div>
