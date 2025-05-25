@@ -205,16 +205,74 @@ const PropertyDetails = () => {
 
   const calculatetotalprice = (arrival, departure) => {
     if (arrival && departure) {
-      const start = new Date(arrival);
-      const end = new Date(departure);
-      const nights = Math.floor((end - start) / (1000 * 60 * 60 * 24));
-      
-      if (nights > 0) {
-        setTotalNights(nights);
-        const basePrice = propertyDetails?.normalrate * nights;
-        const taxes = basePrice * 0.1;
-        settotalprice(basePrice + taxes);
-      }
+        const start = new Date(arrival);
+        const end = new Date(departure);
+        const nights = Math.floor((end - start) / (1000 * 60 * 60 * 24));
+        
+        if (nights > 0) {
+            setTotalNights(nights);
+            
+            // Calculate total price with all rate types
+            let totalBasePrice = 0;
+            let currentDate = new Date(start);
+            let weekendNights = 0;
+            let weekdayNights = 0;
+            let specialEventNights = 0;
+            let regularNights = 0;
+            
+            // Calculate days until check-in for early bird/last minute discounts
+            const daysUntilCheckIn = Math.floor((start - new Date()) / (1000 * 60 * 60 * 24));
+            const isEarlyBird = daysUntilCheckIn > 30;
+            const isLastMinute = daysUntilCheckIn <= 7;
+            
+            for (let i = 0; i < nights; i++) {
+                const dayOfWeek = currentDate.getDay(); // 0 is Sunday, 6 is Saturday
+                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                
+                // Check if date falls within special event period
+                const isSpecialEvent = propertyDetails.startdate && propertyDetails.enddate &&
+                    currentDate >= new Date(propertyDetails.startdate) && 
+                    currentDate <= new Date(propertyDetails.enddate);
+                
+                // Initialize rate multiplier with all applicable rates
+                let rateMultiplier = 1;
+                
+                // Apply special event rate if applicable
+                if (isSpecialEvent) {
+                    rateMultiplier *= (propertyDetails.specialeventrate || 1);
+                    specialEventNights++;
+                } else {
+                    regularNights++;
+                }
+                
+                // Apply weekend rate if applicable
+                if (isWeekend) {
+                    rateMultiplier *= (propertyDetails.weekendrate || 1);
+                    weekendNights++;
+                } else {
+                    weekdayNights++;
+                }
+                
+                // Apply early bird discount if applicable
+                if (isEarlyBird) {
+                    rateMultiplier *= (propertyDetails.earlybirddiscountrate || 1);
+                }
+                
+                // Apply last minute discount if applicable
+                if (isLastMinute) {
+                    rateMultiplier *= (propertyDetails.lastminutediscountrate || 1);
+                }
+                
+                // Calculate price for this night with all applicable rates
+                const nightPrice = propertyDetails.normalrate * rateMultiplier;
+                totalBasePrice += nightPrice;
+                
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            const taxes = totalBasePrice * 0.1;
+            settotalprice(totalBasePrice + taxes);
+        }
     }
   };
 
@@ -802,28 +860,95 @@ const PropertyDetails = () => {
                   </div>
 
                   <div className="price_details">
-                    <div className="price_item">
-                      <div>${propertyDetails?.normalrate} × {totalNights} nights</div>
-                      <div>${propertyDetails?.normalrate * totalNights}</div>
-                    </div>
-                    <div className="price_item">
-                      <div>Cleaning fee (10%)</div>
-                      <div>${Math.floor(propertyDetails?.normalrate * totalNights * 0.1)}</div>
-                    </div>
-                    <div className="price_item">
-                      <div>Service fee (10%)</div>
-                      <div>${Math.floor(propertyDetails?.normalrate * totalNights * 0.1)}</div>
-                    </div>
-                    <div className="price_total">
-                      <div><strong>Total (MYR)</strong></div>
-                      <div><strong>${totalprice}</strong></div>
-                    </div>
+                    {(() => {
+                      const start = new Date(bookingData.checkIn);
+                      const end = new Date(bookingData.checkOut);
+                      const nights = Math.floor((end - start) / (1000 * 60 * 60 * 24));
+                      let totalBasePrice = 0;
+                      let currentDate = new Date(start);
+                      // Group by unit price and label: { key: { count, total, unit, label } }
+                      let groupMap = {};
+                      // Calculate days until check-in for early bird/last minute discounts
+                      const daysUntilCheckIn = Math.floor((start - new Date()) / (1000 * 60 * 60 * 24));
+                      const isEarlyBird = daysUntilCheckIn > 30;
+                      const isLastMinute = daysUntilCheckIn <= 7;
+                      let discountRate = 1;
+                      let discountLabel = '';
+                      if (isEarlyBird && propertyDetails.earlybirddiscountrate && propertyDetails.earlybirddiscountrate < 1) {
+                        discountRate = propertyDetails.earlybirddiscountrate;
+                        discountLabel = `Discount (${Math.round((1 - propertyDetails.earlybirddiscountrate) * 100)}%)`;
+                      } else if (isLastMinute && propertyDetails.lastminutediscountrate && propertyDetails.lastminutediscountrate < 1) {
+                        discountRate = propertyDetails.lastminutediscountrate;
+                        discountLabel = `Discount (${Math.round((1 - propertyDetails.lastminutediscountrate) * 100)}%)`;
+                      }
+                      for (let i = 0; i < nights; i++) {
+                        const dayOfWeek = currentDate.getDay();
+                        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                        const isSpecialEvent = propertyDetails.startdate && propertyDetails.enddate &&
+                          currentDate >= new Date(propertyDetails.startdate) && 
+                          currentDate <= new Date(propertyDetails.enddate);
+                        let rateMultiplier = 1;
+                        let labelParts = [];
+                        if (isWeekend) labelParts.push('Weekend');
+                        if (isSpecialEvent) {
+                          labelParts.push('Special Event');
+                        } else if (!isWeekend) {
+                          labelParts.push('Weekday');
+                        }
+                        if (isWeekend) rateMultiplier *= (propertyDetails.weekendrate || 1);
+                        if (isSpecialEvent) rateMultiplier *= (propertyDetails.specialeventrate || 1);
+                        const nightPrice = propertyDetails.normalrate * rateMultiplier;
+                        const unitKey = nightPrice.toFixed(2) + '-' + labelParts.join(',');
+                        if (!groupMap[unitKey]) {
+                          groupMap[unitKey] = { count: 0, total: 0, unit: nightPrice, label: labelParts.join(', ') };
+                        }
+                        groupMap[unitKey].count += 1;
+                        groupMap[unitKey].total += nightPrice;
+                        totalBasePrice += nightPrice;
+                        currentDate.setDate(currentDate.getDate() + 1);
+                      }
+                      // Calculate discount for display (apply ONCE to subtotal)
+                      let discount = 0;
+                      if (discountRate < 1) {
+                        discount = totalBasePrice * (1 - discountRate);
+                      }
+                      return (
+                        <>
+                          {Object.entries(groupMap).map(([key, info], idx) => (
+                            <div className="price_item" key={idx}>
+                              <div>
+                                RM {info.unit.toFixed(2)} × {info.count} night{info.count > 1 ? 's' : ''}
+                                <br/>
+                                <span className="rate-type-label">({info.label})</span>
+                              </div>
+                              <div>RM {info.total.toFixed(2)}</div>
+                            </div>
+                          ))}
+                          {discount > 0 && (
+                            <div className="price_item discount">
+                              <div>{discountLabel}</div>
+                              <div>- RM {discount.toFixed(2)}</div>
+                            </div>
+                          )}
+                          <div className="price_total">
+                            <div><strong>Total (MYR)</strong></div>
+                            <div><strong>RM {(totalBasePrice - discount).toFixed(2)}</strong></div>
+                          </div>
+                        </>
+                      );
+                    })()}
                   </div>
 
                   <br /><br />
                   <button 
                     className="reserve_button" 
-                    onClick={() => setShowBookingForm(true)}
+                    onClick={() => {
+                      if (!bookingData.checkIn || !bookingData.checkOut) {
+                        displayToast('error', 'Please select check-in and check-out dates first');
+                        return;
+                      }
+                      setShowBookingForm(true);
+                    }}
                   >
                     {isDateOverlapping ? 'Enquiry' : 'Book & Pay'}
                   </button>
@@ -976,7 +1101,7 @@ const PropertyDetails = () => {
                           </div>
 
                           <div className="form-group full-width">
-                            <label>Additional requests (Optional)</label>
+                            <label>Additional requests</label>
                             <textarea
                               name="additionalRequests"
                               value={bookingForm.additionalRequests}
@@ -1017,18 +1142,79 @@ const PropertyDetails = () => {
                       <div className="price-details">
                         <h3>Price details</h3>
                         <div className="price-breakdown">
-                          <div className="price-row">
-                            <span>RM {propertyDetails?.normalrate} × {totalNights} night</span>
-                            <span>RM {propertyDetails?.normalrate * totalNights}</span>
-                          </div>
-                          <div className="price-row">
-                            <span>Taxes (10%)</span>
-                            <span>RM {Math.floor(propertyDetails?.normalrate * totalNights * 0.1)}</span>
-                          </div>
-                          <div className="price-total">
-                            <span>Total (MYR)</span>
-                            <span>RM {totalprice}</span>
-                          </div>
+                          {(() => {
+                            const start = new Date(bookingData.checkIn);
+                            const end = new Date(bookingData.checkOut);
+                            const nights = Math.floor((end - start) / (1000 * 60 * 60 * 24));
+                            let totalBasePrice = 0;
+                            let currentDate = new Date(start);
+                            // Group by unit price and label: { key: { count, total, unit, label } }
+                            let groupMap = {};
+                            // Calculate days until check-in for early bird/last minute discounts
+                            const daysUntilCheckIn = Math.floor((start - new Date()) / (1000 * 60 * 60 * 24));
+                            const isEarlyBird = daysUntilCheckIn > 30;
+                            const isLastMinute = daysUntilCheckIn <= 7;
+                            let discountRate = 1;
+                            let discountLabel = '';
+                            if (isEarlyBird && propertyDetails.earlybirddiscountrate && propertyDetails.earlybirddiscountrate < 1) {
+                              discountRate = propertyDetails.earlybirddiscountrate;
+                              discountLabel = `Discount (${Math.round((1 - propertyDetails.earlybirddiscountrate) * 100)}%)`;
+                            } else if (isLastMinute && propertyDetails.lastminutediscountrate && propertyDetails.lastminutediscountrate < 1) {
+                              discountRate = propertyDetails.lastminutediscountrate;
+                              discountLabel = `Discount (${Math.round((1 - propertyDetails.lastminutediscountrate) * 100)}%)`;
+                            }
+                            for (let i = 0; i < nights; i++) {
+                              const dayOfWeek = currentDate.getDay();
+                              const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                              const isSpecialEvent = propertyDetails.startdate && propertyDetails.enddate &&
+                                currentDate >= new Date(propertyDetails.startdate) && 
+                                currentDate <= new Date(propertyDetails.enddate);
+                              let rateMultiplier = 1;
+                              let labelParts = [];
+                              if (isWeekend) labelParts.push('Weekend');
+                              if (isSpecialEvent) {
+                                labelParts.push('Special Event');
+                              } else if (!isWeekend) {
+                                labelParts.push('Weekday');
+                              }
+                              if (isWeekend) rateMultiplier *= (propertyDetails.weekendrate || 1);
+                              if (isSpecialEvent) rateMultiplier *= (propertyDetails.specialeventrate || 1);
+                              const nightPrice = propertyDetails.normalrate * rateMultiplier;
+                              const unitKey = nightPrice.toFixed(2) + '-' + labelParts.join(',');
+                              if (!groupMap[unitKey]) {
+                                groupMap[unitKey] = { count: 0, total: 0, unit: nightPrice, label: labelParts.join(', ') };
+                              }
+                              groupMap[unitKey].count += 1;
+                              groupMap[unitKey].total += nightPrice;
+                              totalBasePrice += nightPrice;
+                              currentDate.setDate(currentDate.getDate() + 1);
+                            }
+                            // Calculate discount for display (apply ONCE to subtotal)
+                            let discount = 0;
+                            if (discountRate < 1) {
+                              discount = totalBasePrice * (1 - discountRate);
+                            }
+                            return (
+                              <>
+                                {Object.entries(groupMap).map(([key, info], idx) => (
+                                  <div className="price-row" key={idx}>
+                                    <span>RM {info.unit.toFixed(2)} x {info.count}</span>
+                                    <span>RM {info.total.toFixed(2)}</span>
+                                  </div>
+                                ))}
+                                {discount > 0 && (
+                                  <div className="price-row discount">
+                                    <span>{discountLabel}</span>
+                                    <span>-RM {discount.toFixed(2)}</span>
+                                  </div>
+                                )}
+                                <div className="price-total">
+                                  <span>Total (MYR)</span>
+                                  <span>RM {(totalBasePrice - discount).toFixed(2)}</span>
+                                </div>
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                     )}
@@ -1047,7 +1233,13 @@ const PropertyDetails = () => {
                   <span>Total: ${totalprice} for {totalNights} {totalNights === 1 ? 'night' : 'nights'}</span>
                 )}
               </div>
-              <button className="mobile-book-now-btn" onClick={() => setShowBookingForm(true)}>
+              <button className="mobile-book-now-btn" onClick={() => {
+                if (!bookingData.checkIn || !bookingData.checkOut) {
+                  displayToast('error', 'Please select check-in and check-out dates first');
+                  return;
+                }
+                setShowBookingForm(true);
+              }}>
                 {propertyDetails.propertystatus === 'Unavailable' ? 'Enquiry' : 'Book & Pay'}
               </button>
             </div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification, fetchCategories } from '../../../../../Api/api';
+import { fetchReservation, updateReservationStatus, acceptBooking, getOperatorProperties, fetchOperators, suggestNewRoom, sendSuggestNotification } from '../../../../../Api/api';
 import Filter from '../../../../Component/Filter/Filter';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Modal from '../../../../Component/Modal/Modal';
@@ -151,15 +151,6 @@ const Reservations = () => {
         mutationFn: ({ reservationId, operators }) =>
             sendSuggestNotification(reservationId, operators),
     });
-
-    // Fetch categories with React Query
-    const { data: categories = [] } = useQuery({
-        queryKey: ['categories'],
-        queryFn: fetchCategories,
-    });
-
-    // console.log('Categories:', categories);
-    // console.log('Administrator Properties:', administratorProperties);
 
     const handleApplyFilters = () => {
         setAppliedFilters({ status: selectedStatus });
@@ -464,17 +455,6 @@ const Reservations = () => {
         return matchesSearch && matchesMinPrice && matchesMaxPrice;
     });
 
-    const getPropertyType = (property) => {
-        if (!categories || categories.length === 0) {
-            // Fallback to original logic if categories not loaded
-            return property.propertyguestpaxno > 4 ? 'House' : 'Apartment';
-        }
-        
-        const category = categories.find(cat => cat.categoryid === property.categoryid);
-
-        return category ? category.categoryname : 'Unknown';
-    };
-
     const renderAmenities = (property) => {
         const facilitiesString = property.facilities || '';
         const facilitiesList = facilitiesString.split(',').map(f => f.trim()).filter(f => f);
@@ -527,6 +507,38 @@ const Reservations = () => {
         }
         return stars;
     };
+
+    useEffect(() => {
+        if (!Array.isArray(reservationsData)) return;
+
+        reservationsData.forEach(async (reservation) => {
+            if (reservation.reservationstatus === 'Pending') {
+                const newCheckIn = new Date(reservation.checkindatetime);
+                const newCheckOut = new Date(reservation.checkoutdatetime);
+
+                const hasOverlap = reservationsData.some(existingReservation => {
+                    if (existingReservation.reservationid === reservation.reservationid) return false;
+                    if (existingReservation.reservationstatus !== 'Accepted') return false;
+                    const existingCheckIn = new Date(existingReservation.checkindatetime);
+                    const existingCheckOut = new Date(existingReservation.checkoutdatetime);
+                    return (newCheckIn < existingCheckOut && newCheckOut > existingCheckIn);
+                });
+
+                if (!hasOverlap) {
+                    // Auto-accept the reservation
+                    try {
+                        await updateStatusMutation.mutateAsync({
+                            reservationId: reservation.reservationid,
+                            newStatus: 'Accepted'
+                        });
+                        await acceptBookingMutation.mutateAsync(reservation.reservationid);
+                    } catch (error) {
+                        console.error('Auto-accept failed:', error);
+                    }
+                }
+            }
+        });
+    }, [reservationsData]);
 
     return (
         <div>
@@ -661,12 +673,9 @@ const Reservations = () => {
                                                 alt={property.propertyaddress}
                                                 className="property-image-modern"
                                             />
-                                            <div className="property-type-badge">
-                                                {getPropertyType(property)}
-                                            </div>
-                                            {/* <button className="favorite-btn">
-                                                <FaHeart />
-                                            </button> */}
+                                            {/* <div className="property-type-badge">
+                                                {property.propertyguestpaxno > 4 ? 'House' : 'Apartment'}
+                                            </div> */}
                                         </div>
                                         
                                         <div className="property-content">

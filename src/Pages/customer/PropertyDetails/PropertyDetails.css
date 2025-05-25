@@ -1656,6 +1656,13 @@ body {
   text-decoration: underline;
 }
 
+.rate-type-label {
+  font-size: 0.9em;
+  color: #666;
+  margin-left: 8px;
+  font-style: italic;
+}
+
 @media screen and (min-width: 990px) {
     .property-details-main-container{
         width: 95%;

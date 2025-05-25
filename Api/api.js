@@ -213,7 +213,7 @@ export const fetchCustomers = async () => {
   }
 };
 
-//Fetch Owners
+// Fetch Owners
 export const fetchOwners = async () => {
   try {
     const response = await fetch(`${API_URL}/users/owners`);
@@ -229,7 +229,7 @@ export const fetchOwners = async () => {
   }
 };
 
-//Fetch Moderators
+// Fetch Moderators
 export const fetchModerators = async () => {
   try {
     const response = await fetch(`${API_URL}/users/moderators`);
@@ -245,7 +245,7 @@ export const fetchModerators = async () => {
   }
 };
 
-//Fetch Operators
+// Fetch Operators
 export const fetchOperators = async () => {
   try {
     const response = await fetch(`${API_URL}/users/operators`);
@@ -261,7 +261,7 @@ export const fetchOperators = async () => {
   }
 };
 
-//Fetch Administrator
+// Fetch Administrator
 export const fetchAdministrators = async () => {
   try {
     const response = await fetch(`${API_URL}/users/administrators`);
@@ -619,6 +619,31 @@ export const sendPickedUpNotification = async (reservationid) => {
     if(!response) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Failed to send picked up notification');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('API error: ', error);
+    throw error;
+  }
+};
+
+// Send Suggested Room Rejected Message To Operators
+export const rejectSuggestedRoom = async (propertyid) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
+  try {
+    const response = await fetch(`${API_URL}/reject_suggested_room/${propertyid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(responseData.message || 'Failed to reject suggested room');
     }
 
     return await response.json();

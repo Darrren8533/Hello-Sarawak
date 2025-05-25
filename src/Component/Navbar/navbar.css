@@ -267,11 +267,11 @@ body.no-scroll {
     font-size: 20px;
     cursor: pointer;
     transition: color 0.2s ease;
-    color: #493829 !important;
+    color: white;
 }
 
-.notification_icon:hover {
-    color: #6f5641 !important;
+.nav-notification_icon:hover {
+    color: grey;
 }
 
 .nav-notification-container {

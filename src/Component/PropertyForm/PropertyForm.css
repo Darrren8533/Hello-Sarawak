@@ -111,7 +111,7 @@
   border-radius: 8px;
   font-size: 15px;
   color: #1e293b;
-  background-color: #f8fafc;
+  background-color: #fff !important;
   transition: border-color 0.3s, box-shadow 0.3s;
 }
 
@@ -201,7 +201,7 @@
   align-items: center;
   padding: 8px 12px;
   background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #000000;
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -570,7 +570,7 @@ background-color: #bfdbfe;
     border-radius: 8px;
     font-size: 15px;
     color: #1e293b;
-    background-color: #f8fafc;
+    background-color: #fff !important;
     transition: all 0.3s ease;
 }
 
@@ -582,7 +582,7 @@ background-color: #bfdbfe;
 
 /* Style for disabled rate inputs */
 .property-form-group input[type="number"]:disabled {
-    background-color: #f1f1f1;
+    background-color: #fff !important;
     cursor: not-allowed;
     opacity: 0.7;
     border-color: #e2e8f0;
@@ -635,4 +635,10 @@ background-color: #bfdbfe;
 .property-form-toggle input:disabled + .property-form-slider {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+input[readonly],
+select:disabled,
+textarea:disabled {
+  background-color: #fff !important;
 }

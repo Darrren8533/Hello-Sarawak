@@ -924,18 +924,19 @@ cursor: pointer;
 
 /* Reservation status indicators */
 .reservation-status-indicators {
-  display: flex;
+  display: row;
   flex-wrap: wrap;
   gap: 3px;
   margin-top: 3px;
   justify-content: center;
 }
 
-.status-dot {
+.planner-status-dot {
   width: 15px;
   height: 15px;
   border-radius: 50%;
   position: relative;
+  margin-top: 5px;
 }
 
 /* Status colors */
@@ -951,14 +952,6 @@ cursor: pointer;
   background-color: #FF0000; /* Red */
 }
 
-.legend-dot-status-pickup {
-  background-color: #FF8C00; /* Orange */
-}
-
-.legend-dot-status-other {
-  background-color: #808080; /* Gray */
-}
-
 /* Counter badges */
 .count-badge {
   position: absolute;
@@ -967,6 +960,7 @@ cursor: pointer;
   font-size: 10px;
   color: #333;
   white-space: nowrap;
+  align-items: baseline;
 }
 
 /* Week view status indicators */
@@ -977,7 +971,7 @@ cursor: pointer;
   margin-top: 3px;
 }
 
-.week-status-dot {
+.week-planner-status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
