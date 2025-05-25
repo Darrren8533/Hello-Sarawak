@@ -192,6 +192,8 @@ const Reservations = () => {
                 { value: 'Canceled', label: 'Canceled' },
                 { value: 'Paid', label: 'Paid' },
                 { value: 'Expired', label: 'Expired' },
+                { value: 'Suggested', label: 'Suggested' },
+                { value: 'Published', label: 'Published' },
             ],
         },
     ];
@@ -218,7 +220,8 @@ const Reservations = () => {
                     (reservation.reservationid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.propertyaddress?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '')
+                    (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
                 )
         )
         : [];
@@ -442,6 +445,8 @@ const Reservations = () => {
                 <h1 className="dashboard-page-title">Reservations</h1>
                 <SearchBar value={searchKey} onChange={(newValue) => setSearchKey(newValue)} placeholder="Search reservations..." />
             </div>
+
+            <Filter filters={filters} onApplyFilters={handleApplyFilters} />
 
             <div className="room-planner-container">
                 <RoomPlannerCalendar />
