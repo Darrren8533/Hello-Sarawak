@@ -87,7 +87,7 @@ const PropertyListing = () => {
         if (action === 'view') {
             setSelectedProperty({
                 propertyaddress: property.propertyaddress || 'N/A',
-                rateamount: property.rateamount || 'N/A',
+                normalrate: property.normalrate || 'N/A',
                 nearbylocation: property.nearbylocation || 'N/A',
                 propertyguestpaxno: property.propertyguestpaxno || 'N/A',
                 propertystatus: property.propertystatus || 'N/A',
@@ -132,7 +132,7 @@ const PropertyListing = () => {
 
     const displayLabels = {
         propertyaddress: "Property Name",
-        rateamount: "Property Price",
+        normalrate: "Property Price",
         nearbylocation: "Property Location",
         propertyguestpaxno: "Guest Capacity",
         propertystatus: "Property Status",
@@ -152,7 +152,7 @@ const PropertyListing = () => {
                 (property.propertyid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                 (property.propertyaddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                 (property.clustername?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (property.rateamount?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (property.normalrate?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                 (property.propertystatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
             )
     );
@@ -182,7 +182,7 @@ const PropertyListing = () => {
             )
         },
         { header: 'Name', accessor: 'propertyaddress' },
-        { header: 'Price', accessor: 'rateamount' },
+        { header: 'Price', accessor: 'normalrate' },
         { header: 'Cluster', accessor: 'clustername' },
         {
             header: 'Status',
