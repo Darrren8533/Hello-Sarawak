@@ -1,6 +1,6 @@
 /* Button Styles */
 .create-property-button {
-  background: linear-gradient(90deg, #87cd51 0%, #bdf094 100%);
+  background: linear-gradient(90deg, #87cd51 50%, #bdf094 100%);
   color: white;
   border: none;
   padding: 0.6rem 1.2rem;
