@@ -309,7 +309,7 @@ const Moderators = () => {
         { label: 'View Details', icon: <FaEye />, action: 'view' },
         { label: 'Edit', icon: <FaEdit />, action: 'edit' },
         { label: 'Activate', icon: <FaUser />, action: 'activate' },
-        { label: 'Edit Cluster', icon: <FaLayerGroup />, action: 'editCluster' },
+        // { label: 'Edit Cluster', icon: <FaLayerGroup />, action: 'editCluster' },
         { label: 'Remove', icon: <FaTrash />, action: 'remove' },
       ];
     } else if (moderatorStatus === 'Active') {
@@ -317,13 +317,13 @@ const Moderators = () => {
         { label: 'View Details', icon: <FaEye />, action: 'view' },
         { label: 'Edit', icon: <FaEdit />, action: 'edit' },
         { label: 'Suspend', icon: <FaBan />, action: 'suspend' },
-        { label: 'Edit Cluster', icon: <FaLayerGroup />, action: 'editCluster' },
+        // { label: 'Edit Cluster', icon: <FaLayerGroup />, action: 'editCluster' },
       ];
     }
 
     return [
       { label: 'View Details', icon: <FaEye />, action: 'view' },
-      { label: 'Edit Cluster', icon: <FaLayerGroup />, action: 'editCluster' },
+      // { label: 'Edit Cluster', icon: <FaLayerGroup />, action: 'editCluster' },
     ];
   };
 
