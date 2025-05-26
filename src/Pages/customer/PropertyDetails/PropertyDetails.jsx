@@ -346,7 +346,7 @@ const PropertyDetails = () => {
       setTimeout(() => {
         setShowBookingForm(false);
         navigate('/cart');
-      }, 5000);
+      }, 3000);
         
     } catch (error) {
       displayToast('error', 'Failed to create reservation');
