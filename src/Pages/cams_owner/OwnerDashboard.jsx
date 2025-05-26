@@ -61,7 +61,7 @@ import '../../Component/MainContent/MainContent.css';
     { path: '/owner_dashboard/reservations', label: 'Reservations', icon: <FiCalendar /> },
     { path: '/owner_dashboard/booknpay-log', label: 'BooknPayLog', icon: <GoLog /> },
     { path: '/owner_dashboard/finances', label: 'Finances', icon: <FiCreditCard /> },
-    { path: '/owner_dashboard/audit-trails', label: 'Audit Trails', icon: <FiHistory /> },
+    { path: '/owner_dashboard/audit-trails', label: 'Audit Trails', icon: <FaHistory /> },
     { path: '/owner_dashboard/cluster', label: 'Cluster', icon: <FaLayerGroup /> },
     { path: '/owner_dashboard/profile', label: 'Profile', icon: <CgProfile /> },
     
