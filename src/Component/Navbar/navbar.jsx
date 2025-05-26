@@ -398,6 +398,12 @@ function Navbar() {
                                 {/* Notification Bell Icon */}
                                 <div className="nav-notification-container">
                                     <FaBell className='nav-notification_icon' onClick={toggleNotifications} />
+                                    {/* Notification count badge */}
+                                    {suggestedReservation.length > 0 && (
+                                        <span className="notification-count-badge">
+                                            {suggestedReservation.length}
+                                        </span>
+                                    )}
 
                                     {showNotifications && (
                                         <div className="nav-notification-overlay" ref={notificationRef}>
@@ -567,7 +573,6 @@ function Navbar() {
                                     if (selectedNotification && selectedNotification.reservationid) {
                                         try {
                                             await updateReservationStatus(selectedNotification.reservationid, 'Accepted');
-                                            // Handle success (e.g., show toast, close overlay)
                                             displayToast('success', 'Reservation accepted successfully');
                                             setTimeout(() => {
                                                 setSelectedNotification(null);
