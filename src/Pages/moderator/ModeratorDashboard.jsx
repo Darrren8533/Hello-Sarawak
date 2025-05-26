@@ -14,8 +14,7 @@ import '../../Component/MainContent/MainContent.css';
 import { FiCalendar, FiUsers, FiHome } from 'react-icons/fi';
 import { CgProfile } from "react-icons/cg";
 import { GoLog } from "react-icons/go";
-import { FaHotel } from 'react-icons/fa';
-import { MdHistory } from "react-icons/md";
+import { FaHotel, FaHistory } from 'react-icons/fa';
 import { VscGraphLine } from "react-icons/vsc";
 import { useQuery } from '@tanstack/react-query';
 import { fetchUserData } from '../../../Api/api';
@@ -87,7 +86,7 @@ const ModeratorDashboard = () => {
         { path: '/moderator_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel /> },
         { path: '/moderator_dashboard/reservations', label: 'Reservations', icon: <FiCalendar /> },
         { path: '/moderator_dashboard/booknpay-log', label: 'BooknPayLog', icon: <GoLog /> },
-        { path: '/moderator_dashboard/audit-trails', label: 'AuditTrails', icon: <MdHistory /> },
+        { path: '/moderator_dashboard/audit-trails', label: 'AuditTrails', icon: <FaHistory /> },
         { path: '/moderator_dashboard/finance', label: 'Finance', icon: <VscGraphLine /> },
         { path: '/moderator_dashboard/profile', label: 'Profile', icon: <CgProfile /> },
     ];
