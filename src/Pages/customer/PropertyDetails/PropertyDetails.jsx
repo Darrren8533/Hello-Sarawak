@@ -337,9 +337,7 @@ const PropertyDetails = () => {
         throw new Error('Failed to create reservation: No valid reservation ID received');
       }
 
-      if (reservationstatus === 'Pending') {
-        await requestBooking(createdReservation.reservationid);
-      }
+      await requestBooking(createdReservation.reservationid);
 
       displayToast('success', 'Reservation added to the cart');
 
