@@ -536,7 +536,7 @@ const PropertyDetails = () => {
     <div>
       <div className="Property_Details_Main_Container">
         <AuthProvider>
-        {!showAllPhotos && !showBookingForm && !showReviews &&<Navbar />}
+        <Navbar />
         <div className="property-details-main-container">
           <div className="Main_Image_gallery_container">
             <div className="Image_gallery_card_1">
