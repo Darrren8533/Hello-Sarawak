@@ -46,11 +46,11 @@ const BooknPayLog = () => {
       onChange: setSelectedActionType,
       options: [
         { value: 'All', label: 'All Actions' },
+        { value: 'Create', label: 'Create' },
         { value: 'Request', label: 'Request' },
         { value: 'Payment', label: 'Payment' },
-        { value: 'Modify', label: 'Modify' },
-        { value: 'Remove', label: 'Remove' },
-        { value: 'Checkout', label: 'Checkout' },
+        { value: 'Update', label: 'Update' },
+        { value: 'Delete', label: 'Delete' },
       ],
     },
   ];

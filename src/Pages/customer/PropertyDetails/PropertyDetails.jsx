@@ -337,14 +337,16 @@ const PropertyDetails = () => {
         throw new Error('Failed to create reservation: No valid reservation ID received');
       }
 
-      await requestBooking(createdReservation.reservationid);
+      if (reservationData.reservationstatus === 'Pending') {
+        await requestBooking(createdReservation.reservationid);
+      }
 
       displayToast('success', 'Reservation added to the cart');
 
       setTimeout(() => {
         setShowBookingForm(false);
         navigate('/cart');
-      }, 5000);
+      }, 3000);
         
     } catch (error) {
       displayToast('error', 'Failed to create reservation');
@@ -534,7 +536,7 @@ const PropertyDetails = () => {
     <div>
       <div className="Property_Details_Main_Container">
         <AuthProvider>
-        {!showAllPhotos && !showBookingForm && !showReviews &&<Navbar />}
+        <Navbar />
         <div className="property-details-main-container">
           <div className="Main_Image_gallery_container">
             <div className="Image_gallery_card_1">
@@ -836,7 +838,7 @@ const PropertyDetails = () => {
                     <span className="room_price">${propertyDetails?.normalrate}</span>
                     <span className="price_night">/night</span>
                     {isDateOverlapping && (
-                      <span className="details-status-label">CLASHED</span>
+                      <span className="details-status-label">FULL</span>
                     )}
                   </div>
 

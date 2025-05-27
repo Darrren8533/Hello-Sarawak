@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet';
 import { FaBars, FaTimes, FaUserCircle, FaBell } from "react-icons/fa";
-import { logoutUser, fetchUserData } from '../../../Api/api';
+import { logoutUser, fetchUserData, suggestedReservations, rejectSuggestedRoom, updateReservationStatus } from '../../../Api/api';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import DefaultAvatar from '../../../src/public/avatar.png';
 import eventBus from '../EventBus/Eventbus';
 import { useAuth } from '../AuthContext/AuthContext';
+import ImageSlider from '../ImageSlider/ImageSlider';
+import Toast from '../Toast/Toast';
 import './navbar.css';
 
 function Navbar() {
@@ -16,10 +18,20 @@ function Navbar() {
     const { isLoggedIn, userAvatar, userID, logout, updateAvatar } = useAuth();
     const [isScrolled, setIsScrolled] = useState(false);
     const [scrollPosition, setScrollPosition] = useState(0);
-    
+    const [suggestedReservation, setSuggestedReservation] = useState([]);
+
     // Notification states
     const [showNotifications, setShowNotifications] = useState(false);
-    
+    const [selectedNotification, setSelectedNotification] = useState(null);
+
+    // Toast states
+    const [toastMessage, setToastMessage] = useState('');
+    const [toastType, setToastType] = useState('');
+    const [showToast, setShowToast] = useState(false);
+
+    // Ref for the notification container to detect outside clicks
+    const notificationRef = React.useRef(null);
+
     // React Query for user data with polling
     const { data: userData, isLoading: isUserLoading } = useQuery({
         queryKey: ['userData', userID],
@@ -29,7 +41,7 @@ function Navbar() {
         refetchInterval: 5000, // Check every 5 seconds
         refetchIntervalInBackground: true, // Continue checking even when tab is not active
     });
-    
+
     // Derived state
     const isCustomer = userData?.usergroup === "Customer";
 
@@ -42,6 +54,87 @@ function Navbar() {
         setShowNotifications(false);
     };
 
+    // Function to display toast messages
+    const displayToast = (type, message) => {
+        setToastType(type);
+        setToastMessage(message);
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 5000); // Hide toast after 5 seconds
+    };
+
+    // Effect to close notifications when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+                closeNotifications();
+            }
+        };
+
+        if (showNotifications) {
+            // Attach the event listener
+            document.addEventListener('mousedown', handleClickOutside);
+        } else {
+            // Remove the event listener if the dropdown is already closed
+            document.removeEventListener('mousedown', handleClickOutside);
+        }
+
+        // Cleanup function to remove the event listener
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showNotifications]); // Re-run the effect when showNotifications changes
+
+    // Effect for scroll locking when property details overlay is open
+    useEffect(() => {
+        if (selectedNotification) {
+            // Save the current scroll position
+            const scrollY = window.scrollY;
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.width = '100%';
+            document.body.style.overflow = 'hidden';
+            
+            // Add padding to prevent layout shift if a scrollbar was present
+            const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+            if (scrollbarWidth > 0) {
+              document.body.style.paddingRight = `${scrollbarWidth}px`;
+            }
+
+            return () => {
+                // Restore scroll position and body styles
+                const scrollY = document.body.style.top ? parseInt(document.body.style.top, 10) * -1 : 0;
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+                window.scrollTo(0, scrollY);
+            };
+        }
+    }, [selectedNotification]);
+
+    useEffect(() => {
+        const getSuggestedReservations = async () => {
+            try {
+                if (!userID) {
+                    return;
+                }
+                const suggestedReservationsData = await suggestedReservations(userID);
+                if (suggestedReservationsData && Array.isArray(suggestedReservationsData)) {
+                    setSuggestedReservation(suggestedReservationsData);
+                } else {
+                    setSuggestedReservation([]);
+                }
+            } catch (err) {
+                setSuggestedReservation([]);
+            }
+        };
+
+        if (isLoggedIn && userID) {
+            getSuggestedReservations();
+        }
+    }, [userID, isLoggedIn]);
+
     // Check for inactive user and handle logout
     useEffect(() => {
         const checkInactiveStatus = async () => {
@@ -49,11 +142,10 @@ function Navbar() {
                 try {
                     await handleLogout();
                 } catch (error) {
-                    console.error('Error during logout:', error);
                 }
             }
         };
-        
+
         checkInactiveStatus();
     }, [userData?.uactivation, isLoggedIn]);
 
@@ -61,50 +153,50 @@ function Navbar() {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 10);
         };
-        
+
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
     useEffect(() => {
         const offcanvasElement = document.getElementById('offcanvasNavbar');
-      
+
         if (!offcanvasElement) return;
-      
+
         const handleShow = () => {
             // Storing Scroll Position
             const currentPosition = window.pageYOffset;
             setScrollPosition(currentPosition);
-            
+
             // Add No Scroll
             document.body.classList.add('no-scroll');
-            
+
             document.body.style.top = `-${currentPosition}px`;
             document.body.style.position = 'fixed';
             document.body.style.width = '100%';
         };
-      
+
         //Remove No Scroll When Close The Menu
         const handleHide = () => {
             const savedPosition = scrollPosition;
-            
+
             document.body.classList.remove('no-scroll');
             document.body.style.position = '';
             document.body.style.top = '';
             document.body.style.width = '';
-            
+
             window.scrollTo(0, savedPosition);
         };
-      
+
         offcanvasElement.addEventListener('show.bs.offcanvas', handleShow);
         offcanvasElement.addEventListener('hide.bs.offcanvas', handleHide);
-      
+
         return () => {
             offcanvasElement.removeEventListener('show.bs.offcanvas', handleShow);
             offcanvasElement.removeEventListener('hide.bs.offcanvas', handleHide);
         };
     }, [scrollPosition]);
-      
+
     useEffect(() => {
         const initOffcanvas = () => {
             if (typeof bootstrap !== 'undefined') {
@@ -148,18 +240,6 @@ function Navbar() {
         }
     }, [userData, updateAvatar]);
 
-    // Close notifications when clicking outside
-    useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (showNotifications && !event.target.closest('.notification-container')) {
-                closeNotifications();
-            }
-        };
-
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => document.removeEventListener('mousedown', handleClickOutside);
-    }, [showNotifications]);
-
     const handleLogout = async () => {
         try {
             const googleToken = localStorage.getItem('googleAccessToken');
@@ -174,10 +254,8 @@ function Navbar() {
                 logout();
                 navigate('/');
             } else {
-                console.error('Logout failed');
             }
         } catch (error) {
-            console.error('Error during logout:', error);
         }
     };
 
@@ -199,6 +277,7 @@ function Navbar() {
     const isActive = (path) => {
         return location.pathname === path;
     };
+
 
     return (
         <div>
@@ -223,51 +302,51 @@ function Navbar() {
                         <div className="offcanvas-header">
                             <h2 className="offcanvas-title" id="offcanvasNavbarLabel">Hello Sarawak</h2>
                             <button type="button" className="close-btn" data-bs-dismiss="offcanvas" aria-label="Close">
-                                <FaTimes className="icon_close"/>
+                                <FaTimes className="icon_close" />
                             </button>
                         </div>
                         <div className="offcanvas-body">
                             <ul className="navbar-nav">
                                 <li className="nav-item">
-                                    <Link 
-                                        className={`nav-link ${isActive(isLoggedIn ? '/home' : '/') ? 'active' : ''}`} 
-                                        to={isLoggedIn ? '/home' : '/'} 
+                                    <Link
+                                        className={`nav-link ${isActive(isLoggedIn ? '/home' : '/') ? 'active' : ''}`}
+                                        to={isLoggedIn ? '/home' : '/'}
                                         onClick={closeOffcanvas}
                                     >
                                         Home
                                     </Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link 
-                                        className={`nav-link ${isActive('/product') ? 'active' : ''}`} 
-                                        to="/product" 
+                                    <Link
+                                        className={`nav-link ${isActive('/product') ? 'active' : ''}`}
+                                        to="/product"
                                         onClick={closeOffcanvas}
                                     >
                                         Rooms
                                     </Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link 
-                                        className={`nav-link ${isActive('/Cart') ? 'active' : ''}`} 
-                                        to="/Cart" 
+                                    <Link
+                                        className={`nav-link ${isActive('/Cart') ? 'active' : ''}`}
+                                        to="/Cart"
                                         onClick={closeOffcanvas}
                                     >
                                         Cart
                                     </Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link 
-                                        className={`nav-link ${isActive('/about_us') ? 'active' : ''}`} 
-                                        to="/about_us" 
+                                    <Link
+                                        className={`nav-link ${isActive('/about_us') ? 'active' : ''}`}
+                                        to="/about_us"
                                         onClick={closeOffcanvas}
                                     >
                                         About Us
                                     </Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link 
-                                        className={`nav-link ${isActive('/about_sarawak') ? 'active' : ''}`} 
-                                        to="/about_sarawak" 
+                                    <Link
+                                        className={`nav-link ${isActive('/about_sarawak') ? 'active' : ''}`}
+                                        to="/about_sarawak"
                                         onClick={closeOffcanvas}
                                     >
                                         About Sarawak
@@ -278,8 +357,8 @@ function Navbar() {
                                 {isLoggedIn && isCustomer ? (
                                     <>
                                         <li className="nav-item mobile-auth-item">
-                                            <Link 
-                                                className={`nav-link ${isActive('/profile') ? 'active' : ''}`} 
+                                            <Link
+                                                className={`nav-link ${isActive('/profile') ? 'active' : ''}`}
                                                 to="/profile"
                                                 onClick={closeOffcanvas}
                                             >
@@ -287,8 +366,8 @@ function Navbar() {
                                             </Link>
                                         </li>
                                         <li className="nav-item mobile-auth-item">
-                                            <span 
-                                                className="nav-link mobile-auth-link" 
+                                            <span
+                                                className="nav-link mobile-auth-link"
                                                 onClick={() => {
                                                     closeOffcanvas();
                                                     handleLogout();
@@ -300,8 +379,8 @@ function Navbar() {
                                     </>
                                 ) : (
                                     <li className="nav-item mobile-auth-item">
-                                        <Link 
-                                            className={`nav-link ${isActive('/login') ? 'active' : ''}`} 
+                                        <Link
+                                            className={`nav-link ${isActive('/login') ? 'active' : ''}`}
                                             to="/login"
                                             onClick={closeOffcanvas}
                                         >
@@ -318,31 +397,51 @@ function Navbar() {
                             <>
                                 {/* Notification Bell Icon */}
                                 <div className="nav-notification-container">
-                                    <FaBell 
-                                        className='nav-notification_icon'
-                                        onClick={toggleNotifications}
-                                    />
+                                    <FaBell className='nav-notification_icon' onClick={toggleNotifications} />
+                                    {/* Notification count badge */}
+                                    {suggestedReservation.length > 0 && (
+                                        <span className="notification-count-badge">
+                                            {suggestedReservation.length}
+                                        </span>
+                                    )}
+
                                     {showNotifications && (
-                                        <div className="nav-notification-overlay">
+                                        <div className="nav-notification-overlay" ref={notificationRef}>
                                             <div className="nav-notification-content">
                                                 <div className="nav-notification-header">
                                                     <h3>Notifications</h3>
-                                                    <button 
-                                                        className="Notify-close-btn"
-                                                        onClick={closeNotifications}
-                                                    >
-                                                        ×
-                                                    </button>
+                                                    <button className="Notify-close-btn" onClick={closeNotifications}>×</button>
                                                 </div>
+
                                                 <div className="nav-notification-list">
-                                                    <div className="nav-notification-item">
-                                                        <div className="nav-notification-dot"></div>
-                                                        <div className="nav-notification-text">
-                                                            <p>You have receive a new suggested room</p>
-                                                            <span className="nav-notification-time">2 minutes ago</span>
+                                                    {suggestedReservation.length === 0 ? (
+                                                        <div className="nav-notification-item">
+                                                            <div className="nav-notification-text">
+                                                                <p>No new suggestions</p>
+                                                            </div>
                                                         </div>
-                                                    </div>
+                                                    ) : (
+                                                        suggestedReservation.map((res) => (
+                                                            <div 
+                                                                className="nav-notification-item" 
+                                                                key={res.reservationid}
+                                                                onClick={() => {
+                                                                    setSelectedNotification(res);
+                                                                    closeNotifications();
+                                                                }}
+                                                            >
+                                                                <div className="nav-notification-dot"></div>
+                                                                <div className="nav-notification-text">
+                                                                    <p>You have received a new suggested room: {res.propertyaddress}</p>
+                                                                    <span className="nav-notification-time">
+                                                                        Check-in: {new Date(res.checkindatetime).toLocaleDateString()}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        ))
+                                                    )}
                                                 </div>
+
                                                 <div className="nav-notification-footer">
                                                     <button className="nav-view-all-btn">View All</button>
                                                 </div>
@@ -370,7 +469,7 @@ function Navbar() {
                                 </button>
                             </>
                         ) : null}
-                        
+
                         {isLoggedIn && isCustomer ? (
                             <button onClick={handleLogout} className="auth-button logout-button">
                                 Logout
@@ -381,27 +480,119 @@ function Navbar() {
                             </Link>
                         )}
 
-                        <button 
-                            className="navbar-toggler" 
-                            type="button" 
-                            data-bs-toggle="offcanvas" 
-                            data-bs-target="#offcanvasNavbar" 
-                            aria-controls="offcanvasNavbar" 
+                        <button
+                            className="navbar-toggler"
+                            type="button"
+                            data-bs-toggle="offcanvas"
+                            data-bs-target="#offcanvasNavbar"
+                            aria-controls="offcanvasNavbar"
                             aria-label="Toggle navigation"
                         >
-                            <FaBars className="icon_navbar"/>
+                            <FaBars className="icon_navbar" />
                         </button>
                     </div>
                 </nav>
             </div>
 
-            {/* 点击背景关闭overlay */}
-            {showNotifications && (
-                <div 
-                    className="overlay-backdrop"
-                    onClick={closeNotifications}
-                ></div>
+            {selectedNotification && (
+                <div className="property-details-overlay">
+                    <div className="property-details-modal">
+                        <div className="property-details-header">
+                            <h2>Suggested Property Details</h2>
+                            <button 
+                                className="property-details-close-btn"
+                                onClick={() => setSelectedNotification(null)}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        <div className="property-details-content">
+                            <div className="tour-property-item" style={{ boxShadow: 'none', cursor: 'default' }}>
+                                <div className="tour-property-image-box">
+                                    {selectedNotification.propertyimage && selectedNotification.propertyimage.length > 0 ? (
+                                        <ImageSlider 
+                                            images={selectedNotification.propertyimage}
+                                            onClick={e => e.stopPropagation()}
+                                        />
+                                    ) : (
+                                        <p>No images available</p>
+                                    )}
+                                </div>
+                                <div className="tour-property-info">
+                                    <div className="property-location">
+                                        <h4>{selectedNotification.propertyaddress}</h4>
+                                    </div>
+                                    <div className="property-details-row">
+                                        <div className="property-price">
+                                            <span className="price-amount">RM {selectedNotification.totalprice}</span>
+                                        </div>
+                                    </div>
+                                    <div className="property-dates">
+                                        <div className="date-item">
+                                            <span className="date-value">Check-in: {new Date(selectedNotification.checkindatetime).toLocaleDateString()}</span>
+                                        </div>
+                                        <div className="date-item">
+                                            <span className="date-value">Check-out: {new Date(selectedNotification.checkoutdatetime).toLocaleDateString()}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="property-details-footer">
+                            {/* Reject Button */}
+                            <button 
+                                className="property-details-action-btn reject-btn"
+                                onClick={async () => {
+                                    if (!selectedNotification || !selectedNotification.propertyid || !selectedNotification.reservationid) {
+                                        displayToast('error', 'Missing information for rejection');
+                                    } else {
+                                        try {
+                                            // Call both APIs
+                                            await rejectSuggestedRoom(selectedNotification.propertyid);
+                                            await updateReservationStatus(selectedNotification.reservationid, 'Rejected');
+
+                                            // Handle success (e.g., show toast, close overlay)
+                                            displayToast('success', 'Suggested room rejected successfully');
+                                            setTimeout(() => {
+                                                setSelectedNotification(null);
+                                                navigate('/cart');
+                                              }, 3000);
+                                        } catch (error) {
+                                            displayToast('error', 'Failed to reject suggested room');
+                                        }
+                                    }
+                                }}
+                            >
+                                Reject
+                            </button>
+
+                            {/* Accept Button */}
+                            <button 
+                                className="property-details-action-btn accept-btn"
+                                onClick={async () => {
+                                    if (selectedNotification && selectedNotification.reservationid) {
+                                        try {
+                                            await updateReservationStatus(selectedNotification.reservationid, 'Accepted');
+                                            displayToast('success', 'Reservation accepted successfully');
+                                            setTimeout(() => {
+                                                setSelectedNotification(null);
+                                                navigate('/cart');
+                                              }, 3000);
+                                        } catch (error) {
+                                            displayToast('error', 'Failed to accept reservation');
+                                        }
+                                    }
+                                }}
+                            >
+                                Accept
+                            </button>
+                        </div>
+                    </div>
+                </div>
             )}
+
+            {/* Render Toast component */}
+            {showToast && <Toast type={toastType} message={toastMessage} />}
         </div>
     );
 }

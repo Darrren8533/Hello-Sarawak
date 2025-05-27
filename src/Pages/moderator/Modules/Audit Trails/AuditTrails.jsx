@@ -44,11 +44,19 @@ const AuditTrails = () => {
       onChange: setSelectedActionType,
       options: [
         { value: 'All', label: 'All Actions' },
+        { value: 'Accept', label: 'Accept' },
+        { value: 'Reject', label: 'Reject' },
+        { value: 'Create', label: 'Create' },
+        { value: 'Update', label: 'Update' },
+        { value: 'Delete', label: 'Delete' },
+        { value: 'Assign', label: 'Assign' },
         { value: 'Request', label: 'Request' },
-        { value: 'Payment', label: 'Payment' },
-        { value: 'Modify', label: 'Modify' },
-        { value: 'Remove', label: 'Remove' },
-        { value: 'Checkout', label: 'Checkout' },
+        { value: 'Register', label: 'Register'},
+        { value: 'Login', label: 'Login' },
+        { value: 'Logout', label: 'Logout' },
+        { value: 'Suggest', label: 'Suggest' },
+        { value: 'Notify', label: 'Notify' },
+
       ],
     },
   ];
@@ -65,7 +73,7 @@ const AuditTrails = () => {
   };
 
   const filteredLogs = auditTrailsLog.filter((log) => {
-    const searchInFields = `${log.userid} ${log.entityid} ${log.actiontype}`
+    const searchInFields = `${log.userid} ${log.entityid} ${log.actiontype} ${log.action} ${log.username}`
       .toLowerCase()
       .includes(searchKey.toLowerCase());
 

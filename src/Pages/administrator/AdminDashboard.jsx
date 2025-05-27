@@ -14,11 +14,10 @@ import Profile from './Modules/Profile/Profile';
 import AuditTrails from './Modules/Audit Trails/AuditTrails';
 import { FiHome, FiUsers, FiCalendar } from 'react-icons/fi';
 import { GoLog } from "react-icons/go";
-import { FaUserTie, FaHotel } from 'react-icons/fa';
+import { FaUserTie, FaHotel, FaHistory } from 'react-icons/fa';
 import { FaBuildingUser } from "react-icons/fa6";
 import { VscGraphLine } from "react-icons/vsc";
 import { CgProfile } from "react-icons/cg";
-import { MdHistory } from "react-icons/md";
 import '../../Component/MainContent/MainContent.css';
 import { useQuery } from '@tanstack/react-query';
 import { fetchUserData } from '../../../Api/api';
@@ -92,7 +91,7 @@ const AdminDashboard = () => {
         { path: '/administrator_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel />},
         { path: '/administrator_dashboard/reservations', label: 'Reservation', icon: <FiCalendar /> },
         { path: '/administrator_dashboard/booknpay-log', label: 'BooknPayLog', icon: <GoLog /> },
-        { path: '/administrator_dashboard/audit-trails', label: 'AuditTrails', icon: <MdHistory /> },
+        { path: '/administrator_dashboard/audit-trails', label: 'AuditTrails', icon: <FaHistory /> },
         { path: '/administrator_dashboard/finance', label: 'Finance', icon: <VscGraphLine /> },
         { path: '/administrator_dashboard/profile', label: 'Profile', icon: <CgProfile /> },
     ];

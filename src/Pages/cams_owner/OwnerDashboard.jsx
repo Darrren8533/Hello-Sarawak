@@ -13,9 +13,9 @@ import Profile from './Modules/Profile/Profile';
 import Cluster from './Modules/Cluster/Cluster';
 import NoAccess from '../../Component/NoAccess/NoAccess';
 import { FiHome, FiUsers, FiCalendar, FiCreditCard, FiBarChart, FiMessageSquare, FiFileText } from 'react-icons/fi';
-import { FaHotel, FaUserTie } from 'react-icons/fa';
+import { FaHotel, FaUserTie, FaLayerGroup, FaHistory } from 'react-icons/fa';
 import { GoLog } from "react-icons/go";
-import { RiAdminLine } from 'react-icons/ri';
+import { CgProfile } from "react-icons/cg";
 import '../../Component/MainContent/MainContent.css';
 
   const OwnerDashboard = () => {
@@ -61,9 +61,9 @@ import '../../Component/MainContent/MainContent.css';
     { path: '/owner_dashboard/reservations', label: 'Reservations', icon: <FiCalendar /> },
     { path: '/owner_dashboard/booknpay-log', label: 'BooknPayLog', icon: <GoLog /> },
     { path: '/owner_dashboard/finances', label: 'Finances', icon: <FiCreditCard /> },
-    { path: '/owner_dashboard/audit-trails', label: 'Audit Trails', icon: <FiFileText /> },
-    { path: '/owner_dashboard/cluster', label: 'Cluster', icon: <FiUsers /> },
-    { path: '/owner_dashboard/profile', label: 'Profile', icon: <FiUsers /> },
+    { path: '/owner_dashboard/audit-trails', label: 'Audit Trails', icon: <FaHistory /> },
+    { path: '/owner_dashboard/cluster', label: 'Cluster', icon: <FaLayerGroup /> },
+    { path: '/owner_dashboard/profile', label: 'Profile', icon: <CgProfile /> },
     
   ];
 
