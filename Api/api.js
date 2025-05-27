@@ -199,8 +199,10 @@ export const deleteProperty = async (propertyid) => {
 
 // Fetch Customers
 export const fetchCustomers = async () => {
+  const userid = localStorage.getItem("userid");
+  
   try {
-    const response = await fetch(`${API_URL}/users/customers`);
+    const response = await fetch(`${API_URL}/users/customers?userid=${userid}`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch customers');
