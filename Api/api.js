@@ -233,8 +233,10 @@ export const fetchOwners = async () => {
 
 // Fetch Moderators
 export const fetchModerators = async () => {
+  const userid = localStorage.getItem("userid");
+  
   try {
-    const response = await fetch(`${API_URL}/users/moderators`);
+    const response = await fetch(`${API_URL}/users/moderators?userid=${userid}`);
 
     if (!response.ok) {
       throw new Error('Failed to fetch moderators');
