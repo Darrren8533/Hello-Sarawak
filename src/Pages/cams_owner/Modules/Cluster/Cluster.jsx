@@ -206,7 +206,7 @@ const Cluster = () => {
     clustername: 'Name',
     clusterstate: 'State',
     clusterprovince: 'Province',
-    timestamp: 'Created At'
+    // timestamp: 'Created At'
   };
 
   const filteredClusters = clusters.filter((cluster) => {
@@ -232,14 +232,14 @@ const Cluster = () => {
     { header: 'Name', accessor: 'clustername' },
     { header: 'State', accessor: 'clusterstate' },
     { header: 'Province', accessor: 'clusterprovince' },
-    { 
-      header: 'Created At', 
-      accessor: 'timestamp',
-      render: (cluster) => {
-        const date = new Date(cluster.timestamp);
-        return isNaN(date) ? 'N/A' : date.toLocaleString();
-      }
-    },
+    // { 
+    //   header: 'Created At', 
+    //   accessor: 'timestamp',
+    //   render: (cluster) => {
+    //     const date = new Date(cluster.timestamp);
+    //     return isNaN(date) ? 'N/A' : date.toLocaleString();
+    //   }
+    // },
     {
       header: 'Actions',
       accessor: 'actions',
