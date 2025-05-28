@@ -7,6 +7,7 @@ import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown'
 import Status from '../../../../Component/Status/Status';
 import UserActivityCell from '../../../../Component/UserActivityCell/UserActivityCell';
 import Modal from '../../../../Component/Modal/Modal';
+import Toast from '../../../../Component/Toast/Toast';
 import { FaBell, FaEye, FaCheck, FaTimes, FaTimesCircle, FaTv, FaWind, FaSwimmingPool, FaGamepad, FaWineGlass, FaCoffee, FaShower, FaBed, FaStar } from 'react-icons/fa';
 import { publishedReservations, updateReservationStatus, getOperatorProperties, fetchOperators, sendSuggestNotification, suggestNewRoom } from '../../../../../Api/api';
 import { useMutation } from '@tanstack/react-query';
@@ -356,12 +357,20 @@ const Dashboard = () => {
     }
   };
 
+  useEffect(() => {
+    fetchPickupData(); 
+  }, []);
+
+  useEffect(() => {
+    if (showNotifications) {
+      fetchPickupData();
+    }
+  }, [showNotifications]);
+
   return (
     <div>
       {showToast && (
-        <div className={`toast ${toastType}`}>
-          {toastMessage}
-        </div>
+        <Toast type={toastType} message={toastMessage} />
       )}
 
       <div className="header-container">
