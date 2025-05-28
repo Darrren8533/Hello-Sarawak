@@ -145,6 +145,7 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("");
     const [selectedFacilities, setSelectedFacilities] = useState([]);
+    const [isSpecialEventEnabled, setIsSpecialEventEnabled] = useState(false);
     const fileInputRef = useRef(null);
     const locationInputRef = useRef(null);
     const [showMoreAmenities, setShowMoreAmenities] = useState(false);
@@ -199,6 +200,8 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                 lastMinuteDiscountRate: initialData.lastminutediscountrate || "1"
             });
             
+            // Set special event enabled if dates exist
+            setIsSpecialEventEnabled(!!(initialData.startdate && initialData.enddate));
             setSelectedFacilities(facilitiesArray);
         } else {
             setFormData({
@@ -373,6 +376,18 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         });
     };
 
+    const toggleSpecialEvent = () => {
+        setIsSpecialEventEnabled(!isSpecialEventEnabled);
+        if (!isSpecialEventEnabled) {
+            // Clear dates when disabling
+            setFormData(prev => ({
+                ...prev,
+                specialEventStartDate: "",
+                specialEventEndDate: ""
+            }));
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -405,8 +420,14 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
         // Add rate fields with default values if not set
         data.append("weekendRate", formData.weekendRate || "1");
         data.append("specialEventRate", formData.specialEventRate || "1");
-        data.append("specialEventStartDate", formData.specialEventStartDate || "");
-        data.append("specialEventEndDate", formData.specialEventEndDate || "");
+        data.append("isSpecialEventEnabled", isSpecialEventEnabled);
+        
+        // Only append special event dates if enabled
+        if (isSpecialEventEnabled) {
+            data.append("specialEventStartDate", formData.specialEventStartDate || "");
+            data.append("specialEventEndDate", formData.specialEventEndDate || "");
+        }
+        
         data.append("earlyBirdDiscountRate", formData.earlyBirdDiscountRate || "1");
         data.append("lastMinuteDiscountRate", formData.lastMinuteDiscountRate || "1");
 
@@ -629,7 +650,22 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                             </div>
                             
                             <div className="property-form-group">
-                                <label>Special Event Rate:</label>
+                                <div className="property-form-label-with-toggle">
+                                    <label>Special Event Rate:</label>
+                                    <div className="property-form-special-event-toggle">
+                                        <label className="property-form-switch">
+                                            <input
+                                                type="checkbox"
+                                                checked={isSpecialEventEnabled}
+                                                onChange={toggleSpecialEvent}
+                                            />
+                                            <span className="property-form-slider"></span>
+                                        </label>
+                                        <span className="property-form-toggle-label">
+                                            {isSpecialEventEnabled ? "Enabled" : "Disabled"}
+                                        </span>
+                                    </div>
+                                </div>
                                 <input
                                     type="number"
                                     name="specialEventRate"
@@ -645,35 +681,41 @@ const PropertyForm = ({ initialData, onSubmit, onClose }) => {
                                 </div>
                             </div>
 
-                            <div className="property-form-group">
-                                <label>Special Event Date Range:</label>
-                                <div className="date-input-group">
-                                    <label>Start Date:</label>
-                                    <input
-                                        type="date"
-                                        name="specialEventStartDate"
-                                        value={formData.specialEventStartDate}
-                                        onChange={handleChange}
-                                        min={new Date().toISOString().split('T')[0]}
-                                        className="date-input"
-                                    />
-                                </div>
-                            </div>
+                            {isSpecialEventEnabled && (
+                                <>
+                                    <div className="property-form-group">
+                                        <label>Special Event Date Range:</label>
+                                        <div className="date-input-group">
+                                            <label>Start Date:</label>
+                                            <input
+                                                type="date"
+                                                name="specialEventStartDate"
+                                                value={formData.specialEventStartDate}
+                                                onChange={handleChange}
+                                                min={new Date().toISOString().split('T')[0]}
+                                                className="date-input"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
 
-                            <div className="property-form-group">
-                                <label>Special Event Date Range:</label>
-                                <div className="date-input-group">
-                                    <label>End Date:</label>
-                                    <input
-                                        type="date"
-                                        name="specialEventEndDate"
-                                        value={formData.specialEventEndDate}
-                                        onChange={handleChange}
-                                        min={formData.specialEventStartDate || new Date().toISOString().split('T')[0]}
-                                        className="date-input"
-                                    />
-                                </div>
-                            </div>
+                                    <div className="property-form-group">
+                                        <label>Special Event Date Range:</label>
+                                        <div className="date-input-group">
+                                            <label>End Date:</label>
+                                            <input
+                                                type="date"
+                                                name="specialEventEndDate"
+                                                value={formData.specialEventEndDate}
+                                                onChange={handleChange}
+                                                min={formData.specialEventStartDate || new Date().toISOString().split('T')[0]}
+                                                className="date-input"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                             
                             <div className="property-form-group">
                                 <label>Early Bird Discount Rate:</label>
