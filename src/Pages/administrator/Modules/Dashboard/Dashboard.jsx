@@ -392,7 +392,7 @@ const Dashboard = () => {
                 <div className="notification-header">
                   <h3>
                     Pickup Requests 
-                    {loading ? ' (Loading...)' : ` (${pickupData.length})`}
+                    {loading ? ' (Loading...)' : ` (${Array.isArray(pickupData) ? pickupData.length : 0})`}
                   </h3>
                   <div className="notification-actions">
                     <div className="form-close-button" onClick={closeNotifications}>×</div>
