@@ -7,7 +7,7 @@ import video from '../../../public/Sarawak_2.mp4';
 import logo from '../../../public/Sarawak_icon.png';
 
 // Import Icons
-import { FaMailBulk, FaUserAlt, FaEyeSlash } from 'react-icons/fa';
+import { FaMailBulk, FaUserAlt, FaEyeSlash, FaPhoneAlt, FaUserCircle } from 'react-icons/fa';
 import { RiLockPasswordFill, RiLockPasswordLine } from 'react-icons/ri';
 import { IoEyeSharp } from "react-icons/io5";
 
@@ -19,10 +19,13 @@ import Toast from '../../../Component/Toast/Toast';
 import VisualCaptcha from '../../../Component/VisualCaptcha/VisualCaptcha'; 
 
 const Register = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [isCaptchaValid, setIsCaptchaValid] = useState(false);
   const navigate = useNavigate();
   const userGroup = 'Customer';
@@ -72,11 +75,12 @@ const Register = () => {
     }
 
     const userData = {
-      // firstName,
-      // lastName,
+      firstName,
+      lastName,
       username,
       email,
       password,
+      phoneNumber,
       userGroup,
     };
 
@@ -142,9 +146,39 @@ const Register = () => {
 
           <form onSubmit={handleSubmit} className="form grid">
             <div className="inputDiv">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="firstName">First Name</label>
               <div className="input flex">
                 <FaUserAlt className="icon" />
+                <input
+                  type="text"
+                  id="firstName"
+                  placeholder="Enter First Name"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="inputDiv">
+              <label htmlFor="lastName">Last Name</label>
+              <div className="input flex">
+                <FaUserAlt className="icon" />
+                <input
+                  type="text"
+                  id="lastName"
+                  placeholder="Enter Last Name"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="inputDiv">
+              <label htmlFor="username">Username</label>
+              <div className="input flex">
+                <FaUserCircle className="icon" />
                 <input
                   type="text"
                   id="username"
@@ -166,6 +200,21 @@ const Register = () => {
                   placeholder="Enter Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="inputDiv">
+              <label htmlFor="phoneNumber">Phone Number</label>
+              <div className="input flex">
+                <FaPhoneAlt className="icon" />
+                <input
+                  type="tel"
+                  id="phoneNumber"
+                  placeholder="Enter Phone Number"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
                   required
                 />
               </div>
