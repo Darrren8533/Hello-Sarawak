@@ -5,7 +5,7 @@ import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown'
 import Modal from '../../../../Component/Modal/Modal';
 import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import Filter from '../../../../Component/Filter/Filter';
-import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';onsol
+import PaginatedTable from '../../../../Component/PaginatedTable/PaginatedTable';
 import Status from '../../../../Component/Status/Status';
 import UserActivityCell from '../../../../Component/UserActivityCell/UserActivityCell';
 import { FaEye, FaBan, FaUser } from 'react-icons/fa';
