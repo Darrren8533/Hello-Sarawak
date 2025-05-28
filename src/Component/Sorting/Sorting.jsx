@@ -244,7 +244,7 @@ const Sorting = ({
     if (!fetchedProperties) return null;
     
     // Get all prices from fetched properties
-    const prices = fetchedProperties.map(prop => parseFloat(prop.rateamount));
+    const prices = fetchedProperties.map(prop => parseFloat(prop.normalrate));
     const minPrice = Math.min(...prices);
     const maxPrice = Math.max(...prices);
     
