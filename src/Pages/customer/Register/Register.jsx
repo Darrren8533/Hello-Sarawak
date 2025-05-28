@@ -80,7 +80,7 @@ const Register = () => {
       username,
       email,
       password,
-      phoneNumber,
+      uphoneno: phoneNumber,
       userGroup,
     };
 
