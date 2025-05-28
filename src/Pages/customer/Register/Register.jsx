@@ -84,6 +84,9 @@ const Register = () => {
       userGroup,
     };
 
+    console.log(userData);
+    console.log(phoneNumber);
+
     try {
       const response = await signupUser(userData);
       const data = await response.json(); 
