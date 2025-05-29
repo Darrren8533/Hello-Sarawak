@@ -1235,10 +1235,6 @@ const PropertyDetails = () => {
                 )}
               </div>
               <button className="mobile-book-now-btn" onClick={() => {
-                if (!bookingData.checkIn || !bookingData.checkOut) {
-                  displayToast('error', 'Please select check-in and check-out dates first');
-                  return;
-                }
                 setShowBookingForm(true);
               }}>
                 {propertyDetails.propertystatus === 'Unavailable' ? 'Enquiry' : 'Book & Pay'}
