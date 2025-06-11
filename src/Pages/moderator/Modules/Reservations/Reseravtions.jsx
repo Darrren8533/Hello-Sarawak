@@ -10,7 +10,7 @@ import Toast from '../../../../Component/Toast/Toast';
 import Loader from '../../../../Component/Loader/Loader';
 import Status from '../../../../Component/Status/Status';
 import RoomPlannerCalendar from '../../../../Component/Room_Planner_Calender/Room_Planner_Calender';
-import { FaEye, FaCheck, FaTimes } from 'react-icons/fa';
+import { FaEye, FaCheck, FaTimes, FaWifi, FaCar, FaUtensils, FaUmbrellaBeach, FaFire, FaHeart, FaStar, FaTimes as FaTimesCircle, FaTv, FaWind, FaSwimmingPool, FaGamepad, FaWineGlass, FaCoffee, FaShower, FaBed, FaHome, FaBuilding } from 'react-icons/fa';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
@@ -32,6 +32,8 @@ const Reservations = () => {
     const [rejectedReservationID, setRejectedReservationID] = useState(null);
     const [suggestSearchKey, setSuggestSearchKey] = useState('');
     const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+    const [selectedUserGroup, setSelectedUserGroup] = useState('All');
+    const [selectedCluster, setSelectedCluster] = useState('All');
     const [showTable, setShowTable] = useState(true);
     const [currentUser, setCurrentUser] = useState({
         username: '',
@@ -456,6 +458,80 @@ const Reservations = () => {
         },
     ];
 
+    const clearFilters = () => {
+        setSuggestSearchKey('');
+        setPriceRange({ min: '', max: '' });
+        setSelectedUserGroup('All');
+        setSelectedCluster('All');
+    };
+
+    const filteredProperties = administratorProperties.filter(property => {
+        const matchesSearch = !suggestSearchKey || 
+            property.propertyaddress.toLowerCase().includes(suggestSearchKey.toLowerCase());
+        
+        const matchesMinPrice = !priceRange.min || 
+            parseFloat(property.normalrate) >= parseFloat(priceRange.min);
+        
+        const matchesMaxPrice = !priceRange.max || 
+            parseFloat(property.normalrate) <= parseFloat(priceRange.max);
+        
+        return matchesSearch && matchesMinPrice && matchesMaxPrice;
+    });
+
+    const renderAmenities = (property) => {
+        const facilitiesString = property.facilities || '';
+        const facilitiesList = facilitiesString.split(',').map(f => f.trim()).filter(f => f);
+        
+        // Icon mapping for different facilities
+        const amenityIcons = {
+            'TV': <FaTv />,
+            'Dryer': <FaWind />,
+            'Kitchen': <FaUtensils />,
+            'WiFi': <FaWifi />,
+            'Wifi': <FaWifi />,
+            'WIFI': <FaWifi />,
+            'Parking': <FaCar />,
+            'Car Park': <FaCar />,
+            'Swimming Pool': <FaSwimmingPool />,
+            'Pool': <FaSwimmingPool />,
+            'Beach Access': <FaUmbrellaBeach />,
+            'Beach': <FaUmbrellaBeach />,
+            'BBQ': <FaFire />,
+            'Barbecue': <FaFire />,
+            'Gaming': <FaGamepad />,
+            'Games': <FaGamepad />,
+            'Bar': <FaWineGlass />,
+            'Coffee': <FaCoffee />,
+            'Bathroom': <FaShower />,
+            'Shower': <FaShower />,
+            'Bedroom': <FaBed />,
+            'Bed': <FaBed />,
+        };
+        
+        const amenities = facilitiesList.map(facility => ({
+            icon: amenityIcons[facility] || <FaCheck />,
+            label: facility
+        }));
+        
+        return amenities.slice(0, 3); // Show max 3 amenities
+    };
+
+    const renderStars = (rating) => {
+        const stars = [];
+        const numRating = parseFloat(rating); // Default rating if not available
+        
+        for (let i = 1; i <= 5; i++) {
+            stars.push(
+                <FaStar 
+                    key={i} 
+                    className={i <= numRating ? 'star-filled' : 'star-empty'} 
+                />
+            );
+        }
+        return stars;
+    };
+
+
     return (
         <div>
             {showToast && <Toast type={toastType} message={toastMessage} />}
@@ -478,6 +554,21 @@ const Reservations = () => {
                     {showTable ? 'Hide Reservations Table' : 'Show Reservations Table'}
                 </button>
             </div>
+
+            {showMessageBox && (
+                <div className="custom-message-box-overlay">
+                    <div className="custom-message-box">
+                        <h2>Choose An Action</h2>
+                        <p>Please Select An Action For The Rejection:</p>
+                        <button onClick={() => setShowMessageBox(false)} className="form-close-button">×</button>
+
+                        <div class="message-box-buttons">
+                            <button onClick={() => handleMessageBoxSelect('suggest')}>Suggest</button>
+                            <button onClick={() => handleMessageBoxSelect('notify')}>Notify Suggest</button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {showTable && (
                 reservationsLoading ? (
@@ -502,107 +593,399 @@ const Reservations = () => {
                 onClose={() => setSelectedReservation(null)}
             />
 
-            {showMessageBox && (
-                <div className="custom-message-box-overlay">
-                    <div className="custom-message-box">
-                        <h2>Choose An Action</h2>
-                        <p>Please Select An Action For The Rejection:</p>
-                        <button onClick={() => setShowMessageBox(false)} className="form-close-button">×</button>
-
-                        <div class="message-box-buttons">
-                            <button onClick={() => handleMessageBoxSelect('suggest')}>Suggest</button>
-                            <button onClick={() => handleMessageBoxSelect('notify')}>Notify Suggest</button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
             {messageBoxMode === 'suggest' && (
                 <div className="custom-message-box-overlay">
-                    <div className="suggest-properties custom-message-box">
+                    <div className="suggest-properties-modal">
                         <div className="suggest-header">
-                            <h2>Select A Property To Suggest</h2>
-                            <div className="form-close-button" onClick={() => setMessageBoxMode('')}>×</div>
+                            <div className="suggest-title-section">
+                                <h2>Suggest Alternative Property</h2>
+                                <p className="suggest-subtitle">Select a property to suggest as an alternative for the rejected reservation</p>
+                            </div>
+                            <button className="form-close-button" onClick={() => setMessageBoxMode('')}>
+                                <FaTimesCircle />
+                            </button>
                         </div>
 
-                        <div className="property-list">
-                            {administratorProperties.length > 0 ? (
-                                administratorProperties.map((property) => (
-                                    <div key={property.propertyid} className="property-card">
+                        <div className="suggest-filters">
+                            <div className="filter-header">
+                                <h3>Filter Properties</h3>
+                                <button className="clear-filters-btn" onClick={clearFilters}>
+                                    <FaTimesCircle /> Clear Filters
+                                </button>
+                            </div>
+                            
+                            <div className="filter-row">
+                                <div className="search-container">
+                                    <label>Search Properties</label>
+                                    <input
+                                        type="text"
+                                        placeholder="Search by name or location..."
+                                        value={suggestSearchKey}
+                                        onChange={(e) => setSuggestSearchKey(e.target.value)}
+                                        className="suggest-search-input"
+                                    />
+                                </div>
+                            </div>
+                            
+                            <div className="filter-row">
+                                <div className="price-filter-group">
+                                    <div className="price-input-container">
+                                        <label>Min Price (RM)</label>
+                                        <input
+                                            type="number"
+                                            placeholder="0"
+                                            value={priceRange.min}
+                                            onChange={(e) => setPriceRange(prev => ({ ...prev, min: e.target.value }))}
+                                            className="price-input"
+                                        />
+                                    </div>
+                                    <div className="price-input-container">
+                                        <label>Max Price (RM)</label>
+                                        <input
+                                            type="number"
+                                            placeholder="1000"
+                                            value={priceRange.max}
+                                            onChange={(e) => setPriceRange(prev => ({ ...prev, max: e.target.value }))}
+                                            className="price-input"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="property-grid">
+                            {filteredProperties.length > 0 ? (
+                                filteredProperties.map((property) => (
+                                    <div 
+                                        key={property.propertyid} 
+                                        className={`property-card-modern ${selectedProperty === property.propertyid ? 'selected' : ''}`}
+                                        onClick={() => handlePropertySelect(property.propertyid)}
+                                    >
+                                        <div className="property-image-section">
+                                            <img
+                                                src={`data:image/jpeg;base64,${property.images[0]}`}
+                                                alt={property.propertyaddress}
+                                                className="property-image-modern"
+                                            />
+                                            {/* <div className="property-type-badge">
+                                                {property.propertyguestpaxno > 4 ? 'House' : 'Apartment'}
+                                            </div> */}
+                                        </div>
+                                        
+                                        <div className="property-content">
+                                            <div className="property-header">
+                                                <h4 className="property-name-modern">{property.propertyaddress}</h4>
+                                                <div className="property-location">
+                                                    📍 {property.propertyaddress}
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="property-stats">
+                                                <div className="guest-capacity">
+                                                    👥 {property.propertyguestpaxno}
+                                                </div>
+                                                <div className="property-rating">
+                                                    {renderStars(property.rating)}
+                                                    <span className="rating-number">{property.rating}</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <div className="property-price-section">
+                                                <span className="price-amount">RM {property.normalrate}</span>
+                                                <span className="price-period">per night</span>
+                                            </div>
+                                            
+                                            <div className="property-amenities">
+                                                {renderAmenities(property).map((amenity, index) => (
+                                                    <div key={index} className="amenity-item">
+                                                        {amenity.icon}
+                                                        <span>{amenity.label}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        
                                         <input
                                             type="radio"
-                                            id={`property-${property.propertyid}`}
                                             name="property"
                                             value={property.propertyid}
+                                            checked={selectedProperty === property.propertyid}
                                             onChange={() => handlePropertySelect(property.propertyid)}
-                                            className="property-radio"
+                                            className="property-radio-hidden"
                                         />
-                                        <label htmlFor={`property-${property.propertyid}`} className="property-label">
-                                            <div className="property-image-container">
-                                                <img
-                                                    src={`data:image/jpeg;base64,${property.images[0]}`}
-                                                    alt={property.propertyaddress}
-                                                    className="property-image"
-                                                />
-                                            </div>
-                                            <div className="property-details">
-                                                <h3 className="property-title">{property.propertyaddress}</h3>
-                                                <p className="property-info-text">{property.propertyguestpaxno} Pax</p>
-                                                <p className="property-price">RM {property.normalrate}</p>
-                                            </div>
-                                        </label>
                                     </div>
                                 ))
                             ) : (
-                                <p className="no-property-message">No properties match your search criteria</p>
+                                <div className="no-properties-message">
+                                    <p>No properties match your search criteria</p>
+                                </div>
                             )}
+                            
+                            <button className="confirm-suggestion-btn" onClick={handleConfirmSuggestion}>
+                                Confirm Suggestion
+                            </button>
                         </div>
-                        <button className="confirm-button" onClick={handleConfirmSuggestion}>
-                            Confirm Suggestion
-                        </button>
                     </div>
                 </div>
             )}
 
             {messageBoxMode === 'notify' && (
                 <div className="custom-message-box-overlay">
-                    <div className="suggest-properties custom-message-box">
-                        <div className="form-close-button" onClick={() => setMessageBoxMode('')}>×</div>
-                        <h2>Select Operators To Notify</h2>
-                        <div className="operator-list">
-                            <div className="select-all-checkbox">
+                    <div className="operators-selection-modal">
+                        <div className="operators-modal-header">
+                            <div className="operators-title-section">
+                                <h2>Select Operators to Notify</h2>
+                                <p className="operators-subtitle">Choose operators to notify about the rejected reservation</p>
+                            </div>
+                            <button className="form-close-button" onClick={() => setMessageBoxMode('')}>
+                                <FaTimesCircle />
+                            </button>
+                        </div>
+
+                        <div className="operators-selection-stats">
+                            <div className="selection-count">
+                                👥 {selectedOperators.length} selected
+                            </div>
+                            <div className="total-count">
+                                📊 {(() => {
+                                    const filteredOperators = operators.filter(operator => {
+                                        const searchTerm = suggestSearchKey.toLowerCase();
+                                        const matchesSearch = !searchTerm || 
+                                            operator.ufirstname?.toLowerCase().includes(searchTerm) ||
+                                            operator.ulastname?.toLowerCase().includes(searchTerm) ||
+                                            operator.username?.toLowerCase().includes(searchTerm) ||
+                                            operator.uemail?.toLowerCase().includes(searchTerm);
+                                        
+                                        const matchesUserGroup = selectedUserGroup === 'All' || 
+                                            operator.usergroup === selectedUserGroup;
+                                        
+                                        const matchesCluster = selectedCluster === 'All' || 
+                                            operator.clustername === selectedCluster;
+                                        
+                                        return matchesSearch && matchesUserGroup && matchesCluster;
+                                    });
+                                    return filteredOperators.length;
+                                })()} of {operators.length} shown
+                            </div>
+                        </div>
+
+                        <div className="operators-search-section">
+                            <div className="operators-search-container">
+                                <input
+                                    type="text"
+                                    placeholder="Search operators by name, username, or email..."
+                                    value={suggestSearchKey}
+                                    onChange={(e) => setSuggestSearchKey(e.target.value)}
+                                    className="operators-search-input"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="operators-filters-section">
+                            <div className="operators-filter-row">
+                                <select 
+                                    className="operators-filter-select"
+                                    value={selectedUserGroup}
+                                    onChange={(e) => setSelectedUserGroup(e.target.value)}
+                                >
+                                    <option value="All">All Roles</option>
+                                    <option value="Administrator">Administrator</option>
+                                    <option value="Moderator">Moderator</option>
+                                </select>
+                                <select 
+                                    className="operators-filter-select"
+                                    value={selectedCluster}
+                                    onChange={(e) => setSelectedCluster(e.target.value)}
+                                >
+                                    <option value="All">All Clusters</option>
+                                    {[...new Set(operators.map(op => op.clustername).filter(Boolean))].map(clusterName => (
+                                        <option key={clusterName} value={clusterName}>{clusterName}</option>
+                                    ))}
+                                </select>
+                                <button className="clear-filters-btn" onClick={clearFilters}>
+                                    🔄 Clear Filters
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="operators-select-all-section">
+                            <label className="operators-select-all-checkbox">
                                 <input
                                     type="checkbox"
-                                    id="select-all-operators"
-                                    checked={selectedOperators.length === operators.length && operators.length > 0}
+                                    checked={(() => {
+                                        const filteredOperators = operators.filter(operator => {
+                                            const searchTerm = suggestSearchKey.toLowerCase();
+                                            const matchesSearch = !searchTerm || 
+                                                operator.ufirstname?.toLowerCase().includes(searchTerm) ||
+                                                operator.ulastname?.toLowerCase().includes(searchTerm) ||
+                                                operator.username?.toLowerCase().includes(searchTerm) ||
+                                                operator.uemail?.toLowerCase().includes(searchTerm);
+                                            
+                                            const matchesUserGroup = selectedUserGroup === 'All' || 
+                                                operator.usergroup === selectedUserGroup;
+                                            
+                                            const matchesCluster = selectedCluster === 'All' || 
+                                                operator.clustername === selectedCluster;
+                                            
+                                            return matchesSearch && matchesUserGroup && matchesCluster;
+                                        });
+                                        return filteredOperators.length > 0 && 
+                                               filteredOperators.every(op => selectedOperators.includes(op.userid));
+                                    })()}
                                     onChange={(e) => {
                                         const checked = e.target.checked;
-                                        setSelectedOperators(checked ? operators.map(operator => operator.userid) : []);
+                                        const filteredOperators = operators.filter(operator => {
+                                            const searchTerm = suggestSearchKey.toLowerCase();
+                                            const matchesSearch = !searchTerm || 
+                                                operator.ufirstname?.toLowerCase().includes(searchTerm) ||
+                                                operator.ulastname?.toLowerCase().includes(searchTerm) ||
+                                                operator.username?.toLowerCase().includes(searchTerm) ||
+                                                operator.uemail?.toLowerCase().includes(searchTerm);
+                                            
+                                            const matchesUserGroup = selectedUserGroup === 'All' || 
+                                                operator.usergroup === selectedUserGroup;
+                                            
+                                            const matchesCluster = selectedCluster === 'All' || 
+                                                operator.clustername === selectedCluster;
+                                            
+                                            return matchesSearch && matchesUserGroup && matchesCluster;
+                                        });
+                                        
+                                        if (checked) {
+                                            // Add all filtered operators to selection
+                                            const newSelections = [...new Set([...selectedOperators, ...filteredOperators.map(op => op.userid)])];
+                                            setSelectedOperators(newSelections);
+                                        } else {
+                                            // Remove all filtered operators from selection
+                                            const filteredIds = filteredOperators.map(op => op.userid);
+                                            setSelectedOperators(selectedOperators.filter(id => !filteredIds.includes(id)));
+                                        }
                                     }}
                                 />
-                                <label htmlFor="select-all-operators">Select All</label>
-                            </div>
+                                <span className="checkmark"></span>
+                                Select all filtered operators ({(() => {
+                                    const filteredOperators = operators.filter(operator => {
+                                        const searchTerm = suggestSearchKey.toLowerCase();
+                                        const matchesSearch = !searchTerm || 
+                                            operator.ufirstname?.toLowerCase().includes(searchTerm) ||
+                                            operator.ulastname?.toLowerCase().includes(searchTerm) ||
+                                            operator.username?.toLowerCase().includes(searchTerm) ||
+                                            operator.uemail?.toLowerCase().includes(searchTerm);
+                                        
+                                        const matchesUserGroup = selectedUserGroup === 'All' || 
+                                            operator.usergroup === selectedUserGroup;
+                                        
+                                        const matchesCluster = selectedCluster === 'All' || 
+                                            operator.clustername === selectedCluster;
+                                        
+                                        return matchesSearch && matchesUserGroup && matchesCluster;
+                                    });
+                                    return filteredOperators.length;
+                                })()})
+                            </label>
+                        </div>
 
+                        <div className="operators-list-container">
                             {operators.length > 0 ? (
-                                operators.map((operator) => (
-                                    <div key={operator.userid} className="operator-option">
-                                        <input
-                                            type="checkbox"
-                                            id={`operator-${operator.userid}`}
-                                            value={operator.userid}
-                                            checked={selectedOperators.includes(operator.userid)}
-                                            onChange={() => handleOperatorSelect(operator.userid)}
-                                        />
-                                        <label htmlFor={`operator-${operator.userid}`}>
-                                            {operator.ufirstname} {operator.ulastname} ({operator.username}) - {operator.usergroup}
-                                        </label>
-                                    </div>
-                                ))
+                                <div className="operators-grid">
+                                    {operators
+                                        .filter(operator => {
+                                            const searchTerm = suggestSearchKey.toLowerCase();
+                                            const matchesSearch = !searchTerm || 
+                                                operator.ufirstname?.toLowerCase().includes(searchTerm) ||
+                                                operator.ulastname?.toLowerCase().includes(searchTerm) ||
+                                                operator.username?.toLowerCase().includes(searchTerm) ||
+                                                operator.uemail?.toLowerCase().includes(searchTerm);
+                                            
+                                            const matchesUserGroup = selectedUserGroup === 'All' || 
+                                                operator.usergroup === selectedUserGroup;
+                                            
+                                            const matchesCluster = selectedCluster === 'All' || 
+                                                operator.clustername === selectedCluster;
+                                            
+                                            return matchesSearch && matchesUserGroup && matchesCluster;
+                                        })
+                                        .map((operator) => (
+                                            <div 
+                                                key={operator.userid} 
+                                                className={`operator-card ${selectedOperators.includes(operator.userid) ? 'selected' : ''}`}
+                                                onClick={() => handleOperatorSelect(operator.userid)}
+                                            >
+                                                <div className="operator-checkbox-container">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedOperators.includes(operator.userid)}
+                                                        onChange={() => handleOperatorSelect(operator.userid)}
+                                                        className="operator-checkbox"
+                                                    />
+                                                </div>
+                                                
+                                                <div className="operator-avatar">
+                                                    {operator.uimage ? (
+                                                        <img 
+                                                            src={`data:image/jpeg;base64,${operator.uimage}`} 
+                                                            alt={`${operator.ufirstname} ${operator.ulastname}`}
+                                                            className="operator-avatar-img"
+                                                        />
+                                                    ) : (
+                                                        <div className="operator-avatar-placeholder">
+                                                            {(operator.ufirstname?.[0] || '') + (operator.ulastname?.[0] || '')}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                
+                                                <div className="operator-info">
+                                                    <div className="operator-name">
+                                                        {operator.ufirstname} {operator.ulastname}
+                                                    </div>
+                                                    <div className="operator-username">
+                                                        {operator.username}
+                                                    </div>
+                                                    <div className="operator-details">
+                                                        <span className="operator-email">
+                                                            ✉️ {operator.uemail}
+                                                        </span>
+                                                        <span className="operator-location">
+                                                            📍 {operator.clustername || 'No Cluster'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="operator-role-badge">
+                                                    {operator.usergroup}
+                                                </div>
+                                            </div>
+                                        ))
+                                    }
+                                </div>
                             ) : (
-                                <p>No operator available to notify</p>
+                                <div className="no-operators-message">
+                                    <p>No operators available to notify</p>
+                                </div>
                             )}
                         </div>
-                        <button onClick={handleConfirmNotification}>Confirm Selection</button>
+
+                        <div className="operators-modal-footer">
+                            <div className="operators-selection-summary">
+                                {selectedOperators.length} operators selected
+                            </div>
+                            <div className="operators-action-buttons">
+                                <button 
+                                    className="operators-notify-btn" 
+                                    onClick={handleConfirmNotification}
+                                    disabled={selectedOperators.length === 0}
+                                >
+                                    Notify Selected Operators
+                                </button>
+                                <button 
+                                    className="operators-cancel-btn" 
+                                    onClick={() => setMessageBoxMode('')}
+                                >
+                                    Cancel
+                                </button>
+                                
+                            </div>
+                        </div>
                     </div>
                 </div>
             )}
@@ -611,3 +994,5 @@ const Reservations = () => {
 };
 
 export default Reservations;
+
+
