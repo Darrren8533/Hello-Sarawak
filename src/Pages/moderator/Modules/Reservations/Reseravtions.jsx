@@ -221,7 +221,9 @@ const Reservations = () => {
                     (reservation.propertyaddress?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
+                    (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (new Date(reservation.checkindatetime).toLocaleDateString('en-GB').includes(searchKey) || '') ||
+                    (new Date(reservation.checkoutdatetime).toLocaleDateString('en-GB').includes(searchKey) || '')
                 )
         )
         : [];
@@ -419,6 +421,22 @@ const Reservations = () => {
         },
         { header: 'Property Name', accessor: 'propertyaddress' },
         { header: 'Total Price', accessor: 'totalprice' },
+        {
+            header: 'Check-In Date',
+            accessor: 'checkindatetime',
+            render: (reservation) => {
+                const date = new Date(reservation.checkindatetime);
+                return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+            },
+        },
+        {
+            header: 'Check-Out Date',
+            accessor: 'checkoutdatetime',
+            render: (reservation) => {
+                const date = new Date(reservation.checkoutdatetime);
+                return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+            },
+        },
         {
             header: 'Status',
             accessor: 'reservationstatus',
