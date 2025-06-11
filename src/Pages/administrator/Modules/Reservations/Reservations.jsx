@@ -53,6 +53,8 @@ const Reservations = () => {
             userid,
             userGroup
         });
+
+        console.log('Current user loaded:', { username, userid, userGroup });
     }, []);
 
     // Fetch reservations with React Query
@@ -62,6 +64,7 @@ const Reservations = () => {
             try {
                 const reservationData = await fetchReservation();
                 if (Array.isArray(reservationData)) {
+                    // console.log('Reservations Data:', reservationData);
                     return reservationData.map(reservation => {
                         const reservationblocktime = new Date(reservation.reservationblocktime).getTime();
                         const currentDateTime = Date.now() + 8 * 60 * 60 * 1000;
@@ -89,7 +92,9 @@ const Reservations = () => {
         queryKey: ['operators'],
         queryFn: async () => {
             try {
+                console.log('Fetching operators with cluster names...');
                 const operatorsData = await fetchOperators();
+                console.log('Operators data with cluster names:', operatorsData);
                 return operatorsData;
             } catch (error) {
                 console.error('Error fetching operators:', error);
@@ -98,6 +103,7 @@ const Reservations = () => {
         },
         staleTime: 5 * 60 * 1000, // 5 minutes
     });
+    console.log('Operators Data:', operators);
 
     // Fetch clusters with React Query
     const { data: clusters = [] } = useQuery({
@@ -131,6 +137,8 @@ const Reservations = () => {
         },
         enabled: false, // Prevent automatic fetch
     });
+
+    // console.log('Administrator Properties:', administratorProperties);
     
     useEffect(() => {
         if (rejectedReservationID?.reservationid) {
@@ -170,16 +178,25 @@ const Reservations = () => {
 
     const isPropertyOwner = (reservation) => {
         if (!currentUser.userid || !reservation) {
+            console.log('Missing data:', { currentUser, reservation });
             return false;
         }
 
         const propertyOwnerID = reservation.userid;
         
         if (!propertyOwnerID) {
+            console.log('Property owner userid missing in reservation:', reservation);
             return false;
         }
 
         const isOwner = Number(propertyOwnerID) === Number(currentUser.userid);
+        
+        // console.log('Ownership Check:', {
+        //     currentUserID: currentUser.userid,
+        //     propertyOwnerID,
+        //     userGroup: currentUser.userGroup,
+        //     isOwner
+        // });
         return isOwner;
     };
 
@@ -226,7 +243,9 @@ const Reservations = () => {
                     (reservation.propertyaddress?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '')
+                    (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (new Date(reservation.checkindatetime).toLocaleDateString('en-GB').includes(searchKey) || '') ||
+                    (new Date(reservation.checkoutdatetime).toLocaleDateString('en-GB').includes(searchKey) || '')
                 )
         )
         : [];
@@ -424,6 +443,22 @@ const Reservations = () => {
         },
         { header: 'Property Name', accessor: 'propertyaddress' },
         { header: 'Total Price', accessor: 'totalprice' },
+        {
+            header: 'Check-In Date',
+            accessor: 'checkindatetime',
+            render: (reservation) => {
+                const date = new Date(reservation.checkindatetime);
+                return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+            },
+        },
+        {
+            header: 'Check-Out Date',
+            accessor: 'checkoutdatetime',
+            render: (reservation) => {
+                const date = new Date(reservation.checkoutdatetime);
+                return `${String(date.getDate()).padStart(2, '0')}-${String(date.getMonth() + 1).padStart(2, '0')}-${date.getFullYear()}`;
+            },
+        },
         {
             header: 'Status',
             accessor: 'reservationstatus',
