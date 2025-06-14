@@ -15,7 +15,6 @@ const ReviewForm = ({ isOpen, onClose, propertyId }) => {
   const [toastMessage, setToastMessage] = useState('');
   const [toastType, setToastType] = useState('');
 
-  // Add useEffect to manage body overflow similar to Reviews.jsx
   useEffect(() => {
     if (isOpen) {
       // Save the current scroll position and body styles
@@ -122,16 +121,16 @@ const ReviewForm = ({ isOpen, onClose, propertyId }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="filter-overlay">
-      <div className="filter-overlay-content">
-        <div className="filter-header">
+    <div className="reviews-overlay">
+      <div className="reviews-overlay-content">
+        <div className="reviews-header">
           <h3>Write a Review</h3>
           <button className="cls-button" onClick={onClose}>
             <IoMdClose />
           </button>
         </div>
         
-        <div className="filter-content-scrollable">
+        <div className="reviews-content-scrollable">
           <form onSubmit={handleSubmit} className="review-form">
             
             <div className="rating-selection">
