@@ -4,32 +4,198 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  width: 100vw;
+  height: 100vh;
+  z-index: 2000;
   display: flex;
   justify-content: center;
-  align-items: center;
-  z-index: 2000;
-  overflow-y: auto;
+  align-items: flex-start;
+  background-color: rgba(0, 0, 0, 0.5);
+  animation: fadeIn 0.3s ease-out;
+  backdrop-filter: blur(2px);
 }
 
-.reviews-modal {
+.reviews-overlay-content {
   background-color: white;
-  width: 90%;
-  height: 70vh;
-  max-width: 1000px;
-  max-height: 90vh;
+  width: 100%;
+  max-width: 1000px; 
+  height: 90vh; 
+  max-height: 800px;
+  padding: 0;
+  margin-top: 40px; 
   border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.reviews-content-scrollable {
+  flex: 1;
   overflow-y: auto;
-  position: relative;
+  overflow-x: hidden;
+  padding: 0;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Webkit scrollbar styles */
+.reviews-content-scrollable::-webkit-scrollbar {
+  width: 6px;
+}
+
+.reviews-content-scrollable::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.reviews-content-scrollable::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
+.reviews-content-scrollable::-webkit-scrollbar-thumb:hover {
+  background: #999;
+}
+
+/* Firefox */
+.reviews-content-scrollable {
+  scrollbar-width: thin;
+  scrollbar-color: #ccc transparent;
 }
 
 .reviews-header {
-  padding: 20px;
-  border-bottom: 1px solid #eaeaea;
   position: sticky;
   top: 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
   background-color: white;
   z-index: 10;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.reviews-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.cls-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 50%;
+  font-size: 24px;
+}
+
+.cls-button:hover {
+  background-color: #f0f0f0;
+}
+
+/* Review Form Styles */
+.review-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 10px;
+}
+
+.rating-selection h4,
+.review-input h4 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.star-rating {
+  display: flex;
+  gap: 5px;
+}
+
+.star-rating label {
+  cursor: pointer;
+}
+
+.review-input textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  resize: none;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.review-input textarea:focus {
+  outline: none;
+  border-color: #222;
+}
+
+.character-count {
+  text-align: right;
+  font-size: 12px;
+  color: #717171;
+  margin-top: 5px;
+}
+
+.error-message {
+  color: #e31c5f;
+  font-size: 14px;
+  padding: 5px 0;
+}
+
+.success-message {
+  color: #008489;
+  font-size: 14px;
+  padding: 5px 0;
+}
+
+.review-form-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.cancel-button,
+.submit-button {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-button {
+  background-color: transparent;
+  border: 1px solid #222;
+  color: #222;
+}
+
+.submit-button {
+  background-color: #222;
+  border: 1px solid #222;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #f7f7f7;
+}
+
+.submit-button:hover {
+  background-color: #000;
+}
+
+.cancel-button:disabled,
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .close-reviews-btn {
@@ -66,6 +232,11 @@
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.rating-display {
+  display: flex;
+  align-items: center;
 }
 
 .star-icon {
@@ -314,7 +485,6 @@
   color: #000;
 }
 
-/* Styles for the reviews section in PropertyDetails */
 .reviews-section {
   margin-top: 40px;
 }
@@ -350,24 +520,6 @@
   -webkit-box-orient: vertical;
 }
 
-/* Sorting component styles imported */
-.filter-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  background-color: rgba(0, 0, 0, 0.5);
-  animation: fadeIn 0.3s ease-out;
-  backdrop-filter: blur(2px);
-}
-
 .body-no-scroll {
   overflow: hidden;
   position: fixed;
@@ -383,191 +535,9 @@
   }
 }
 
-.filter-overlay-content {
-  background-color: white;
-  width: 100%;
-  max-width: 1000px; /* Match the Airbnb design width */
-  height: 90vh; /* Use viewport height */
-  max-height: 800px;
-  padding: 0;
-  margin-top: 40px; /* Match the Airbnb design top spacing */
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-}
-
-.filter-content-scrollable {
-  flex: 1;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 0;
-  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-}
-
-/* Webkit scrollbar styles */
-.filter-content-scrollable::-webkit-scrollbar {
-  width: 6px;
-}
-
-.filter-content-scrollable::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.filter-content-scrollable::-webkit-scrollbar-thumb {
-  background: #ccc;
-  border-radius: 10px;
-}
-
-.filter-content-scrollable::-webkit-scrollbar-thumb:hover {
-  background: #999;
-}
-
-/* Firefox */
-.filter-content-scrollable {
-  scrollbar-width: thin;
-  scrollbar-color: #ccc transparent;
-}
-
-.filter-header {
-  position: sticky;
-  top: 0;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px;
-  background-color: white;
-  z-index: 10;
-  border-bottom: 1px solid #eaeaea;
-}
-
-.filter-header h3 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.cls-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #555;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  border-radius: 50%;
-  font-size: 24px;
-}
-
-.cls-button:hover {
-  background-color: #f0f0f0;
-}
-
-/* Review Form Styles */
-.review-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 0 10px;
-}
-
-.rating-selection h4,
-.review-input h4 {
-  margin-bottom: 10px;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.star-rating {
-  display: flex;
-  gap: 5px;
-}
-
-.star-rating label {
-  cursor: pointer;
-}
-
-.review-input textarea {
-  width: 100%;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  resize: none;
-  font-family: inherit;
-  font-size: 14px;
-}
-
-.review-input textarea:focus {
-  outline: none;
-  border-color: #222;
-}
-
-.character-count {
-  text-align: right;
-  font-size: 12px;
-  color: #717171;
-  margin-top: 5px;
-}
-
-.error-message {
-  color: #e31c5f;
-  font-size: 14px;
-  padding: 5px 0;
-}
-
-.success-message {
-  color: #008489;
-  font-size: 14px;
-  padding: 5px 0;
-}
-
-.review-form-buttons {
-  display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.cancel-button,
-.submit-button {
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.cancel-button {
-  background-color: transparent;
-  border: 1px solid #222;
-  color: #222;
-}
-
-.submit-button {
-  background-color: #222;
-  border: 1px solid #222;
-  color: white;
-}
-
-.cancel-button:hover {
-  background-color: #f7f7f7;
-}
-
-.submit-button:hover {
-  background-color: #000;
-}
-
-.cancel-button:disabled,
-.submit-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
 
 @media (max-width: 768px) {
-  .filter-overlay-content {
+  .reviews-overlay-content {
     width: 100%;
     max-width: none;
     height: 100%;
