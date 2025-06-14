@@ -27,6 +27,7 @@ ChartJS.register(
 
 export default function FinancialDashboard() {
   const [chartType, setChartType] = useState("revenue");
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear().toString());
   const userid = localStorage.getItem('userid');
 
   const {
@@ -103,12 +104,12 @@ export default function FinancialDashboard() {
   if (financeError) return <div>Error: {financeError.message}</div>;
 
   const renderChart = () => {
-    if (!financeData?.monthlyData || financeData.monthlyData.length === 0) {
+    if (!filteredFinanceData?.monthlyData || filteredFinanceData.monthlyData.length === 0) {
       return <h1>No reservations made yet.</h1>;
     }
 
     if (chartType === "occupancy") {
-      const data = occupancyData?.monthlyData;
+      const data = filteredOccupancyData?.monthlyData;
     
       if (!data || data.length === 0) {
         return <div>No occupancy data available</div>;
@@ -142,7 +143,7 @@ export default function FinancialDashboard() {
           },
           title: {
             display: true,
-            text: "Monthly Occupancy Rate Trend",
+            text: `Monthly Occupancy Rate Trend - ${selectedYear}`,
           },
           tooltip: {
             callbacks: {
@@ -172,12 +173,12 @@ export default function FinancialDashboard() {
     }
 
     if (chartType === "revpar") {
-      if (!revPARData?.monthlyData || revPARData.monthlyData.length === 0) {
+      if (!filteredRevPARData?.monthlyData || filteredRevPARData.monthlyData.length === 0) {
         return <div>No RevPAR data</div>;
       }
     
-      const months = revPARData.monthlyData.map((entry) => entry.month);
-      const revparValues = revPARData.monthlyData.map((entry) =>
+      const months = filteredRevPARData.monthlyData.map((entry) => entry.month);
+      const revparValues = filteredRevPARData.monthlyData.map((entry) =>
         parseFloat(entry.revpar)
       );
     
@@ -203,7 +204,7 @@ export default function FinancialDashboard() {
         responsive: true,
         plugins: {
           legend: { position: "top" },
-          title: { display: true, text: "Monthly RevPAR" },
+          title: { display: true, text: `Monthly RevPAR - ${selectedYear}` },
           tooltip: {
             callbacks: {
               label: (context) =>
@@ -226,12 +227,12 @@ export default function FinancialDashboard() {
     }
 
     if (chartType === "cancellation") {
-      if (!cancellationRateData?.monthlyData || cancellationRateData.monthlyData.length === 0) {
+      if (!filteredCancellationRateData?.monthlyData || filteredCancellationRateData.monthlyData.length === 0) {
         return <div>No cancellation data available</div>;
       }
     
-      const months = cancellationRateData.monthlyData.map((item) => item.month); 
-      const cancellationRates = cancellationRateData.monthlyData.map((item) =>
+      const months = filteredCancellationRateData.monthlyData.map((item) => item.month); 
+      const cancellationRates = filteredCancellationRateData.monthlyData.map((item) =>
         parseFloat(item.cancellation_rate)
       );
     
@@ -257,7 +258,7 @@ export default function FinancialDashboard() {
         responsive: true,
         plugins: {
           legend: { position: "top" },
-          title: { display: true, text: "Monthly Cancellation Rate" },
+          title: { display: true, text: `Monthly Cancellation Rate - ${selectedYear}` },
           tooltip: {
             callbacks: {
               label: (context) =>
@@ -282,18 +283,18 @@ export default function FinancialDashboard() {
 
     if (chartType === "retention") {
       if (
-        !customerRetentionRateData?.monthlyData ||
-        customerRetentionRateData.monthlyData.length === 0
+        !filteredCustomerRetentionRateData?.monthlyData ||
+        filteredCustomerRetentionRateData.monthlyData.length === 0
       ) {
         return <div>No Retention Rate data available</div>;
       }
     
       const retentionRateChartData = {
-        labels: customerRetentionRateData.monthlyData.map((item) => item.month),
+        labels: filteredCustomerRetentionRateData.monthlyData.map((item) => item.month),
         datasets: [
           {
             label: "Retention Rate (%)",
-            data: customerRetentionRateData.monthlyData.map((item) =>
+            data: filteredCustomerRetentionRateData.monthlyData.map((item) =>
               parseFloat(item.customer_retention_rate)
             ),
             fill: false,
@@ -312,7 +313,7 @@ export default function FinancialDashboard() {
         responsive: true,
         plugins: {
           legend: { position: "top" },
-          title: { display: true, text: "Monthly Customer Retention Rate Trend" },
+          title: { display: true, text: `Monthly Customer Retention Rate Trend - ${selectedYear}` },
           tooltip: {
             callbacks: {
               label: (context) =>
@@ -337,18 +338,18 @@ export default function FinancialDashboard() {
 
     if (chartType === "satisfaction") {
       if (
-        !guestSatisfactionScoreData?.monthlyData ||
-        guestSatisfactionScoreData.monthlyData.length === 0
+        !filteredGuestSatisfactionScoreData?.monthlyData ||
+        filteredGuestSatisfactionScoreData.monthlyData.length === 0
       ) {
         return <div>No Guest Satisfaction Score data</div>;
       }
     
       const guestSatisfactionChartData = {
-        labels: guestSatisfactionScoreData.monthlyData.map((item) => item.month),
+        labels: filteredGuestSatisfactionScoreData.monthlyData.map((item) => item.month),
         datasets: [
           {
             label: "Guest Satisfaction Score",
-            data: guestSatisfactionScoreData.monthlyData.map((item) =>
+            data: filteredGuestSatisfactionScoreData.monthlyData.map((item) =>
               parseFloat(item.guest_satisfaction_score)
             ),
             fill: false,
@@ -367,7 +368,7 @@ export default function FinancialDashboard() {
         responsive: true,
         plugins: {
           legend: { position: "top" },
-          title: { display: true, text: "Monthly Guest Satisfaction Score" },
+          title: { display: true, text: `Monthly Guest Satisfaction Score - ${selectedYear}` },
           tooltip: {
             callbacks: {
               label: (context) => `Score: ${context.parsed.y.toFixed(2)}`,
@@ -392,16 +393,16 @@ export default function FinancialDashboard() {
     }
 
     if (chartType === "alos") {
-      if (!alosData?.monthlyData || alosData.monthlyData.length === 0) {
+      if (!filteredALOSData?.monthlyData || filteredALOSData.monthlyData.length === 0) {
         return <div>No Average Length of Stay data</div>;
       }
     
       const alosChartData = {
-        labels: alosData.monthlyData.map((item) => item.month),
+        labels: filteredALOSData.monthlyData.map((item) => item.month),
         datasets: [
           {
             label: "Average Length of Stay (Days)",
-            data: alosData.monthlyData.map((item) => parseFloat(item.average_length_of_stay)),
+            data: filteredALOSData.monthlyData.map((item) => parseFloat(item.average_length_of_stay)),
             fill: false,
             borderColor: "rgb(255, 205, 86)",
             tension: 0.3,
@@ -418,7 +419,7 @@ export default function FinancialDashboard() {
         responsive: true,
         plugins: {
           legend: { position: "top" },
-          title: { display: true, text: "Average Length of Stay (Monthly)" },
+          title: { display: true, text: `Average Length of Stay (Monthly) - ${selectedYear}` },
           tooltip: {
             callbacks: {
               label: (context) => `ALOS: ${context.parsed.y.toFixed(2)} days`,
@@ -440,14 +441,14 @@ export default function FinancialDashboard() {
     }
 
     const chartData = {
-      labels: financeData.monthlyData.map((item) => item.month),
+      labels: filteredFinanceData.monthlyData.map((item) => item.month),
       datasets: [
         {
           label:
             chartType === "revenue"
               ? "Monthly Revenue"
               : "Monthly Reservations",
-          data: financeData.monthlyData.map((item) =>
+          data: filteredFinanceData.monthlyData.map((item) =>
             chartType === "revenue"
               ? item.monthlyrevenue
               : item.monthlyreservations
@@ -474,8 +475,8 @@ export default function FinancialDashboard() {
           display: true,
           text:
             chartType === "revenue"
-              ? "Monthly Revenue Trend"
-              : "Monthly Reservations Trend",
+              ? `Monthly Revenue Trend - ${selectedYear}`
+              : `Monthly Reservations Trend - ${selectedYear}`,
         },
         tooltip: {
           callbacks: {
@@ -557,6 +558,29 @@ export default function FinancialDashboard() {
     };
   };
 
+  const getAvailableYears = () => {
+    if (!financeData?.monthlyData) return [];
+    const years = new Set(financeData.monthlyData.map(item => item.month.split('-')[0]));
+    return Array.from(years).sort((a, b) => b - a); // Sort years in descending order
+  };
+
+  const filterDataByYear = (data) => {
+    if (!data?.monthlyData) return data;
+    return {
+      ...data,
+      monthlyData: data.monthlyData.filter(item => item.month.startsWith(selectedYear))
+    };
+  };
+
+  // Filter all data by selected year
+  const filteredFinanceData = filterDataByYear(financeData);
+  const filteredOccupancyData = filterDataByYear(occupancyData);
+  const filteredRevPARData = filterDataByYear(revPARData);
+  const filteredCancellationRateData = filterDataByYear(cancellationRateData);
+  const filteredCustomerRetentionRateData = filterDataByYear(customerRetentionRateData);
+  const filteredGuestSatisfactionScoreData = filterDataByYear(guestSatisfactionScoreData);
+  const filteredALOSData = filterDataByYear(alosData);
+
   return (
     <div className="container mx-auto p-4">
       <div>
@@ -568,8 +592,8 @@ export default function FinancialDashboard() {
             <p className="text-2xl font-bold">
               $
               {(
-                Array.isArray(financeData?.monthlyData)
-                  ? financeData.monthlyData.reduce((sum, item) => sum + item.monthlyrevenue, 0)
+                Array.isArray(filteredFinanceData?.monthlyData)
+                  ? filteredFinanceData.monthlyData.reduce((sum, item) => sum + item.monthlyrevenue, 0)
                   : 0
               ).toFixed(2)}
             </p>
@@ -587,17 +611,16 @@ export default function FinancialDashboard() {
           <div className="bg-white p-4 rounded-lg shadow">
             <h2 className="text-sm font-medium text-gray-500">Total Reservations</h2>
             <p className="text-2xl font-bold">
-              {Array.isArray(financeData?.monthlyData)
-                ? financeData.monthlyData.reduce((sum, item) => sum + Number(item.monthlyreservations), 0)
+              {Array.isArray(filteredFinanceData?.monthlyData)
+                ? filteredFinanceData.monthlyData.reduce((sum, item) => sum + Number(item.monthlyreservations), 0)
                 : 0}
             </p>
             {(() => {
               if (
-                Array.isArray(financeData?.monthlyData) &&
-                financeData.monthlyData.length >= 2
+                Array.isArray(filteredFinanceData?.monthlyData) &&
+                filteredFinanceData.monthlyData.length >= 2
               ) {
-                // Sort data by month (format YYYY-MM)
-                const sorted = [...financeData.monthlyData].sort(
+                const sorted = [...filteredFinanceData.monthlyData].sort(
                   (a, b) => new Date(a.month) - new Date(b.month)
                 );
           
@@ -626,10 +649,10 @@ export default function FinancialDashboard() {
             </h2>
             <p className="text-2xl font-bold">
               $
-              {Array.isArray(financeData?.monthlyData) && financeData.monthlyData.length > 0
+              {Array.isArray(filteredFinanceData?.monthlyData) && filteredFinanceData.monthlyData.length > 0
                 ? Math.round(
-                    financeData.monthlyData.reduce((sum, item) => sum + item.monthlyrevenue, 0) /
-                    financeData.monthlyData.length
+                    filteredFinanceData.monthlyData.reduce((sum, item) => sum + item.monthlyrevenue, 0) /
+                    filteredFinanceData.monthlyData.length
                   )
                 : 0}
             </p>
@@ -647,31 +670,55 @@ export default function FinancialDashboard() {
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow mb-4">
-          <div className="mb-4 flex items-center space-x-2">
-            <label htmlFor="chartSelector" className="text-sm font-medium text-gray-700">
-              Select Chart:
-            </label>
-            <div className="relative">
-              <select
-                id="chartSelector"
-                value={chartType}
-                onChange={(e) => setChartType(e.target.value)}
-                className="appearance-none bg-white border border-gray-300 rounded-xl px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 w-auto min-w-[200px] hover:border-blue-400 transition"
-              >
-                <option value="revenue">Revenue Chart</option>
-                <option value="reservations">Reservations Chart</option>
-                <option value="occupancy">Occupancy Rate Chart</option>
-                <option value="revpar">RevPAR Chart</option>
-                <option value="cancellation">Cancellation Rate Chart</option>
-                <option value="retention">Customer Retention Rate Chart</option>
-                <option value="satisfaction">Guest Satisfaction Score Chart</option>
-                <option value="alos">Average Length of Stay Chart</option>
-              </select>
-              {/* Custom arrow */}
-              <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                </svg>
+          <div className="mb-4 flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <label htmlFor="chartSelector" className="text-sm font-medium text-gray-700">
+                Select Chart:
+              </label>
+              <div className="relative">
+                <select
+                  id="chartSelector"
+                  value={chartType}
+                  onChange={(e) => setChartType(e.target.value)}
+                  className="appearance-none bg-white border border-gray-300 rounded-xl px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 w-auto min-w-[200px] hover:border-blue-400 transition"
+                >
+                  <option value="revenue">Revenue Chart</option>
+                  <option value="reservations">Reservations Chart</option>
+                  <option value="occupancy">Occupancy Rate Chart</option>
+                  <option value="revpar">RevPAR Chart</option>
+                  <option value="cancellation">Cancellation Rate Chart</option>
+                  <option value="retention">Customer Retention Rate Chart</option>
+                  <option value="satisfaction">Guest Satisfaction Score Chart</option>
+                  <option value="alos">Average Length of Stay Chart</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <label htmlFor="yearSelector" className="text-sm font-medium text-gray-700">
+                Select Year:
+              </label>
+              <div className="relative">
+                <select
+                  id="yearSelector"
+                  value={selectedYear}
+                  onChange={(e) => setSelectedYear(e.target.value)}
+                  className="appearance-none bg-white border border-gray-300 rounded-xl px-3 py-2 pr-8 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 w-auto min-w-[120px] hover:border-blue-400 transition"
+                >
+                  {getAvailableYears().map(year => (
+                    <option key={year} value={year}>{year}</option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-500">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
