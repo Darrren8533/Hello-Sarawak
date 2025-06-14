@@ -172,16 +172,16 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
 
   return (
     <>
-      <div className="filter-overlay">
-        <div className="filter-overlay-content">
-          <div className="filter-header">
+      <div className="reviews-overlay">
+        <div className="reviews-overlay-content">
+          <div className="reviews-header">
             <h3>Reviews</h3>
             <button className="cls-button" onClick={handleClose}>
               <IoMdClose />
             </button>
           </div>
           
-          <div className="filter-content-scrollable">
+          <div className="reviews-content-scrollable">
             <div className="reviews-content">
               <div className="reviews-summary">
                 <div className="reviews-average">
@@ -190,8 +190,9 @@ const Reviews = ({ isOpen, onClose, propertyId }) => {
                       {Number.isInteger(propertyData.rating) 
                         ? propertyData.rating.toFixed(1)
                         : propertyData.rating.toFixed(2).replace(/\.?0+$/, '')}
+                        
                     </span>
-                    <FaStar className="star-icon" />
+                    <span className="star-icon"> <FaStar /></span>
                     <span className="total-reviews">{propertyData.ratingno} reviews</span>
                   </div>
                 </div>
