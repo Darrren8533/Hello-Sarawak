@@ -58,8 +58,7 @@ const PropertyListing = () => {
     // React Query mutation for accepting property (enabling)
     const acceptMutation = useMutation({
         mutationFn: async (propertyId) => {
-            await propertyListingAccept(propertyId);
-            return updatePropertyStatus(propertyId, 'Available');
+            return updatePropertyStatus(propertyId, 'Pending');
         },
         onSuccess: (_, propertyId) => {
             queryClient.invalidateQueries({ queryKey: ['properties'] });
@@ -255,13 +254,13 @@ const PropertyListing = () => {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Edit', icon: <FaEdit />, action: 'edit' },
-                { label: 'Disable', icon: <FaCheck />, action: 'disable' },
+                { label: 'Disable', icon: <FaTimes />, action: 'disable' },
             ];
         } else if (propertystatus === 'Unavailable') {
             return [
                 { label: 'View Details', icon: <FaEye />, action: 'view' },
                 { label: 'Edit', icon: <FaEdit />, action: 'edit' },
-                { label: 'Enable', icon: <FaTimes />, action: 'enable' },
+                { label: 'Enable', icon: <FaCheck />, action: 'enable' },
             ];
         }
     }
