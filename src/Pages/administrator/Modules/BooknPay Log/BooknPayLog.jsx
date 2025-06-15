@@ -8,6 +8,7 @@ import SearchBar from '../../../../Component/SearchBar/SearchBar';
 import ActionDropdown from '../../../../Component/ActionDropdown/ActionDropdown';
 import Loader from '../../../../Component/Loader/Loader'; 
 import { fetchBookLog } from '../../../../../Api/api';
+import Status from '../../../../Component/Status/Status';
 import '../../../../Component/MainContent/MainContent.css';
 import '../../../../Component/ActionDropdown/ActionDropdown.css';
 import '../../../../Component/Modal/Modal.css';
@@ -20,18 +21,16 @@ const BooknPayLog = () => {
   const [appliedFilters, setAppliedFilters] = useState({ actionType: 'All' });
   const [selectedLog, setSelectedLog] = useState(null);
 
-  // Get userid from localStorage
   const userid = localStorage.getItem('userid');
 
-  // Replace useEffect with React Query
   const { data: logs = [], isLoading } = useQuery({
     queryKey: ['bookLogs', userid],
     queryFn: () => fetchBookLog(userid),
-    enabled: !!userid, // Only run query if userid exists
+    enabled: !!userid,
     onError: (error) => {
       console.error('Failed to fetch Book & Pay Logs:', error);
     },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 5 * 60 * 1000,
   });
 
   const handleApplyFilters = () => {
@@ -90,7 +89,16 @@ const BooknPayLog = () => {
   const columns = [
     { header: 'UID', accessor: 'userid' },
     { header: 'Timestamp', accessor: 'timestamp' },
-    { header: 'Action', accessor: 'action' },
+    {
+      header: 'Action',
+      accessor: 'action',
+      render: (log) => (
+        <>
+          {log.action}
+          <Status value={log.status} /> 
+        </>
+      ),
+    },
     {
       header: 'Actions',
       accessor: 'actions',
