@@ -221,16 +221,14 @@ const Reservations = () => {
     ];
 
     const displayLabels = {
-        reservationid: "RID",
+        reservationid: "Reservation ID",
         propertyaddress: "Property Name",
         checkindatetime: "Check-In Date Time",
         checkoutdatetime: "Check-Out Date Time",
-        reservationblocktime: "Block Time",
+        name: "Customer Name",
         request: "Request",
         totalprice: "Total Price",
-        name: "Customer Name",
         reservationstatus: "Status",
-        userid: "UID",
         images: "Images",
     };
 
