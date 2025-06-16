@@ -232,29 +232,18 @@ const Reservations = () => {
         images: "Images",
     };
 
-    const formatDate = (datetime) => {
-    if (!datetime) return '';
-    const date = new Date(datetime);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    return `${day}-${month}-${year}`;
-};
-
-    
     const filteredReservations = Array.isArray(reservationsData)
         ? reservationsData.filter(
             (reservation) =>
-                (appliedFilters.status === 'All' ||
-                    (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
+                (appliedFilters.status === 'All' || (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
                 (
                     (reservation.reservationid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.propertyaddress?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (formatDate(reservation.checkindatetime).includes(searchKey)) ||
-                    (formatDate(reservation.checkoutdatetime).includes(searchKey))
+                    (new Date(reservation.checkindatetime).toLocaleDateString('en-GB').includes(searchKey) || '') ||
+                    (new Date(reservation.checkoutdatetime).toLocaleDateString('en-GB').includes(searchKey) || '')
                 )
         )
         : [];
@@ -294,15 +283,14 @@ const Reservations = () => {
             const essentialFields = {
                 reservationid: reservation.reservationid || 'N/A',
                 propertyaddress: reservation.propertyaddress || 'N/A',
-                checkindatetime: formatDate(reservation.checkindatetime),
-                checkoutdatetime: formatDate(reservation.checkoutdatetime),
+                checkindatetime: reservation.checkindatetime || 'N/A',
+                checkoutdatetime: reservation.checkoutdatetime || 'N/A',
                 request: reservation.request || 'N/A',
                 totalprice: reservation.totalprice || 'N/A',
-                name: `${reservation.firstname || ''} ${reservation.lastname || ''}`.trim() || 'N/A',
+                name: `${reservation.rcfirstname || ''} ${reservation.rclastname || ''}`.trim() || 'N/A',
                 reservationstatus: reservation.reservationstatus || 'N/A',
                 images: reservation.propertyimage || [],
             };
-        }
             setSelectedReservation(essentialFields);
         } else if (action === 'accept') {
             // Check for overlapping reservations before accepting
