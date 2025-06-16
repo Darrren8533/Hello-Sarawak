@@ -290,7 +290,7 @@ const Reservations = () => {
                 reservationblocktime: reservation.reservationblocktime || 'N/A',
                 request: reservation.request || 'N/A',
                 totalprice: reservation.totalprice || 'N/A',
-                name: `${reservation.firstname || ''} ${reservation.lastname || ''}`.trim() || 'N/A',
+                name: `${reservation.rcfirstname || ''} ${reservation.rclastname || ''}`.trim() || 'N/A',
                 reservationstatus: reservation.reservationstatus || 'N/A',
                 userid: reservation.userid || 'N/A',
                 images: reservation.propertyimage || [],
