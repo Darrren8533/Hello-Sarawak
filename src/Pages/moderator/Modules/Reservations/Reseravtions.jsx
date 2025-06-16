@@ -201,18 +201,25 @@ const Reservations = () => {
     ];
 
     const displayLabels = {
-        reservationid: "RID",
+        reservationid: "Reservation ID",
         propertyaddress: "Property Name",
         checkindatetime: "Check-In Date Time",
         checkoutdatetime: "Check-Out Date Time",
-        reservationblocktime: "Block Time",
+        name: "Customer Name",
         request: "Request",
         totalprice: "Total Price",
-        rcid: "RCID",
         reservationstatus: "Status",
-        userid: "UID",
         images: "Images",
     };
+
+    const formatDate = (datetime) => {
+      if (!datetime) return '';
+      const date = new Date(datetime);
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}-${month}-${year}`;
+  };
 
     const filteredReservations = Array.isArray(reservationsData)
         ? reservationsData.filter(
@@ -224,8 +231,8 @@ const Reservations = () => {
                     (reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (new Date(reservation.checkindatetime).toLocaleDateString('en-GB').includes(searchKey) || '') ||
-                    (new Date(reservation.checkoutdatetime).toLocaleDateString('en-GB').includes(searchKey) || '')
+                     (formatDate(reservation.checkindatetime).includes(searchKey)) ||
+                     (formatDate(reservation.checkoutdatetime).includes(searchKey))
                 )
         )
         : [];
