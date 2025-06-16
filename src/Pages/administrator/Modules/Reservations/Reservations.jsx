@@ -251,8 +251,8 @@ const Reservations = () => {
                     (reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                    (new Date(reservation.checkindatetime).toLocaleDateString('en-GB').includes(searchKey) || '') ||
-                    (new Date(reservation.checkoutdatetime).toLocaleDateString('en-GB').includes(searchKey) || '')
+                    (formatDate(reservation.checkindatetime).includes(searchKey)) ||
+                    (formatDate(reservation.checkoutdatetime).includes(searchKey))
                 )
         )
         : [];
