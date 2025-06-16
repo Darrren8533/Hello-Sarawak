@@ -272,16 +272,14 @@ const Reservations = () => {
             const essentialFields = {
                 reservationid: reservation.reservationid || 'N/A',
                 propertyaddress: reservation.propertyaddress || 'N/A',
-                checkindatetime: reservation.checkindatetime || 'N/A',
-                checkoutdatetime: reservation.checkoutdatetime || 'N/A',
-                reservationblocktime: reservation.reservationblocktime || 'N/A',
+                checkindatetime: formatDate(reservation.checkindatetime) || 'N/A',
+                checkoutdatetime: formatDate(reservation.checkoutdatetime) || 'N/A',
                 request: reservation.request || 'N/A',
                 totalprice: reservation.totalprice || 'N/A',
-                rcid: reservation.rcid || 'N/A',
+                name: `${reservation.rcfirstname || ''} ${reservation.rclastname || ''}`.trim() || 'N/A',
                 reservationstatus: reservation.reservationstatus || 'N/A',
-                userid: reservation.userid || 'N/A',
                 images: reservation.propertyimage || [],
-            };
+        };
             setSelectedReservation(essentialFields);
         } else if (action === 'accept') {
             // Check for overlapping reservations before accepting
