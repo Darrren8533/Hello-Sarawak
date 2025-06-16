@@ -115,8 +115,8 @@ const Reservations = () => {
         return `${day}-${month}-${year}`;
     };
 
-    const filteredReservations = Array.isArray(reservationsData)
-    ? reservationsData.filter(
+    const filteredReservations = Array.isArray(reservations)
+    ? reservations.filter(
         (reservation) =>
             (appliedFilters.status === 'All' ||
                 (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
