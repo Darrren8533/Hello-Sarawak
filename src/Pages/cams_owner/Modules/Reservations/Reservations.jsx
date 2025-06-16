@@ -106,19 +106,31 @@ const Reservations = () => {
         images: "Images"
     };
 
-    const filteredReservations = reservations.filter(
+    const formatDate = (datetime) => {
+        if (!datetime) return '';
+        const date = new Date(datetime);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+    };
+
+    const filteredReservations = Array.isArray(reservationsData)
+    ? reservationsData.filter(
         (reservation) =>
-            (appliedFilters.status === 'All' || (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
+            (appliedFilters.status === 'All' ||
+                (reservation.reservationstatus ?? 'Pending').toLowerCase() === appliedFilters.status.toLowerCase()) &&
             (
                 (reservation.reservationid?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (reservation.propertyaddress?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (reservation.propertyaddress?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                 (reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                 (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                (new Date(reservation.checkindatetime).toLocaleDateString('en-GB').includes(searchKey) || '') ||
-                (new Date(reservation.checkoutdatetime).toLocaleDateString('en-GB').includes(searchKey) || '')
+                (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                (formatDate(reservation.checkindatetime).includes(searchKey)) ||
+                (formatDate(reservation.checkoutdatetime).includes(searchKey))
             )
-    );
+    )
+    : [];
 
     const handleAction = (action, reservation) => {
         if (reservation.reservationstatus === 'expired') {
@@ -130,11 +142,12 @@ const Reservations = () => {
             setSelectedReservation({
                 reservationid: reservation.reservationid || 'N/A',
                 propertyaddress: reservation.propertyaddress || 'N/A',
-                totalprice: reservation.totalprice || 'N/A',
-                reservationstatus: reservation.reservationstatus || 'N/A',
-                checkindatetime: reservation.checkindatetime || 'N/A',
-                checkoutdatetime: reservation.checkoutdatetime || 'N/A',
+                checkindatetime: formatDate(reservation.checkindatetime) || 'N/A',
+                checkoutdatetime: formatDate(reservation.checkoutdatetime) || 'N/A',
                 request: reservation.request || 'N/A',
+                totalprice: reservation.totalprice || 'N/A',
+                name: `${reservation.rcfirstname || ''} ${reservation.rclastname || ''}`.trim() || 'N/A',
+                reservationstatus: reservation.reservationstatus || 'N/A',
                 images: reservation.propertyimage || [],
             });
         }
