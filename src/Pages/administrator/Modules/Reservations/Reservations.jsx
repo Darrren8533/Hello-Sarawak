@@ -232,6 +232,15 @@ const Reservations = () => {
         images: "Images",
     };
 
+    const formatDate = (datetime) => {
+    if (!datetime) return '';
+    const date = new Date(datetime);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+};
+
     const filteredReservations = Array.isArray(reservationsData)
         ? reservationsData.filter(
             (reservation) =>
@@ -283,8 +292,8 @@ const Reservations = () => {
             const essentialFields = {
                 reservationid: reservation.reservationid || 'N/A',
                 propertyaddress: reservation.propertyaddress || 'N/A',
-                checkindatetime: reservation.checkindatetime || 'N/A',
-                checkoutdatetime: reservation.checkoutdatetime || 'N/A',
+                checkindatetime: formatDate(reservation.checkindatetime) || 'N/A',
+                checkoutdatetime: formatDate(reservation.checkoutdatetime) || 'N/A',
                 request: reservation.request || 'N/A',
                 totalprice: reservation.totalprice || 'N/A',
                 name: `${reservation.rcfirstname || ''} ${reservation.rclastname || ''}`.trim() || 'N/A',
