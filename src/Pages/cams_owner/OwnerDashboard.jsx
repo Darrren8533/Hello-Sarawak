@@ -7,7 +7,7 @@ import Operators from './Modules/Operators/Operators';
 import PropertyListing from './Modules/Property Listing/PropertyListing';
 import Reservations from './Modules/Reservations/Reservations';
 import BooknPayLog from './Modules/BooknPay Log/BooknPayLog';
-import Finances from './Modules/Finances/Finances';
+import Finance from './Modules/Finances/Finances';
 import AuditTrails from './Modules/Audit Trails/AuditTrails';
 import Profile from './Modules/Profile/Profile';
 import Cluster from './Modules/Cluster/Cluster';
@@ -60,7 +60,7 @@ import '../../Component/MainContent/MainContent.css';
     { path: '/owner_dashboard/property-listing', label: 'PropertyListing', icon: <FaHotel /> },
     { path: '/owner_dashboard/reservations', label: 'Reservations', icon: <FiCalendar /> },
     { path: '/owner_dashboard/booknpay-log', label: 'BooknPayLog', icon: <GoLog /> },
-    { path: '/owner_dashboard/finances', label: 'Finances', icon: <FiCreditCard /> },
+    { path: '/owner_dashboard/finance', label: 'Finance', icon: <FiCreditCard /> },
     { path: '/owner_dashboard/audit-trails', label: 'Audit Trails', icon: <FaHistory /> },
     { path: '/owner_dashboard/cluster', label: 'Cluster', icon: <FaLayerGroup /> },
     { path: '/owner_dashboard/profile', label: 'Profile', icon: <CgProfile /> },
@@ -90,7 +90,7 @@ import '../../Component/MainContent/MainContent.css';
           <Route path="property-listing" element={<PropertyListing />} />
           <Route path="reservations" element={<Reservations />} />
           <Route path="booknpay-log" element={<BooknPayLog />} />
-          <Route path="finances" element={<Finances />} />
+          <Route path="finance" element={<Finance />} />
           <Route path="audit-trails" element={<AuditTrails />} />
           <Route path="cluster" element={<Cluster />} />
           <Route path="profile" element={<Profile />} />
