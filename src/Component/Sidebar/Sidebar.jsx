@@ -72,6 +72,11 @@ const Sidebar = ({ title, links, isCollapsed, toggleSidebar }) => {
                 key={link.path} 
                 to={link.path} 
                 className={({ isActive }) => (isActive ? 'menu-item active' : 'menu-item')}
+                onClick={() => {
+                  if (window.innerWidth <= 768 && !isCollapsed) {
+                    toggleSidebar();
+                  }
+                }}
               >
                 <span className="menu-icon">{link.icon}</span> {link.label}
               </NavLink>
