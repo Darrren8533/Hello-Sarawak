@@ -122,19 +122,27 @@ body {
 }
 
 .menu-toggle {
-    display: block;
     position: fixed;
-    top: 18px;
-    left: 5px;
-    background-color: transparent;
+    top: 14px;
+    left: 8px;
+    z-index: 3000;
+    background: #fff;
     border: none;
-    color: var(--primaryColor);
-    font-size: 2rem;
-    z-index: 1001;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    font-size: 1.5rem;
     cursor: pointer;
+    color: #333;
+    padding: 4px 8px;
+    transition: background 0.2s;
+    text-align: center;
 }
 
-/* Responsive adjustments for screens smaller than 768px */
+.menu-toggle:hover {
+    background: #f0f0f0;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
     .sidebar-wrapper {
         width: 100%;
@@ -161,7 +169,7 @@ body {
     }
 }
 
-/* Further adjustments for very small screens */
+
 @media (max-width: 480px) {
     .sidebar-wrapper {
         min-width: 180px;
