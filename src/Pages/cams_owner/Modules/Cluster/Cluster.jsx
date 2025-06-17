@@ -38,6 +38,8 @@ const Cluster = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('');
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [clusterToDelete, setClusterToDelete] = useState(null);
 
   const queryClient = useQueryClient();
 
@@ -112,10 +114,17 @@ const Cluster = () => {
     onSuccess: (data, clusterID) => {
       queryClient.invalidateQueries(['clusters']);
       queryClient.invalidateQueries(['clusterNames']);
-      displayToast('success', 'Successfully deleted cluster');
+      const cluster = clusters.find(c => c.clusterid === clusterID);
+      if (cluster) {
+        displayToast('success', `Cluster ${cluster.clustername} deleted successfully.`);
+      }
+      setIsDialogOpen(false);
+      setClusterToDelete(null);
     },
     onError: (error) => {
       displayToast('error', `Error deleting cluster: ${error.message}`);
+      setIsDialogOpen(false);
+      setClusterToDelete(null);
     }
   });
 
@@ -140,11 +149,10 @@ const Cluster = () => {
     setSearchKey(newValue);
   }, []);
 
-  const handleDeleteCluster = useCallback(async (clusterID) => {
-    if (window.confirm('Are you sure you want to delete this cluster?')) {
-      deleteClusterMutation.mutate(clusterID);
-    }
-  }, [deleteClusterMutation]);
+  const handleDeleteCluster = useCallback(async (cluster) => {
+    setClusterToDelete(cluster);
+    setIsDialogOpen(true);
+  }, []);
 
   const handleAction = useCallback((action, cluster) => {
     if (action === 'view') {
@@ -159,7 +167,7 @@ const Cluster = () => {
       setEditMode(true);
       setShowAddModal(true);
     } else if (action === 'delete') {
-      handleDeleteCluster(cluster.clusterid);
+      handleDeleteCluster(cluster);
     }
   }, [handleDeleteCluster]);
 
@@ -382,25 +390,23 @@ const Cluster = () => {
       
       <div className="header-container">
         <h1 className="dashboard-page-title">Cluster Management</h1>
-        <div className="header-actions">
-          <SearchBar
-            value={searchKey}
-            onChange={handleSearchChange}
-            placeholder="Search clusters..."
-          />
-          <button 
-            className="add-button"
-            onClick={() => {
-              resetForm();
-              setShowAddModal(true);
-            }}
-          >
-            Add New Cluster
-          </button>
-        </div>
+        <SearchBar
+          value={searchKey}
+          onChange={handleSearchChange}
+          placeholder="Search clusters..."
+        />
       </div>
 
       <Filter filters={filters} onApplyFilters={handleApplyFilters} />
+      <button 
+        className="create-cluster-button"
+        onClick={() => {
+          resetForm();
+          setShowAddModal(true);
+        }}
+      >
+        Add New Cluster
+      </button>
 
       {clustersLoading && (
         <div className="loader-box">
@@ -436,6 +442,23 @@ const Cluster = () => {
           resetForm();
         }} 
       />
+
+      {isDialogOpen && (
+        <Alert
+          isOpen={isDialogOpen}
+          title="Confirm Delete"
+          message={`Are you sure you want to delete Cluster ${clusterToDelete?.clustername}?`}
+          onConfirm={() => {
+            if (clusterToDelete) {
+              deleteClusterMutation.mutate(clusterToDelete.clusterid);
+            }
+          }}
+          onCancel={() => {
+            setIsDialogOpen(false);
+            setClusterToDelete(null);
+          }}
+        />
+      )}
     </div>
   );
 };
