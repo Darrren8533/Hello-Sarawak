@@ -9,16 +9,13 @@ const Sidebar = ({ title, links, isCollapsed, toggleSidebar }) => {
   const navigate = useNavigate();
   const API_URL = import.meta.env.VITE_API_URL;
 
-
   useEffect(() => {
     const checkLoginStatus = async () => {
       const userid = localStorage.getItem('userid');
-
       if (userid) {
         try {
           const response = await fetch(`${API_URL}/checkStatus?userid=${userid}`);
           const data = await response.json();
-
           if (data.ustatus === 'login') {
             setIsLoggedIn(true);
           } else {
@@ -31,16 +28,13 @@ const Sidebar = ({ title, links, isCollapsed, toggleSidebar }) => {
         setIsLoggedIn(false);
       }
     };
-
     checkLoginStatus();
   }, []);
 
   const handleLogout = async () => {
     const userid = localStorage.getItem('userid');
-
     try {
       const response = await logoutUser(userid);
-
       if (response.success) {
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('userid');
@@ -58,11 +52,10 @@ const Sidebar = ({ title, links, isCollapsed, toggleSidebar }) => {
   };
 
   return (
-    <div>
+    <>
       <button className="menu-toggle" onClick={toggleSidebar}>
         <FiMenu />
       </button>
-
       <div className={`sidebar-wrapper ${isCollapsed ? 'collapsed' : 'expanded'}`}>
         <h2 className="sidebar-title">{title}</h2>
         <nav>
@@ -83,7 +76,6 @@ const Sidebar = ({ title, links, isCollapsed, toggleSidebar }) => {
             ))}
           </ul>
         </nav>
-
         {isLoggedIn && (
           <div className="logout-container">
             <button onClick={handleLogout} className="logout-item">
@@ -92,7 +84,7 @@ const Sidebar = ({ title, links, isCollapsed, toggleSidebar }) => {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 };
 
