@@ -8,7 +8,7 @@
 }
 
 .dashboard-page-title {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 600;
   color: #2c3e50;
   margin: 0;
@@ -19,6 +19,7 @@
   height: 100vh;
   background-color: #E8E8E8;
   overflow: hidden; 
+  
 }
 
 .dashboard-content {
@@ -26,8 +27,9 @@
   padding: 20px;
   transition: margin-left 0.3s ease;
   margin-left: 260px; 
-  min-height: 100vh; 
+  max-height: 100vh; 
   overflow-y: auto; 
+  padding-top: 50px;
 }
 
 .sidebar-collapsed .dashboard-content {
@@ -38,5 +40,6 @@
   .dashboard-content {
     margin-left: 0;
     padding-left: 10px;
+    padding-top: 64px;
   }
 }
