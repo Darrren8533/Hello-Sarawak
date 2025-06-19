@@ -331,12 +331,19 @@ const Moderators = () => {
   const columns = [
     { header: 'UID', accessor: 'userid' },
     {
-      header: 'Moderator',
+      header: 'Username',
       accessor: 'moderator',
       render: (moderator) => (
         <UserActivityCell user={moderator} />
       ),
     },
+    {
+      header: 'Name',
+      accessor: 'name',
+      render: (moderator) => (
+          `${moderator.ufirstname.trim()} ${moderator.ulastname.trim()}`
+      ),
+  },
     { header: 'Email', accessor: 'uemail' },
     {
       header: 'Status',
@@ -349,7 +356,6 @@ const Moderators = () => {
       header: 'Cluster',
       accessor: 'clustername',
       render: (moderator) => {
-        // 直接显示集群名称，如果没有则显示N/A
         const clusterName = moderator.clustername || 'N/A';
         return <span>{clusterName}</span>;
       },
