@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FaArrowLeft, FaArrowRight, FaShoppingCart, FaHistory, FaTrash, FaCreditCard, FaCalendarAlt, FaFilter, FaSort, FaExclamationCircle, FaPaypal } from 'react-icons/fa';
-import { removeReservation, updateReservationStatus, getPropertyOwnerPayPalId, fetchCart } from '../../../../Api/api';
+import { removeReservation, updateReservationStatus, getPropertyOwnerPayPalId, fetchCart, paymentSuccess } from '../../../../Api/api';
 import { Link } from 'react-router-dom';
 import { AuthProvider } from '../../../Component/AuthContext/AuthContext';
 import Navbar from '../../../Component/Navbar/navbar';
@@ -213,6 +213,8 @@ const Cart = () => {
       // Close the payment modal
       setShowPaymentModal(false);
       setSelectedReservation(null);
+
+      await paymentSuccess(selectedReservation.reservationid);
       
       return true;
     } catch (error) {
