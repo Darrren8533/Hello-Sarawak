@@ -444,7 +444,7 @@ export const requestBooking = async (reservationid) => {
 
     if(!response) {
       const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to send booking request');
+      throw new Error(errorData.message || 'Failed to send booking request notification');
     }
 
     return await response.json();
@@ -469,7 +469,7 @@ export const acceptBooking = async (reservationid) => {
 
     if (!response) {
       const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to accept booking');
+      throw new Error(errorData.message || 'Failed to send booking accepted notification');
     }
 
     return await response.json();
@@ -494,7 +494,7 @@ export const suggestNewRoom = async (propertyid, reservationid) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(responseData.message || 'Failed to suggest new room');
+      throw new Error(responseData.message || 'Failed to send new room suggested notification');
     }
 
     return await response.json();
@@ -519,7 +519,7 @@ export const propertyListingRequest = async (propertyid) => {
 
     if(!response) {
       const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to send property listing request');
+      throw new Error(errorData.message || 'Failed to send property listing request notification');
     }
 
     return await response.json();
@@ -647,7 +647,7 @@ export const rejectSuggestedRoom = async (propertyid) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(responseData.message || 'Failed to reject suggested room');
+      throw new Error(responseData.message || 'Failed to send suggested room rejected notification');
     }
 
     return await response.json();
