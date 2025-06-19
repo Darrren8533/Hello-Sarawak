@@ -291,12 +291,19 @@ const Operators = () => {
   const columns = [
     { header: 'ID', accessor: 'userid' },
     {
-      header: 'Operator',
+      header: 'Username',
       accessor: 'operator',
       render: (operator) => (
         <UserActivityCell user={operator} />
       ),
     },
+    {
+      header: 'Name',
+      accessor: 'name',
+      render: (operator) => (
+          `${operator.ufirstname.trim()} ${operator.ulastname.trim()}`
+      ),
+  },
     { header: 'Email', accessor: 'uemail' },
     {
       header: 'Role',
