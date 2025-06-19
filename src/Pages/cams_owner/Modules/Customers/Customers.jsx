@@ -114,11 +114,19 @@ const Customers = () => {
     };
 
     const columns = [
+        { header: 'UID', accessor: 'userid' },
         {
-            header: 'Customer',
+            header: 'Username',
             accessor: 'customer',
             render: (customer) => (
                <UserActivityCell user={customer} />
+            ),
+        },
+        {
+            header: 'Name',
+            accessor: 'name',
+            render: (customer) => (
+                `${customer.ufirstname.trim()} ${customer.ulastname.trim()}`
             ),
         },
         { header: 'Email', accessor: 'uemail' },
