@@ -231,8 +231,10 @@ const Reservations = () => {
                     (reservation.totalprice?.toString().toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
-                     (formatDate(reservation.checkindatetime).includes(searchKey)) ||
-                     (formatDate(reservation.checkoutdatetime).includes(searchKey))
+                    (formatDate(reservation.checkindatetime).includes(searchKey)) ||
+                    (formatDate(reservation.checkoutdatetime).includes(searchKey)) ||
+                    (reservation.rcfirstname?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.rclastname?.toLowerCase().includes(searchKey.toLowerCase()) || '')
                 )
         )
         : [];
@@ -425,6 +427,13 @@ const Reservations = () => {
                 ) : (
                     <span>No Image</span>
                 ),
+        },
+        {
+            header: 'Name',
+            accessor: 'name',
+            render: (reservation) => (
+                `${reservation.rcfirstname.trim()} ${reservation.rclastname.trim()}`
+            ),
         },
         { header: 'Property Name', accessor: 'propertyaddress' },
         { header: 'Total Price', accessor: 'totalprice' },
