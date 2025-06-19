@@ -55,7 +55,7 @@ const BooknPayLog = () => {
   ];
 
   const displayLabels = {
-    userid: 'UID',
+    username: 'Actioned By',
     timestamp: 'Timestamp',
     action: 'Action',
   };
@@ -78,6 +78,7 @@ const BooknPayLog = () => {
         userid: log.userid || 'N/A',
         timestamp: log.timestamp || 'N/A',
         action: log.action || 'N/A',
+        username: log.username || 'N/A',
       };
       setSelectedLog(essentialFields);
     }
@@ -88,9 +89,9 @@ const BooknPayLog = () => {
   ];
 
   const columns = [
-    { header: 'UID', accessor: 'userid' },
     { header: 'Timestamp', accessor: 'timestamp' },
     { header: 'Action', accessor: 'action' },
+    { header: 'Actioned By', accessor: 'username' },
     {
       header: 'Actions',
       accessor: 'actions',
