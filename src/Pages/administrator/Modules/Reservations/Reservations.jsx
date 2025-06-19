@@ -252,7 +252,9 @@ const Reservations = () => {
                     (reservation.request?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (reservation.reservationstatus?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
                     (formatDate(reservation.checkindatetime).includes(searchKey)) ||
-                    (formatDate(reservation.checkoutdatetime).includes(searchKey))
+                    (formatDate(reservation.checkoutdatetime).includes(searchKey)) ||
+                    (reservation.rcfirstname?.toLowerCase().includes(searchKey.toLowerCase()) || '') ||
+                    (reservation.rclastname?.toLowerCase().includes(searchKey.toLowerCase()) || '')
                 )
         )
         : [];
@@ -447,6 +449,13 @@ const Reservations = () => {
                 ),
         },
         { header: 'Property Name', accessor: 'propertyaddress' },
+        {
+            header: 'Name',
+            accessor: 'name',
+            render: (reservation) => (
+                `${reservation.rcfirstname.trim()} ${reservation.rclastname.trim()}`
+            ),
+        },
         { header: 'Total Price', accessor: 'totalprice' },
         {
             header: 'Check-In Date',
