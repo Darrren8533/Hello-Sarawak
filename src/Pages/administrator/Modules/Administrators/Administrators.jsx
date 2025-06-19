@@ -98,12 +98,19 @@ const Administrators = () => {
   const columns = [
     { header: 'UID', accessor: 'userid' },
     {
-      header: 'Administrator',
+      header: 'Username',
       accessor: 'administrator',
       render: (administrator) => (
         <UserActivityCell user={administrator} />
       ),
     },
+    {
+      header: 'Name',
+      accessor: 'name',
+      render: (administrator) => (
+          `${administrator.ufirstname.trim()} ${administrator.ulastname.trim()}`
+      ),
+  },
     { header: 'Email', accessor: 'uemail' },
     {
       header: 'Status',
