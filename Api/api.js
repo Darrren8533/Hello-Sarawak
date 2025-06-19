@@ -1321,3 +1321,28 @@ export const fetchCategories = async () => {
     throw error; 
   }
 };
+
+// Payment Successful Notification
+export const paymentSuccess = async (reservationid) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+  
+  try {
+    const response = await fetch(`${API_URL}/payment_success/${reservationid}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to send payment successful notification');
+    }
+
+    return await response.json();
+  }catch (error) {
+    console.error('API error: ', error);
+    throw error;
+  }
+};
