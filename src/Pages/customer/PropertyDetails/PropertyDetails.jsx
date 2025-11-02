@@ -164,19 +164,23 @@ const PropertyDetails = () => {
           name === "checkOut" ? value : prev.checkOut
         );
 
-        // Check for date overlap
+        // Check for date overlap via backend API
         if (value && (name === "checkIn" ? prev.checkOut : prev.checkIn)) {
-          const checkIn = new Date(name === "checkIn" ? value : prev.checkIn);
-          const checkOut = new Date(name === "checkOut" ? value : prev.checkOut);
-          const existingCheckin = new Date(propertyDetails.checkindatetime);
-          const existingCheckout = new Date(propertyDetails.checkoutdatetime);
-          
-          const hasOverlap = checkIn < existingCheckout && checkOut > existingCheckin;
-          setIsDateOverlapping(hasOverlap);
-        }
-      }
+          const checkIn = name === "checkIn" ? value : prev.checkIn;
+          const checkOut = name === "checkOut" ? value : prev.checkOut;
 
-      return updatedData;
+        // Call backend API for overlap check
+        checkDateOverlap(propertyDetails.id, checkIn, checkOut)
+          .then((result) => {
+            setIsDateOverlapping(result.overlap);
+          })
+          .catch((error) => {
+            console.error("Error checking date overlap:", error);
+          });
+      }
+    }
+
+    return updatedData;
     });
   };
 
