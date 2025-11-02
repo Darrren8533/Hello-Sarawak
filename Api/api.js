@@ -1353,7 +1353,7 @@ export const checkDateOverlap = async (propertyId, checkIn, checkOut) => {
   const creatorUsername = localStorage.getItem("username");
 
   try {
-    const response = await fetch(${API_URL}/check-date-overlap/${propertyId}?creatorid=${creatorid}&creatorUsername=${creatorUsername}, {
+    const response = await fetch(`${API_URL}/check-date-overlap/${propertyId}?creatorid=${creatorid}&creatorUsername=${creatorUsername}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
