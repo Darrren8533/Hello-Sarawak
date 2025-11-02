@@ -16,7 +16,7 @@ import Toast from '../../../Component/Toast/Toast';
 import Reviews from '../../../Component/Reviews/Reviews';
 import Footer from '../../../Component/Footer/footer';
 import './PropertyDetails.css';
-import { createReservation, requestBooking, getCoordinates, fetchUserData } from '../../../../Api/api';
+import { createReservation, requestBooking, getCoordinates, fetchUserData, checkDateOverlap } from '../../../../Api/api';
 
 const facilities = [
     { name: "Wi-Fi", icon: <FaWifi className="facilities-icon"/> },
