@@ -1348,20 +1348,30 @@ export const paymentSuccess = async (reservationid) => {
 };
 
 // add for checking date overlapping
-import axios from "axios";
-
-const API_BASE_URL = "http://localhost:5000/api";
-
+// Check Date Overlap
 export const checkDateOverlap = async (propertyId, checkIn, checkOut) => {
   try {
-    const res = await axios.post(`${API_BASE_URL}/check-date-overlap`, {
-      propertyId,
-      checkIn,
-      checkOut,
+    const response = await fetch(`${API_URL}/check-date-overlap`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        propertyId,
+        checkIn,
+        checkOut,
+      }),
     });
-    return res.data; // { overlap: true/false }
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to check date overlap');
+    }
+
+    return await response.json(); // { overlap: true/false }
   } catch (error) {
-    console.error("Error checking date overlap:", error);
+    console.error('API error:', error);
     throw error;
   }
 };
+
