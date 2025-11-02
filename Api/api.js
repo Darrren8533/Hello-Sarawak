@@ -1348,30 +1348,26 @@ export const paymentSuccess = async (reservationid) => {
 };
 
 // add for checking date overlapping
-// Check Date Overlap
 export const checkDateOverlap = async (propertyId, checkIn, checkOut) => {
+  const creatorid = localStorage.getItem("userid");
+  const creatorUsername = localStorage.getItem("username");
+
   try {
-    const response = await fetch(`${API_URL}/check-date-overlap`, {
+    const response = await fetch(${API_URL}/check-date-overlap/${propertyId}?creatorid=${creatorid}&creatorUsername=${creatorUsername}, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        propertyId,
-        checkIn,
-        checkOut,
-      }),
     });
 
-    if (!response.ok) {
+    if (!response) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Failed to check date overlap');
     }
 
-    return await response.json(); // { overlap: true/false }
+    return await response.json(); // should return { overlap: true/false }
   } catch (error) {
     console.error('API error:', error);
     throw error;
   }
 };
-
