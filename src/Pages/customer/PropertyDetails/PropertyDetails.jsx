@@ -1252,3 +1252,15 @@ const PropertyDetails = () => {
 };
 
 export default PropertyDetails;
+
+// add for checking date overlapping
+import { checkDateOverlap } from "./api";
+
+const handleBookingValidation = async () => {
+  const result = await checkDateOverlap(propertyDetails.id, bookingData.checkIn, bookingData.checkOut);
+  if (result.overlap) {
+    setIsDateOverlapping(true);
+  } else {
+    setIsDateOverlapping(false);
+  }
+};
