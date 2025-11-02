@@ -1346,3 +1346,22 @@ export const paymentSuccess = async (reservationid) => {
     throw error;
   }
 };
+
+// add for checking date overlapping
+import axios from "axios";
+
+const API_BASE_URL = "http://localhost:5000/api";
+
+export const checkDateOverlap = async (propertyId, checkIn, checkOut) => {
+  try {
+    const res = await axios.post(`${API_BASE_URL}/check-date-overlap`, {
+      propertyId,
+      checkIn,
+      checkOut,
+    });
+    return res.data; // { overlap: true/false }
+  } catch (error) {
+    console.error("Error checking date overlap:", error);
+    throw error;
+  }
+};
