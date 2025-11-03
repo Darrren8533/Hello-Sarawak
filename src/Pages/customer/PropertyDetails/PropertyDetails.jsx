@@ -169,14 +169,13 @@ const PropertyDetails = () => {
           const checkIn = name === "checkIn" ? value : prev.checkIn;
           const checkOut = name === "checkOut" ? value : prev.checkOut;
 
-        // Call backend API for overlap check
-        checkDateOverlap(propertyDetails.id, checkIn, checkOut)
-          .then((result) => {
-            setIsDateOverlapping(result.overlap);
-          })
-          .catch((error) => {
-            console.error("Error checking date overlap:", error);
-          });
+          const isOverlap = await checkDateOverlap(propertyDetails.id, checkIn);
+
+          if (!isOverlap) {
+              displayToast('error', 'Failed to check date overlapping');
+          } else if (isOverlap === true) {
+              setIsDateOverlapping(true);
+          }
       }
     }
 
