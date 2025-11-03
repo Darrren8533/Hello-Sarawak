@@ -172,7 +172,7 @@ const PropertyDetails = () => {
        const checkOut = name === "checkOut" ? value : bookingData.checkOut;
 
        try {
-         const isOverlap = await checkDateOverlap(propertyDetails.id, checkIn);
+         const isOverlap = await checkDateOverlap(propertyDetails.propertyid, checkIn);
 
          if (isOverlap === true) {
            setIsDateOverlapping(true);
