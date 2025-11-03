@@ -1348,7 +1348,7 @@ export const paymentSuccess = async (reservationid) => {
 };
 
 // add for checking date overlapping
-export const checkDateOverlap = async (propertyId, checkIn, checkOut) => {
+export const checkDateOverlap = async (propertyId, checkIn) => {
   const creatorid = localStorage.getItem("userid");
   const creatorUsername = localStorage.getItem("username");
 
