@@ -146,43 +146,49 @@ const PropertyDetails = () => {
     }
   }, [location.key]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setBookingData((prev) => {
-      const updatedData = { ...prev, [name]: value };
+  const handleInputChange = async (e) => {
+   const { name, value } = e.target;
+   setBookingData((prev) => {
+     const updatedData = { ...prev, [name]: value };
 
-      if (
-        (name === "checkIn" && new Date(value) >= new Date(prev.checkOut)) ||
-        (name === "checkOut" && new Date(prev.checkIn) >= new Date(value))
-      ) {
-        updatedData.checkOut = "";
-      }
+     if (
+       (name === "checkIn" && new Date(value) >= new Date(prev.checkOut)) ||
+       (name === "checkOut" && new Date(prev.checkIn) >= new Date(value))
+     ) {
+       updatedData.checkOut = "";
+     }
 
-      if (name === "checkIn" || name === "checkOut") {
-        calculatetotalprice(
-          name === "checkIn" ? value : prev.checkIn,
-          name === "checkOut" ? value : prev.checkOut
-        );
+     return updatedData;
+   });
 
-        // Check for date overlap via backend API
-        if (value && (name === "checkIn" ? prev.checkOut : prev.checkIn)) {
-          const checkIn = name === "checkIn" ? value : prev.checkIn;
-          const checkOut = name === "checkOut" ? value : prev.checkOut;
+   if (name === "checkIn" || name === "checkOut") {
+     calculatetotalprice(
+       name === "checkIn" ? value : bookingData.checkIn,
+       name === "checkOut" ? value : bookingData.checkOut
+     );
 
-          const isOverlap = await checkDateOverlap(propertyDetails.id, checkIn);
+     if (value && (name === "checkIn" ? bookingData.checkOut : bookingData.checkIn)) {
+       const checkIn = name === "checkIn" ? value : bookingData.checkIn;
+       const checkOut = name === "checkOut" ? value : bookingData.checkOut;
 
-          if (!isOverlap) {
-              displayToast('error', 'Failed to check date overlapping');
-          } else if (isOverlap === true) {
-              setIsDateOverlapping(true);
-          }
-      }
-    }
+       try {
+         const isOverlap = await checkDateOverlap(propertyDetails.id, checkIn);
 
-    return updatedData;
-    });
-  };
-
+         if (isOverlap === true) {
+           setIsDateOverlapping(true);
+         } else if (isOverlap === false) {
+           setIsDateOverlapping(false);
+         } else {
+           displayToast('error', 'Failed to check date overlapping');
+         }
+       } catch (error) {
+         console.error(error);
+         displayToast('error', 'Error checking date overlap');
+       }
+     }
+   }
+ };
+    
   const nextSlide = () => {
     setCurrentSlide(prev => 
       prev === propertyDetails.propertyimage.length - 1 ? 0 : prev + 1
