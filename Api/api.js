@@ -1358,14 +1358,16 @@ export const checkDateOverlap = async (propertyId, checkIn) => {
       headers: {
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ checkIn }),
     });
 
-    if (!response) {
+    if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || 'Failed to check date overlap');
     }
 
-    return await response.json(); // should return { overlap: true/false }
+    const data = await response.json();
+    return data.overlap;
   } catch (error) {
     console.error('API error:', error);
     throw error;
